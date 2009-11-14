@@ -21,7 +21,7 @@ public class Main {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        serverFrame.main(null);
+        new serverFrame();
 //        int port = 10500;
 //        Net net = new Net(port);
 //        net.startAcceptingClients();

@@ -11,6 +11,8 @@ package org.amse.bomberman.server.gameInit;
 public class Player {
 
     private String nickName = "unnamed";
+    
+    private int lives=3;
     private int id = 1;
     private int x = 0;
     private int y = 0;
@@ -22,6 +24,22 @@ public class Player {
     public Player(String nickName, int id) {
         this.nickName = nickName;
         this.id = id;
+    }
+
+    public boolean isAlive() {
+        return (this.lives > 0);
+    }
+    
+    public boolean canPlaceBomb(){
+        return (this.bombs < this.maxBombs);
+    }
+    
+    public void placedBomb(){
+        this.bombs+=1;
+    }
+    
+    public void detonatedBomd(){
+        this.bombs-=1;
     }
 
     public void setID(int id) {
@@ -46,5 +64,13 @@ public class Player {
 
     public void setY(int y) {
         this.y = y;
+    }
+    
+    public void bombed(){
+        this.lives-=1;
+    }
+    
+    public int getRadius(){
+        return this.explRadius;
     }
 }

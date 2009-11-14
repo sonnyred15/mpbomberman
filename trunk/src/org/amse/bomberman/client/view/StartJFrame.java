@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import org.amse.bomberman.client.model.Model;
+import javax.swing.SwingConstants;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 
@@ -22,12 +22,12 @@ import org.amse.bomberman.client.net.IConnector;
  */
 public class StartJFrame extends JFrame {
     private static final int PORT = 10500;
-    private final int height = 240;
-    private final int width = 320;
+    private final int height = 150;
+    private final int width = 240;
     private JButton connectJButton = new JButton();
-    private JButton ipDefault = new JButton();
+    //private JButton ipDefault = new JButton();
     private JTextField ipTF = new JTextField();
-    private JButton portDefault = new JButton();
+    //private JButton portDefault = new JButton();
     private JTextField portTF = new JTextField();
 
     public StartJFrame() {
@@ -39,30 +39,44 @@ public class StartJFrame extends JFrame {
 
         Container c = getContentPane();
         c.setLayout(new FlowLayout());
+
         Box bottomBox = Box.createHorizontalBox();
-        bottomBox.add(new JLabel("IP"));
-        bottomBox.add(Box.createHorizontalStrut(10));
-        ipTF.setPreferredSize(new Dimension(150, 20));
+        JLabel ipLabel = new JLabel("IP");
+        ipLabel.setPreferredSize(new Dimension(width/8, 20));
+        ipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        bottomBox.add(ipLabel);
+       // bottomBox.add(Box.createHorizontalStrut(10));
+        ipTF.setPreferredSize(new Dimension(width/2, 20));
+        try {
+            ipTF.setText(InetAddress.getByName("localhost").getHostAddress());
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }
         bottomBox.add(ipTF);
-        bottomBox.add(Box.createHorizontalStrut(10));
-        bottomBox.add(ipDefault);
+        //bottomBox.add(Box.createHorizontalStrut(10));
+        //bottomBox.add(ipDefault);
 
         Box centralBox = Box.createHorizontalBox();
-        centralBox.add(new JLabel("Port"));
-        centralBox.add(Box.createHorizontalStrut(10));
-        portTF.setPreferredSize(new Dimension(150, 20));
+        JLabel portLabel = new JLabel("Port");
+        portLabel.setPreferredSize(new Dimension(width/8, 20));
+        portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        centralBox.add(portLabel);
+        //centralBox.add(Box.createHorizontalStrut(10));
+        portTF.setPreferredSize(new Dimension(width/2, 20));
+        portTF.setText("" + PORT);
         centralBox.add(portTF);
-        centralBox.add(Box.createHorizontalStrut(10));
-        centralBox.add(portDefault);
+        //centralBox.add(Box.createHorizontalStrut(10));
+        //centralBox.add(portDefault);
         
         c.add(bottomBox);
         c.add(centralBox);
         c.add(connectJButton);
 
-        ipDefault.setAction(new DefaultIPAction(this));
-        portDefault.setAction(new DefaultPortAction(this));
+        //ipDefault.setAction(new DefaultIPAction(this));
+        //portDefault.setAction(new DefaultPortAction(this));
         connectJButton.setAction(new ConnectAction(this));
 
+        setResizable(false);
         setVisible(true);
     }
     public InetAddress getIPAddress() throws UnknownHostException {
@@ -79,7 +93,7 @@ public class StartJFrame extends JFrame {
         sb.append(portValue);
         portTF.setText(sb.toString());
     }
-    public static class DefaultIPAction extends AbstractAction {
+    /*public static class DefaultIPAction extends AbstractAction {
         StartJFrame parent;
 
         public DefaultIPAction(StartJFrame jFrame) {
@@ -108,10 +122,9 @@ public class StartJFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             parent.setPort(PORT);
         }
-    }
+    }*/
     public static class ConnectAction extends AbstractAction {
         StartJFrame parent;
-        boolean isConnected = false;
 
         public ConnectAction(StartJFrame jFrame) {
             parent = jFrame;
@@ -121,28 +134,15 @@ public class StartJFrame extends JFrame {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            if (!isConnected) {
-                IConnector con = Connector.getInstance();
-                try {
-                    con.сonnect(parent.getIPAddress(), parent.getPort());
-                    //parent.dispose();
-                    isConnected = true;
-                    putValue(NAME, "DISCONNECT");
-                    parent.repaint();
-                    ServerInfoJFrame serverJFrame = new ServerInfoJFrame();
-                } catch (UnknownHostException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                // is this true??? or method dissconect is designed for
-                // dissconnect from game only?
-                IConnector model = Connector.getInstance();
-                model.disconnect();
-                isConnected = false;
-                putValue(NAME, "CONNECT");
-                parent.repaint();
+            IConnector con = Connector.getInstance();
+            try {
+                con.сonnect(parent.getIPAddress(), parent.getPort());
+                parent.dispose();
+                ServerInfoJFrame serverJFrame = new ServerInfoJFrame();
+            } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }

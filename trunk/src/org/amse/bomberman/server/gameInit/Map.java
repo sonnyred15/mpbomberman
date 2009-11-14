@@ -107,7 +107,7 @@ public final class Map {
      * @return True if map[x][y]=-16
      */
     public boolean isMine(int x, int y) {
-        return (this.mapArray[x][y] == Constants.MAP_MINE);
+        return (this.mapArray[x][y] == Constants.MAP_BOMB);
     }
 
     /**

@@ -10,8 +10,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTable;
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.Map;
+import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
@@ -93,15 +92,15 @@ public class ServerInfoJFrame extends JFrame{
         if (gameNumber != -1 && table.getValueAt(gameNumber, 0) != null) {
             IConnector connect = Connector.getInstance();
             connect.joinGame(gameNumber);
-            //----------------------------------------------------------------
-            connect.startGame();
+            //------------------------------------------------------------
+            BombMap map = connect.getMap();
             Model model = (Model) Model.getInstance();
-            Map map = connect.getMap();
             model.setMap(map);
             MapJFrame frame = new MapJFrame(map);
             model.addListener(frame);
-            //----------------------------------------------------------------
-            this.dispose();
+            connect.beginUpdating();
+            //-------------------------------------------------------------
+            this.setVisible(false);
         }
     }
 
