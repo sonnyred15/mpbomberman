@@ -15,7 +15,6 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.Timer;
 import org.amse.bomberman.server.gameInit.Game;
 import org.amse.bomberman.server.gameInit.Map;
 import org.amse.bomberman.server.gameInit.Player;
@@ -113,11 +112,12 @@ public class Session extends Thread {
                     try {
                         direction = Integer.parseInt(query.substring(1, 2));
                         if (direction < 0 || direction > 3) {
-                            throw new NumberFormatException("Unsupported direction. Error on client side.");
+                            throw new NumberFormatException("Unsupported direction. Error on client side.");                            
                         }
                         moved = this.game.doMove(player, direction);
                     } catch (NumberFormatException ex) {
                         System.out.println(ex.getMessage() + " Direction must be int from 0 to 3.");
+                        break;
                     }
                     if(moved){
                         timer.setStartTime(System.currentTimeMillis());
@@ -147,6 +147,11 @@ public class Session extends Thread {
                 sendAnswer("Disconnected.", null);
                 break;
             }
+            case Commands.PLACE_BOMB: {
+                this.game.placeBomb(this.player);
+                sendAnswer("ok", null);
+                break;
+            }
             default: {
                 sendAnswer("Wrong query. Unrecognized command!", null);
             }
@@ -171,8 +176,10 @@ public class Session extends Thread {
 
         if (counter == 0) {
             this.sendAnswer("No Games Finded.", null);//"???change to no UNSTARTED Games???"
+            return;
         } else {
             this.sendAnswer(null, linesToSend);
+            return;
         }
     }
 
@@ -197,6 +204,7 @@ public class Session extends Thread {
             Game g = new Game(new Map(mapName + ".map"), gameName, maxPlayers);
             this.net.addGame(g);
             sendAnswer("Game created.", null);
+            return;
         } catch (FileNotFoundException ex) {
             sendAnswer("No such map on server.", null);
             return;

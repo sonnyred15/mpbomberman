@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.Map;
+import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Model;
 
 /**
@@ -17,16 +17,21 @@ import org.amse.bomberman.client.model.Model;
  */
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
+    private final Color WALL_COLOR = Color.BLUE;
+    private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
     private final Color PLAYER1_COLOR = Color.GREEN;
-    private final Color PLAYER2_COLOR = Color.ORANGE;
+    private final Color PLAYER2_COLOR = Color.CYAN;
     private final Color PLAYER3_COLOR = Color.PINK;
+    private final Color BOMB_COLOR = Color.BLACK;
+    private final Color EXPLODE_COLOR = Color.RED;
+    private final Color BEAM_COLOR = Color.ORANGE;
     private final int height = 650;
     private final int width = 650;
 
-    public MapJFrame(Map map) {
+    public MapJFrame(BombMap map) {
         super("BomberMan");
         setSize(width, height);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocation(400, 100);
         setMinimumSize(new Dimension(width / 2, height / 2));
         
@@ -43,17 +48,18 @@ public class MapJFrame extends JFrame implements IView{
         }
         this.refresh(map);
         this.addKeyListener(new MapJFrameListener());
+        this.setJMenuBar(new MapJMenuBar(this));
         setResizable(false);
         setVisible(true);
     }
 
     public void update() {
         IModel model = Model.getInstance();
-        Map newMap = model.getMap();
+        BombMap newMap = model.getMap();
         this.refresh(newMap);
         this.repaint();
     }
-    private void refresh(Map map) {
+    private void refresh(BombMap map) {
         int num = map.getSize();
         for (int i = 0; i < num; i++) {
             for (int j = 0; j < num; j++) {
@@ -66,27 +72,35 @@ public class MapJFrame extends JFrame implements IView{
             this.setPreferredSize(new Dimension(size, size));
         }
         public void setContent(int key) {
-            if (key == Map.EMPTY) {
-                this.setBackground(Color.LIGHT_GRAY);
+            Color value = null;
+            switch (key) {
+                case BombMap.EMPTY: { 
+                    value = EMPTY_COLOR;
+                    this.setBorder(new LineBorder(EMPTY_COLOR));
+                    break;
+                }
+                case BombMap.BOMB: { value = BOMB_COLOR; break;}
+                case BombMap.EXPLODED_BOMB: { value = EXPLODE_COLOR; break;}
+                case BombMap.BOMB_BEAM: { value = BEAM_COLOR; break;}
+            }
+            if (key < BombMap.EMPTY && key >= BombMap.BOMB_PROOF_WALL) {
+                value = WALL_COLOR;
+                this.setBorder(new LineBorder(Color.BLACK));
             } else {
-                if (key < Map.EMPTY && key >= Map.BOMB_PROOF_WALL) {
-                    this.setBackground(Color.blue);
-                    this.setBorder(new LineBorder(Color.BLACK));
-                } else {
-                    if (key > Map.EMPTY && key <= Map.MAX_PLAYERS) {
-                        // only for 2 players yet
-                        if (key == 1) {
-                            this.setBackground(PLAYER1_COLOR);
+                if (key > BombMap.EMPTY && key <= BombMap.MAX_PLAYERS) {
+                    // only for 2 players yet
+                    if (key == 1) {
+                        value = PLAYER1_COLOR;
+                    } else {
+                        if (key == 2) {
+                            value = PLAYER2_COLOR;
                         } else {
-                            if (key == 2) {
-                                this.setBackground(PLAYER2_COLOR);
-                            } else {
-                                this.setBackground(PLAYER3_COLOR);
-                            }
+                            value = PLAYER3_COLOR;
                         }
                     }
                 }
             }
+            this.setBackground(value);
         }
     }
 }

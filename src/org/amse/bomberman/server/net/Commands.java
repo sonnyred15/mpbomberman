@@ -17,6 +17,7 @@ public class Commands {
     public static final int GET_MAP_ARRAY = 4;
     public static final int START_GAME = 5;
     public static final int LEAVE_GAME = 6;
+    public static final int PLACE_BOMB = 7;
 
     private Commands() {
     }

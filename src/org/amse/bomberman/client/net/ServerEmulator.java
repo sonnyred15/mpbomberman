@@ -9,7 +9,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import org.amse.bomberman.client.model.Map;
+import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.model.Player;
 
 /**
@@ -26,7 +27,7 @@ public class ServerEmulator extends Thread{
     private final int port =10500;
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private Map map;
+    private BombMap map;
 
     public ServerEmulator() throws IOException {
         serverSocket = new ServerSocket(port,0,InetAddress.getByName("localhost"));
@@ -76,7 +77,7 @@ public class ServerEmulator extends Thread{
             case ServerEmulator.CREATE_HOST:{
                 //createHost();
                 try {
-                    map = new Map("input2.txt");
+                    map = new BombMap("input2.txt");
                 } catch (FileNotFoundException ex) {
                     System.out.println(ex.getMessage());
                 } catch (UnsupportedOperationException ex) {
@@ -95,8 +96,8 @@ public class ServerEmulator extends Thread{
                 break;
             }
             case ServerEmulator.DO_MOVE:{
-                int direction=Integer.parseInt(query.substring(1, 2));
-                map.movePlayer(1, direction);
+                int dir=Integer.parseInt(query.substring(1, 2));
+                map.movePlayer(1, Direction.getDirection(dir));
                 sendOK();
                 break;
             }

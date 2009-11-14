@@ -8,7 +8,12 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import org.amse.bomberman.client.model.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.model.IModel;
+import org.amse.bomberman.client.model.Model;
 
 /**
  *
@@ -17,6 +22,7 @@ import org.amse.bomberman.client.model.Map;
 public class Connector implements IConnector{
     private Socket socket;
     private static IConnector connector= null;
+    private volatile boolean updating=false;
 
     private Connector() {
     }
@@ -31,7 +37,7 @@ public class Connector implements IConnector{
         this.socket = new Socket(address, port);
     }
     // is realy able to???
-    public void disconnect() {
+    public void leaveGame() {
         System.out.println(queryAnswer("6").get(0));
         System.out.println();
     }
@@ -51,17 +57,23 @@ public class Connector implements IConnector{
         System.out.println(queryAnswer("2" + n).get(0));
         System.out.println();
     }
-    public boolean doMove(int direction) {
-        String res = queryAnswer("3" + direction).get(0);
+    public boolean doMove(Direction dir) {
+        String res = queryAnswer("3" + dir.getInt()).get(0);
         return (res.charAt(0) == 't');
     }
     public void startGame(){
         System.out.println(queryAnswer("5").get(0));
         System.out.println();
     }
-    public Map getMap(){
+    public void beginUpdating() {
+         // must be here or somewhere else???
+        Timer timer = new Timer();
+        // period???
+        timer.schedule(new UpdateTimerTask(), (long)0,(long) 200);
+    }
+    public BombMap getMap(){
         ArrayList<String> mp = queryAnswer("4");
-        Map map = null;
+        BombMap map = null;
         int i = 0;
         for (String string : mp) {
             // first is size
@@ -73,7 +85,7 @@ public class Connector implements IConnector{
             } else {
                 // what does exception throw????
                 try {
-                map = new Map((int)Integer.parseInt(string));
+                    map = new BombMap((int)Integer.parseInt(string));
                 } catch (NumberFormatException ex){
                     ex.printStackTrace();
                     System.out.println(ex.getMessage());
@@ -84,7 +96,13 @@ public class Connector implements IConnector{
         }
         return map;
     }
-    public ArrayList<String> queryAnswer(String query){
+    public void plantBomb() {
+        System.out.println(queryAnswer("7").get(0));
+        System.out.println();
+    }
+
+    private ArrayList<String> queryAnswer(String query){        
+        updating=true;
         PrintWriter out = null;
         BufferedReader in = null;
         ArrayList<String> answer=null;
@@ -106,6 +124,19 @@ public class Connector implements IConnector{
             System.out.println("Client: Answer received.");
         } catch (Exception e) {
         }
+        updating = false;
         return answer;
+    }
+     private class UpdateTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            if(!updating){
+                updating=true;
+                Model model = (Model)Model.getInstance();
+                model.setMap(getMap());
+                updating=false;
+                System.out.println("Map has been updated.");
+            }
+        }
     }
 }

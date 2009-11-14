@@ -2,11 +2,10 @@ package org.amse.bomberman.client.view;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.Map;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.IConnector;
 /**
- *
  * @author michail korovkin
  */
 public class MapJFrameListener implements KeyListener{
@@ -16,23 +15,26 @@ public class MapJFrameListener implements KeyListener{
     }
 
     public void keyPressed(KeyEvent e) {
-        IModel model = Model.getInstance();
-        // only for player with number 1 ???
+        IConnector connector = Connector.getInstance();
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT : {
-                model.movePlayer(1, Map.LEFT);
+                connector.doMove(Direction.LEFT);
                 break;
             }
             case KeyEvent.VK_UP: {
-                model.movePlayer(1, Map.UP);
+                connector.doMove(Direction.UP);
                 break;
             }
             case KeyEvent.VK_RIGHT: {
-                model.movePlayer(1, Map.RIGHT);
+                connector.doMove(Direction.RIGHT);
                 break;
             }
             case KeyEvent.VK_DOWN: {
-                model.movePlayer(1, Map.DOWN);
+                connector.doMove(Direction.DOWN);
+                break;
+            }
+            case KeyEvent.VK_SPACE: {
+                connector.plantBomb();
                 break;
             }
             default: return;

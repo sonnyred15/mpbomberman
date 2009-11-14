@@ -6,8 +6,8 @@ package org.amse.bomberman.server.gameInit;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.server.gameInit.IModel.IModel;
-import org.amse.bomberman.server.gameInit.IModel.impl.Model;
+import org.amse.bomberman.server.gameInit.imodel.IModel;
+import org.amse.bomberman.server.gameInit.imodel.impl.Model;
 
 /**
  *
@@ -26,7 +26,8 @@ public class Game {
         this.gameName = gameName;
         this.maxPlayers = map.getMaxPlayers();
         this.players = new ArrayList<Player>();
-        this.model = new Model(map);
+        this.model = new Model(map, this);
+                             //CHECK ^ THIS!//
     }
 
     public Game(Map map, String gameName, int maxPlayers) {
@@ -50,6 +51,12 @@ public class Game {
     public void disconnect(Player player) {
         this.players.remove(player);
         this.model.removePlayer(player.getID());
+    }
+
+    public void placeBomb(Player player) {
+        if (this.started!=false){
+            this.model.placeBomb(player);
+        }
     }
 
     public void startGame() {
@@ -81,5 +88,13 @@ public class Game {
 
     public String getName() {
         return this.gameName;
+    }
+    
+    public void playerBombed(int id){
+        for (Player player : players) {
+            if (player.getID()==id){
+                player.bombed();
+            }
+        }
     }
 }
