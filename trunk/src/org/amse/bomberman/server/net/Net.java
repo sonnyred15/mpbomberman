@@ -19,22 +19,27 @@ import org.amse.bomberman.server.gameInit.Game;
  */
 public class Net {
 
-    private int port = 10500;
+    public static int DEFAULT_PORT = 10500;
+    private int port;
     private List<Game> games;
     private ServerSocket serverSocket;
     private boolean exit;
     private Thread listeningThread;
 
     /**
-     * 
-     * @throws java.io.IOException if we have error while opening the socket.
+     * Constructor with default port.
      */
-    public Net() throws IOException {
+    public Net() {
+        this.port = Net.DEFAULT_PORT;
         this.exit = false;
         this.games = new ArrayList<Game>();
     }
 
-    public Net(int port) throws IOException {
+    /**
+     * Constructor that creating Net object with port param.
+     * @param port Free port number. Port must be between 0 and 65535, inclusive.
+     */
+    public Net(int port) {
         this();
         this.port = port;
     }
@@ -63,7 +68,8 @@ public class Net {
         this.exit = true;
         if (this.serverSocket != null) {
             this.serverSocket.close();// to shutdown without waiting timeout.
-        //CHECK ^ THIS//
+        //CHECK ^ THIS//is thi is normal to close socket.
+        //or maybe it is better to make so called "fake-connect"
         }
         this.listeningThread = null;
     }
@@ -79,9 +85,9 @@ public class Net {
     public List<Game> getGamesList() {
         return this.games;
     }
-    
+
     public boolean isShutdowned() {
-        return this.exit;       
+        return this.exit;
     }
 
     private class SocketListen implements Runnable {
@@ -93,7 +99,7 @@ public class Net {
 
         public SocketListen(Net net) {
             this.net = net;
-        }      
+        }
 
         public void run() {
             System.out.println("Server: started.");
