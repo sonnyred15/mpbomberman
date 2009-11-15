@@ -22,7 +22,6 @@ import org.amse.bomberman.client.model.Model;
 public class Connector implements IConnector{
     private Socket socket;
     private static IConnector connector= null;
-    private volatile boolean updating=false;
 
     private Connector() {
     }
@@ -101,8 +100,7 @@ public class Connector implements IConnector{
         System.out.println();
     }
 
-    private ArrayList<String> queryAnswer(String query){        
-        updating=true;
+    private synchronized ArrayList<String> queryAnswer(String query){
         PrintWriter out = null;
         BufferedReader in = null;
         ArrayList<String> answer=null;
@@ -124,19 +122,15 @@ public class Connector implements IConnector{
             System.out.println("Client: Answer received.");
         } catch (Exception e) {
         }
-        updating = false;
         return answer;
     }
-     private class UpdateTimerTask extends TimerTask {
+
+    private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
-            if(!updating){
-                updating=true;
                 Model model = (Model)Model.getInstance();
                 model.setMap(getMap());
-                updating=false;
                 System.out.println("Map has been updated.");
-            }
         }
     }
 }
