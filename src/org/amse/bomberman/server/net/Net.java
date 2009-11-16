@@ -63,6 +63,7 @@ public class Net {
             this.serverSocket = new ServerSocket(port, 0); // throws IOExeption
             this.listeningThread = new Thread(new SocketListen(this));
             this.listeningThread.start();
+            this.games = new ArrayList<Game>();
         } else {
             throw new IllegalStateException("Already accepting. Can`t raise server.");
         }
