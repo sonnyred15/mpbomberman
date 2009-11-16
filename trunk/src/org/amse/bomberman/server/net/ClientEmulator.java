@@ -12,7 +12,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import org.amse.bomberman.server.net.Session;
 
 /**
  *
@@ -46,7 +45,7 @@ public class ClientEmulator {
     }
 
     public void joinGame(int n) {
-        System.out.println(queryAnswer("2" + n).get(0));
+        System.out.println(queryAnswer("2 " + n).get(0));
         System.out.println();
     }
 

@@ -4,7 +4,6 @@
  */
 package org.amse.bomberman.server.gameInit.imodel;
 
-import javax.swing.event.ChangeListener;
 import org.amse.bomberman.server.gameInit.Player;
 
 /**
@@ -13,13 +12,12 @@ import org.amse.bomberman.server.gameInit.Player;
  */
 public interface IModel {
 
-    public void placeBomb(Player player);
+    void placeBomb(Player player);
 
     boolean doMove(Player player, int direction);
 
     void removePlayer(int playerID);
-//  void notifyListeners();
-//  void addChangeListener(ChangeListener changeModelListener);
+
     int[][] getMapArray();
 
     void printToConsole();

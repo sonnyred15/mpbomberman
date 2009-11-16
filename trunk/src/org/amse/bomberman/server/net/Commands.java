@@ -5,10 +5,10 @@
 package org.amse.bomberman.server.net;
 
 /**
- *
+ * 
  * @author chibis
  */
-public class Commands {
+public final class Commands {
 
     public static final int GET_GAMES = 0;
     public static final int CREATE_GAME = 1;
