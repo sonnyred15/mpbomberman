@@ -5,8 +5,8 @@
 package org.amse.bomberman.server;
 
 import java.io.IOException;
-import java.net.BindException;
-import org.amse.bomberman.server.net.Net;
+import org.amse.bomberman.util.ILog;
+import org.amse.bomberman.util.impl.ConsoleLog;
 
 /**
  *
@@ -18,6 +18,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, InterruptedException {
-        new serverFrame();
+        ILog errorLog = new ConsoleLog();
+        new serverFrame(errorLog);
     }
 }

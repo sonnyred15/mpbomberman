@@ -21,16 +21,16 @@ public class Game {
     private List<Player> players;
     private IModel model;
 
-    public Game(Map map, String gameName) {
+    public Game(GameMap map, String gameName) {
         this.started = false;
         this.gameName = gameName;
         this.maxPlayers = map.getMaxPlayers();
         this.players = new ArrayList<Player>();
         this.model = new Model(map, this);
-                             //CHECK ^ THIS!//
+    //CHECK ^ THIS!//
     }
 
-    public Game(Map map, String gameName, int maxPlayers) {
+    public Game(GameMap map, String gameName, int maxPlayers) {
         this(map, gameName);
         if (maxPlayers > 0 && maxPlayers <= this.maxPlayers) {
             this.maxPlayers = maxPlayers;
@@ -38,7 +38,7 @@ public class Game {
     }
 
     public Player join(String name) {
-        if (players.size() == this.maxPlayers) {
+        if (players.size() == this.maxPlayers) { //CHECK < THIS// what if size>max???
             return null;
         } else {
             Player player = new Player(name, players.size() + 1);
@@ -48,13 +48,13 @@ public class Game {
         }
     }
 
-    public void disconnect(Player player) {
+    public void disconnectFromGame(Player player) {
         this.players.remove(player);
         this.model.removePlayer(player.getID());
     }
 
     public void placeBomb(Player player) {
-        if (this.started!=false){
+        if (this.started != false) {
             this.model.placeBomb(player);
         }
     }
@@ -72,10 +72,11 @@ public class Game {
 
     public boolean doMove(Player player, int direction) {
         if (this.started != false) {
-            return model.doMove(player, direction);
-        } else {
-            return false;
+            if (player.isAlive()) {
+                return model.doMove(player, direction);
+            }
         }
+        return false;
     }
 
     public int[][] getMapArray() {
@@ -89,11 +90,14 @@ public class Game {
     public String getName() {
         return this.gameName;
     }
-    
-    public void playerBombed(int id){
+
+    public void playerBombed(int id) {
         for (Player player : players) {
-            if (player.getID()==id){
+            if (player.getID() == id) {
                 player.bombed();
+                if (!player.isAlive()) {
+                    model.removePlayer(id);
+                }
             }
         }
     }

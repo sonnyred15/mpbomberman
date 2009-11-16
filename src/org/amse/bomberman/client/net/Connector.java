@@ -53,7 +53,7 @@ public class Connector implements IConnector{
         System.out.println();
     }
     public void joinGame(int n) {
-        System.out.println(queryAnswer("2" + n).get(0));
+        System.out.println(queryAnswer("2 " + n).get(0));
         System.out.println();
     }
     public boolean doMove(Direction dir) {

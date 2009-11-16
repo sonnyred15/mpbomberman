@@ -17,9 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.amse.bomberman.server.net.Net;
+import org.amse.bomberman.util.ILog;
 
 /**
- *
+ * Server startup window.
  * @author Kirilchuck V.E.
  */
 public class serverFrame extends JFrame {
@@ -32,12 +33,12 @@ public class serverFrame extends JFrame {
     private AbstractButton stopButton = new JButton("Down");
 
     /** Creates new form serverFrame */
-    public serverFrame() throws IOException {
+    public serverFrame(final ILog errorLog) throws NumberFormatException {
 
         /*initial form properties*/
         this.setTitle("server control");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setMinimumSize(new Dimension(190, 90));
+        this.setMinimumSize(new Dimension(200, 100));
         this.setResizable(false);
         this.setLocation(300, 300);
 
@@ -50,7 +51,7 @@ public class serverFrame extends JFrame {
         portPanel.add(portField);
         this.add(portPanel);
 
-        /*server raisel and server shutdown buttons*/
+        /*server raise and server shutdown buttons*/
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         buttonPanel.add(startButton);
@@ -62,17 +63,33 @@ public class serverFrame extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 try {
-                    int port = Integer.parseInt(portField.getText());
+                    port = Integer.parseInt(portField.getText());
 
                     if (port < 0 || port > 65535) {
-                        throw new NumberFormatException();
+                        throw new NumberFormatException(); //catching
                     }
-                    net = new Net(port);
+                    if (net == null) {
+                        net = new Net(port);
+                    } else if (net.getPort() != port) {
+                        if (!net.isShutdowned()) {
+                            net.stopAcceptingClients();
+                        }
+                        errorLog.println("Raising server on new port");
+                        net = new Net(port);
+                    }
+
                     net.startAcceptingClients();
-                } catch (NumberFormatException ex) {
-                    portField.setText("Must be int from 1 to 65535(incl)");
-                } catch (IOException ex) {
-                    portField.setText("Port is already in use");
+
+                } catch (NumberFormatException ex) { //parse errors
+                    String s = ". Must be int from 1 to 65535(inclusive)";
+                    portField.setText("Error");
+                    errorLog.println(ex.getMessage() + s);
+                } catch (IOException ex) { //sockets errors                   
+                    portField.setText("Error");
+                    errorLog.println(ex.getMessage());
+                } catch (IllegalStateException ex) {
+                    portField.setText("Error");
+                    errorLog.println(ex.getMessage());
                 }
             }
         });
@@ -81,9 +98,17 @@ public class serverFrame extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 try {
-                    net.stopAcceptingClients();
+                    if (net != null) {
+                        net.stopAcceptingClients();
+                    } else {
+                        throw new IllegalStateException("No server. Can`t shutdown.");
+                    }
                 } catch (IOException ex) {
-                    portField.setText("Error while closing socket");
+                    portField.setText("Error");
+                    errorLog.println(ex.getMessage());
+                } catch (IllegalStateException ex) {
+                    portField.setText("Error");
+                    errorLog.println(ex.getMessage());
                 }
             }
         });

@@ -8,22 +8,21 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import org.amse.bomberman.server.gameInit.Constants;
 
 /**
  *
  * @author chibis
  */
-public final class Map {
+public final class GameMap {
 
     private int maxPlayers = Constants.MAX_PLAYERS;
     private int dimension;
     private int[][] mapArray;
 
-    private Map() {
+    private GameMap() {
     }
 
-    public Map(int[][] mapArray) {
+    public GameMap(int[][] mapArray) { //CHECK < THIS// What if we get non square matrix???
         this.dimension = mapArray.length;
         this.mapArray = mapArray;
         this.maxPlayers = countMaxPlayers(this.mapArray);
@@ -35,7 +34,7 @@ public final class Map {
      * @throws java.io.FileNotFoundException if no file with such name found
      * @throws java.io.IOException if an error occurs while reading from file.
      */
-    public Map(String fileName) throws FileNotFoundException, IOException {
+    public GameMap(String fileName) throws FileNotFoundException, IOException {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(fileName));
@@ -114,8 +113,9 @@ public final class Map {
      *
      * @param x
      * @param y
-     * @return 1 if block undestroyable
+     * @return 1 if block undestroyable.
      * n in [2..8] if destroyable by n mines.
+     * -1 if it is not block.
      */
     public int blockAt(int x, int y) {
         int square = this.mapArray[x][y];
@@ -159,7 +159,6 @@ public final class Map {
             }
         }
     }
-    
     //remove `unused` players from map
     public void changeMapForCurMaxPlayers(int curMaxPlayers) {
         for (int i = curMaxPlayers + 1; i <= this.maxPlayers; ++i) {
