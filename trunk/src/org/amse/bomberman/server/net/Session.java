@@ -15,10 +15,10 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.amse.bomberman.server.gameInit.Constants;
-import org.amse.bomberman.server.gameInit.Game;
-import org.amse.bomberman.server.gameInit.GameMap;
-import org.amse.bomberman.server.gameInit.Player;
+import org.amse.bomberman.server.gameinit.Constants;
+import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.ILog;
 
 /**

@@ -1,28 +1,38 @@
 package org.amse.bomberman.client.view;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 
 /**
- * @author maverick
+ * @author michail korovkin
  */
 public class MapJMenuBar extends JMenuBar{
      private MapJFrame parent = null;
      JMenu game = new JMenu("Game");
-     JMenuItem leave = new JMenuItem("Leave");
-     JMenuItem start = new JMenuItem("Start");
+     JMenuItem leave = new JMenuItem();
+     JMenuItem start = new JMenuItem();
+     JMenuItem exit = new JMenuItem("Exit");
 
      public MapJMenuBar(MapJFrame frame) {
          parent = frame;
          game.add(start);
          game.add(leave);
+         game.addSeparator();
+         game.add(exit);
          leave.setAction(new LeaveAction(parent));
          start.setAction(new StartAction(parent));
+         exit.addActionListener(new ActionListener() {
+             public void actionPerformed(ActionEvent e) {
+                 System.exit(0);
+             }
+         });
          this.add(game);
      }
     public static class LeaveAction extends AbstractAction {
@@ -36,7 +46,9 @@ public class MapJMenuBar extends JMenuBar{
         }
         public void actionPerformed(ActionEvent e) {
             parent.dispose();
+            Model.getInstance().removeListener(parent);
             Connector.getInstance().leaveGame();
+            ServerInfoJFrame serv = new ServerInfoJFrame();
         }
     }
     public static class StartAction extends AbstractAction {

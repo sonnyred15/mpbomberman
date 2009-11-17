@@ -2,16 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.gameInit.imodel.impl;
+package org.amse.bomberman.server.gameinit.imodel.impl;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.amse.bomberman.server.gameInit.Constants;
-import org.amse.bomberman.server.gameInit.Game;
-import org.amse.bomberman.server.gameInit.imodel.IModel;
-import org.amse.bomberman.server.gameInit.GameMap;
-import org.amse.bomberman.server.gameInit.Player;
+import org.amse.bomberman.server.gameinit.Constants;
+import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameinit.imodel.IModel;
+import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.Player;
 
 /**
  *

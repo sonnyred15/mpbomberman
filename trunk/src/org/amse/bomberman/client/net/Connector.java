@@ -22,6 +22,7 @@ import org.amse.bomberman.client.model.Model;
 public class Connector implements IConnector{
     private Socket socket;
     private static IConnector connector= null;
+    private Timer timer;
 
     private Connector() {
     }
@@ -35,8 +36,9 @@ public class Connector implements IConnector{
     public void сonnect(InetAddress address, int port) throws UnknownHostException, IOException {
         this.socket = new Socket(address, port);
     }
-    // is realy able to???
     public void leaveGame() {
+        // true stop timer?
+        timer.cancel();
         System.out.println(queryAnswer("6").get(0));
         System.out.println();
     }
@@ -66,7 +68,7 @@ public class Connector implements IConnector{
     }
     public void beginUpdating() {
          // must be here or somewhere else???
-        Timer timer = new Timer();
+        timer = new Timer();
         // period???
         timer.schedule(new UpdateTimerTask(), (long)0,(long) 200);
     }
