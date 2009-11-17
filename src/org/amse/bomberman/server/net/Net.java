@@ -11,7 +11,7 @@ import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.server.gameInit.Game;
+import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.ILog;
 import org.amse.bomberman.util.impl.ConsoleLog;
 import org.amse.bomberman.util.impl.FileLog;

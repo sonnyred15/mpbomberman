@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.gameInit;
+package org.amse.bomberman.server.gameinit;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

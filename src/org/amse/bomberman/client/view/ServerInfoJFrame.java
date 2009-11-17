@@ -71,36 +71,38 @@ public class ServerInfoJFrame extends JFrame{
         }
         IConnector connect = Connector.getInstance();
         ArrayList<String> games = connect.takeGamesList();
-        if (games.get(0).charAt(0) == '0') {
+        // if not "No games"
+        if (games.get(0).charAt(0) != 'N') {
             int counter = 0;
             for (String game : games) {
                 String[] buf = game.split(":");
                 table.setValueAt(buf[0], counter, 0);
                 table.setValueAt(buf[1], counter, 1);
+                // only for early version
                 table.setValueAt("1.map", counter, 2);
                 table.setValueAt("?", counter, 3);
                 table.setValueAt(4, counter, 4);
                 counter++;
             }
-        } else {
-            table.setValueAt("...", 0, 0);
         }
         table.repaint();
     }
     private void join() {
-        int gameNumber = table.getSelectedRow();
-        if (gameNumber != -1 && table.getValueAt(gameNumber, 0) != null) {
+        if (table.getSelectedRow() != -1
+                && table.getValueAt(table.getSelectedRow(), 0) != null) {
+            int gameNumber = Integer.parseInt(
+                    (String) table.getValueAt(table.getSelectedRow(), 0));
             IConnector connect = Connector.getInstance();
             connect.joinGame(gameNumber);
             //------------------------------------------------------------
             BombMap map = connect.getMap();
             Model model = (Model) Model.getInstance();
-            model.setMap(map);
             MapJFrame frame = new MapJFrame(map);
             model.addListener(frame);
+            model.setMap(map);
             connect.beginUpdating();
             //-------------------------------------------------------------
-            this.setVisible(false);
+            this.dispose();
         }
     }
 

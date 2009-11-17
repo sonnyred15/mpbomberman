@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.gameInit.imodel;
+package org.amse.bomberman.server.gameinit.imodel;
 
-import org.amse.bomberman.server.gameInit.Player;
+import org.amse.bomberman.server.gameinit.Player;
 
 /**
  *
