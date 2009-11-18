@@ -9,6 +9,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Model;
@@ -20,12 +22,12 @@ import org.amse.bomberman.client.net.IConnector;
  * @author michail korovkin
  */
 public class ServerInfoJFrame extends JFrame{
-    private final int width = 640;
-    private final int height = 480;
+    private final int width = 500;
+    private final int height = 375;
     private JButton createJButton = new JButton();
     private JButton joinJButton = new JButton();
     private JButton refreshJButton = new JButton();
-    private JTable table = null;
+    private JTable table;
     private final Dimension buttonSize = new Dimension(200,40);
 
     
@@ -103,6 +105,10 @@ public class ServerInfoJFrame extends JFrame{
             connect.beginUpdating();
             //-------------------------------------------------------------
             this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "You did't select the game! "
+                         + " Do this and then click join."
+                        , "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

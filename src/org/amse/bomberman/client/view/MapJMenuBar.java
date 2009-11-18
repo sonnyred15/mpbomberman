@@ -64,6 +64,7 @@ public class MapJMenuBar extends JMenuBar{
             //----------------------------------------------------------------
             IConnector connect = Connector.getInstance();
             connect.startGame();
+            this.setEnabled(false);
             //----------------------------------------------------------------
         }
     }

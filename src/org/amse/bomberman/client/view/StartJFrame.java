@@ -11,6 +11,7 @@ import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.client.net.Connector;
@@ -141,8 +142,15 @@ public class StartJFrame extends JFrame {
                 ServerInfoJFrame serverJFrame = new ServerInfoJFrame();
             } catch (UnknownHostException ex) {
                 ex.printStackTrace();
+                JOptionPane.showMessageDialog(parent,"Can not connect to: " 
+                        + ex.getMessage() + " Please check server IP."
+                        , "Error", JOptionPane.ERROR_MESSAGE);
             } catch (IOException ex) {
                 ex.printStackTrace();
+                JOptionPane.showMessageDialog(parent,"Can not connect to the server."
+                        + "\nPerhaps it is unavailable now\nor you set incorrect " +
+                        "server Address.\nPlease check server IP and port."
+                        , "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
