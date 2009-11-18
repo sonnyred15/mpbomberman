@@ -31,7 +31,7 @@ public class MapJFrame extends JFrame implements IView{
     public MapJFrame(BombMap map) {
         super("BomberMan");
         setSize(width, height);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(400, 100);
         setMinimumSize(new Dimension(width / 2, height / 2));
         
