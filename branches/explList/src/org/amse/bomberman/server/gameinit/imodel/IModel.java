@@ -4,6 +4,8 @@
  */
 package org.amse.bomberman.server.gameinit.imodel;
 
+import java.util.List;
+import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 
 /**
@@ -19,6 +21,8 @@ public interface IModel {
     void removePlayer(int playerID);
 
     int[][] getMapArray();
+
+    List<Pair> getExplosionSquares();
 
     void printToConsole();
 

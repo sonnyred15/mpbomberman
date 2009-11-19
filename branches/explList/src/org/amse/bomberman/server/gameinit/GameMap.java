@@ -105,7 +105,7 @@ public final class GameMap {
      * @param y
      * @return True if map[x][y]=-16
      */
-    public boolean isMine(int x, int y) {
+    public boolean isBomb(int x, int y) {
         return (this.mapArray[x][y] == Constants.MAP_BOMB);
     }
 

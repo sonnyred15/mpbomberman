@@ -82,6 +82,10 @@ public class Game {
     public int[][] getMapArray() {
         return this.model.getMapArray();
     }
+    
+    public List<Pair> getExplosionSquares(){
+        return this.model.getExplosionSquares();
+    }
 
     public boolean isStarted() {
         return this.started;

@@ -18,6 +18,7 @@ import java.util.List;
 import org.amse.bomberman.server.gameinit.Constants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.ILog;
 
@@ -48,13 +49,13 @@ public class Session extends Thread {
         PrintWriter out = null;
         try {
             out = new PrintWriter(this.clientSocket.getOutputStream());
-            log.println("Session: Sending answer...");
+            writeToLog("Session: Sending answer...");
             out.println(shortAnswer);
 
             out.println();
             out.flush();
         } catch (IOException ex) {
-            log.println(ex.getMessage() + " In sendAnswer method.");
+            writeToLog(ex.getMessage() + " In sendAnswer method.");
         }
     }
 
@@ -67,28 +68,28 @@ public class Session extends Thread {
         try {
             out = new PrintWriter(this.clientSocket.getOutputStream());
 
-            log.println("Session: Sending answer...");
+            writeToLog("Session: Sending answer...");
 
             if (linesToSend != null) {
                 for (String string : linesToSend) {
                     out.println(string);
                 }
             } else {
-                log.println("ERROR in Session. Tryed to send 0 Strings to CLient in sendAnswer()");
+                writeToLog("ERROR in Session. Tryed to send 0 Strings to CLient in sendAnswer()");
                 throw new IllegalArgumentException("MUST SEND AT LEAST ONE STRING!!!");//CHECK < THIS//                
             }
 
             out.println();
             out.flush();
         } catch (IOException ex) {
-            log.println(ex.getMessage() + " In sendAnswer method.");
+            writeToLog(ex.getMessage() + " In sendAnswer method.");
         }
     }
 
     private void answerOnCommand(String query) {
         if (query.length() == 0) {
             sendShortAnswer("Empty query received. Error on client side.");
-            log.println("Empty query received. Error on client side. query=" + query);
+            writeToLog("Empty query received. Error on client side. query=" + query);
             return;
         }
 
@@ -96,7 +97,7 @@ public class Session extends Thread {
         try {
             command = Integer.parseInt(query.substring(0, 1));
         } catch (NumberFormatException nEx) {
-            log.println(nEx.getMessage() +
+            writeToLog(nEx.getMessage() +
                     "First char of command must be int from 0 to 9. " +
                     "Error command from client.");
         }
@@ -126,7 +127,7 @@ public class Session extends Thread {
             }
             case Commands.GET_MAP_ARRAY: {
                 //"4"
-                sendMap(this.game.getMapArray());
+                sendMap();
                 break;
             }
             case Commands.START_GAME: {
@@ -146,7 +147,7 @@ public class Session extends Thread {
             }
             default: {
                 sendShortAnswer("Wrong query. Unrecognized command!");
-                log.println("Getted wrong query. Unrecognized command!" +
+                writeToLog("Getted wrong query. Unrecognized command!" +
                         " query=" + query);
             }
         }
@@ -170,11 +171,11 @@ public class Session extends Thread {
 
         if (counter == 0) {
             this.sendShortAnswer("No Games Finded.");//"???change to no UNSTARTED Games???"
-            log.println("Tryed to get games list. No unstarted games finded");
+            writeToLog("Tryed to get games list. No unstarted games finded");
             return;
         } else {
             this.sendAnswer(linesToSend);
-            log.println(" Tryed to get games list. Some games sended");
+            writeToLog(" Tryed to get games list. Some games sended");
             return;
         }
     }
@@ -193,7 +194,7 @@ public class Session extends Thread {
                 maxPlayers = Integer.parseInt(args[3]);
             } catch (NumberFormatException nEx) {
                 sendShortAnswer("Wrong command parameters. Error on client side.");
-                log.println(" Tryed to create game, canceled. " +
+                writeToLog(" Tryed to create game, canceled. " +
                         "Wrong command parameters. Error on client side.");
                 return;
             }
@@ -202,7 +203,7 @@ public class Session extends Thread {
             Game g = new Game(new GameMap(mapName + ".map"), gameName, maxPlayers);
             this.net.addGame(g);
             sendShortAnswer("Game created.");
-            log.println("Tryed to create game. " +
+            writeToLog("Tryed to create game. " +
                     "Game created. Map=" + mapName +
                     " gameName=" + gameName +
                     " maxPlayers=" + maxPlayers +
@@ -210,14 +211,14 @@ public class Session extends Thread {
             return;
         } catch (FileNotFoundException ex) {
             sendShortAnswer("No such map on server.");
-            log.println("Tryed to create game, canceled. " +
+            writeToLog("Tryed to create game, canceled. " +
                     "Map wasn`t founded on server." +
                     " Map=" + mapName +
                     " query=" + query);
             return;
         } catch (IOException ex) {
             sendShortAnswer("Error on server side, while loading map.");
-            log.println("Tryed to create game, canceled. " +
+            writeToLog("Tryed to create game, canceled. " +
                     "Error on server side while loading map." +
                     " Map=" + mapName +
                     " query=" + query);
@@ -238,7 +239,7 @@ public class Session extends Thread {
                 } catch (NumberFormatException ex) {
                     sendShortAnswer("Wrong command parameters. Error on client side." +
                             " gameID must be int.");
-                    log.println(ex.getMessage() + " Wrong command parameters. " +
+                    writeToLog(ex.getMessage() + " Wrong command parameters. " +
                             "Error on client side. gameID must be int." +
                             " query=" + query);
                 }
@@ -250,7 +251,7 @@ public class Session extends Thread {
                 } catch (NumberFormatException ex) {
                     sendShortAnswer("Wrong command parameters. Error on client side." +
                             " gameID must be int.");
-                    log.println(ex.getMessage() + " Wrong command parameters. " +
+                    writeToLog(ex.getMessage() + " Wrong command parameters. " +
                             "Error on client side. gameID must be int." +
                             " query=" + query);
                 }
@@ -259,7 +260,7 @@ public class Session extends Thread {
             }
             default: {
                 sendShortAnswer("Wrong command parameters. Error on client side.");
-                log.println(" Wrong command parameters. Error on client side." +
+                writeToLog(" Wrong command parameters. Error on client side." +
                         " query=" + query);
                 break;
             }
@@ -271,12 +272,12 @@ public class Session extends Thread {
                 this.player = gameToJoin.join(playerName);
                 if (this.player == null) {                    
                     sendShortAnswer("Game is full. Try to join later.");
-                    log.println("Tryed to join to full game, canceled");
+                    writeToLog("Tryed to join to full game, canceled");
                     return;
                 } else {
                     this.game = gameToJoin;
                     sendShortAnswer("Joined.");
-                    log.println("Tryed to join to the game. Joined." +
+                    writeToLog("Tryed to join to the game. Joined." +
                             " GameID=" + gameID +
                             " Player=" + playerName +
                             " query=" + query);
@@ -284,13 +285,13 @@ public class Session extends Thread {
                 }
             } else {
                 sendShortAnswer("Game was  already started.");
-                log.println("Tryed to join gameID=" + gameID + " but canceled " +
+                writeToLog("Tryed to join gameID=" + gameID + " but canceled " +
                         "cause game is already started ");
                 return;
             }
         } else { //if game==null true;
             sendShortAnswer("No such game.");
-            log.println("Tryed to join gameID=" + gameID + " but canceled " +
+            writeToLog("Tryed to join gameID=" + gameID + " but canceled " +
                     "no such game on server. ");
             return;
         }
@@ -298,7 +299,7 @@ public class Session extends Thread {
 
     public void doMove(String query) {
         if (this.game != null) {
-            if (timer.getDiff() > Constants.stepTime) {
+            if (timer.getDiff() > Constants.GAME_STEP_TIME) {
                 int direction = 0;
                 boolean moved = false;
                 try {
@@ -308,7 +309,7 @@ public class Session extends Thread {
                     }
                     moved = this.game.doMove(player, direction);
                 } catch (NumberFormatException ex) {
-                    log.println("Tryed to move, canceled. Unsupported direction. Error on client side." +
+                    writeToLog("Tryed to move, canceled. Unsupported direction. Error on client side." +
                             " direction=" + direction +
                             " query=" + query);
                 }
@@ -321,13 +322,13 @@ public class Session extends Thread {
                 return;
             } else { //timer.getDiff < gameStep true
                 sendShortAnswer("false");
-                log.println("Tryed to move, canceled. Moves allowed only every 200ms." +
+                writeToLog("Tryed to move, canceled. Moves allowed only every 200ms." +
                         " query=" + query);
                 return;
             }
         } else { //game == null true
             sendShortAnswer("false");
-            log.println("Tryed to move, canceled. Not joined to any game.");
+            writeToLog("Tryed to move, canceled. Not joined to any game.");
             return;
         }
     }
@@ -337,16 +338,16 @@ public class Session extends Thread {
             if (!this.game.isStarted()) {
                 this.game.startGame();
                 sendShortAnswer("Game started.");
-                log.println("Started game");
+                writeToLog("Started game");
                 return;
             } else {
                 sendShortAnswer("Game is already started.");
-                log.println("Tryed to start started game");
+                writeToLog("Tryed to start started game");
                 return;
             }
         } else{ // game == null true
             sendShortAnswer("Error. Game not started. Not joined to any game.");
-            log.println("Tryed to start game, canceled. Not joined to any game.");
+            writeToLog("Tryed to start game, canceled. Not joined to any game.");
             return;
         }
     }
@@ -357,11 +358,11 @@ public class Session extends Thread {
             this.game = null;
             this.player = null;
             sendShortAnswer("Disconnected.");
-            log.println("Player has  been disconnected from the game");
+            writeToLog("Player has  been disconnected from the game");
             return;
         } else {
             sendShortAnswer("Cant disconnect. You are not in any game");
-            log.println("Tryed to disconnect from game, canceled. Not joined to any game");
+            writeToLog("Tryed to disconnect from game, canceled. Not joined to any game");
             return;
         }
     }
@@ -371,19 +372,20 @@ public class Session extends Thread {
             if (this.game.isStarted()) { 
                 this.game.placeBomb(this.player); //CHECK < THIS// whats about player isAlive?
                 sendShortAnswer("ok");
-                log.println("Tryed to planted bomb." +
+                writeToLog("Tryed to plant bomb." +
                         " playerID=" + this.player.getID() +
                         " x=" + this.player.getX() +
                         " y=" + this.player.getY());
             }
         } else {
             sendShortAnswer("Error.Cant place bomb.");
-            log.println("Tryed to place bomb in illegal state. Not joined to any game.");
+            writeToLog("Tryed to place bomb in illegal state. Not joined to any game.");
         }
     }
 
-    private void sendMap(int[][] map) {
+    private void sendMap() {
         if (this.game != null) {
+            int[][] map = this.game.getMapArray();
             ArrayList<String> linesToSend = new ArrayList<String>();
             linesToSend.add(String.valueOf(map.length));
             for (int i = 0; i < map.length; i++) {
@@ -395,10 +397,18 @@ public class Session extends Thread {
                 buff.deleteCharAt(buff.length() - 1);
                 linesToSend.add(buff.toString());
             }
+            ////////////////explosionSquares//////////////////
+            List<Pair> explSq = this.game.getExplosionSquares();            
+            linesToSend.add(""+explSq.size());
+            for (Pair pair : explSq) {
+                linesToSend.add(pair.getX() + "" + pair.getY());
+            }
+            //////////////////////////////////////////////////
             sendAnswer(linesToSend);
+            writeToLog("Sended mapArray to client");
         } else {
             sendShortAnswer("You are not joined to any game. Error.");
-            log.println("Tryed to getMapArray, canceled. Not joined to any game.");
+            writeToLog("Tryed to getMapArray, canceled. Not joined to any game.");
         }
     }
 
@@ -408,9 +418,9 @@ public class Session extends Thread {
         try {
             this.clientSocket.setSoTimeout(1000); //throws SocketException
         } catch (SocketException ex) {
-            log.println("Exception in Session run method. " + ex.getMessage()); //Error in the underlaying TCP protocol.
+            writeToLog("Exception in Session run method. " + ex.getMessage()); //Error in the underlaying TCP protocol.
         }
-        log.println("Session: Waiting for query from client.");
+        writeToLog("Session: Waiting for query from client.");
         try {
             in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
             String clientQueryLine;
@@ -424,18 +434,18 @@ public class Session extends Thread {
                 if (clientQueryLine == null) {
                     break;
                 }
-                log.println("Session: Query line received: '" + clientQueryLine + "'.");
+                writeToLog("Session: Query line received: '" + clientQueryLine + "'.");
                 answerOnCommand(clientQueryLine);
             }
 
         } catch (IOException ex) { //IO in in.readLine()
-            log.println(ex.getMessage() + " In session.run() method.");
+            writeToLog(ex.getMessage() + " In session.run() method.");
         } finally {
             if (in != null) {
                 try {
                     in.close(); //throws IOException                    
                 } catch (IOException ex) {
-                    log.println("IOException in Session run method while closing `in` stream.");
+                    writeToLog("IOException in Session run method while closing `in` stream.");
                 }
             }
 

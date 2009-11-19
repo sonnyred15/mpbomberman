@@ -25,5 +25,7 @@ public final class Constants {
     public static final int DIRECTION_UP    = 2;
     public static final int DIRECTION_RIGHT = 3;
     
-    public static final long stepTime = 200L;
+    public static final long GAME_STEP_TIME = 200L;
+    public static final long BOMB_TIMER_VALUE = GAME_STEP_TIME*10;
+    public static final long BOMB_DETONATION_TIME = GAME_STEP_TIME*3;
 }
