@@ -401,7 +401,7 @@ public class Session extends Thread {
             List<Pair> explSq = this.game.getExplosionSquares();            
             linesToSend.add(""+explSq.size());
             for (Pair pair : explSq) {
-                linesToSend.add(pair.getX() + "" + pair.getY());
+                linesToSend.add(pair.getX() + " " + pair.getY());
             }
             //////////////////////////////////////////////////
             sendAnswer(linesToSend);

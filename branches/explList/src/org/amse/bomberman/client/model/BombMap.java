@@ -22,11 +22,14 @@ public class BombMap {
     public static final int MAX_PLAYERS = 15;
     private int size;
     private int[][] cells;
-    private List<Player> players;
+    private List<Cell> explosions;
+    
     //perhaps waste
     public BombMap (int size) {
         this.size = size;
         cells = new int[size][size];
+        explosions = new ArrayList<Cell>();
+        
     }
 
     public BombMap(String fileName) throws FileNotFoundException, UnsupportedOperationException, IOException {
@@ -41,7 +44,7 @@ public class BombMap {
                     " Please Check this");
             }
             cells = new int[size][size];
-            players = new ArrayList<Player>();
+            explosions = new ArrayList<Cell>();
             for (int i = 0; i < size; i++) {
                 String[] numbers = br.readLine().split(" ");
                 if (numbers.length < size) {
@@ -67,6 +70,9 @@ public class BombMap {
     public int getValue (int x, int y) {
         return cells[x][y];
     }
+    public ArrayList<Cell> getExplosions() {
+        return (ArrayList)explosions;
+    }
     // perhaps is waste
     public int[][] getMassive() {
         return cells;
@@ -75,7 +81,10 @@ public class BombMap {
     public void setCell(int x, int y, int value) {
         cells[x][y] = value;
     }
-    public void addPlayer(Player player, int x, int y) throws UnsupportedOperationException {
+    public void setExplosions(ArrayList<Cell> expl) {
+        explosions = expl;
+    }
+    /*public void addPlayer(Player player, int x, int y) throws UnsupportedOperationException {
         if (cells[x][y] == BombMap.EMPTY ) {
             if (players.size() < BombMap.MAX_PLAYERS) {
                 players.add(player);
@@ -86,9 +95,9 @@ public class BombMap {
         } else {
             throw new UnsupportedOperationException("Cell is filled already.");
         }
-    }
+    }*/
     // perhaps Player or PlayerName in stead of playerNumber
-    public boolean movePlayer(int playerNumber, Direction direction) {
+    /*public boolean movePlayer(int playerNumber, Direction direction) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (cells[i][j] == playerNumber) {
@@ -106,7 +115,7 @@ public class BombMap {
             }
         }
         return false;
-    }
+    }*/
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -168,25 +177,31 @@ public class BombMap {
                     " for Direction");
         }
     }
-    private class Cell {
+    public static class Cell {
         int myX;
         int myY;
         public Cell (int x, int y) throws UnsupportedOperationException{
-            if (x < 0 || x > size - 1 || y < 0 || y > size - 1) {
+            /*if (x < 0 || x > size - 1 || y < 0 || y > size - 1) {
                 throw new UnsupportedOperationException("Out of Map range.");
-            } else {
+            } else {*/
                 myX = x;
                 myY = y;
-            }
+            //}
+        }
+        public int getX() {
+            return myX;
+        }
+        public int getY() {
+            return myY;
         }
     }
-    private void goToCell(Cell cell, int playerNumber) {
+    /*private void goToCell(Cell cell, int playerNumber) {
         if (cells[cell.myX][cell.myY] < BombMap.BOMB_PROOF_WALL) {
             // different bonuses!!!
             players.get(playerNumber).incBomb();
         }
         cells[cell.myX][cell.myY] = playerNumber;
-    }
+    }*/
     private Cell nextCell(Cell cell, Direction direction)
             throws UnsupportedOperationException {
         switch (direction) {

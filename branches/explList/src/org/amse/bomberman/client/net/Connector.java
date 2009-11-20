@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.BombMap.Cell;
 import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
@@ -75,26 +76,32 @@ public class Connector implements IConnector{
     public BombMap getMap(){
         ArrayList<String> mp = queryAnswer("4");
         BombMap map = null;
-        int i = 0;
-        for (String string : mp) {
-            // first is size
-            if (i != 0) {
-                String[] numbers = string.split(" ");
-                for (int j = 0; j < numbers.length; j++) {
-                    map.setCell(i-1, j, (int)Integer.parseInt(numbers[j]));
-                }
-            } else {
-                // what does exception throw????
-                try {
-                    map = new BombMap((int)Integer.parseInt(string));
-                } catch (NumberFormatException ex){
-                    ex.printStackTrace();
-                    System.out.println(ex.getMessage());
-                    System.out.println(string);
-                }
-            }
-            i++;
+        int n = 0;
+        // what does exception throw????
+        try {
+            n = Integer.parseInt(mp.get(0));
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+            System.out.println(mp.get(0));
         }
+        map = new BombMap(n);
+        for (int i = 0; i < n; i++) {
+            String[] numbers = mp.get(i+1).split(" ");
+            for (int j = 0; j < numbers.length; j++) {
+                map.setCell(i, j, (int) Integer.parseInt(numbers[j]));
+            }
+        }
+        // receive list of explosive
+        int k = Integer.parseInt(mp.get(n+1));
+        ArrayList<Cell> expl = new ArrayList<Cell>(k);
+        for (int i = 0; i < k; i++) {
+            String[] xy = mp.get(i+n+2).split(" ");
+            Cell buf = new Cell((int) Integer.parseInt(xy[0])
+                    , (int) Integer.parseInt(xy[1]));
+            expl.add(buf);
+        }
+        map.setExplosions(expl);
         return map;
     }
     public void plantBomb() {

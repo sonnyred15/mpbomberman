@@ -12,6 +12,10 @@ import org.amse.bomberman.client.view.IView;
 public class Model implements IModel{
     private static IModel model= null;
     private BombMap map;
+    // here?
+    private List<Player> players = new ArrayList<Player>();
+    // waste???
+    private int myNumber = 1;
     private List<IView> listener = new ArrayList<IView>();
 
     private Model() {
@@ -37,6 +41,10 @@ public class Model implements IModel{
     }*/
     public BombMap getMap() {
         return map;
+    }
+    // waste!!!
+    public int getMyNumber() {
+        return myNumber;
     }
     public void addListener(IView view) {
         listener.add(view);

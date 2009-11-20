@@ -4,11 +4,14 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.BombMap.Cell;
 import org.amse.bomberman.client.model.Model;
 
 /**
@@ -18,15 +21,19 @@ import org.amse.bomberman.client.model.Model;
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private final Color WALL_COLOR = Color.BLUE;
+    private final Color WALL_EXPL_COLOR = new Color(0,0,127);
     private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
-    private final Color PLAYER1_COLOR = Color.GREEN;
-    private final Color PLAYER2_COLOR = Color.CYAN;
-    private final Color PLAYER3_COLOR = Color.PINK;
+    private final Color PLAYER1_COLOR = new Color(0,255,0);
+    private final Color PLAYER2_COLOR = new Color(0,200,0);
+    private final Color PLAYER3_COLOR = new Color(0,150,0);
+    private final Color PL_EXPL_COLOR = new Color(63,255,255);
     private final Color BOMB_COLOR = Color.BLACK;
     private final Color EXPLODE_COLOR = Color.RED;
     private final Color BEAM_COLOR = Color.ORANGE;
     private final int height = 650;
     private final int width = 650;
+    // IT IS VERY BAD!!!
+    private int lives = 3;
 
     public MapJFrame(BombMap map) {
         super("BomberMan");
@@ -66,6 +73,12 @@ public class MapJFrame extends JFrame implements IView{
                 cells[i][j].setContent(map.getValue(i, j));
             }
         }
+        ArrayList<Cell> expl = map.getExplosions();
+        for (int i = 0; i < expl.size(); i++){
+            int x = expl.get(i).getX();
+            int y = expl.get(i).getY();
+            cells[x][y].checkExplosion(map.getValue(x, y));
+        }
     }
     private class MyJPanel extends JPanel {
         public MyJPanel(int size) {
@@ -97,6 +110,35 @@ public class MapJFrame extends JFrame implements IView{
                         } else {
                             value = PLAYER3_COLOR;
                         }
+                    }
+                }
+            }
+            this.setBackground(value);
+        }
+        public void checkExplosion(int mapValue){
+            Color value = null;
+            // if it is wall
+            if (mapValue < BombMap.EMPTY && mapValue >= BombMap.BOMB_PROOF_WALL) {
+                value = WALL_EXPL_COLOR;
+            } else {
+                // if it is player
+                if (mapValue > BombMap.EMPTY && mapValue <= BombMap.MAX_PLAYERS) {
+                    value = PL_EXPL_COLOR;
+                    // IT IS BAAAADDD TO DO THAT!!!!!
+                    Model model = (Model)Model.getInstance();
+                    if (mapValue == model.getMyNumber()) {
+                        lives--;
+                        if (lives == 0) {
+                            JOptionPane.showMessageDialog(this, "You are DEAD!!!"
+                        , "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    // if it is center of Explosion
+                    if (mapValue == BombMap.EXPLODED_BOMB) {
+                        
+                    } else {
+                        value = BEAM_COLOR;
                     }
                 }
             }
