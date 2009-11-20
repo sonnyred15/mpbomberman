@@ -77,13 +77,13 @@ public class ServerInfoJFrame extends JFrame{
         if (games.get(0).charAt(0) != 'N') {
             int counter = 0;
             for (String game : games) {
-                String[] buf = game.split(":");
+                String[] buf = game.split(" ");
                 table.setValueAt(buf[0], counter, 0);
                 table.setValueAt(buf[1], counter, 1);
                 // only for early version
                 table.setValueAt("1.map", counter, 2);
-                table.setValueAt("?", counter, 3);
-                table.setValueAt(4, counter, 4);
+                table.setValueAt(buf[2], counter, 3);
+                table.setValueAt(buf[3], counter, 4);
                 counter++;
             }
         }

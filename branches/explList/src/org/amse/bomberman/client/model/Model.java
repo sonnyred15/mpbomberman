@@ -13,9 +13,7 @@ public class Model implements IModel{
     private static IModel model= null;
     private BombMap map;
     // here?
-    private List<Player> players = new ArrayList<Player>();
-    // waste???
-    private int myNumber = 1;
+    private Player player = new Player("Mavr");
     private List<IView> listener = new ArrayList<IView>();
 
     private Model() {
@@ -31,6 +29,12 @@ public class Model implements IModel{
         this.map = map;
         updateListeners();
     }
+    public void setPlayerLives(int lives) {
+        player.setLives(lives);
+    }
+    public int getPlayerLives() {
+        return player.getLife();
+    }
     // only for player from this connector
     /*public boolean movePlayer(int number, Direction dir) {
         if (Connector.getInstance().doMove(dir)) {
@@ -41,10 +45,6 @@ public class Model implements IModel{
     }*/
     public BombMap getMap() {
         return map;
-    }
-    // waste!!!
-    public int getMyNumber() {
-        return myNumber;
     }
     public void addListener(IView view) {
         listener.add(view);

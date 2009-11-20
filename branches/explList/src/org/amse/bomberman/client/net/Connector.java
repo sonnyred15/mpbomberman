@@ -101,6 +101,20 @@ public class Connector implements IConnector{
                     , (int) Integer.parseInt(xy[1]));
             expl.add(buf);
         }
+        // receive player info
+        // k == 1 always
+        int m = Integer.parseInt(mp.get(n+k+2));
+        if (m == 1) {
+            String[] info = new String[6];
+            info = mp.get(n + k + 3).split(" ");
+            int x = Integer.parseInt(info[0]);
+            int y = Integer.parseInt(info[1]);
+            String nick = info[2];
+            int lives = Integer.parseInt(info[3]);
+            int bombs = Integer.parseInt(info[4]);
+            int maxBombs = Integer.parseInt(info[5]);
+            Model.getInstance().setPlayerLives(lives);
+        }
         map.setExplosions(expl);
         return map;
     }

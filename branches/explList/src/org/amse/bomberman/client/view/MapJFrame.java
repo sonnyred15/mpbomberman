@@ -6,8 +6,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
@@ -20,6 +22,7 @@ import org.amse.bomberman.client.model.Model;
  */
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
+    private JLabel livesJLabel;
     private final Color WALL_COLOR = Color.BLUE;
     private final Color WALL_EXPL_COLOR = new Color(0,0,127);
     private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
@@ -30,11 +33,12 @@ public class MapJFrame extends JFrame implements IView{
     private final Color BOMB_COLOR = Color.BLACK;
     private final Color EXPLODE_COLOR = Color.RED;
     private final Color BEAM_COLOR = Color.ORANGE;
-    private final int height = 650;
+    // is really nead???
+    private boolean dead = false;
+    private MapJFrameListener listener = new MapJFrameListener();
+    private final int height = 700;
     private final int width = 650;
-    // IT IS VERY BAD!!!
-    private int lives = 3;
-
+    
     public MapJFrame(BombMap map) {
         super("BomberMan");
         setSize(width, height);
@@ -44,6 +48,11 @@ public class MapJFrame extends JFrame implements IView{
         
         Container c = getContentPane();
         c.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
+        livesJLabel = new JLabel("Lives: 0");
+        // ???
+        livesJLabel.setPreferredSize(new Dimension(width, 30));
+        livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        c.add(livesJLabel);
         int num = map.getSize();
         int size = (width - 50) / num;
         cells = new MyJPanel[num][num];
@@ -54,7 +63,7 @@ public class MapJFrame extends JFrame implements IView{
             }
         }
         this.refresh(map);
-        this.addKeyListener(new MapJFrameListener());
+        this.addKeyListener(listener);
         this.setJMenuBar(new MapJMenuBar(this));
         setResizable(false);
         setVisible(true);
@@ -63,8 +72,24 @@ public class MapJFrame extends JFrame implements IView{
     public void update() {
         IModel model = Model.getInstance();
         BombMap newMap = model.getMap();
+        int lives = model.getPlayerLives();
         this.refresh(newMap);
+        this.refreshLives(lives);
         this.repaint();
+        if (lives <= 0) {
+            if (!dead) {
+                JOptionPane.showMessageDialog(this, "You are dead!!!", "Error"
+                        , JOptionPane.ERROR_MESSAGE);
+                this.removeKeyListener(listener);
+                dead = true;
+            }
+        }
+    }
+    private void refreshLives(int lives) {
+        String buf = livesJLabel.getText();
+        String beginS = buf.substring(0, buf.length() - 1);
+        String result = beginS.concat("" + lives);
+        livesJLabel.setText(result);
     }
     private void refresh(BombMap map) {
         int num = map.getSize();
@@ -124,15 +149,6 @@ public class MapJFrame extends JFrame implements IView{
                 // if it is player
                 if (mapValue > BombMap.EMPTY && mapValue <= BombMap.MAX_PLAYERS) {
                     value = PL_EXPL_COLOR;
-                    // IT IS BAAAADDD TO DO THAT!!!!!
-                    Model model = (Model)Model.getInstance();
-                    if (mapValue == model.getMyNumber()) {
-                        lives--;
-                        if (lives == 0) {
-                            JOptionPane.showMessageDialog(this, "You are DEAD!!!"
-                        , "Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
                 } else {
                     // if it is center of Explosion
                     if (mapValue == BombMap.EXPLODED_BOMB) {
