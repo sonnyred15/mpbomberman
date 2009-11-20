@@ -189,6 +189,9 @@ public class Model implements IModel {
         if (player.canPlaceBomb()) { //player is alive and have bombs to set up
             int x = player.getX();
             int y = player.getY();
+            if (this.map.isBomb(x, y)){
+                return;
+            }
             this.map.setSquare(x, y, Constants.MAP_BOMB);
             DetonateTask dt = new DetonateTask(player, x, y);
             bombes.add(dt);            
@@ -199,18 +202,24 @@ public class Model implements IModel {
     private class ClearExplosion extends TimerTask {
 
         private List<Pair> explSqToClear;
+        private Player player;
         private int bombX;
         private int bombY;
 
-        public ClearExplosion(List<Pair> toClear, Pair bombToClear) {
+        public ClearExplosion(List<Pair> toClear, Pair bombToClear, Player player) {
             this.explSqToClear = toClear;
+            this.player = player;
             this.bombX = bombToClear.getX();
             this.bombY = bombToClear.getY();
         }
 
         @Override
         public void run() {
-            map.setSquare(bombX, bombY, Constants.MAP_EMPTY); //clear from map
+            if (player.getX()==bombX && player.getY()==bombY && player.isAlive()){
+                map.setSquare(bombX, bombY, this.player.getID());    
+            }else{
+                map.setSquare(bombX, bombY, Constants.MAP_EMPTY); //clear from map    
+            }
             for (Pair pair : explSqToClear) { // clear from explosions list
                 explosionSquares.remove(pair);
             }
@@ -236,7 +245,10 @@ public class Model implements IModel {
         @Override
         public void run() {
             ArrayList<Pair> explSq = new ArrayList<Pair>();
-
+            
+            if(this.player.getX()==this.x && this.player.getY()==this.y){
+                player.bombed();
+            }
             map.setSquare(x, y, Constants.MAP_DETONATED_BOMB);
             bombes.remove(this);
             //explotion lines
@@ -285,7 +297,7 @@ public class Model implements IModel {
             }
             explosionSquares.addAll(explSq); //add explosion from this to others
             player.detonatedBomd();
-            timer.schedule(new ClearExplosion(explSq, new Pair(x, y)), Constants.BOMB_DETONATION_TIME);
+            timer.schedule(new ClearExplosion(explSq, new Pair(x, y), this.player), Constants.BOMB_DETONATION_TIME);
         }
 
         public boolean isCorrespondTo(int x, int y) {
