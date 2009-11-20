@@ -25,6 +25,16 @@ public class Player {
         this.id = id;
     }
 
+    public String getInfo() {
+        String ret = this.x + " " +
+                this.y + " " +
+                this.nickName + " " +
+                this.lives + " " +
+                this.bombs + " " +
+                this.maxBombs;
+        return ret;
+    }
+
     public boolean isAlive() {
         return (this.lives > 0);
     }

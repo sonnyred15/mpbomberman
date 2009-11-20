@@ -165,12 +165,14 @@ public class Session extends Thread {
             //send only games that are not started!!!
             if (!g.isStarted()) {
                 ++counter;
-                linesToSend.add(i + ":" + g.getName());
+                linesToSend.add(i + " " + g.getName() + " " +
+                        g.getCurrentPlayers() + " " +
+                        g.getGameMaxPlayers());
             }
         }
 
         if (counter == 0) {
-            this.sendShortAnswer("No Games Finded.");//"???change to no UNSTARTED Games???"
+            this.sendShortAnswer("No unstarted games finded.");//"???change to no UNSTARTED Games???"
             writeToLog("Tryed to get games list. No unstarted games finded");
             return;
         } else {
@@ -371,7 +373,7 @@ public class Session extends Thread {
         if (this.game != null) { // Always if game!=null player is not null too!
             if (this.game.isStarted()) { 
                 this.game.placeBomb(this.player); //CHECK < THIS// whats about player isAlive?
-                sendShortAnswer("ok");
+                sendShortAnswer("Ok.");
                 writeToLog("Tryed to plant bomb." +
                         " playerID=" + this.player.getID() +
                         " x=" + this.player.getX() +
@@ -404,8 +406,15 @@ public class Session extends Thread {
                 linesToSend.add(pair.getX() + " " + pair.getY());
             }
             //////////////////////////////////////////////////
+            
+            ///////////////playerInfo//////////////////
+            String info = this.player.getInfo();
+            linesToSend.add(""+1);
+            linesToSend.add(info);
+            //////////////////////////////////////////
+            
             sendAnswer(linesToSend);
-            writeToLog("Sended mapArray to client");
+            writeToLog("Sended mapArray+explosions+playerInfo to client");
         } else {
             sendShortAnswer("You are not joined to any game. Error.");
             writeToLog("Tryed to getMapArray, canceled. Not joined to any game.");
@@ -479,8 +488,21 @@ public class Session extends Thread {
     }
 
     private void writeToLog(String message) {
-        if (this.log != null) {
+        if (this.log != null && !filtred(message)) {
             this.log.println(message);
         }
+    }
+    
+    private boolean filtred(String message){
+        if (message.equals("Session: Query line received: '4'.")){
+            return true;
+        }
+        if (message.equals("Session: Sending answer...")){
+            return true;
+        }
+        if (message.equals("Sended mapArray to client")){
+            return true;
+        }
+        return false;
     }
 }

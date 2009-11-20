@@ -105,4 +105,12 @@ public class Game {
             }
         }
     }
+    
+    public int getGameMaxPlayers(){
+        return this.maxPlayers;
+    }
+    
+    public int getCurrentPlayers(){
+        return this.players.size();
+    }
 }
