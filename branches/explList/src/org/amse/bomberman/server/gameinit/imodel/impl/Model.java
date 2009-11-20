@@ -104,6 +104,10 @@ public class Model implements IModel {
         }
         this.map.setSquare(newX, newY, player.getID());
 
+        if (explosionSquares.contains(new Pair(newX, newY))){
+            this.game.playerBombed(player.getID());
+        }
+
         player.setX(newX);
         player.setY(newY);
     }
@@ -309,13 +313,15 @@ public class Model implements IModel {
 
                 return false;
             } else if (map.isBomb(x, y)) {  //another bomb
+                DetonateTask dt = null;
                 for (DetonateTask detonateTask : bombes) {
                     if(detonateTask.isCorrespondTo(x, y)){
-                        detonateTask.cancel(); //removeFromTimer
-                        bombes.remove(detonateTask); //removeFromList
-                        detonateTask.run(); //execute
+                        dt = detonateTask;
                     }
                 }
+                dt.cancel(); //removeFromTimer
+                bombes.remove(dt); //removeFromList
+                dt.run(); //execute
                 return false;
             }
             return true; //CHECK < THIS// is this ok?

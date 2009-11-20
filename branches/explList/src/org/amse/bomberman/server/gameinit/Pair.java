@@ -11,19 +11,32 @@ package org.amse.bomberman.server.gameinit;
  */
 public class Pair {
 
-        private int x;
-        private int y;
+    private int x;
+    private int y;
 
-        public Pair(int x, int y) {
-            this.x = x;
-            this.y = y;
+    public Pair(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return this.x;
+    }
+
+    public int getY() {
+        return this.y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this==obj){
+            return true;
         }
-        
-        public int getX(){
-            return this.x;
+        if(! (obj instanceof Pair)){
+            return false;
         }
-        
-        public int getY(){
-            return this.y;
-        }
+        Pair pair = (Pair) obj;
+        return ((this.x==pair.x) && (this.y==pair.y));
+    }
+
 }
