@@ -18,6 +18,7 @@ public final class GameMap {
     private int maxPlayers = Constants.MAX_PLAYERS;
     private int dimension;
     private int[][] mapArray;
+    private String mapName;
 
     private GameMap() {
     }
@@ -26,6 +27,7 @@ public final class GameMap {
         this.dimension = mapArray.length;
         this.mapArray = mapArray;
         this.maxPlayers = countMaxPlayers(this.mapArray);
+        this.mapName = "intArrayMap";
     }
 
     /**
@@ -54,7 +56,7 @@ public final class GameMap {
 
             this.mapArray = arr;
             this.maxPlayers = countMaxPlayers(this.mapArray);
-
+            this.mapName = fileName;
         } catch (NumberFormatException ex) {
             throw new IOException("Incorrect map.");
         } finally {
@@ -74,6 +76,10 @@ public final class GameMap {
 
     public int getMaxPlayers() {
         return this.maxPlayers;
+    }
+
+    public String getName() {
+        return this.mapName;
     }
 
     public int getSquare(int x, int y) {

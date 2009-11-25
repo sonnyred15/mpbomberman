@@ -6,7 +6,7 @@ Server supportes 8 commands from Client:
 
 Description   | Full syntax of query| Answer description| syntax of answer if all is ok
 ------------------------------------------------------------------------------------------------------------------------------
-GET_GAMES     |  "0"                | Unstarted games   | "gameID gameName curPlayers maxPlayers" for each game on next line.|
+GET_GAMES     |  "0"                | Unstarted games   | "gameID gameName mapName curPlayers maxPlayers" each game on next line.|
 CREATE_GAME   |  "1 gN mN mP"       | Confirm or error  | "Game created."                                                    |
 JOIN_GAME     |  "2 gameID playerN" | Confirm or error  | "Joined."                                                          |
 DO_MOVE       |  "3 direction"      | true or false     | "true"                                                             |

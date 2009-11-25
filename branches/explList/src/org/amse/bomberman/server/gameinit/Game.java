@@ -37,6 +37,10 @@ public class Game {
         }
     }
 
+    public String getMapName() {
+        return this.model.getMapName();
+    }
+
     public Player join(String name) {
         if (players.size() == this.maxPlayers) { //CHECK < THIS// what if size>max???
             return null;

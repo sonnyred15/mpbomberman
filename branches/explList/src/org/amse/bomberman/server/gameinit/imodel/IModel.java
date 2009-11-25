@@ -14,6 +14,8 @@ import org.amse.bomberman.server.gameinit.Player;
  */
 public interface IModel {
 
+    public String getMapName();
+
     void placeBomb(Player player);
 
     boolean doMove(Player player, int direction);

@@ -199,6 +199,10 @@ public class Model implements IModel {
         }
     }
 
+    public String getMapName() {
+        return this.map.getName();
+    }
+
     private class ClearExplosion extends TimerTask {
 
         private List<Pair> explSqToClear;
