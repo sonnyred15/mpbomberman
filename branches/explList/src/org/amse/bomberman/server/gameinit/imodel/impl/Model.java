@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.amse.bomberman.server.gameinit.Constants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -129,32 +130,31 @@ public class Model implements IModel {
 
     private int[] newCoords(int x, int y, int direction) {
         int[] arr = new int[2];
-        switch (direction) {
-            case Constants.DIRECTION_DOWN: {
+        Direction dir = Direction.fromInt(direction);
+
+        switch (dir) {
+            case DOWN: {
                 arr[0] = x + 1;
                 arr[1] = y;
                 break;
             }
-            case Constants.DIRECTION_LEFT: {
+            case LEFT: {
                 arr[0] = x;
                 arr[1] = y - 1;
                 break;
             }
-            case Constants.DIRECTION_UP: {
+            case UP: {
                 arr[0] = x - 1;
                 arr[1] = y;
                 break;
             }
-            case Constants.DIRECTION_RIGHT: {
+            case RIGHT: {
                 arr[0] = x;
                 arr[1] = y + 1;
                 break;
             }
-            default: {
-                throw new IllegalArgumentException("Unsupported direction"
-                        + " dir=" + direction + ". In Model.newCoords()");
-            }
         }
+
         return arr;
     }
 

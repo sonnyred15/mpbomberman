@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -74,10 +75,10 @@ public class Game {
         }
     }
 
-    public boolean doMove(Player player, int direction) {
+    public boolean doMove(Player player, Direction direction) {
         if (this.started != false) {
             if (player.isAlive()) {
-                return model.doMove(player, direction);
+                return model.doMove(player, direction.getValue());
             }
         }
         return false;

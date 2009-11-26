@@ -2,57 +2,62 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.net;
+package org.amse.bomberman.server.net.impl;
 
+import org.amse.bomberman.server.net.*;
+import org.amse.bomberman.server.net.impl.Server;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.amse.bomberman.server.gameinit.Constants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Constants.*;
 import org.amse.bomberman.util.ILog;
 
 /**
  *
  * @author chibis
  */
-public class Session extends Thread {
+public class Session extends Thread implements ISession{
 
-    private Net net;
-    private Socket clientSocket;
+    private final Server server;
+    private final Socket clientSocket;
+    private final int sessionID;
+
     private Game game;
     private Player player;
     private MyTimer timer = new MyTimer(System.currentTimeMillis());
-    private ILog log = null; // if log wouldnt be initialized. All wrong messages would be ignored;
+    private ILog log = null; //it can be null. So use writeToLog() instead of log.println()
 
-    private Session() {
-    }
-
-    public Session(Socket clientSocket, Net net, ILog log) {
+    public Session(Server server, Socket clientSocket, int sessionID, ILog log) {
         this.setDaemon(true);
+        this.server = server;
         this.clientSocket = clientSocket;
-        this.net = net;
+        this.sessionID = sessionID;
         this.log = log;
     }
 
     private void sendAnswer(String shortAnswer) {
-        PrintWriter out = null;
+        BufferedWriter out = null;
         try {
-            out = new PrintWriter(this.clientSocket.getOutputStream());
+            out = new BufferedWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
             writeToLog("Session: Sending answer...");
-            out.println(shortAnswer);
-
-            out.println();
+            out.write(shortAnswer);
+            out.newLine();
+            out.write("");
+            out.newLine();
             out.flush();
         } catch (IOException ex) {
             writeToLog(ex.getMessage() + " In sendAnswer method.");
@@ -63,23 +68,26 @@ public class Session extends Thread {
      * Send strings from linesToSend to client.
      * @param linesToSend lines to send.
      */
-    private void sendAnswer(ArrayList<String> linesToSend) {
-        PrintWriter out = null;
+    private void sendAnswer(ArrayList<String> linesToSend) throws IllegalArgumentException {
+        BufferedWriter out = null;
         try {
-            out = new PrintWriter(this.clientSocket.getOutputStream());
+            out = new BufferedWriter(new OutputStreamWriter(
+                    this.clientSocket.getOutputStream()));//throws IOException
 
             writeToLog("Session: Sending answer...");
 
-            if (linesToSend != null) {
-                for (String string : linesToSend) {
-                    out.println(string);
-                }
+            if (linesToSend == null || linesToSend.size() == 0) {
+                writeToLog("ERROR in Session. Tryed to send 0 Strings to client in sendAnswer method");
+                throw new IllegalArgumentException("MUST SEND AT LEAST ONE STRING!!!");
             } else {
-                writeToLog("ERROR in Session. Tryed to send 0 Strings to CLient in sendAnswer()");
-                throw new IllegalArgumentException("MUST SEND AT LEAST ONE STRING!!!");//CHECK < THIS//                
+                for (String string : linesToSend) {
+                    out.write(string);
+                    out.newLine();
+                }
             }
 
-            out.println();
+            out.write("");
+            out.newLine();
             out.flush();
         } catch (IOException ex) {
             writeToLog(ex.getMessage() + " In sendAnswer method.");
@@ -154,7 +162,7 @@ public class Session extends Thread {
     }
 
     private void sendGames() {
-        List<Game> games =  net.getGamesList();
+        List<Game> games =  server.getGamesList();
 
         ArrayList<String> linesToSend = new ArrayList<String>();
 
@@ -174,7 +182,7 @@ public class Session extends Thread {
         }
 
         if (counter == 0) {
-            this.sendAnswer("No unstarted games finded.");//"???change to no UNSTARTED Games???"
+            this.sendAnswer("No unstarted games finded.");
             writeToLog("Tryed to get games list. No unstarted games finded");
             return;
         } else {
@@ -205,7 +213,7 @@ public class Session extends Thread {
         }
         try {
             Game g = new Game(new GameMap(mapName + ".map"), gameName, maxPlayers);
-            this.net.addGame(g);
+            this.server.addGame(g);
             sendAnswer("Game created.");
             writeToLog("Tryed to create game. " +
                     "Game created. Map=" + mapName +
@@ -270,7 +278,7 @@ public class Session extends Thread {
             }
         }
 
-        Game gameToJoin = net.getGame(gameID);
+        Game gameToJoin = server.getGame(gameID);
         if (gameToJoin != null) {
             if (!gameToJoin.isStarted()) {                
                 this.player = gameToJoin.join(playerName);
@@ -301,20 +309,21 @@ public class Session extends Thread {
         }
     }
 
-    public void doMove(String query) {
+    private void doMove(String query) {
         if (this.game != null) {
             if (timer.getDiff() > Constants.GAME_STEP_TIME) {
-                int direction = 0;
+                int dir = 0;
                 boolean moved = false;
                 try {
-                    direction = Integer.parseInt(query.substring(1, 2));
-                    if (direction < 0 || direction > 3) {
-                        throw new NumberFormatException();
-                    }
+                    dir = Integer.parseInt(query.substring(1, 2));//throws NumberFormatException
+                    Direction direction = Direction.fromInt(dir); //throws IllegalArgumentException
                     moved = this.game.doMove(player, direction);
                 } catch (NumberFormatException ex) {
                     writeToLog("Tryed to move, canceled. Unsupported direction. Error on client side." +
-                            " direction=" + direction +
+                            " query=" + query);
+                } catch (IllegalArgumentException ex) {
+                    writeToLog("Tryed to move, canceled. Unsupported direction. Error on client side." +
+                            " direction=" + dir +
                             " query=" + query);
                 }
 
@@ -356,7 +365,7 @@ public class Session extends Thread {
         }
     }
 
-    public void leaveGame() {
+    private void leaveGame() {
         if (this.game != null) {
             this.game.disconnectFromGame(this.player);
             this.game = null;
@@ -371,7 +380,7 @@ public class Session extends Thread {
         }
     }
 
-    public void placeBomb() {
+    private void placeBomb() {
         if (this.game != null) { // Always if game!=null player is not null too!
             if (this.game.isStarted()) { 
                 this.game.placeBomb(this.player); //CHECK < THIS// whats about player isAlive?
@@ -436,7 +445,7 @@ public class Session extends Thread {
             in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
             String clientQueryLine;
 
-            while (!this.net.isShutdowned()) {
+            while (!Thread.interrupted()) {
                 try {
                     clientQueryLine = in.readLine(); //throws IOException
                 } catch (SocketTimeoutException ex) {
@@ -449,7 +458,7 @@ public class Session extends Thread {
                 answerOnCommand(clientQueryLine);
             }
 
-        } catch (IOException ex) { //IO in in.readLine()
+        } catch (IOException ex) { //IOException in in.readLine()
             writeToLog(ex.getMessage() + " In session.run() method.");
         } finally {
             if (in != null) {
@@ -491,7 +500,7 @@ public class Session extends Thread {
 
     private void writeToLog(String message) {
         if (this.log != null && !filtred(message)) {
-            this.log.println(message);
+            this.log.println(this.sessionID + " " + message);
         }
     }
     

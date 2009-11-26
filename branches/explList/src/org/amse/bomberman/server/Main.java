@@ -18,7 +18,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, InterruptedException {
-        ILog errorLog = new ConsoleLog();
-        new serverFrame(errorLog);
+        ILog log = new ConsoleLog();
+        new ServerFrame(log);
     }
 }
