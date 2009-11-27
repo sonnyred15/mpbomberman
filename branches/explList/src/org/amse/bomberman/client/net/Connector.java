@@ -102,7 +102,7 @@ public class Connector implements IConnector{
             expl.add(buf);
         }
         // receive player info
-        // k == 1 always
+        // m == 1 always
         int m = Integer.parseInt(mp.get(n+k+2));
         if (m == 1) {
             String[] info = new String[6];
