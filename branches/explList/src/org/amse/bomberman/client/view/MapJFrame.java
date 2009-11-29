@@ -82,8 +82,8 @@ public class MapJFrame extends JFrame implements IView{
         this.repaint();
         if (lives <= 0) {
             if (!dead) {
-                JOptionPane.showMessageDialog(this, "You are dead!!!", "Error"
-                        , JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "You are dead!!!", "Death"
+                        , JOptionPane.INFORMATION_MESSAGE);
                 this.removeKeyListener(listener);
                 dead = true;
             }

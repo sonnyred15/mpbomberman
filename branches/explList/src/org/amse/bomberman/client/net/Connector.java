@@ -22,7 +22,7 @@ import org.amse.bomberman.client.model.Model;
  */
 public class Connector implements IConnector{
     private Socket socket;
-    private static IConnector connector= null;
+    private static IConnector connector = null;
     private Timer timer;
 
     private Connector() {
@@ -77,14 +77,7 @@ public class Connector implements IConnector{
         ArrayList<String> mp = queryAnswer("4");
         BombMap map = null;
         int n = 0;
-        // what does exception throw????
-        try {
-            n = Integer.parseInt(mp.get(0));
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-            System.out.println(ex.getMessage());
-            System.out.println(mp.get(0));
-        }
+        n = Integer.parseInt(mp.get(0));
         map = new BombMap(n);
         for (int i = 0; i < n; i++) {
             String[] numbers = mp.get(i+1).split(" ");
@@ -120,7 +113,7 @@ public class Connector implements IConnector{
     }
     public void plantBomb() {
         System.out.println(queryAnswer("7").get(0));
-        System.out.println();
+        //System.out.println();
     }
 
     private synchronized ArrayList<String> queryAnswer(String query){
@@ -151,9 +144,9 @@ public class Connector implements IConnector{
     private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
-                Model model = (Model)Model.getInstance();
-                model.setMap(getMap());
-                System.out.println("Map has been updated.");
+            IModel model = Model.getInstance();
+            model.setMap(getMap());
+            //System.out.println("Map has been updated.");
         }
     }
 }

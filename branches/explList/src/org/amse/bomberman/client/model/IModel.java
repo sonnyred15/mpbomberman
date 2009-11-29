@@ -7,6 +7,7 @@ import org.amse.bomberman.client.view.IView;
  */
 public interface IModel {
     //public boolean movePlayer(int number, Direction dir);
+    public void setMap(BombMap map);
     public void addListener(IView view);
     public void removeListener(IView view);
     public BombMap getMap();
