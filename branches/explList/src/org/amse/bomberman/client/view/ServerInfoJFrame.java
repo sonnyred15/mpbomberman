@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -16,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.Bot;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
@@ -31,7 +34,8 @@ public class ServerInfoJFrame extends JFrame{
     private JButton createJButton = new JButton();
     private JButton joinJButton = new JButton();
     private JButton refreshJButton = new JButton();
-    private JTable table = table = new JTable(new MyTableModel());
+    private JButton botJButton = new JButton();
+    private JTable table = new JTable(new MyTableModel());
     private final Dimension buttonSize = new Dimension(200,40);
 
     
@@ -44,11 +48,12 @@ public class ServerInfoJFrame extends JFrame{
 
         JPanel leftBox = new JPanel();
         // how calculate sizes???
-        leftBox.setPreferredSize(new Dimension(80, 100));
-        leftBox.setLayout(new GridLayout(3, 1, 10, 10));
+        leftBox.setPreferredSize(new Dimension(80, 120));
+        leftBox.setLayout(new GridLayout(4, 1, 10, 10));
         leftBox.add(createJButton);
         leftBox.add(joinJButton);
         leftBox.add(refreshJButton);
+        leftBox.add(botJButton);
 
         this.refreshTable();
         this.setSizesTable();
@@ -65,6 +70,7 @@ public class ServerInfoJFrame extends JFrame{
         refreshJButton.setAction(new RefreshAction(this));
         createJButton.setAction(new CreateAction(this));
         joinJButton.setAction(new JoinAction(this));
+        botJButton.setAction(new AddBotAction(this));
         setResizable(false);
         setVisible(true);
     }
@@ -105,27 +111,27 @@ public class ServerInfoJFrame extends JFrame{
         columnModel.getColumn(3).setResizable(false);
         columnModel.getColumn(4).setResizable(false);
     }
-    private void join() {
+    private void join(int gameNumber) {
+        IConnector connect = Connector.getInstance();
+        connect.joinGame(gameNumber);
+        //------------------------------------------------------------
+        BombMap map = connect.getMap();
+        Model model = (Model) Model.getInstance();
+        MapJFrame frame = new MapJFrame(map);
+        model.addListener(frame);
+        model.setMap(map);
+        connect.beginUpdating();
+        //-------------------------------------------------------------
+        this.dispose();
+    }
+    private int getSelectedGame() {
+        int result = -1;
         if (table.getSelectedRow() != -1
-                && table.getValueAt(table.getSelectedRow(), 0) != null) {
-            int gameNumber = Integer.parseInt(
+                    && table.getValueAt(table.getSelectedRow(), 0) != null) {
+            result = Integer.parseInt(
                     (String) table.getValueAt(table.getSelectedRow(), 0));
-            IConnector connect = Connector.getInstance();
-            connect.joinGame(gameNumber);
-            //------------------------------------------------------------
-            BombMap map = connect.getMap();
-            Model model = (Model) Model.getInstance();
-            MapJFrame frame = new MapJFrame(map);
-            model.addListener(frame);
-            model.setMap(map);
-            connect.beginUpdating();
-            //-------------------------------------------------------------
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "You did't select the game! "
-                         + " Do this and then click join."
-                        , "Error", JOptionPane.ERROR_MESSAGE);
-        }
+            return result;
+        } else return result;
     }
 
     public static class RefreshAction extends AbstractAction {
@@ -167,7 +173,46 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            parent.join();
+            int gameNumber = parent.getSelectedGame();
+            if (gameNumber != -1) {
+                parent.join(gameNumber);
+            } else {
+                JOptionPane.showMessageDialog(parent, "You did't select the game! "
+                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    public static class AddBotAction extends AbstractAction {
+        ServerInfoJFrame parent;
+
+        public AddBotAction(ServerInfoJFrame jFrame) {
+            parent = jFrame;
+            putValue(NAME, "Add Bot");
+            putValue(SHORT_DESCRIPTION, "Add one bot to selected game");
+            putValue(SMALL_ICON, null);
+        }
+        public void actionPerformed(ActionEvent e) {
+            int gameNumber = parent.getSelectedGame();
+            if (gameNumber != -1) {
+                try {
+                    IConnector connector = Connector.getInstance();
+                    InetAddress address = connector.getInetAddress();
+                    int port = connector.getPort();
+                    Bot bot = new Bot(gameNumber, address, port);
+                    parent.refreshTable();
+                    Thread botThread = new Thread(bot);
+                    Model.getInstance().addBot(botThread);
+                    JOptionPane.showMessageDialog(parent, "Bot was successfully added."
+                        , "Sucessful", JOptionPane.INFORMATION_MESSAGE);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(parent, "Cann't add a new bot"
+                        + " to the selected Game", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(parent, "You did't select the game! "
+                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
     private class MyTableModel extends AbstractTableModel {

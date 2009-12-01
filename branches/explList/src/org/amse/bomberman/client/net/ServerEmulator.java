@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Player;
 
 /**
@@ -102,7 +103,14 @@ public class ServerEmulator extends Thread{
                 break;
             }
             case ServerEmulator.GET_MAP:{
-                sendMap(map.getMassive());
+                int n = map.getSize();
+                int[][] cells = new int[n][n];
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        cells[i][j] = map.getValue(new Cell(i,j));
+                    }
+                }
+                sendMap(cells);
                 break;
             }
             default: {

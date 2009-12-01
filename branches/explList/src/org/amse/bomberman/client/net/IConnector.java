@@ -24,4 +24,6 @@ public interface IConnector {
      public void plantBomb();
      // must be here???
      public void beginUpdating();
+     public InetAddress getInetAddress();
+     public int getPort();
 }

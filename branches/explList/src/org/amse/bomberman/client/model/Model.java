@@ -15,6 +15,8 @@ public class Model implements IModel{
     // here?
     private Player player = new Player("Mavr");
     private List<IView> listener = new ArrayList<IView>();
+    // ??? how do it? how start bot Threads?
+    private List<Thread> bots = new ArrayList<Thread>();
 
     private Model() {
     }
@@ -60,6 +62,14 @@ public class Model implements IModel{
     private void updateListeners() {
         for (IView elem : listener) {
             elem.update();
+        }
+    }
+    public void addBot(Thread botThread) {
+        bots.add(botThread);
+    }
+    public void startBots() {
+        for (Thread bot: bots) {
+            bot.start();
         }
     }
 }

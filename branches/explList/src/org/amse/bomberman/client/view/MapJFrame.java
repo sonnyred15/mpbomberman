@@ -13,7 +13,7 @@ import javax.swing.SwingConstants;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Cell;
+import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Model;
 
 /**
@@ -99,14 +99,14 @@ public class MapJFrame extends JFrame implements IView{
         int num = map.getSize();
         for (int i = 0; i < num; i++) {
             for (int j = 0; j < num; j++) {
-                cells[i][j].setContent(map.getValue(i, j));
+                cells[i][j].setContent(map.getValue(new Cell(i, j)));
             }
         }
         ArrayList<Cell> expl = map.getExplosions();
         for (int i = 0; i < expl.size(); i++){
             int x = expl.get(i).getX();
             int y = expl.get(i).getY();
-            cells[x][y].checkExplosion(map.getValue(x, y));
+            cells[x][y].checkExplosion(map.getValue(new Cell(x, y)));
         }
     }
     private class MyJPanel extends JLabel {

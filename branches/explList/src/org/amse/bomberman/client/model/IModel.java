@@ -14,4 +14,7 @@ public interface IModel {
     public void setPlayerLives(int lives);
     public int getPlayerLives();
     //public void plantBomb(int number);
+    // how do it??? who must start bot thread???
+    public void addBot(Thread botThread);
+    public void startBots();
 }

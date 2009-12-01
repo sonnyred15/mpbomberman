@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Cell;
 import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
 
@@ -82,7 +82,7 @@ public class Connector implements IConnector{
         for (int i = 0; i < n; i++) {
             String[] numbers = mp.get(i+1).split(" ");
             for (int j = 0; j < numbers.length; j++) {
-                map.setCell(i, j, (int) Integer.parseInt(numbers[j]));
+                map.setCell(new Cell(i,j), (int) Integer.parseInt(numbers[j]));
             }
         }
         // receive list of explosive
@@ -114,6 +114,12 @@ public class Connector implements IConnector{
     public void plantBomb() {
         System.out.println(queryAnswer("7").get(0));
         //System.out.println();
+    }
+    public InetAddress getInetAddress() {
+        return socket.getInetAddress();
+    }
+    public int getPort() {
+        return socket.getPort();
     }
 
     private synchronized ArrayList<String> queryAnswer(String query){
