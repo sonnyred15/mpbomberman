@@ -19,9 +19,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.impl.Server;
+import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.ILog;
+import org.amse.bomberman.util.impl.ConsoleLog;
 
 /**
  * Server startup window.
@@ -36,8 +36,10 @@ public class ServerFrame extends JFrame {
     private AbstractButton startButton = new JButton("Raise");
     private AbstractButton stopButton = new JButton("Down");
 
+    private ConsoleLog log = new ConsoleLog();
+
     /** Creates new form ServerFrame */
-    public ServerFrame(final ILog log){
+    public ServerFrame(){
 
         /*initial form properties*/
         this.setTitle("server control");
@@ -70,6 +72,7 @@ public class ServerFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         buttonPanel.add(startButton);
+        stopButton.setEnabled(false);
         buttonPanel.add(stopButton);
         this.add(buttonPanel);
 
@@ -95,16 +98,21 @@ public class ServerFrame extends JFrame {
                     }
                     server.start();
                 } catch (NumberFormatException ex) { //parse errors                    
-                    portField.setText("Error");
+                    //portField.setText("Error");
                     log.println(ex.getMessage() + 
                             "Must be int from 0 to 65535(inclusive)");
-                } catch (IOException ex) { //sockets errors                   
-                    portField.setText("Error");
-                    log.println(ex.getMessage());
+                    return;
+                } catch (IOException ex) { //sockets errors. Server logging them.
+                    //portField.setText("Error");
+                    //log.println(ex.getMessage());
+                    return;
                 } catch (IllegalStateException ex) {
-                    portField.setText("Error");
+                    //portField.setText("Error");
                     log.println(ex.getMessage());
+                    return;
                 }
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
             }
         });
 
@@ -116,15 +124,19 @@ public class ServerFrame extends JFrame {
                     if (server != null) {
                         server.shutdown();
                     } else {
-                        throw new IllegalStateException("No server. Can`t shutdown.");
+                        throw new IllegalStateException("No server. Can`t shutdown."); //catching
                     }
-                } catch (IOException ex) {
-                    portField.setText("Error");
-                    log.println(ex.getMessage());
+                } catch (IOException ex) { //Server loggs IOErrors and throw them again.
+                    //portField.setText("Error");
+                    //log.println(ex.getMessage());
+                    return;
                 } catch (IllegalStateException ex) {
-                    portField.setText("Error");
+                    //portField.setText("Error");
                     log.println(ex.getMessage());
+                    return;
                 }
+                startButton.setEnabled(true);
+                stopButton.setEnabled(false);
             }
         });
 

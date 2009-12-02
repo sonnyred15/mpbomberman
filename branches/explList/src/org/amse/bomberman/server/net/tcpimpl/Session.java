@@ -2,10 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.impl;
+package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.net.*;
-import org.amse.bomberman.server.net.impl.Server;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -101,59 +100,62 @@ public class Session extends Thread implements ISession{
             return;
         }
 
-        int command = -1;
+        Command cmd = null;
         try {
-            command = Integer.parseInt(query.substring(0, 1));
+            int command = Integer.parseInt(query.substring(0, 1));
+            cmd = Command.fromInt(command);
         } catch (NumberFormatException nEx) {
             writeToLog(nEx.getMessage() +
-                    "First char of command must be int from 0 to 9. " +
+                    "First char of command must be int from 0 to 7 inclusive. " +
                     "Error command from client.");
+        } catch (IllegalArgumentException ex){
+            writeToLog("Non supported by Command enum int from client.");
         }
 
-        switch (command) {
-            case Commands.GET_GAMES: {
+        switch (cmd) {
+            case GET_GAMES: {
                 //"0"
                 sendGames();
                 break;
             }
-            case Commands.CREATE_GAME: {
+            case CREATE_GAME: {
                 //"1 gameName mapName maxPlayers" or just "1" for defaults
                 createGame(query);
                 break;
             }
             // CHECK v THIS!!!//
-            case Commands.JOIN_GAME: {
+            case JOIN_GAME: {
                 //"2 gameID playerName"
                 joinGame(query);
                 break;
             }
             // CHECK v THIS!!!//
-            case Commands.DO_MOVE: {
+            case DO_MOVE: {
                 //"3"+direction
                 doMove(query);
                 break;
             }
-            case Commands.GET_MAP_ARRAY: {
+            case GET_MAP_ARRAY: {
                 //"4"
                 sendMap();
                 break;
             }
-            case Commands.START_GAME: {
+            case START_GAME: {
                 //"5"
                 startGame();
                 break;
             }
-            case Commands.LEAVE_GAME: {
+            case LEAVE_GAME: {
                 //"6"
                 leaveGame();
                 break;
             }
-            case Commands.PLACE_BOMB: {
+            case PLACE_BOMB: {
                 //"7"
                 placeBomb();
                 break;
             }
-            default: {
+            default: { //CHECK < V THIS!!!// never happens!?
                 sendAnswer("Wrong query. Unrecognized command!");
                 writeToLog("Getted wrong query. Unrecognized command!" +
                         " query=" + query);

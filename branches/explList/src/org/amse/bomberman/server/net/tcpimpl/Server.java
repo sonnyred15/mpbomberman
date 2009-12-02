@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.impl;
+package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.net.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,11 @@ import org.amse.bomberman.util.impl.ConsoleLog;
  */
 public class Server implements IServer{
 
-    private ILog log; // if log wouldn`t be initialized all messages would print to console.
+    private ILog log; // could be never initialized. Use writeToLog(...) instead of log.println(...)
     private int port;
     private List<Game> games;
     private ServerSocket serverSocket;
-    private boolean shutdowned = true; //until we start accepting clients.
+    private boolean shutdowned = true; //true until we start accepting clients.
     private Thread listeningThread;
     private int sessionCounter = 0; //need to generate name of log files.
 
@@ -51,20 +52,33 @@ public class Server implements IServer{
 
     /**
      * Starts listening thread where ServerSocket.accept() method is using.
-     * @throws java.io.IOException if we have error while opening socket.
+     * 
      */
     public void start() throws IOException, IllegalStateException {
-        if (shutdowned) {
-            this.shutdowned = false;
-            this.sessionCounter = 0;
-            this.serverSocket = new ServerSocket(port, 0); // throws IOExeption
-            this.listeningThread = new Thread(new SocketListen(this));
-            this.listeningThread.start();
-            this.games = new ArrayList<Game>();
-            this.log = new ConsoleLog();
-        } else {
-            throw new IllegalStateException("Already accepting. Can`t raise server.");
+        try {
+
+            if (shutdowned) {
+                this.shutdowned = false;
+                this.sessionCounter = 0;
+                this.serverSocket = new ServerSocket(port, 0); // throws IOExeption,SecurityException
+                this.listeningThread = new Thread(new SocketListen(this));
+                this.listeningThread.start();
+                this.games = new ArrayList<Game>();
+                this.log = new ConsoleLog();
+            } else {
+                throw new IllegalStateException("Already accepting. Can`t raise server.");
+            }
+
+        } catch (IOException ex) {
+            writeToLog(ex.getMessage());
+            this.shutdown();
+            throw ex;
+        } catch (SecurityException ex) {
+            writeToLog(ex.getMessage());
+            this.shutdown();
+            throw ex;
         }
+
     }
 
     /**
@@ -74,27 +88,38 @@ public class Server implements IServer{
      * @throws IllegalStateException if we are trying to shutdown not raised server.
      */
     public void shutdown() throws IOException, IllegalStateException {
-        if (!this.shutdowned) {
-            try {
+        try {
+
+            if (!this.shutdowned) {
                 this.shutdowned = true;
-                this.listeningThread.interrupt();
-                this.listeningThread = null;
-                this.serverSocket.close();
-                this.serverSocket = null;
+                if (this.listeningThread != null) {
+                    this.listeningThread.interrupt();
+                    this.listeningThread = null;
+                }
+                if (this.serverSocket != null) {
+                    this.serverSocket.close();
+                    this.serverSocket = null;
+                }
                 this.games = null;
-                this.log.close();
-            } catch (IOException ex) {
-                System.out.println("IOException while closing log in " +
-                        "stopAcceptingClients() " + ex.getMessage());
-            } catch (SecurityException ex) {
-                System.out.println("Thread can`t interrupt sessions by" +
-                        "security reasons in stopAcceptingClients(). " +
-                        ex.getMessage());
+                if (this.log != null) {
+                    this.log.close();
+                }
+            } else {
+                throw new IllegalStateException("Server is not raised. Can`t shutdown it.");
             }
-            writeToLog("Server: shutdowned.");
-        } else {
-            throw new IllegalStateException("Server is not raised. Can`t shutdown it.");
+
+        } catch (IOException ex) {
+            writeToLog("IOException in stopAcceptingClients() "
+                    + ex.getMessage());
+            throw ex;
+        } catch (SecurityException ex) {
+            writeToLog("Thread can`t interrupt sessions by" +
+                    "security reasons in stopAcceptingClients(). " +
+                    ex.getMessage());
+            throw ex;
         }
+
+        writeToLog("Server: shutdowned.");
     }
 
     public void addGame(Game game) {
@@ -167,8 +192,10 @@ public class Server implements IServer{
                     newSession.start();
                 }
 
-            } catch (IOException ex) { //if an I/O error occurs when waiting for a connection.
+            } catch (SocketTimeoutException ex) { //never happen in current realization
                 writeToLog(ex.getMessage());
+            } catch (IOException ex) { //if an I/O error occurs when waiting for a connection.
+                writeToLog(ex.getMessage()); //or socket closed
             } catch (SecurityException ex) { //accept wasn`t allowed
                 writeToLog(ex.getMessage());
             } catch (IllegalBlockingModeException ex) { //CHECK < THIS// what comments should i write?

@@ -62,4 +62,50 @@ public final class Constants {
             }
         }
     }
+
+    public static enum Command {
+
+        GET_GAMES(0),
+        CREATE_GAME(1),
+        JOIN_GAME(2),
+        DO_MOVE(3),
+        GET_MAP_ARRAY(4),
+        START_GAME(5),
+        LEAVE_GAME(6),
+        PLACE_BOMB(7);
+
+        private final int value;
+
+        private Command(int value){
+            this.value = value;
+        }
+
+        private int getValue(){
+            return this.value;
+        }
+
+        public static Command fromInt(int command) {
+            switch (command) {
+                case 0:
+                    return GET_GAMES;
+                case 1:
+                    return CREATE_GAME;
+                case 2:
+                    return JOIN_GAME;
+                case 3:
+                    return DO_MOVE;
+                case 4:
+                    return GET_MAP_ARRAY;
+                case 5:
+                    return START_GAME;
+                case 6:
+                    return LEAVE_GAME;
+                case 7:
+                    return PLACE_BOMB;
+                default:
+                    throw new IllegalArgumentException("Wrong argument " +
+                            "must be between 0 and 7 inclusive");
+            }
+        }
+    }
 }

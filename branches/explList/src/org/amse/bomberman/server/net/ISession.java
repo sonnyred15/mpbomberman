@@ -8,11 +8,11 @@ package org.amse.bomberman.server.net;
  *
  * @author chibis
  */
-public interface ISession {
+public interface ISession { // Session must Extend Thread
 
-    void run();
+    void run(); //method from Thread
 
-    void interrupt() throws SecurityException;
+    void interrupt() throws SecurityException; //must delegate to thread.interrupt()
 
-    void start();
+    void start(); //method from Thread
 }
