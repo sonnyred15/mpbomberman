@@ -401,7 +401,7 @@ public class Session extends Thread implements ISession{
     public void run() {
         BufferedReader in = null;
         try {
-            this.clientSocket.setSoTimeout(1000); //throws SocketException
+            this.clientSocket.setSoTimeout(Constants.DEFAULT_CLIENT_TIMEOUT); //throws SocketException
         } catch (SocketException ex) {
             writeToLog("Exception in Session run method. " + ex.getMessage()); //Error in the underlaying TCP protocol.
         }
@@ -413,37 +413,60 @@ public class Session extends Thread implements ISession{
             while (!Thread.interrupted()) {
                 try {
                     clientQueryLine = in.readLine(); //throws IOException
-                } catch (SocketTimeoutException ex) {
-                    continue;
-                }
-                if (clientQueryLine == null) {
+                    if (clientQueryLine == null) {
+                        break;
+                    }
+                    writeToLog("Session: Query line received: '" + clientQueryLine + "'.");
+                    answerOnCommand(clientQueryLine);
+
+                } catch (SocketTimeoutException ex) { //if client not responsable
+                    writeToLog("Session: Terminated by socket timeout.");
                     break;
                 }
-                writeToLog("Session: Query line received: '" + clientQueryLine + "'.");
-                answerOnCommand(clientQueryLine);
             }
 
         } catch (IOException ex) { //IOException in in.readLine()
             writeToLog(ex.getMessage() + " In session.run() method.");
         } finally {
-            if (in != null) {
-                try {
-                    in.close(); //throws IOException                    
-                } catch (IOException ex) {
-                    writeToLog("IOException in Session run method while closing `in` stream.");
-                }
-            }
 
             try {
-                if (log != null) {
-                    log.close(); // throws IOException
+                if (in != null) {
+                    in.close(); //throws IOException     
+                }
+            } catch (IOException ex) {
+                writeToLog("IOException in Session run method while closing `in` stream.");
+            }
+            
+            try {
+                if (this.log != null) {
+                    this.log.close(); // throws IOException
+                    this.log = null;
                 }
             } catch (IOException ex) {
                 // can`t close log stream. Log wont be saved
                 System.out.println("Error: can`t close log stream. Log won`t be saved " +
                         ex.getMessage());
             }
+
+            try{
+                 writeToLog("Session: Ended. Freeing resources.");
+                 freeResources();
+            } catch (IOException ex){
+                 writeToLog("Session: Error while closing client socket.");
+            }
+
         }
+    }
+
+    private void freeResources() throws IOException {
+        if (this.game != null) {
+            this.game.disconnectFromGame(this.player);
+            this.game = null;
+            this.player = null;
+        }
+        this.clientSocket.close();
+        this.timer = null;
+        this.log = null;
     }
 
     private class MyTimer {

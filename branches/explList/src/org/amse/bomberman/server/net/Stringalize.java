@@ -52,7 +52,7 @@ public class Stringalize {
         return lst;
     }
 
-    public static List<String> explosions(List<Pair> expl) { //CHECK < THIS!!!// WHATS ABOUT map SYNCHRONIZATION?
+    public static List<String> explosions(List<Pair> expl) { //CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
         lst.add("" + expl.size());
         for (Pair pair : expl) {
