@@ -11,6 +11,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
@@ -36,7 +38,7 @@ public class Server implements IServer{
      */
     public Server() {
         this.port = Constants.DEFAULT_PORT;
-        this.games = new ArrayList<Game>();
+        this.games = Collections.synchronizedList(new LinkedList<Game>());
     }
 
     /**
@@ -47,7 +49,7 @@ public class Server implements IServer{
      */
     public Server(int port) {
         this.port = port;
-        this.games = new ArrayList<Game>();
+        this.games = Collections.synchronizedList(new LinkedList<Game>());
     }
 
     /**
@@ -63,7 +65,7 @@ public class Server implements IServer{
                 this.serverSocket = new ServerSocket(port, 0); // throws IOExeption,SecurityException
                 this.listeningThread = new Thread(new SocketListen(this));
                 this.listeningThread.start();
-                this.games = new ArrayList<Game>();
+                this.games = Collections.synchronizedList(new LinkedList<Game>());
                 this.log = new ConsoleLog();
             } else {
                 throw new IllegalStateException("Already accepting. Can`t raise server.");
@@ -126,7 +128,7 @@ public class Server implements IServer{
         if(!this.shutdowned){
             this.games.add(game);
         }else{
-            System.out.println("Tryed to add game to shutdowned server.");
+            writeToLog("Tryed to add game to shutdowned server.");
             return;
         }
     }
@@ -137,10 +139,10 @@ public class Server implements IServer{
             try {
                 game = this.games.get(n);
             } catch (IndexOutOfBoundsException ex) {
-                log.println("Client tryed to get game with illegal ID. Canceled.");
+                writeToLog("Client tryed to get game with illegal ID. Canceled.");
             }
         } else {
-            System.out.println("Tryed to get game from shutdowned server.");
+            writeToLog("Tryed to get game from shutdowned server.");
         }
         return game;
     }
@@ -149,7 +151,7 @@ public class Server implements IServer{
         if (!this.shutdowned){
             return this.games;
         }else{ //if server was stopped.
-            System.out.println("Tryed to get games list from shutdowned server.");
+            writeToLog("Tryed to get games list from shutdowned server.");
             return null;
         }
     }

@@ -14,12 +14,9 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
-import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.*;
@@ -27,7 +24,7 @@ import org.amse.bomberman.util.ILog;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E
  */
 public class Session extends Thread implements ISession{
 
@@ -55,6 +52,7 @@ public class Session extends Thread implements ISession{
             writeToLog("Session: Sending answer...");
             out.write(shortAnswer);
             out.newLine();
+
             out.write("");
             out.newLine();
             out.flush();
@@ -67,7 +65,7 @@ public class Session extends Thread implements ISession{
      * Send strings from linesToSend to client.
      * @param linesToSend lines to send.
      */
-    private void sendAnswer(ArrayList<String> linesToSend) throws IllegalArgumentException {
+    private void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
         BufferedWriter out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(
@@ -164,26 +162,9 @@ public class Session extends Thread implements ISession{
     }
 
     private void sendGames() {
-        List<Game> games =  server.getGamesList();
-
-        ArrayList<String> linesToSend = new ArrayList<String>();
-
-        int counter = 0;
-        Iterator<Game> it = games.iterator();
-        for (int i = 0; it.hasNext(); ++i) {
-            Game g = it.next();
-            //send only games that are not started!!!
-            if (!g.isStarted()) {
-                ++counter;
-                linesToSend.add(i + " " + 
-                        g.getName() + " " +
-                        g.getMapName() + " " +
-                        g.getCurrentPlayers() + " " +
-                        g.getGameMaxPlayers());
-            }
-        }
-
-        if (counter == 0) {
+        List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
+        
+        if (linesToSend.size() == 0) {
             this.sendAnswer("No unstarted games finded.");
             writeToLog("Tryed to get games list. No unstarted games finded");
             return;
@@ -201,7 +182,7 @@ public class Session extends Thread implements ISession{
         int maxPlayers = -1;//defines by GameMap;
 
         String[] args = query.split(" ");
-        if (args.length == 4) {
+        if (args.length == 4) {//if we getted command in full syntax
             gameName = args[1];
             mapName = args[2];
             try {
@@ -247,7 +228,7 @@ public class Session extends Thread implements ISession{
         int gameID = 0;
         String playerName = "defaultPlayer";
         switch (args.length) {
-            case 2: {
+            case 2: { //to support command in "short" syntax when player name is ommited
                 try {
                     gameID = Integer.parseInt(args[1]);
                 } catch (NumberFormatException ex) {
@@ -259,7 +240,7 @@ public class Session extends Thread implements ISession{
                 }
                 break;
             }
-            case 3: {
+            case 3: { //if we getted command in full syntax
                 try {
                     gameID = Integer.parseInt(args[1]);
                 } catch (NumberFormatException ex) {
@@ -272,7 +253,7 @@ public class Session extends Thread implements ISession{
                 playerName = args[2];
                 break;
             }
-            default: {
+            default: { //wrong syntax
                 sendAnswer("Wrong command parameters. Error on client side.");
                 writeToLog(" Wrong command parameters. Error on client side." +
                         " query=" + query);
@@ -297,13 +278,13 @@ public class Session extends Thread implements ISession{
                             " query=" + query);
                     return;
                 }
-            } else {
+            } else { //if game.isStarted() true
                 sendAnswer("Game was  already started.");
                 writeToLog("Tryed to join gameID=" + gameID + " but canceled " +
                         "cause game is already started ");
                 return;
             }
-        } else { //if game==null true;
+        } else { //if game==null true
             sendAnswer("No such game.");
             writeToLog("Tryed to join gameID=" + gameID + " but canceled " +
                     "no such game on server. ");
@@ -337,7 +318,8 @@ public class Session extends Thread implements ISession{
                 return;
             } else { //timer.getDiff < gameStep true
                 sendAnswer("false");
-                writeToLog("Tryed to move, canceled. Moves allowed only every 200ms." +
+                writeToLog("Tryed to move, canceled. Moves allowed only every " +
+                        Constants.GAME_STEP_TIME + "ms." +
                         " query=" + query);
                 return;
             }
@@ -385,7 +367,7 @@ public class Session extends Thread implements ISession{
     private void placeBomb() {
         if (this.game != null) { // Always if game!=null player is not null too!
             if (this.game.isStarted()) { 
-                this.game.placeBomb(this.player); //CHECK < THIS// whats about player isAlive?
+                this.game.placeBomb(this.player); //is player alive checking in model
                 sendAnswer("Ok.");
                 writeToLog("Tryed to plant bomb." +
                         " playerID=" + this.player.getID() +
@@ -400,31 +382,12 @@ public class Session extends Thread implements ISession{
 
     private void sendMap() {
         if (this.game != null) {
-            int[][] map = this.game.getMapArray();
-            ArrayList<String> linesToSend = new ArrayList<String>();
-            linesToSend.add(String.valueOf(map.length));
-            for (int i = 0; i < map.length; i++) {
-                StringBuilder buff = new StringBuilder();
-                for (int j = 0; j < map.length; j++) {
-                    buff.append(map[i][j]);
-                    buff.append(" ");
-                }
-                buff.deleteCharAt(buff.length() - 1);
-                linesToSend.add(buff.toString());
-            }
-            ////////////////explosionSquares//////////////////
-            List<Pair> explSq = this.game.getExplosionSquares();            
-            linesToSend.add(""+explSq.size());
-            for (Pair pair : explSq) {
-                linesToSend.add(pair.getX() + " " + pair.getY());
-            }
-            //////////////////////////////////////////////////
+            List<String> linesToSend = Stringalize.map(this.game.getMapArray());
+        
+            linesToSend.addAll(Stringalize.explosions(this.game.getExplosionSquares()));
             
-            ///////////////playerInfo//////////////////
-            String info = this.player.getInfo();
-            linesToSend.add(""+1);
-            linesToSend.add(info);
-            //////////////////////////////////////////
+            linesToSend.add("" + 1);
+            linesToSend.add(Stringalize.playerInfo(this.player));
             
             sendAnswer(linesToSend);
             writeToLog("Sended mapArray+explosions+playerInfo to client");
@@ -514,6 +477,12 @@ public class Session extends Thread implements ISession{
             return true;
         }
         if (message.equals("Sended mapArray to client")){
+            return true;
+        }
+        if (message.startsWith("Tryed to move, canceled. Moves allowed only every")){
+            return true;
+        }
+        if (message.startsWith("Sended mapArray+explosions")){
             return true;
         }
         return false;
