@@ -20,6 +20,8 @@ public interface IServer {
 
     void addGame(Game game);
 
+    void removeGame(Game game);
+
     Game getGame(int gameID);
 
     List<Game> getGamesList();

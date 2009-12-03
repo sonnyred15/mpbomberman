@@ -5,9 +5,12 @@
 package org.amse.bomberman.server.gameinit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
+import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -16,23 +19,25 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Game {
 
+    private IServer server;
     private boolean started = false;
     private String gameName = "game";
     private int maxPlayers;
     private List<Player> players;
     private IModel model;
 
-    public Game(GameMap map, String gameName) {
+    public Game(IServer server,GameMap map, String gameName) {
+        this.server=server;
         this.started = false;
         this.gameName = gameName;
         this.maxPlayers = map.getMaxPlayers();
-        this.players = new ArrayList<Player>();
+        this.players = Collections.synchronizedList(new ArrayList<Player>());
         this.model = new Model(map, this);
     //CHECK ^ THIS!//
     }
 
-    public Game(GameMap map, String gameName, int maxPlayers) {
-        this(map, gameName);
+    public Game(IServer server,GameMap map, String gameName, int maxPlayers) {
+        this(server, map, gameName);
         if (maxPlayers > 0 && maxPlayers <= this.maxPlayers) {
             this.maxPlayers = maxPlayers;
         }
@@ -56,6 +61,9 @@ public class Game {
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
         this.model.removePlayer(player.getID());
+        if(this.players.size()==0){
+            endGame();
+        }
     }
 
     public void placeBomb(Player player) {
@@ -73,6 +81,10 @@ public class Game {
             player.setX(model.xCoordOf(player.getID()));
             player.setY(model.yCoordOf(player.getID()));
         }
+    }
+
+    private void endGame(){
+        this.server.removeGame(this);
     }
 
     public boolean doMove(Player player, Direction direction) {

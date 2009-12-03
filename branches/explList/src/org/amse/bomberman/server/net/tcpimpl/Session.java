@@ -198,7 +198,7 @@ public class Session extends Thread implements ISession {
             }
         }
         try {
-            Game g = new Game(new GameMap(mapName + ".map"), gameName, maxPlayers);
+            Game g = Creator.createGame(this.server, mapName, gameName, maxPlayers);
             this.server.addGame(g);
             sendAnswer("Game created.");
             writeToLog("Tryed to create game. " +

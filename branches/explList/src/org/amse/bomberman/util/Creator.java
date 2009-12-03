@@ -7,7 +7,9 @@ package org.amse.bomberman.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.net.IServer;
 
 /**
  *
@@ -20,5 +22,14 @@ public class Creator {
         GameMap map = new GameMap(fileName);
         ret = map.getMapArray();
         return ret;
+    }
+
+    public static Game createGame(IServer server,String mapName, String gameName, int maxPlayers)
+            throws FileNotFoundException, IOException{
+       GameMap map = new GameMap(mapName + ".map");
+       return new Game(server, map, gameName, maxPlayers);
+    }
+
+    private Creator() {
     }
 }

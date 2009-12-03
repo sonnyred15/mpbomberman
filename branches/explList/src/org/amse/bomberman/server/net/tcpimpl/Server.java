@@ -127,8 +127,19 @@ public class Server implements IServer{
     public void addGame(Game game) {
         if(!this.shutdowned){
             this.games.add(game);
+            writeToLog("Game added.");
         }else{
             writeToLog("Tryed to add game to shutdowned server.");
+            return;
+        }
+    }
+
+    public void removeGame(Game gameToRemove) {
+        if(!this.shutdowned){
+           this.games.remove(gameToRemove);
+           writeToLog("Game removed");
+        }else{
+            writeToLog("Tryed to remove game from shutdowned server.");
             return;
         }
     }
