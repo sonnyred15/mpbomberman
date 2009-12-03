@@ -73,7 +73,8 @@ public final class Constants {
         GET_MAP_ARRAY(4),
         START_GAME(5),
         LEAVE_GAME(6),
-        PLACE_BOMB(7);
+        PLACE_BOMB(7),
+        DOWNLOAD_MAP(8);
 
         private final int value;
 

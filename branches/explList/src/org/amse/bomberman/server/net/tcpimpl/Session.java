@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.net.tcpimpl;
 
+import org.amse.bomberman.util.Stringalize;
 import org.amse.bomberman.server.net.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,18 +21,18 @@ import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.*;
+import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ILog;
 
 /**
  *
  * @author Kirilchuk V.E
  */
-public class Session extends Thread implements ISession{
+public class Session extends Thread implements ISession {
 
     private final Server server;
     private final Socket clientSocket;
     private final int sessionID;
-
     private Game game;
     private Player player;
     private MyTimer timer = new MyTimer(System.currentTimeMillis());
@@ -106,7 +107,7 @@ public class Session extends Thread implements ISession{
             writeToLog(nEx.getMessage() +
                     "First char of command must be int from 0 to 7 inclusive. " +
                     "Error command from client.");
-        } catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             writeToLog("Non supported by Command enum int from client.");
         }
 
@@ -121,13 +122,11 @@ public class Session extends Thread implements ISession{
                 createGame(query);
                 break;
             }
-            // CHECK v THIS!!!//
             case JOIN_GAME: {
                 //"2 gameID playerName"
                 joinGame(query);
                 break;
             }
-            // CHECK v THIS!!!//
             case DO_MOVE: {
                 //"3"+direction
                 doMove(query);
@@ -135,7 +134,7 @@ public class Session extends Thread implements ISession{
             }
             case GET_MAP_ARRAY: {
                 //"4"
-                sendMap();
+                sendMapArray();
                 break;
             }
             case START_GAME: {
@@ -153,6 +152,10 @@ public class Session extends Thread implements ISession{
                 placeBomb();
                 break;
             }
+            case DOWNLOAD_MAP: {
+                //"8"+" "+mapName
+                sendMap(query);
+            }
             default: { //CHECK < V THIS!!!// never happens!?
                 sendAnswer("Wrong query. Unrecognized command!");
                 writeToLog("Getted wrong query. Unrecognized command!" +
@@ -163,7 +166,7 @@ public class Session extends Thread implements ISession{
 
     private void sendGames() {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
-        
+
         if (linesToSend.size() == 0) {
             this.sendAnswer("No unstarted games finded.");
             writeToLog("Tryed to get games list. No unstarted games finded");
@@ -263,9 +266,9 @@ public class Session extends Thread implements ISession{
 
         Game gameToJoin = server.getGame(gameID);
         if (gameToJoin != null) {
-            if (!gameToJoin.isStarted()) {                
+            if (!gameToJoin.isStarted()) {
                 this.player = gameToJoin.join(playerName);
-                if (this.player == null) {                    
+                if (this.player == null) {
                     sendAnswer("Game is full. Try to join later.");
                     writeToLog("Tryed to join to full game, canceled");
                     return;
@@ -342,7 +345,7 @@ public class Session extends Thread implements ISession{
                 writeToLog("Tryed to start started game");
                 return;
             }
-        } else{ // game == null true
+        } else { // game == null true
             sendAnswer("Error. Game not started. Not joined to any game.");
             writeToLog("Tryed to start game, canceled. Not joined to any game.");
             return;
@@ -366,7 +369,7 @@ public class Session extends Thread implements ISession{
 
     private void placeBomb() {
         if (this.game != null) { // Always if game!=null player is not null too!
-            if (this.game.isStarted()) { 
+            if (this.game.isStarted()) {
                 this.game.placeBomb(this.player); //is player alive checking in model
                 sendAnswer("Ok.");
                 writeToLog("Tryed to plant bomb." +
@@ -380,21 +383,59 @@ public class Session extends Thread implements ISession{
         }
     }
 
-    private void sendMap() {
+    private void sendMapArray() {
         if (this.game != null) {
             List<String> linesToSend = Stringalize.map(this.game.getMapArray());
-        
+
             linesToSend.addAll(Stringalize.explosions(this.game.getExplosionSquares()));
-            
+
             linesToSend.add("" + 1);
             linesToSend.add(Stringalize.playerInfo(this.player));
-            
+
             sendAnswer(linesToSend);
             writeToLog("Sended mapArray+explosions+playerInfo to client");
         } else {
             sendAnswer("You are not joined to any game. Error.");
             writeToLog("Tryed to getMapArray, canceled. Not joined to any game.");
         }
+    }
+
+    private void sendMap(String query) {
+        String[] args = query.split(" ");
+        int[][] ret = null;
+
+        if (args.length == 2) {
+            String mapFileName = args[1] + ".map";
+            try {
+                ret = Creator.createMapAndGetArray(mapFileName);
+            } catch (FileNotFoundException ex) {
+                sendAnswer("No such map on server.");
+                writeToLog("Tryed to download map, canceled. " +
+                        "Map wasn`t founded on server." +
+                        " Map=" + mapFileName +
+                        " query=" + query +
+                        " " + ex.getMessage());
+                return;
+            } catch (IOException ex) {
+                sendAnswer("Error on server side, while loading map.");
+                writeToLog("Tryed to download map, canceled. " +
+                        "Error on server side while loading map." +
+                        " Map=" + mapFileName +
+                        " query=" + query +
+                        " " + ex.getMessage());
+                return;
+            }
+        } else { //if arguments!=2
+            sendAnswer("Wrong query. Not enough arguments");
+            writeToLog("Tryed to download map. Canceled. Wrong query. query=" + query);
+            return;
+        }
+
+        //if all is OK.
+        List<String> lst = Stringalize.map(ret);
+        sendAnswer(lst);
+        writeToLog("Downloaded map. query=" + query);
+
     }
 
     @Override
@@ -436,7 +477,7 @@ public class Session extends Thread implements ISession{
             } catch (IOException ex) {
                 writeToLog("IOException in Session run method while closing `in` stream.");
             }
-            
+
             try {
                 if (this.log != null) {
                     this.log.close(); // throws IOException
@@ -448,11 +489,11 @@ public class Session extends Thread implements ISession{
                         ex.getMessage());
             }
 
-            try{
-                 writeToLog("Session: Ended. Freeing resources.");
-                 freeResources();
-            } catch (IOException ex){
-                 writeToLog("Session: Error while closing client socket.");
+            try {
+                writeToLog("Session: Ended. Freeing resources.");
+                freeResources();
+            } catch (IOException ex) {
+                writeToLog("Session: Error while closing client socket.");
             }
 
         }
@@ -491,21 +532,21 @@ public class Session extends Thread implements ISession{
             this.log.println(this.sessionID + " " + message);
         }
     }
-    
-    private boolean filtred(String message){
-        if (message.equals("Session: Query line received: '4'.")){
+
+    private boolean filtred(String message) {
+        if (message.startsWith("Session: Query line received: '4")) {
             return true;
         }
-        if (message.equals("Session: Sending answer...")){
+        if (message.startsWith("Session: Sending answer")) {
             return true;
         }
-        if (message.equals("Sended mapArray to client")){
+        if (message.startsWith("Sended mapArray")) {
             return true;
         }
-        if (message.startsWith("Tryed to move, canceled. Moves allowed only every")){
+        if (message.startsWith("Tryed to move, canceled")) {
             return true;
         }
-        if (message.startsWith("Sended mapArray+explosions")){
+        if (message.startsWith("Query line received: '3")) {
             return true;
         }
         return false;

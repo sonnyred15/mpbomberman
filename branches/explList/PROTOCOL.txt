@@ -6,7 +6,7 @@ Server supportes 8 commands from Client:
 
 Description   | Full syntax of query| Answer description| syntax of answer if all is ok
 ------------------------------------------------------------------------------------------------------------------------------
-GET_GAMES     |  "0"                | Unstarted games   | "gameID gameName mapName curPlayers maxPlayers" each game on next line.|
+GET_GAMES     |  "0"                | Unstarted games   | "gameID gameName mN.map curPlrs maxPlayers" each game on next line.|
 CREATE_GAME   |  "1 gN mN mP"       | Confirm or error  | "Game created."                                                    |
 JOIN_GAME     |  "2 gameID playerN" | Confirm or error  | "Joined."                                                          |
 DO_MOVE       |  "3 direction"      | true or false     | "true"                                                             |
@@ -14,9 +14,10 @@ GET_MAP_ARRAY |  "4"                | map+expl+plInfo   | *(watch (mapArray))   
 START_GAME    |  "5"                | Confirm or error  | "Game started."                                                    |
 LEAVE_GAME    |  "6"                | Confirm or error  | "Disconnected.                                                     |
 PLACE_BOMB    |  "7"                | Confirm or error  | "Ok."                                                              |
+DOWNLOAD_MAP  |  "8 mapName"        | map or error      | *like mapArray but ONLY map ints. Without explosions and plInfo.   |
 ------------------------------------------------------------------------------------------------------------------------------
 where gN - gameName is game name.
-      mN - mapName  is map name(must exist in server) For ex: for 1.map command would be "1 gameName 1 -1"
+      mN - mapName  is map name(must exist on server) For ex: for 1.map command would be "1 gameName 1 -1" WITHOUT .map!
       mP - maxPlayers is maxPlayers - value between 1 and map.maxPlayers inclusive. 
           On other values just map.MaxPlayers will be used.
       gameID - id of game that can be getted from GET_GAMES command. 
