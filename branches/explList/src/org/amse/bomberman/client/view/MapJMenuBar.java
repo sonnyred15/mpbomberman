@@ -30,6 +30,8 @@ public class MapJMenuBar extends JMenuBar{
          start.setAction(new StartAction(parent));
          exit.addActionListener(new ActionListener() {
              public void actionPerformed(ActionEvent e) {
+                 Model.getInstance().removeListener(parent);
+                 Model.getInstance().getConnector().leaveGame();
                  System.exit(0);
              }
          });
@@ -47,7 +49,8 @@ public class MapJMenuBar extends JMenuBar{
         public void actionPerformed(ActionEvent e) {
             parent.dispose();
             Model.getInstance().removeListener(parent);
-            Connector.getInstance().leaveGame();
+            Model.getInstance().getConnector().leaveGame();
+            Model.getInstance().removeBots();
             ServerInfoJFrame serv = new ServerInfoJFrame();
         }
     }
@@ -62,7 +65,7 @@ public class MapJMenuBar extends JMenuBar{
         }
         public void actionPerformed(ActionEvent e) {
             //----------------------------------------------------------------
-            IConnector connect = Connector.getInstance();
+            IConnector connect = Model.getInstance().getConnector();
             connect.startGame();
             this.setEnabled(false);
             // rewrite this!!! it must be something otherwise

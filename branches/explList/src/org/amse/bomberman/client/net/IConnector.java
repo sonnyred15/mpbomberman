@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *

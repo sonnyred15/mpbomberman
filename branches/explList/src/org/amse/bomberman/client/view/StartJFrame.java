@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 
@@ -77,6 +78,8 @@ public class StartJFrame extends JFrame {
         //portDefault.setAction(new DefaultPortAction(this));
         connectJButton.setAction(new ConnectAction(this));
 
+        IConnector connector = new Connector();
+        Model.getInstance().setConnector(connector);
         setResizable(false);
         setVisible(true);
     }
@@ -135,7 +138,7 @@ public class StartJFrame extends JFrame {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector con = Connector.getInstance();
+            IConnector con = Model.getInstance().getConnector();
             try {
                 con.сonnect(parent.getIPAddress(), parent.getPort());
                 parent.dispose();

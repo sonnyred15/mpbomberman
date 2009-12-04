@@ -1,6 +1,7 @@
 package org.amse.bomberman.client.model;
 
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.util.Constants.Direction;
+
 
 /**
  *

@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.util.*;
+import org.amse.bomberman.util.Constants.Command;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -23,29 +24,22 @@ import org.amse.bomberman.util.*;
  */
 public class Connector implements IConnector{
     private Socket socket;
-    private static IConnector connector = null;
     private Timer timer;
 
-    private Connector() {
+    public Connector() {
     }
 
-    public static IConnector getInstance() {
-        if (connector == null) {
-            connector = new Connector();
-        }
-        return connector;
-    }
     public void сonnect(InetAddress address, int port) throws UnknownHostException, IOException {
         this.socket = new Socket(address, port);
     }
     public void leaveGame() {
         // true stop timer?
         timer.cancel();
-        System.out.println(queryAnswer("6").get(0));
+        System.out.println(queryAnswer(""+Command.LEAVE_GAME.getValue()).get(0));
         System.out.println();
     }
     public ArrayList<String> takeGamesList() {
-        ArrayList<String> games = queryAnswer("0");
+        ArrayList<String> games = queryAnswer(""+Command.GET_GAMES.getValue());
         for (String string : games) {
             System.out.println(string);
         }
@@ -53,7 +47,7 @@ public class Connector implements IConnector{
         return games;
     }
     public void createGame(){
-        System.out.println(queryAnswer("1").get(0));
+        System.out.println(queryAnswer(""+Command.CREATE_GAME.getValue()).get(0));
         System.out.println();
     }
     public boolean joinGame(int n) throws IOException {
@@ -65,11 +59,11 @@ public class Connector implements IConnector{
         } else throw new IOException(answer);
     }
     public boolean doMove(Direction dir) {
-        String res = queryAnswer("3" + dir.getInt()).get(0);
+        String res = queryAnswer("3" + dir.getValue()).get(0);
         return (res.charAt(0) == 't');
     }
     public void startGame(){
-        System.out.println(queryAnswer("5").get(0));
+        System.out.println(queryAnswer(""+Command.START_GAME.getValue()).get(0));
         System.out.println();
     }
     public void beginUpdating() {
@@ -79,7 +73,7 @@ public class Connector implements IConnector{
         timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     public BombMap getMap(){
-        ArrayList<String> mp = queryAnswer("4");
+        ArrayList<String> mp = queryAnswer(""+Command.GET_MAP_ARRAY.getValue());
         BombMap map = null;
         int n = 0;
         n = Integer.parseInt(mp.get(0));
@@ -117,7 +111,7 @@ public class Connector implements IConnector{
         return map;
     }
     public void plantBomb() {
-        System.out.println(queryAnswer("7").get(0));
+        System.out.println(queryAnswer(""+Command.PLACE_BOMB.getValue()).get(0));
         //System.out.println();
     }
     public InetAddress getInetAddress() {
@@ -133,7 +127,7 @@ public class Connector implements IConnector{
         ArrayList<String> answer=null;
         try {
             out = new PrintWriter(this.socket.getOutputStream());
-            System.out.println("Client: Sending query: '"+query+"'.");
+            //System.out.println("Client: Sending query: '"+query+"'.");
             out.println(query);
             out.flush();
 
@@ -146,7 +140,7 @@ public class Connector implements IConnector{
                 }
                 answer.add(oneLine);
             }
-            System.out.println("Client: Answer received.");
+            //System.out.println("Client: Answer received.");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -2,7 +2,7 @@ package org.amse.bomberman.client.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
 
 /**
@@ -11,14 +11,16 @@ import org.amse.bomberman.client.view.IView;
  */
 public class Model implements IModel{
     private static IModel model= null;
+    private IConnector connector;
     private BombMap map;
     // here?
     private Player player = new Player("Mavr");
     private List<IView> listener = new ArrayList<IView>();
     // ??? how do it? how start bot Threads?
-    private List<Thread> bots = new ArrayList<Thread>();
+    private List<Bot> bots = new ArrayList<Bot>();
 
-    private Model() {
+    // VERY BAD HACK!!! If it pravate, then can not extends BotModel
+    protected Model() {
     }
 
     public static IModel getInstance() {
@@ -48,6 +50,12 @@ public class Model implements IModel{
     public BombMap getMap() {
         return map;
     }
+    public void setConnector(IConnector connector) {
+        this.connector = connector;
+    }
+    public IConnector getConnector() {
+        return connector;
+    }
     public void addListener(IView view) {
         listener.add(view);
     }
@@ -64,12 +72,22 @@ public class Model implements IModel{
             elem.update();
         }
     }
-    public void addBot(Thread botThread) {
+    public void addBot(Bot botThread) {
         bots.add(botThread);
     }
     public void startBots() {
-        for (Thread bot: bots) {
-            bot.start();
+        for (Bot bot: bots) {
+            if (!bot.isAlive()){
+                bot.start();
+            } 
+        }
+    }
+    public void removeBots() {
+        for (Bot bot: bots) {
+            bot.kill();
+        }
+        for (int i = bots.size(); i > 0; i--) {
+            bots.remove(bots.get(i-1));
         }
     }
 }

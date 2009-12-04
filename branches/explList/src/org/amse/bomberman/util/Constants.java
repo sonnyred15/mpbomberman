@@ -82,7 +82,7 @@ public final class Constants {
             this.value = value;
         }
 
-        private int getValue(){
+        public int getValue(){
             return this.value;
         }
 
@@ -104,9 +104,11 @@ public final class Constants {
                     return LEAVE_GAME;
                 case 7:
                     return PLACE_BOMB;
+                case 8:
+                    return DOWNLOAD_MAP;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
-                            "must be between 0 and 7 inclusive");
+                            "must be between 0 and 8 inclusive");
             }
         }
     }

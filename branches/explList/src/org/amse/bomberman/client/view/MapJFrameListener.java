@@ -2,9 +2,10 @@ package org.amse.bomberman.client.view;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.util.Constants.Direction;
 /**
  * @author michail korovkin
  */
@@ -15,7 +16,7 @@ public class MapJFrameListener implements KeyListener{
     }
 
     public void keyPressed(KeyEvent e) {
-        IConnector connector = Connector.getInstance();
+        IConnector connector = Model.getInstance().getConnector();
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT : {
                 connector.doMove(Direction.LEFT);

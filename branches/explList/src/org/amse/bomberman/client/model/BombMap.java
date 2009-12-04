@@ -64,6 +64,7 @@ public class BombMap {
             return cells[cell.getX()][cell.getY()];
         } else throw new UnsupportedOperationException("Asking cell is absent.");
     }
+    @SuppressWarnings("unchecked")
     public ArrayList<Cell> getExplosions() {
         return (ArrayList)explosions;
     }
@@ -146,31 +147,6 @@ public class BombMap {
                 System.out.println("Cann't close file. Please check this.");
             }
             throw ex;
-        }
-    }
-    public static enum Direction {
-        DOWN,
-        LEFT,
-        UP,
-        RIGHT;
-        public int getInt() {
-            switch(this.valueOf(this.toString())){
-                case DOWN: return 0;
-                case LEFT: return 1;
-                case UP: return 2;
-                case RIGHT: return 3;
-            }
-            return -1;
-        }
-        public static Direction getDirection(int x) throws UnsupportedOperationException{
-            switch(x) {
-                case 0: return DOWN;
-                case 1: return LEFT;
-                case 2: return UP;
-                case 3: return RIGHT;
-            }
-            throw new UnsupportedOperationException("Wrong Integer value" +
-                    " for Direction");
         }
     }
     /*private void goToCell(Cell cell, int playerNumber) {

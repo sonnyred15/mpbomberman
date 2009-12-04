@@ -1,5 +1,5 @@
 package org.amse.bomberman.client.model;
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
 /**
  *
@@ -15,6 +15,9 @@ public interface IModel {
     public int getPlayerLives();
     //public void plantBomb(int number);
     // how do it??? who must start bot thread???
-    public void addBot(Thread botThread);
+    public void addBot(Bot botThread);
     public void startBots();
+    public void removeBots();
+    public void setConnector(IConnector connector);
+    public IConnector getConnector();
 }

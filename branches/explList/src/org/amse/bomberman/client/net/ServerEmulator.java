@@ -10,7 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Player;
 

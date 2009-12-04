@@ -75,7 +75,7 @@ public class ServerInfoJFrame extends JFrame{
         setVisible(true);
     }
     private void refreshTable() {
-        IConnector connect = Connector.getInstance();
+        IConnector connect = Model.getInstance().getConnector();
         ArrayList<String> games = connect.takeGamesList();
         // if not "No games"
         if (games.get(0).charAt(0) != 'N') {
@@ -112,7 +112,7 @@ public class ServerInfoJFrame extends JFrame{
         columnModel.getColumn(4).setResizable(false);
     }
     private void join(int gameNumber) {
-        IConnector connect = Connector.getInstance();
+        IConnector connect = Model.getInstance().getConnector();
         try {
             connect.joinGame(gameNumber);
             //------------------------------------------------------------
@@ -164,7 +164,7 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector connect = Connector.getInstance();
+            IConnector connect = Model.getInstance().getConnector();
             connect.createGame();
             parent.refreshTable();
         }
@@ -201,13 +201,12 @@ public class ServerInfoJFrame extends JFrame{
             int gameNumber = parent.getSelectedGame();
             if (gameNumber != -1) {
                 try {
-                    IConnector connector = Connector.getInstance();
+                    IConnector connector = Model.getInstance().getConnector();
                     InetAddress address = connector.getInetAddress();
                     int port = connector.getPort();
                     Bot bot = new Bot(gameNumber, address, port);
+                    Model.getInstance().addBot(bot);
                     parent.refreshTable();
-                    Thread botThread = new Thread(bot);
-                    Model.getInstance().addBot(botThread);
                     JOptionPane.showMessageDialog(parent, "Bot was successfully added."
                         , "Sucessful", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {

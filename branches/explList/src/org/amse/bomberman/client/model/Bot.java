@@ -1,30 +1,28 @@
 package org.amse.bomberman.client.model;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
-import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.*;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  * Class for adding bots to the games on server
  * @author michail korovkin
  */
-public class Bot implements Runnable{
-    private Socket socket;
+public class Bot extends Thread{
     private Cell target = null;
     // how receive myCoord???
     private Cell myCoord = new Cell(0,0);
     // how receive myNumber???
-    private int myNumber = 1;
+    private int myNumber = -1;
     private BombMap temp;
     private int cons = 1000;
+    private IConnector connector = null;
+    private boolean isDead;
 
     /**
      * Constructor, that create new socket and join bot to the game by its gameNumber
@@ -34,55 +32,38 @@ public class Bot implements Runnable{
      * @throws java.io.IOException if occures any troubles with connection to server
      */
     public Bot(int gameNumber, InetAddress address, int port) throws IOException {
-        this.socket = new Socket(address, port);
-        joinGame(gameNumber);
-        //Connector.getInstance().сonnect(address, port);
-        //Connector.getInstance().joinGame(gameNumber);
-    }
-    public void joinGame(int n) {
-        System.out.println(queryAnswer("2 " + n).get(0));
-        System.out.println();
-    }
-    public boolean doMove(Direction dir) {
-        String res = queryAnswer("3" + dir.getInt()).get(0);
-        return (res.charAt(0) == 't');
-    }
-    private synchronized ArrayList<String> queryAnswer(String query){
-        PrintWriter out = null;
-        BufferedReader in = null;
-        ArrayList<String> answer=null;
-        try {
-            out = new PrintWriter(this.socket.getOutputStream());
-            System.out.println("Client: Sending query: '"+query+"'.");
-            out.println(query);
-            out.flush();
-
-            in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-            String oneLine;
-            answer = new ArrayList<String>();
-            while ((oneLine = in.readLine()) != null) {
-                if (oneLine.length() == 0) {
-                    break;
-                }
-                answer.add(oneLine);
-            }
-            System.out.println("Client: Answer received.");
-        } catch (Exception e) {
+        connector = new Connector();
+        isDead = false;
+        connector.сonnect(address, port);
+        // BAD HACK!!! What is another way to know myNumber on the map???
+        int buf = getMyNumber(connector.takeGamesList(), gameNumber);
+        if (buf!= -1) {
+            myNumber = buf;
+            connector.joinGame(gameNumber);
+        } else {
+            throw new IOException("Wrong game for connect.");
         }
-        return answer;
     }
+    private boolean isDead() {
+        return (isDead);
+    }
+    public void kill() {
+        isDead = true;
+    }
+    @Override
     public void run() {
         int x = 0;
         int y = 0;
         Random random = new Random();
-        while (true) {
+        while (!isDead()) {
             BombMap map = Model.getInstance().getMap();
             while (map.getValue(new Cell(x, y)) != Constants.MAP_EMPTY) {
                 x = random.nextInt(map.getSize() - 1);
                 y = random.nextInt(map.getSize() - 1);
             }
             target = new Cell(x, y);
-            while ((myCoord.getX() != target.getX()) || (myCoord.getY() != target.getY())) {
+            while (((myCoord.getX() != target.getX()) || (myCoord.getY() != target.getY()))
+                    && (!isDead())) {
                 map = Model.getInstance().getMap();
                 for (int i = 0; i < map.getSize(); i++) {
                     for (int j = 0; j < map.getSize(); j++) {
@@ -98,14 +79,13 @@ public class Bot implements Runnable{
                 temp = map;
                 try {
                     Direction direct = findWay(myCoord, target);
-                    //Connector.getInstance().doMove(direct);
-                    doMove(direct);
+                    connector.doMove(direct);
+                    //doMove(direct);
                 } catch (UnsupportedOperationException ex) {
                     //ex.printStackTrace();
                 }
             }
         }
-        //System.out.println("End of bot.");
     }
     private Direction findWay(Cell begin, Cell end) {
         rec(begin, cons);
@@ -186,5 +166,18 @@ public class Bot implements Runnable{
                 rec(next, steps+1);
             }
         }
+    }
+    private int getMyNumber(ArrayList<String> gameList, int gameNumber) {
+        for (String game:gameList) {
+            String[] info = game.split(" ");
+            if ((int)Integer.parseInt(info[0]) == gameNumber) {
+                if ((int)Integer.parseInt(info[3]) < (int)Integer.parseInt(info[4])) {
+                    return ((int)Integer.parseInt(info[3]) + 1);
+                } else {
+                    return -1;
+                }
+            }
+        }
+        return -1;
     }
 }
