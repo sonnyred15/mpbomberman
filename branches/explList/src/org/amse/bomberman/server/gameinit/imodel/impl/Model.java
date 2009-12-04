@@ -6,8 +6,11 @@ package org.amse.bomberman.server.gameinit.imodel.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
@@ -22,20 +25,17 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Model implements IModel {
 
-    private GameMap map;
-    private Game game;
-    private Timer timer = new Timer();
-    private List<Pair> explosionSquares;
-    private List<DetonateTask> bombes;
-
-    private Model() {
-    }
+    private final GameMap map;
+    private final Game game;
+    private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    private final List<Pair> explosionSquares;
+    private final List<Canceller> bombes;
 
     public Model(GameMap map, Game game) {
         this.map = map;
         this.game = game;
-        this.explosionSquares = new ArrayList<Pair>();
-        this.bombes = new ArrayList<DetonateTask>();
+        this.explosionSquares = new ArrayList<Pair>(); //what`s about syncronization?
+        this.bombes = new ArrayList<Canceller>();
     }
 
     public int[][] getMapArray() {
@@ -128,7 +128,7 @@ public class Model implements IModel {
         return (this.map.isEmpty(x, y)) ? false : true;
     }
 
-    private int[] newCoords(int x, int y, int direction) {
+    private int[] newCoords(int x, int y, int direction) { //whats about catch illegalArgumentException
         int[] arr = new int[2];
         Direction dir = Direction.fromInt(direction);
 
@@ -158,7 +158,7 @@ public class Model implements IModel {
         return arr;
     }
 
-    public void printToConsole() {
+    public void printToConsole() { //useless?
         int dim = this.map.getDimension();
         for (int i = 0; i < dim; i++) {
             System.out.println();
@@ -194,23 +194,52 @@ public class Model implements IModel {
             }
             this.map.setSquare(x, y, Constants.MAP_BOMB);
             DetonateTask dt = new DetonateTask(player, x, y);
-            bombes.add(dt);            
-            this.timer.schedule(dt, Constants.BOMB_TIMER_VALUE);
+            ScheduledFuture<?> futureBoom = timer.schedule(dt,Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
+            bombes.add(new Canceller(x, y, futureBoom,dt));
         }
     }
 
     public String getMapName() {
         return this.map.getName();
     }
+    
+    private class Canceller{        
+        private int x;
+        private int y;
+        private ScheduledFuture<?> boom;
+        private DetonateTask dt;
+        
+        public Canceller( int x, int y, ScheduledFuture<?> boom, DetonateTask dt){
+            this.x=x;
+            this.y=y;
+            this.boom=boom;
+            this.dt = dt;
+        }
 
-    private class ClearExplosion extends TimerTask {
+        public boolean isCorrespondTo(int x, int y) {
+            if (this.x == x && this.y == y) {
+                return true;
+            }
+            return false;
+        }
+        
+        public void cancel(){
+            this.boom.cancel(false);
+        }
+
+        private void execute() {
+           dt.run();
+        }
+    }
+
+    private class ClearExplosionTask extends TimerTask {
 
         private List<Pair> explSqToClear;
         private Player player;
         private int bombX;
         private int bombY;
 
-        public ClearExplosion(List<Pair> toClear, Pair bombToClear, Player player) {
+        public ClearExplosionTask(List<Pair> toClear, Pair bombToClear, Player player) {
             this.explSqToClear = toClear;
             this.player = player;
             this.bombX = bombToClear.getX();
@@ -300,16 +329,10 @@ public class Model implements IModel {
                 }
             }
             explosionSquares.addAll(explSq); //add explosion from this to others
-            player.detonatedBomd();
-            timer.schedule(new ClearExplosion(explSq, new Pair(x, y), this.player), Constants.BOMB_DETONATION_TIME);
+            player.detonatedBomd();           
+            timer.schedule(new ClearExplosionTask(explSq, new Pair(x, y), this.player), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
         }
 
-        public boolean isCorrespondTo(int x, int y) {
-            if (this.x == x && this.y == y) {
-                return true;
-            }
-            return false;
-        }
         //true if we must put explosion square
         //false if we must break cycle;
         private boolean explodeSquare(int x, int y) {
@@ -329,18 +352,18 @@ public class Model implements IModel {
 
                 return false;
             } else if (map.isBomb(x, y)) {  //another bomb
-                DetonateTask dt = null;
-                for (DetonateTask detonateTask : bombes) {
+                Canceller boomCancel = null;
+                for (Canceller detonateTask : bombes) {
                     if(detonateTask.isCorrespondTo(x, y)){
-                        dt = detonateTask;
+                        boomCancel = detonateTask;
                     }
                 }
-                dt.cancel(); //removeFromTimer
-                bombes.remove(dt); //removeFromList
-                dt.run(); //execute
+                boomCancel.cancel(); //removeFromTimer
+                bombes.remove(boomCancel); //removeFromList
+                boomCancel.execute(); //execute
                 return false;
             }
             return true; //CHECK < THIS// is this ok?
         }
+        }
     }
-}

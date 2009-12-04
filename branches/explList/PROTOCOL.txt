@@ -63,3 +63,5 @@ Now answers if all is not ok:
 (6) "Cant disconnect. You are not in any game" - if you are not joined to any game and trying to disconnect
 
 (7) "Error.Cant place bomb." - if you are not joined to any game
+
+(8) @see (1) but except "Wrong command parametres. Error on..." -> "Wrong query. Not enough arguments"

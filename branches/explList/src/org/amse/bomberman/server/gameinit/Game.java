@@ -10,7 +10,6 @@ import java.util.List;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -19,55 +18,56 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Game {
 
-    private IServer server;
-    private boolean started = false;
-    private String gameName = "game";
-    private int maxPlayers;
-    private List<Player> players;
-    private IModel model;
+    private final IServer server;
+    private final String gameName;
+    private final int maxPlayers;
+    private final IModel model;
+    private final List<Player> players;
+    private boolean started;
 
-    public Game(IServer server,GameMap map, String gameName) {
-        this.server=server;
-        this.started = false;
+    public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
+        this.server = server;
         this.gameName = gameName;
-        this.maxPlayers = map.getMaxPlayers();
-        this.players = Collections.synchronizedList(new ArrayList<Player>());
-        this.model = new Model(map, this);
-    //CHECK ^ THIS!//
-    }
 
-    public Game(IServer server,GameMap map, String gameName, int maxPlayers) {
-        this(server, map, gameName);
-        if (maxPlayers > 0 && maxPlayers <= this.maxPlayers) {
+        int mapMaxPlayers = map.getMaxPlayers();
+        if (maxPlayers > 0 && maxPlayers <= mapMaxPlayers) {
             this.maxPlayers = maxPlayers;
+        } else {
+            this.maxPlayers = mapMaxPlayers;
         }
+
+        this.model = new Model(map, this);
+        this.players = Collections.synchronizedList(new ArrayList<Player>());
+
+        this.started = false;
     }
 
     public String getMapName() {
         return this.model.getMapName();
     }
 
-    public Player join(String name) {
-        if (players.size() == this.maxPlayers) { //CHECK < THIS// what if size>max???
-            return null;
-        } else {
-            Player player = new Player(name, players.size() + 1);
+    public synchronized Player join(String name) {
+        Player player = null;
+
+        if (this.players.size() < this.maxPlayers) { //CHECK < THIS// what if size>max???
+            player = new Player(name, this.players.size() + 1);
             //coordinates of players will be set when game would start!!!!
-            players.add(player);
-            return player;
+            this.players.add(player);
         }
+
+        return player;
     }
 
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
         this.model.removePlayer(player.getID());
-        if(this.players.size()==0){
-            endGame();
+        if (this.players.size() == 0) {
+            this.endGame();
         }
     }
 
     public void placeBomb(Player player) {
-        if (this.started != false) {
+        if (this.started) {
             this.model.placeBomb(player);
         }
     }
@@ -83,12 +83,12 @@ public class Game {
         }
     }
 
-    private void endGame(){
+    private void endGame() {
         this.server.removeGame(this);
     }
 
     public boolean doMove(Player player, Direction direction) {
-        if (this.started != false) {
+        if (this.started) {
             if (player.isAlive()) {
                 return model.doMove(player, direction.getValue());
             }
@@ -99,8 +99,8 @@ public class Game {
     public int[][] getMapArray() {
         return this.model.getMapArray();
     }
-    
-    public List<Pair> getExplosionSquares(){
+
+    public List<Pair> getExplosionSquares() {
         return this.model.getExplosionSquares();
     }
 
@@ -113,21 +113,24 @@ public class Game {
     }
 
     public void playerBombed(int id) {
-        for (Player player : players) {
-            if (player.getID() == id) {
-                player.bombed();
-                if (!player.isAlive()) {
-                    model.removePlayer(id);
+        synchronized (players) { //otherwise iterator could broke
+            for (Player player : players) {
+                if (player.getID() == id) {
+                    player.bombed();
+                    if (!player.isAlive()) {
+                        model.removePlayer(id);
+                    }
+                    break;
                 }
             }
         }
     }
-    
-    public int getGameMaxPlayers(){
+
+    public int getGameMaxPlayers() {
         return this.maxPlayers;
     }
-    
-    public int getCurrentPlayers(){
+
+    public int getCurrentPlayers() {
         return this.players.size();
     }
 }
