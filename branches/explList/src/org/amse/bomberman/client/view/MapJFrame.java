@@ -24,19 +24,16 @@ import org.amse.bomberman.util.*;
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private JLabel livesJLabel;
-    private final Color WALL_COLOR = Color.BLUE;
-    private final Color WALL_EXPL_COLOR = new Color(0,0,127);
     private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
-    private final Color PLAYER1_COLOR = new Color(0,255,0);
-    private final Color PLAYER2_COLOR = new Color(0,200,0);
-    private final Color PLAYER3_COLOR = new Color(0,150,0);
     private final Color PL_EXPL_COLOR = new Color(63,255,255);
-    private final Color BOMB_COLOR = Color.BLACK;
     private final Color EXPLODE_COLOR = Color.RED;
     private final Color BEAM_COLOR = Color.ORANGE;
     private final String BOMB_ICON_PATH = "org/amse/bomberman/client/icons/bomb2.png";
     private final String WALL_ICON_PATH = "org/amse/bomberman/client/icons/wall_blue-48.png";
-    private final String MAN_ICON_PATH = "org/amse/bomberman/client/icons/superman-48.png";
+    private final String PL1_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-1.png";
+    private final String PL2_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-2.png";
+    private final String PL3_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-3.png";
+    private final String PL4_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-4.png";
     private final String BURN_ICON_PATH = "org/amse/bomberman/client/icons/burn-48.png";
     // is really nead???
     private boolean dead = false;
@@ -132,21 +129,12 @@ public class MapJFrame extends JFrame implements IView{
                     break;
                 }
             }
-            if (key < Constants.MAP_EMPTY && key >= BombMap.BOMB_PROOF_WALL) {
-                color = WALL_COLOR;
+            if (key < Constants.MAP_EMPTY && key >= Constants.MAP_PROOF_WALL) {
                 icon = new ImageIcon(cl.getResource(WALL_ICON_PATH));
             } else {
                 if (key > Constants.MAP_EMPTY && key <= Constants.MAX_PLAYERS) {
-                    icon = new ImageIcon(cl.getResource(MAN_ICON_PATH));
-                    /*if (key == 1) {
-                        value = PLAYER1_COLOR;
-                    } else {
-                        if (key == 2) {
-                            value = PLAYER2_COLOR;
-                        } else {
-                            value = PLAYER3_COLOR;
-                        }
-                    }*/
+                    icon = getPlayerIcon(key);
+                    
                 }
             }
             this.setBackground(color);
@@ -158,13 +146,13 @@ public class MapJFrame extends JFrame implements IView{
             ImageIcon icon = null;
             ClassLoader cl = Main.class.getClassLoader();
             // if it is wall
-            if (mapValue < Constants.MAP_EMPTY && mapValue >= BombMap.BOMB_PROOF_WALL) {
+            if (mapValue < Constants.MAP_EMPTY && mapValue >= Constants.MAP_PROOF_WALL) {
                 //value = WALL_EXPL_COLOR;
                 icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
             } else {
                 // if it is player
                 if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
-                    icon = new ImageIcon(cl.getResource(MAN_ICON_PATH));
+                    icon = getPlayerIcon(mapValue);
                     value = PL_EXPL_COLOR;
                 } else {
                     // if it is center of Explosion
@@ -178,6 +166,16 @@ public class MapJFrame extends JFrame implements IView{
             }
             this.setBackground(value);
             this.setIcon(icon);
+        }
+    }
+    private ImageIcon getPlayerIcon(int mapValue) {
+        ClassLoader cl = Main.class.getClassLoader();
+        switch(mapValue) {
+            case 1: return new ImageIcon(cl.getResource(PL1_ICON_PATH));
+            case 2: return new ImageIcon(cl.getResource(PL2_ICON_PATH));
+            case 3: return new ImageIcon(cl.getResource(PL3_ICON_PATH));
+            case 4: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
+            default: return null;
         }
     }
 }

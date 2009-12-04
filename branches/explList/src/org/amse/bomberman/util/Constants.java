@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.util;
 
 /**
@@ -14,6 +10,7 @@ public final class Constants {
     }
 
     public static final int MAP_EMPTY  = 0;
+    public static final int MAP_PROOF_WALL = -8;
     public static final int MAP_BOMB  = -16;
     public static final int MAP_DETONATED_BOMB = -17;
     public static final int MAP_EXPLOSION_LINE = -18;

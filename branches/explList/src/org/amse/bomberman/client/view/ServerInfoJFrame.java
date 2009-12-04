@@ -125,7 +125,7 @@ public class ServerInfoJFrame extends JFrame{
             //-------------------------------------------------------------
             this.dispose();
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Can not join to the game: " +
+            JOptionPane.showMessageDialog(this, "Can not join to the game: \n" +
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
        

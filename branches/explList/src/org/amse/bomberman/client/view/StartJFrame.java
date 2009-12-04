@@ -17,13 +17,13 @@ import javax.swing.SwingConstants;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.util.Constants;
 
 /**
  *
  * @author michail korovkin
  */
 public class StartJFrame extends JFrame {
-    private static final int PORT = 10500;
     private final int height = 150;
     private final int width = 240;
     private JButton connectJButton = new JButton();
@@ -65,7 +65,7 @@ public class StartJFrame extends JFrame {
         centralBox.add(portLabel);
         //centralBox.add(Box.createHorizontalStrut(10));
         portTF.setPreferredSize(new Dimension(width/2, 20));
-        portTF.setText("" + PORT);
+        portTF.setText("" + Constants.DEFAULT_PORT);
         centralBox.add(portTF);
         //centralBox.add(Box.createHorizontalStrut(10));
         //centralBox.add(portDefault);

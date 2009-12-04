@@ -14,7 +14,6 @@ import java.util.List;
  * @author michail korovkin
  */
 public class BombMap {
-    public static final int BOMB_PROOF_WALL = -8;
     private int[][] cells;
     private List<Cell> explosions;
     
@@ -148,6 +147,20 @@ public class BombMap {
             }
             throw ex;
         }
+    }
+    @Override
+    @SuppressWarnings("unchecked")
+    public BombMap clone() {
+        BombMap res = new BombMap(this.getSize());
+        for (int i = 0; i < this.getSize(); i++) {
+            for (int j = 0; j < this.getSize(); j++) {
+                res.setCell(new Cell(i,j), this.getValue(new Cell(i,j)));
+            }
+        }
+        List<Cell> expl = new ArrayList<Cell>();
+        expl = this.getExplosions();
+        res.setExplosions((ArrayList)expl);
+        return res;
     }
     /*private void goToCell(Cell cell, int playerNumber) {
         if (cells[cell.myX][cell.myY] < BombMap.BOMB_PROOF_WALL) {

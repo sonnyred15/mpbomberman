@@ -16,7 +16,7 @@ import org.amse.bomberman.util.Constants.Direction;
 public class Bot extends Thread{
     private Cell target = null;
     // how receive myCoord???
-    private Cell myCoord = new Cell(0,0);
+    private Cell myCoord = null;
     // how receive myNumber???
     private int myNumber = -1;
     private BombMap temp;
@@ -52,11 +52,13 @@ public class Bot extends Thread{
     }
     @Override
     public void run() {
+        BombMap map = Model.getInstance().getMap();
+        myCoord = findMyCoord(map);
+        Random random = new Random();
         int x = 0;
         int y = 0;
-        Random random = new Random();
         while (!isDead()) {
-            BombMap map = Model.getInstance().getMap();
+            map = Model.getInstance().getMap();
             while (map.getValue(new Cell(x, y)) != Constants.MAP_EMPTY) {
                 x = random.nextInt(map.getSize() - 1);
                 y = random.nextInt(map.getSize() - 1);
@@ -65,24 +67,21 @@ public class Bot extends Thread{
             while (((myCoord.getX() != target.getX()) || (myCoord.getY() != target.getY()))
                     && (!isDead())) {
                 map = Model.getInstance().getMap();
-                for (int i = 0; i < map.getSize(); i++) {
-                    for (int j = 0; j < map.getSize(); j++) {
-                        if (map.getValue(new Cell(i, j)) == myNumber) {
-                            myCoord = new Cell(i, j);
-                            break;
-                        }
+                myCoord = findMyCoord(map);
+                if (myCoord == null) {
+                    this.kill();
+                } else {
+                    if ((myCoord.getX() == target.getX()) && (myCoord.getY()
+                            == target.getY())) {
+                        break;
                     }
-                }
-                if ((myCoord.getX() == target.getX()) && (myCoord.getY() == target.getY())) {
-                    break;
-                }
-                temp = map;
-                try {
-                    Direction direct = findWay(myCoord, target);
-                    connector.doMove(direct);
-                    //doMove(direct);
-                } catch (UnsupportedOperationException ex) {
-                    //ex.printStackTrace();
+                    temp = map.clone();
+                    try {
+                        Direction direct = findWay(myCoord, target);
+                        connector.doMove(direct);
+                    } catch (UnsupportedOperationException ex) {
+                        System.out.println("Bot can not find the way to the target cell.");
+                    }
                 }
             }
         }
@@ -127,12 +126,10 @@ public class Bot extends Thread{
                     } else {
                         // ???? what is it??? what to do???
                         throw new UnsupportedOperationException();
-                        //return Direction.RIGHT;
                     }
                 }
             }
         }
-
     }
     private void rec(Cell current, int steps) {
         int x = current.getX();
@@ -179,5 +176,17 @@ public class Bot extends Thread{
             }
         }
         return -1;
+    }
+    private Cell findMyCoord(BombMap map) {
+        Cell res = null;
+        for (int i = 0; i < map.getSize(); i++) {
+            for (int j = 0; j < map.getSize(); j++) {
+                if (map.getValue(new Cell(i, j)) == myNumber) {
+                    res = new Cell(i, j);
+                    break;
+                }
+            }
+        }
+        return res;
     }
 }
