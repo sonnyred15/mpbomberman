@@ -17,7 +17,7 @@ public interface IConnector {
      public void leaveGame();
      public ArrayList<String> takeGamesList();
      public void createGame();
-     public void joinGame(int gameID);
+     public boolean joinGame(int gameID) throws IOException;
      public boolean doMove(Direction dir);
      public void startGame();
      public BombMap getMap();

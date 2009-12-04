@@ -113,16 +113,22 @@ public class ServerInfoJFrame extends JFrame{
     }
     private void join(int gameNumber) {
         IConnector connect = Connector.getInstance();
-        connect.joinGame(gameNumber);
-        //------------------------------------------------------------
-        BombMap map = connect.getMap();
-        Model model = (Model) Model.getInstance();
-        MapJFrame frame = new MapJFrame(map);
-        model.addListener(frame);
-        model.setMap(map);
-        connect.beginUpdating();
-        //-------------------------------------------------------------
-        this.dispose();
+        try {
+            connect.joinGame(gameNumber);
+            //------------------------------------------------------------
+            BombMap map = connect.getMap();
+            Model model = (Model) Model.getInstance();
+            MapJFrame frame = new MapJFrame(map);
+            model.addListener(frame);
+            model.setMap(map);
+            connect.beginUpdating();
+            //-------------------------------------------------------------
+            this.dispose();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Can not join to the game: " +
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+       
     }
     private int getSelectedGame() {
         int result = -1;

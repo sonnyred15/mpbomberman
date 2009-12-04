@@ -15,6 +15,7 @@ import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.util.*;
 
 /**
  *
@@ -55,9 +56,13 @@ public class Connector implements IConnector{
         System.out.println(queryAnswer("1").get(0));
         System.out.println();
     }
-    public void joinGame(int n) {
-        System.out.println(queryAnswer("2 " + n).get(0));
+    public boolean joinGame(int n) throws IOException {
+        String answer = queryAnswer("2 " + n).get(0);
+        System.out.println(answer);
         System.out.println();
+        if (answer.equals("Joined.")) {
+            return true;
+        } else throw new IOException(answer);
     }
     public boolean doMove(Direction dir) {
         String res = queryAnswer("3" + dir.getInt()).get(0);
@@ -71,7 +76,7 @@ public class Connector implements IConnector{
          // must be here or somewhere else???
         timer = new Timer();
         // period???
-        timer.schedule(new UpdateTimerTask(), (long)0,(long) 200);
+        timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     public BombMap getMap(){
         ArrayList<String> mp = queryAnswer("4");
@@ -143,6 +148,7 @@ public class Connector implements IConnector{
             }
             System.out.println("Client: Answer received.");
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return answer;
     }

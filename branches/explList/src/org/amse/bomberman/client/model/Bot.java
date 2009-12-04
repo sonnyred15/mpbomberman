@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import org.amse.bomberman.client.model.BombMap.Direction;
 import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.util.*;
 
 /**
  * Class for adding bots to the games on server
@@ -76,7 +77,7 @@ public class Bot implements Runnable{
         Random random = new Random();
         while (true) {
             BombMap map = Model.getInstance().getMap();
-            while (map.getValue(new Cell(x, y)) != BombMap.EMPTY) {
+            while (map.getValue(new Cell(x, y)) != Constants.MAP_EMPTY) {
                 x = random.nextInt(map.getSize() - 1);
                 y = random.nextInt(map.getSize() - 1);
             }
@@ -159,28 +160,28 @@ public class Bot implements Runnable{
         temp.setCell(current, steps);
         if (y < temp.getSize() - 1) {
             Cell next = new Cell(x, y+1);
-            if ((temp.getValue(next) == BombMap.EMPTY)
+            if ((temp.getValue(next) == Constants.MAP_EMPTY)
                     || ((temp.getValue(next) > 1000) && (temp.getValue(next) > steps + 1))) {
                 rec(next, steps+1);
             }
         }
         if (y > 0) {
             Cell next = new Cell(x, y-1);
-            if ((temp.getValue(next) == BombMap.EMPTY)
+            if ((temp.getValue(next) == Constants.MAP_EMPTY)
                     || ((temp.getValue(next) > 1000) && (temp.getValue(next) > steps + 1))) {
                 rec(next, steps+1);
             }
         }
         if (x > 0) {
             Cell next = new Cell(x-1, y);
-            if ((temp.getValue(next) == BombMap.EMPTY)
+            if ((temp.getValue(next) == Constants.MAP_EMPTY)
                     || ((temp.getValue(next) > 1000) && (temp.getValue(next) > steps + 1))) {
                 rec(next, steps+1);
             }
         }
         if (x < temp.getSize() - 1) {
             Cell next = new Cell(x+1, y);
-            if ((temp.getValue(next) == BombMap.EMPTY)
+            if ((temp.getValue(next) == Constants.MAP_EMPTY)
                     || ((temp.getValue(next) > 1000) && (temp.getValue(next) > steps + 1))) {
                 rec(next, steps+1);
             }

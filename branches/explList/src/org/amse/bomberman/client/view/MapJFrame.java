@@ -15,6 +15,7 @@ import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.util.*;
 
 /**
  *
@@ -118,25 +119,24 @@ public class MapJFrame extends JFrame implements IView{
             ImageIcon icon = null;
             ClassLoader cl = Main.class.getClassLoader();
             switch (key) {
-                case BombMap.EMPTY: { 
+                case Constants.MAP_EMPTY: {
                     icon = null;
                     break;
                 }
-                case BombMap.BOMB: {
+                case Constants.MAP_BOMB: {
                     icon = new ImageIcon(cl.getResource(BOMB_ICON_PATH));
                     break;
                 }
-                case BombMap.EXPLODED_BOMB: {
+                case Constants.MAP_DETONATED_BOMB: {
                     icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
                     break;
                 }
-                //case BombMap.BOMB_BEAM: { value = BEAM_COLOR; break;}
             }
-            if (key < BombMap.EMPTY && key >= BombMap.BOMB_PROOF_WALL) {
+            if (key < Constants.MAP_EMPTY && key >= BombMap.BOMB_PROOF_WALL) {
                 color = WALL_COLOR;
                 icon = new ImageIcon(cl.getResource(WALL_ICON_PATH));
             } else {
-                if (key > BombMap.EMPTY && key <= BombMap.MAX_PLAYERS) {
+                if (key > Constants.MAP_EMPTY && key <= Constants.MAX_PLAYERS) {
                     icon = new ImageIcon(cl.getResource(MAN_ICON_PATH));
                     /*if (key == 1) {
                         value = PLAYER1_COLOR;
@@ -158,18 +158,18 @@ public class MapJFrame extends JFrame implements IView{
             ImageIcon icon = null;
             ClassLoader cl = Main.class.getClassLoader();
             // if it is wall
-            if (mapValue < BombMap.EMPTY && mapValue >= BombMap.BOMB_PROOF_WALL) {
+            if (mapValue < Constants.MAP_EMPTY && mapValue >= BombMap.BOMB_PROOF_WALL) {
                 //value = WALL_EXPL_COLOR;
                 icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
             } else {
                 // if it is player
-                if (mapValue > BombMap.EMPTY && mapValue <= BombMap.MAX_PLAYERS) {
+                if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
                     icon = new ImageIcon(cl.getResource(MAN_ICON_PATH));
                     value = PL_EXPL_COLOR;
                 } else {
                     // if it is center of Explosion
                     icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
-                    if (mapValue == BombMap.EXPLODED_BOMB) {
+                    if (mapValue == Constants.MAP_DETONATED_BOMB) {
                         
                     } else {
                         //value = BEAM_COLOR;

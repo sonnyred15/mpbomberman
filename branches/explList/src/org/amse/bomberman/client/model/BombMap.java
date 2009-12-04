@@ -14,12 +14,7 @@ import java.util.List;
  * @author michail korovkin
  */
 public class BombMap {
-    public static final int BOMB = -16;
-    public static final int EXPLODED_BOMB = -17;
-    public static final int BOMB_BEAM = -18;
     public static final int BOMB_PROOF_WALL = -8;
-    public static final int EMPTY = 0;
-    public static final int MAX_PLAYERS = 15;
     private int[][] cells;
     private List<Cell> explosions;
     
