@@ -2,7 +2,8 @@ package org.amse.bomberman.util;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E
+ * @author michail korovkin
  */
 public final class Constants {
     
@@ -71,7 +72,9 @@ public final class Constants {
         START_GAME(5),
         LEAVE_GAME(6),
         PLACE_BOMB(7),
-        DOWNLOAD_MAP(8);
+        DOWNLOAD_MAP(8),
+        GET_GAME_STATUS(9),
+        GET_MAPS_LIST(10);
 
         private final int value;
 
@@ -103,6 +106,10 @@ public final class Constants {
                     return PLACE_BOMB;
                 case 8:
                     return DOWNLOAD_MAP;
+                case 9:
+                    return GET_GAME_STATUS;
+                case 10:
+                    return GET_MAPS_LIST;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
                             "must be between 0 and 8 inclusive");

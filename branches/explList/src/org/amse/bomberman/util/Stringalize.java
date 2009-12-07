@@ -17,6 +17,26 @@ import org.amse.bomberman.server.gameinit.Player;
  */
 public class Stringalize {
 
+    public static String gameStatus(Game game) {
+        if (game.isStarted()){
+            return "started.";
+        }else{
+            return "not started.";
+        }
+    }
+
+    public static List<String> mapsList(String[] mapsList) {
+        String[] maps = Creator.createMapsList();
+        ArrayList<String> ret = null;
+        if (maps != null && maps.length != 0) {
+            ret = new ArrayList<String>();
+            for (String string : maps) {
+                ret.add(string);
+            }
+        }
+        return ret;
+    }
+
     public static List<String> unstartedGames(List<Game> allGames) {
         List<String> unstartedGames = new ArrayList<String>();
         if (allGames != null) {

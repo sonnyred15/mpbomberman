@@ -17,7 +17,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.*;
@@ -155,6 +154,17 @@ public class Session extends Thread implements ISession {
             case DOWNLOAD_MAP: {
                 //"8"+" "+mapName
                 sendMap(query);
+                break;
+            }
+            case GET_GAME_STATUS: {
+                //"9"
+                sendGameStatus();
+                break;
+            }
+            case GET_MAPS_LIST: {
+                //"10"
+                sendMapsList();
+                break;
             }
             default: { //CHECK < V THIS!!!// never happens!?
                 sendAnswer("Wrong query. Unrecognized command!");
@@ -436,6 +446,32 @@ public class Session extends Thread implements ISession {
         sendAnswer(lst);
         writeToLog("Downloaded map. query=" + query);
 
+    }
+
+    private void sendGameStatus() {
+        if (this.game != null) {
+            String ret = Stringalize.gameStatus(this.game);
+            sendAnswer(ret);
+            writeToLog("Sended game status.");
+            return;
+        } else {
+            sendAnswer("You are not joined to any game. Error.");
+            writeToLog("Tryed to get game status, canceled. Not joined to any game.");
+            return;
+        }
+    }
+
+    public void sendMapsList() {
+        List<String> maps = Stringalize.mapsList(Creator.createMapsList());
+        if (maps != null) {
+            sendAnswer(maps);
+            writeToLog("Sended maps list.");
+            return;
+        } else {
+            sendAnswer("No maps on server was founded.");
+            writeToLog("Tryed to get maps list. No maps founded on server.");
+            return;
+        }
     }
 
     @Override
