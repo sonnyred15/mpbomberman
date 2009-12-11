@@ -3,7 +3,6 @@ package org.amse.bomberman.client.view;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import org.amse.bomberman.client.model.Model;
-import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.Constants.Direction;
 /**

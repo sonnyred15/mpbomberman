@@ -44,7 +44,7 @@ public class CreatingGameJDialog extends JDialog {
         if (!maps[0].equals("No maps on server was founded.")) {
             mapBox = new JComboBox(maps);
         }
-
+        // creating top line for gameName Field
         Box topBox = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("GameName");
         nameLabel.setPreferredSize(new Dimension(width/4, LINE_H));
@@ -55,7 +55,7 @@ public class CreatingGameJDialog extends JDialog {
         topBox.add(gameNameTF);
         topBox.add(Box.createHorizontalGlue());
         topBox.setPreferredSize(new Dimension(width-30, LINE_H));
-
+        // creating central line for MaxPlayers Field
         Box centralBox = Box.createHorizontalBox();
         JLabel maxPlLabel = new JLabel("MaxPlayers");
         maxPlLabel.setPreferredSize(new Dimension(width/4, LINE_H));
@@ -70,7 +70,7 @@ public class CreatingGameJDialog extends JDialog {
             centralBox.add(Box.createHorizontalGlue());
         }
         centralBox.setPreferredSize(new Dimension(width-30, LINE_H));
-
+        // creating bottom line for Map-Select Field
         Box bottomBox = Box.createHorizontalBox();
         JLabel mapLabel = new JLabel("Map");
         mapLabel.setPreferredSize(new Dimension(width/4, LINE_H));

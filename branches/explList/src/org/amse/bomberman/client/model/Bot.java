@@ -44,6 +44,17 @@ public class Bot extends Thread{
             throw new IOException("Wrong game for connect.");
         }
     }
+    private void findNewTarget() {
+        BombMap map = Model.getInstance().getMap();
+        int x = 0;
+        int y = 0;
+        Random random = new Random();
+        while (map.getValue(new Cell(x, y)) != Constants.MAP_EMPTY) {
+                x = random.nextInt(map.getSize() - 1);
+                y = random.nextInt(map.getSize() - 1);
+            }
+            target = new Cell(x, y);
+    }
     private boolean isDead() {
         return (isDead);
     }
@@ -54,18 +65,14 @@ public class Bot extends Thread{
     public void run() {
         BombMap map = Model.getInstance().getMap();
         myCoord = findMyCoord(map);
-        Random random = new Random();
-        int x = 0;
-        int y = 0;
+        //Random random = new Random();
+        //int x = 0;
+        //int y = 0;
         while (!isDead()) {
-            map = Model.getInstance().getMap();
-            while (map.getValue(new Cell(x, y)) != Constants.MAP_EMPTY) {
-                x = random.nextInt(map.getSize() - 1);
-                y = random.nextInt(map.getSize() - 1);
-            }
-            target = new Cell(x, y);
-            while (((myCoord.getX() != target.getX()) || (myCoord.getY() != target.getY()))
-                    && (!isDead())) {
+            //map = Model.getInstance().getMap();
+            findNewTarget();
+            while ((!isDead()) &&((myCoord.getX() != target.getX())
+                    || (myCoord.getY() != target.getY()))) {
                 map = Model.getInstance().getMap();
                 myCoord = findMyCoord(map);
                 if (myCoord == null) {
@@ -81,10 +88,13 @@ public class Bot extends Thread{
                         connector.doMove(direct);
                     } catch (UnsupportedOperationException ex) {
                         System.out.println("Bot can not find the way to the target cell.");
+                        findNewTarget();
+                        System.out.println("Bot dreamed new target.");
                     }
                 }
             }
         }
+        System.out.println("Bot is dead!!!");
     }
     private Direction findWay(Cell begin, Cell end) {
         rec(begin, cons);

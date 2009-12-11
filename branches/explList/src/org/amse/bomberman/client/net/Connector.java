@@ -75,6 +75,7 @@ public class Connector implements IConnector{
     }
     public boolean doMove(Direction dir) {
         String res = queryAnswer("3 " + dir.getValue()).get(0);
+        // if res == "true"
         return (res.charAt(0) == 't');
     }
     public void startGame(){
@@ -146,10 +147,10 @@ public class Connector implements IConnector{
      */
     public boolean isStarted() throws IOException {
         ArrayList<String> status = queryAnswer(""+Command.GET_GAME_STATUS.getValue());
-        if (status.get(0).equals("started")) {
+        if (status.get(0).equals("started.")) {
             return true;
         } else {
-            if (status.get(0).equals("not started")) {
+            if (status.get(0).equals("not started.")) {
                 return false;
             } else {
                 throw new IOException(status.get(0));

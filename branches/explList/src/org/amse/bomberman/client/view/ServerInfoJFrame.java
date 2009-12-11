@@ -20,7 +20,6 @@ import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Bot;
 import org.amse.bomberman.client.model.Model;
-import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 
 /**
@@ -115,15 +114,8 @@ public class ServerInfoJFrame extends JFrame{
         IConnector connect = Model.getInstance().getConnector();
         try {
             connect.joinGame(gameNumber);
-            //------------------------------------------------------------
-            BombMap map = connect.getMap();
-            Model model = (Model) Model.getInstance();
-            MapJFrame frame = new MapJFrame(map);
-            model.addListener(frame);
-            model.setMap(map);
-            connect.beginUpdating();
-            //-------------------------------------------------------------
             this.dispose();
+            startMap();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n" +
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -139,7 +131,13 @@ public class ServerInfoJFrame extends JFrame{
             return result;
         } else return result;
     }
-
+    private static void startMap() {
+        IConnector connect = Model.getInstance().getConnector();
+        BombMap map = connect.getMap();
+        Model model = (Model) Model.getInstance();
+        model.setMap(map);
+        MapJFrame frame = new MapJFrame(map);
+    }
     public static class RefreshAction extends AbstractAction {
         ServerInfoJFrame parent;
 

@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,6 +18,7 @@ import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.*;
 
 /**
@@ -24,6 +28,7 @@ import org.amse.bomberman.util.*;
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private JLabel livesJLabel;
+    private Timer timer;
     private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
     private final Color PL_EXPL_COLOR = new Color(63,255,255);
     private final Color EXPLODE_COLOR = Color.RED;
@@ -67,6 +72,8 @@ public class MapJFrame extends JFrame implements IView{
         this.refresh(map);
         this.addKeyListener(listener);
         this.setJMenuBar(new MapJMenuBar(this));
+
+        checkStart();
         setResizable(false);
         setVisible(true);
     }
@@ -105,6 +112,32 @@ public class MapJFrame extends JFrame implements IView{
             int x = expl.get(i).getX();
             int y = expl.get(i).getY();
             cells[x][y].checkExplosion(map.getValue(new Cell(x, y)));
+        }
+    }
+    private void checkStart() {
+        timer = new Timer();
+        timer.schedule(new CheckTimerTask(this), (long)0,(long) Constants.GAME_STEP_TIME);
+    }
+    private class CheckTimerTask extends TimerTask {
+        MapJFrame parent;
+        public CheckTimerTask(MapJFrame jframe) {
+            parent = jframe;
+        }
+        @Override
+        public void run() {
+            IConnector connect = Model.getInstance().getConnector();
+            try {
+                if (connect.isStarted()) {
+                    Model.getInstance().addListener(parent);
+                    connect.beginUpdating();
+                    Model.getInstance().startBots();
+                    // block JMenuItem "Start"
+                    parent.getJMenuBar().getMenu(0).getItem(0).setEnabled(false);
+                    this.cancel();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
     private class MyJPanel extends JLabel {
@@ -175,7 +208,7 @@ public class MapJFrame extends JFrame implements IView{
             case 2: return new ImageIcon(cl.getResource(PL2_ICON_PATH));
             case 3: return new ImageIcon(cl.getResource(PL3_ICON_PATH));
             case 4: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
-            default: return null;
+            default: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
         }
     }
 }

@@ -7,7 +7,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import org.amse.bomberman.client.model.Model;
-import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.IConnector;
 
 /**
@@ -64,13 +63,9 @@ public class MapJMenuBar extends JMenuBar{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            //----------------------------------------------------------------
             IConnector connect = Model.getInstance().getConnector();
             connect.startGame();
-            this.setEnabled(false);
-            // rewrite this!!! it must be something otherwise
-            Model.getInstance().startBots();
-            //----------------------------------------------------------------
+            //this.setEnabled(false);
         }
     }
 }
