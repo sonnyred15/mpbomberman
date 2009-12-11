@@ -16,7 +16,7 @@ public interface IConnector {
              throws UnknownHostException, IOException;
      public void leaveGame();
      public ArrayList<String> takeGamesList();
-     public void createGame();
+     public boolean createGame(String gameName, String mapName, int maxPl) throws IOException;
      public boolean joinGame(int gameID) throws IOException;
      public boolean doMove(Direction dir);
      public void startGame();
@@ -26,4 +26,6 @@ public interface IConnector {
      public void beginUpdating();
      public InetAddress getInetAddress();
      public int getPort();
+     public String[] getMaps();
+     public boolean isStarted() throws IOException;
 }

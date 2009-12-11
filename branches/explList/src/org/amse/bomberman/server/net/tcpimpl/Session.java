@@ -100,8 +100,21 @@ public class Session extends Thread implements ISession {
 
         Command cmd = null;
         try {
-            int command = Integer.parseInt(query.substring(0, 1));
-            cmd = Command.fromInt(command);
+            // CHECK THIS!!! Command can consist ot 2 digits!!!
+            if (query.charAt(0) != '1') {
+                int command = Integer.parseInt(query.substring(0, 1));
+                cmd = Command.fromInt(command);
+            } else {
+                // if it is "10" == GET_MAPS_LIST
+                if (query.length() == 2) {
+                    int command = Integer.parseInt(query.substring(0, 2));
+                    cmd = Command.fromInt(command);
+                    // if it is "1"+gN+mN+mP
+                } else {
+                    int command = Integer.parseInt(query.substring(0, 1));
+                    cmd = Command.fromInt(command);
+                }
+            }
         } catch (NumberFormatException nEx) {
             writeToLog(nEx.getMessage() +
                     "First char of command must be int from 0 to 7 inclusive. " +

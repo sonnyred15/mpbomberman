@@ -164,8 +164,9 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector connect = Model.getInstance().getConnector();
-            connect.createGame();
+            CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
+            //IConnector connect = Model.getInstance().getConnector();
+            //connect.createGame();
             parent.refreshTable();
         }
     }
