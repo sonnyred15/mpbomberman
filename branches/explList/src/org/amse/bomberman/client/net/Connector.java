@@ -74,7 +74,7 @@ public class Connector implements IConnector{
         } else throw new IOException(answer);
     }
     public boolean doMove(Direction dir) {
-        String res = queryAnswer("3" + dir.getValue()).get(0);
+        String res = queryAnswer("3 " + dir.getValue()).get(0);
         return (res.charAt(0) == 't');
     }
     public void startGame(){

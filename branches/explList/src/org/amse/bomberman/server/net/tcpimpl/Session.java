@@ -92,29 +92,20 @@ public class Session extends Thread implements ISession {
     }
 
     private void answerOnCommand(String query) {
+        //writeToLog("Query received. query=" + query);
         if (query.length() == 0) {
             sendAnswer("Empty query received. Error on client side.");
-            writeToLog("Empty query received. Error on client side. query=" + query);
+            writeToLog("Empty query received. Error on client side.");
             return;
         }
 
         Command cmd = null;
+        String[] queryArgs = query.split(" ");
         try {
-            // CHECK THIS!!! Command can consist ot 2 digits!!!
-            if (query.charAt(0) != '1') {
-                int command = Integer.parseInt(query.substring(0, 1));
-                cmd = Command.fromInt(command);
-            } else {
-                // if it is "10" == GET_MAPS_LIST
-                if (query.length() == 2) {
-                    int command = Integer.parseInt(query.substring(0, 2));
-                    cmd = Command.fromInt(command);
-                    // if it is "1"+gN+mN+mP
-                } else {
-                    int command = Integer.parseInt(query.substring(0, 1));
-                    cmd = Command.fromInt(command);
-                }
-            }
+                        
+            int command = Integer.parseInt(queryArgs[0]);
+            cmd = Command.fromInt(command);
+
         } catch (NumberFormatException nEx) {
             writeToLog(nEx.getMessage() +
                     "First char of command must be int from 0 to 7 inclusive. " +
@@ -131,17 +122,17 @@ public class Session extends Thread implements ISession {
             }
             case CREATE_GAME: {
                 //"1 gameName mapName maxPlayers" or just "1" for defaults
-                createGame(query);
+                createGame(queryArgs);
                 break;
             }
             case JOIN_GAME: {
                 //"2 gameID playerName"
-                joinGame(query);
+                joinGame(queryArgs);
                 break;
             }
             case DO_MOVE: {
                 //"3"+direction
-                doMove(query);
+                doMove(queryArgs);
                 break;
             }
             case GET_MAP_ARRAY: {
@@ -166,7 +157,7 @@ public class Session extends Thread implements ISession {
             }
             case DOWNLOAD_MAP: {
                 //"8"+" "+mapName
-                sendMap(query);
+                sendMap(queryArgs);
                 break;
             }
             case GET_GAME_STATUS: {
@@ -181,8 +172,7 @@ public class Session extends Thread implements ISession {
             }
             default: { //CHECK < V THIS!!!// never happens!?
                 sendAnswer("Wrong query. Unrecognized command!");
-                writeToLog("Getted wrong query. Unrecognized command!" +
-                        " query=" + query);
+                writeToLog("Getted wrong query. Unrecognized command!");
             }
         }
     }
@@ -201,19 +191,18 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void createGame(String query) {
-        //Example query = "1 gameName mapName maxpl"
+    private void createGame(String[] queryArgs) {
+        //Example queryArgs = "1" "gameName" "mapName" "maxpl"
         String gameName = "defaultGame";
         String mapName = "1";
         int maxPlayers = -1;//defines by GameMap;
-
-        String[] args = query.split(" ");
-        if (args.length == 4) {//if we getted command in full syntax
-            gameName = args[1];
-            mapName = args[2];
+        
+        if (queryArgs.length == 4) {//if we getted command in full syntax
+            gameName = queryArgs[1];
+            mapName = queryArgs[2];
             try {
-                maxPlayers = Integer.parseInt(args[3]);
-            } catch (NumberFormatException nEx) {
+                maxPlayers = Integer.parseInt(queryArgs[3]);
+            } catch (NumberFormatException ex) {
                 sendAnswer("Wrong command parameters. Error on client side.");
                 writeToLog(" Tryed to create game, canceled. " +
                         "Wrong command parameters. Error on client side.");
@@ -227,62 +216,55 @@ public class Session extends Thread implements ISession {
             writeToLog("Tryed to create game. " +
                     "Game created. Map=" + mapName +
                     " gameName=" + gameName +
-                    " maxPlayers=" + maxPlayers +
-                    " query=" + query);
+                    " maxPlayers=" + maxPlayers);
             return;
         } catch (FileNotFoundException ex) {
             sendAnswer("No such map on server.");
             writeToLog("Tryed to create game, canceled. " +
                     "Map wasn`t founded on server." +
-                    " Map=" + mapName +
-                    " query=" + query);
+                    " Map=" + mapName);
             return;
         } catch (IOException ex) {
             sendAnswer("Error on server side, while loading map.");
             writeToLog("Tryed to create game, canceled. " +
                     "Error on server side while loading map." +
-                    " Map=" + mapName +
-                    " query=" + query);
+                    " Map=" + mapName);
             return;
         }
     }
 
-    private void joinGame(String query) {
-        //"2 gameID playerName"
-        String[] args = query.split(" ");
+    private void joinGame(String[] queryArgs) {
+        //"2" "gameID" "playerName"
 
         int gameID = 0;
         String playerName = "defaultPlayer";
-        switch (args.length) {
+        switch (queryArgs.length) {
             case 2: { //to support command in "short" syntax when player name is ommited
                 try {
-                    gameID = Integer.parseInt(args[1]);
+                    gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
                     sendAnswer("Wrong command parameters. Error on client side." +
                             " gameID must be int.");
                     writeToLog(ex.getMessage() + " Wrong command parameters. " +
-                            "Error on client side. gameID must be int." +
-                            " query=" + query);
+                            "Error on client side. gameID must be int.");
                 }
                 break;
             }
             case 3: { //if we getted command in full syntax
                 try {
-                    gameID = Integer.parseInt(args[1]);
+                    gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
                     sendAnswer("Wrong command parameters. Error on client side." +
                             " gameID must be int.");
                     writeToLog(ex.getMessage() + " Wrong command parameters. " +
-                            "Error on client side. gameID must be int." +
-                            " query=" + query);
+                            "Error on client side. gameID must be int.");
                 }
-                playerName = args[2];
+                playerName = queryArgs[2];
                 break;
             }
             default: { //wrong syntax
                 sendAnswer("Wrong command parameters. Error on client side.");
-                writeToLog(" Wrong command parameters. Error on client side." +
-                        " query=" + query);
+                writeToLog(" Wrong command parameters. Error on client side.");
                 break;
             }
         }
@@ -300,8 +282,7 @@ public class Session extends Thread implements ISession {
                     sendAnswer("Joined.");
                     writeToLog("Tryed to join to the game. Joined." +
                             " GameID=" + gameID +
-                            " Player=" + playerName +
-                            " query=" + query);
+                            " Player=" + playerName);
                     return;
                 }
             } else { //if game.isStarted() true
@@ -318,22 +299,21 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void doMove(String query) {
+    private void doMove(String[] queryArgs) {
         if (this.game != null) {
             if (timer.getDiff() > Constants.GAME_STEP_TIME) {
                 int dir = 0;
                 boolean moved = false;
                 try {
-                    dir = Integer.parseInt(query.substring(1, 2));//throws NumberFormatException
+                    dir = Integer.parseInt(queryArgs[1]);//throws NumberFormatException
                     Direction direction = Direction.fromInt(dir); //throws IllegalArgumentException
                     moved = this.game.doMove(player, direction);
                 } catch (NumberFormatException ex) {
                     writeToLog("Tryed to move, canceled. Unsupported direction. Error on client side." +
-                            " query=" + query);
+                            " direction=" + queryArgs[1]);
                 } catch (IllegalArgumentException ex) {
                     writeToLog("Tryed to move, canceled. Unsupported direction. Error on client side." +
-                            " direction=" + dir +
-                            " query=" + query);
+                            " direction=" + dir);
                 }
 
                 if (moved) {
@@ -345,8 +325,7 @@ public class Session extends Thread implements ISession {
             } else { //timer.getDiff < gameStep true
                 sendAnswer("false");
                 writeToLog("Tryed to move, canceled. Moves allowed only every " +
-                        Constants.GAME_STEP_TIME + "ms." +
-                        " query=" + query);
+                        Constants.GAME_STEP_TIME + "ms.");
                 return;
             }
         } else { //game == null true
@@ -423,12 +402,11 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void sendMap(String query) {
-        String[] args = query.split(" ");
+    private void sendMap(String[] queryArgs) {
         int[][] ret = null;
 
-        if (args.length == 2) {
-            String mapFileName = args[1] + ".map";
+        if (queryArgs.length == 2) {
+            String mapFileName = queryArgs[1] + ".map";
             try {
                 ret = Creator.createMapAndGetArray(mapFileName);
             } catch (FileNotFoundException ex) {
@@ -436,7 +414,6 @@ public class Session extends Thread implements ISession {
                 writeToLog("Tryed to download map, canceled. " +
                         "Map wasn`t founded on server." +
                         " Map=" + mapFileName +
-                        " query=" + query +
                         " " + ex.getMessage());
                 return;
             } catch (IOException ex) {
@@ -444,20 +421,19 @@ public class Session extends Thread implements ISession {
                 writeToLog("Tryed to download map, canceled. " +
                         "Error on server side while loading map." +
                         " Map=" + mapFileName +
-                        " query=" + query +
                         " " + ex.getMessage());
                 return;
             }
         } else { //if arguments!=2
             sendAnswer("Wrong query. Not enough arguments");
-            writeToLog("Tryed to download map. Canceled. Wrong query. query=" + query);
+            writeToLog("Tryed to download map. Canceled. Wrong query.");
             return;
         }
 
         //if all is OK.
         List<String> lst = Stringalize.map(ret);
         sendAnswer(lst);
-        writeToLog("Downloaded map. query=" + query);
+        writeToLog("Downloaded map.");
 
     }
 

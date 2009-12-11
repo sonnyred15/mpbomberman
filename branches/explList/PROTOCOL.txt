@@ -9,7 +9,7 @@ Description    |Full syntax query  | Answer description| syntax of answer if all
 GET_GAMES      | "0"               | Unstarted games   | "gameID gameName mN.map curPlrs maxPlayers" each game on next line.|
 CREATE_GAME    | "1 gN mN mP"      | Confirm or error  | "Game created."                                                    |
 JOIN_GAME      | "2 gameID playerN"| Confirm or error  | "Joined."                                                          |
-DO_MOVE        | "3direction"      | true or false     | "true"                                                             |
+DO_MOVE        | "3 direction"     | true or false     | "true"                                                             |
 GET_MAP_ARRAY  | "4"               | map+expl+plInfo   | *(watch (mapArray))                                                |
 START_GAME     | "5"               | Confirm or error  | "Game started."                                                    |
 LEAVE_GAME     | "6"               | Confirm or error  | "Disconnected.                                                     |
