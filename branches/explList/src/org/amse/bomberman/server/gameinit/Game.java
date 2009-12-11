@@ -49,7 +49,7 @@ public class Game {
     public synchronized Player join(String name) {
         Player player = null;
 
-        if (this.players.size() < this.maxPlayers) { //CHECK < THIS// what if size>max???
+        if (this.players.size() < this.maxPlayers) { 
             player = new Player(name, this.players.size() + 1);
             //coordinates of players will be set when game would start!!!!
             this.players.add(player);
