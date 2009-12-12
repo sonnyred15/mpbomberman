@@ -89,7 +89,7 @@ public class ServerTest {
             Thread.sleep(5000);
         }
 
-        assertEquals(MAX_THREADS*MAX_GAMES_BY_THREAD,INSTANCE.getGamesList().size());
+        assertEquals(0,INSTANCE.getGamesList().size());
     }
 
     @Test
