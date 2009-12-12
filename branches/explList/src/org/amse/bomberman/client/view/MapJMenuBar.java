@@ -51,6 +51,7 @@ public class MapJMenuBar extends JMenuBar{
             Model.getInstance().getConnector().leaveGame();
             Model.getInstance().removeBots();
             ServerInfoJFrame serv = new ServerInfoJFrame();
+            parent.stopWaitStart();
         }
     }
     public static class StartAction extends AbstractAction {

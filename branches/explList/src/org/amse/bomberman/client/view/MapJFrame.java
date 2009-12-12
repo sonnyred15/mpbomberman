@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -12,6 +13,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.model.IModel;
@@ -62,22 +65,30 @@ public class MapJFrame extends JFrame implements IView{
         c.add(livesJLabel);
         int num = map.getSize();
         int size = (width - 50) / num;
+        JPanel field = new JPanel();
+        field.setLayout(new GridLayout(num,num,0,0));
         cells = new MyJPanel[num][num];
         for (int i = 0; i < num; i++) {
             for (int j = 0; j < num; j++) {
                 cells[i][j] = new MyJPanel(48);
-                c.add(cells[i][j]);
+                field.add(cells[i][j]);
             }
         }
+        //c.add(field);
+        c.add(new JScrollPane(field/*, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS*/));
         this.refresh(map);
         this.addKeyListener(listener);
         this.setJMenuBar(new MapJMenuBar(this));
 
         checkStart();
-        setResizable(false);
+        setResizable(true);
         setVisible(true);
     }
 
+    public void stopWaitStart() {
+        timer.cancel();
+    }
     public void update() {
         IModel model = Model.getInstance();
         BombMap newMap = model.getMap();

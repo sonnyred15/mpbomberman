@@ -34,7 +34,9 @@ public class Connector implements IConnector{
     }
     public void leaveGame() {
         // true stop timer?
-        timer.cancel();
+        if (timer != null) {
+            timer.cancel();
+        }
         System.out.println(queryAnswer(""+Command.LEAVE_GAME.getValue()).get(0));
         System.out.println();
     }
@@ -163,7 +165,7 @@ public class Connector implements IConnector{
     public int getPort() {
         return socket.getPort();
     }
-
+    
     private synchronized ArrayList<String> queryAnswer(String query){
         PrintWriter out = null;
         BufferedReader in = null;
