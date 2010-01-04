@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.ImageIcon;
@@ -71,13 +72,13 @@ public class MapJFrame extends JFrame implements IView{
         for (int i = 0; i < num; i++) {
             for (int j = 0; j < num; j++) {
                 cells[i][j] = new MyJPanel(48);
+                cells[i][j].setContent(map.getValue(new Cell(i,j)));
                 field.add(cells[i][j]);
             }
         }
-        //c.add(field);
-        c.add(new JScrollPane(field/*, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS*/));
-        this.refresh(map);
+        c.add(field);
+        List<Cell> changes = Model.getInstance().getChanges();
+        //this.refresh(changes, map);
         this.addKeyListener(listener);
         this.setJMenuBar(new MapJMenuBar(this));
 
@@ -91,11 +92,11 @@ public class MapJFrame extends JFrame implements IView{
     }
     public void update() {
         IModel model = Model.getInstance();
+        List<Cell> changes = model.getChanges();
         BombMap newMap = model.getMap();
         int lives = model.getPlayerLives();
-        this.refresh(newMap);
+        this.refresh(changes, newMap);
         this.refreshLives(lives);
-        this.repaint();
         if (lives <= 0) {
             if (!dead) {
                 JOptionPane.showMessageDialog(this, "You are dead!!!", "Death"
@@ -111,18 +112,18 @@ public class MapJFrame extends JFrame implements IView{
         String result = beginS.concat("" + lives);
         livesJLabel.setText(result);
     }
-    private void refresh(BombMap map) {
-        int num = map.getSize();
-        for (int i = 0; i < num; i++) {
-            for (int j = 0; j < num; j++) {
-                cells[i][j].setContent(map.getValue(new Cell(i, j)));
+    private void refresh(List<Cell> changes, BombMap map) {
+        if (changes != null) {
+            List<Cell> expl = map.getExplosions();
+            for (Cell cell : changes) {
+                if (expl.contains(cell)) {
+                    cells[cell.getX()][cell.getY()].checkExplosion(map.getValue(cell));
+                } else {
+                    cells[cell.getX()][cell.getY()].setContent(map.getValue(cell));
+                }
+                // why it isn't need???
+                //cells[cell.getX()][cell.getY()].repaint();
             }
-        }
-        ArrayList<Cell> expl = map.getExplosions();
-        for (int i = 0; i < expl.size(); i++){
-            int x = expl.get(i).getX();
-            int y = expl.get(i).getY();
-            cells[x][y].checkExplosion(map.getValue(new Cell(x, y)));
         }
     }
     private void checkStart() {

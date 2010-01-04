@@ -1,9 +1,10 @@
 package org.amse.bomberman.client.model;
+import java.util.List;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
 /**
  *
- * @author maverick
+ * @author michail korovkin
  */
 public interface IModel {
     //public boolean movePlayer(int number, Direction dir);
@@ -11,6 +12,7 @@ public interface IModel {
     public void addListener(IView view);
     public void removeListener(IView view);
     public BombMap getMap();
+    public List<Cell> getChanges();
     public void setPlayerLives(int lives);
     public int getPlayerLives();
     //public void plantBomb(int number);

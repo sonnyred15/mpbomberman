@@ -63,16 +63,15 @@ public class BombMap {
             return cells[cell.getX()][cell.getY()];
         } else throw new UnsupportedOperationException("Asking cell is absent.");
     }
-    @SuppressWarnings("unchecked")
-    public ArrayList<Cell> getExplosions() {
-        return (ArrayList)explosions;
+    public List<Cell> getExplosions() {
+        return explosions;
     }
     public void setCell(Cell cell, int value) {
         if (checkCell(cell)) {
             cells[cell.getX()][cell.getY()] = value;
         } else throw new UnsupportedOperationException("You want set value of absent cell.");
     }
-    public void setExplosions(ArrayList<Cell> expl) {
+    public void setExplosions(List<Cell> expl) {
         for (Cell cell:expl) {
             if (!checkCell(cell)) {
                 throw new UnsupportedOperationException("False cell in list of explosions.");
