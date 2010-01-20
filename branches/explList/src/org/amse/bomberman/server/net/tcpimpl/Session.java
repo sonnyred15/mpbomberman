@@ -571,7 +571,7 @@ public class Session extends Thread implements ISession {
         if (message.startsWith("Tryed to move, canceled")) {
             return true;
         }
-        if (message.startsWith("Query line received: '3")) {
+        if (message.startsWith("Query line received: \'3")) {
             return true;
         }
         return false;

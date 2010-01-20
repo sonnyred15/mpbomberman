@@ -355,7 +355,7 @@ public class Model implements IModel {
 
             //leftlines
             k = radius;
-            for (i = bombY - 1; (i >= 0 && k > 0); --i, ++k) {
+            for (i = bombY - 1; (i >= 0 && k > 0); --i, --k) {
                 contin = explodeSquare(bombX, i);
                 explSq.add(new Pair(bombX, i));
                 if (!contin) {

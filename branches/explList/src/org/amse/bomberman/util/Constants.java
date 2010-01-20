@@ -18,7 +18,7 @@ public final class Constants {
     
     public static final int MAX_PLAYERS  = 15;//1..15
     
-    public static final long GAME_STEP_TIME = 200L;
+    public static final long GAME_STEP_TIME = 40L;
     public static final long BOMB_TIMER_VALUE = 200L*10;
     public static final long BOMB_DETONATION_TIME = 200L*3;
 

@@ -4,8 +4,6 @@
  */
 package org.amse.bomberman.server.gameinit;
 
-import java.util.EventListener;
-
 /**
  *
  * @author Kirilchuk V.E
