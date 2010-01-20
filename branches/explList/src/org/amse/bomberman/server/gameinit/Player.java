@@ -4,11 +4,15 @@
  */
 package org.amse.bomberman.server.gameinit;
 
+import java.util.EventListener;
+
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E
  */
 public class Player {
+
+    private DieListener gameListener;
 
     private String nickName = "unnamed";
     private int lives = 3;
@@ -23,6 +27,10 @@ public class Player {
     public Player(String nickName, int id) {
         this.nickName = nickName;
         this.id = id;
+    }
+
+    public void setDieListener(DieListener gameDieListener){
+        this.gameListener = gameDieListener;
     }
 
     public String getInfo() {
@@ -51,6 +59,19 @@ public class Player {
         this.bombs -= 1;
     }
 
+    public void takedBonus(int bonus){
+        switch (bonus){
+            case 1:{
+                this.lives+=1;
+                break;
+            }
+            default:{
+                throw new IllegalArgumentException("Such bonus is not supported." +
+                        " Bonus = " + bonus);
+            }
+        }
+    }
+
     public void setID(int id) {
         this.id = id;
     }
@@ -75,8 +96,11 @@ public class Player {
         this.y = y;
     }
 
-    public void bombed() {
+    public synchronized void bombed() { //synchronized(player)
         this.lives -= 1;
+        if (this.lives <= 0){
+            gameListener.playerDied(this);
+        }
     }
 
     public int getRadius() {

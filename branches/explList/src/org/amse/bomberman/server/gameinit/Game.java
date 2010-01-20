@@ -25,6 +25,8 @@ public class Game {
     private final List<Player> players;
     private boolean started;
 
+    private final DieListener dieListener;
+
     public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
         this.server = server;
         this.gameName = gameName;
@@ -38,6 +40,7 @@ public class Game {
 
         this.model = new Model(map, this);
         this.players = Collections.synchronizedList(new ArrayList<Player>());
+        this.dieListener = new DieListener(this);
 
         this.started = false;
     }
@@ -53,9 +56,21 @@ public class Game {
             player = new Player(name, this.players.size() + 1);
             //coordinates of players will be set when game would start!!!!
             this.players.add(player);
+            player.setDieListener(dieListener);
         }
 
         return player;
+    }
+
+    public Player getPlayer(int id){
+        synchronized(players){
+            for (Player player : players) {
+                if (player.getID()==id){
+                    return player;
+                }
+            }
+        }
+        return null;
     }
 
     public void disconnectFromGame(Player player) {
@@ -90,7 +105,7 @@ public class Game {
     public boolean doMove(Player player, Direction direction) {
         if (this.started) {
             if (player.isAlive()) {
-                return model.doMove(player, direction.getValue());
+                return model.doMove(player, direction);
             }
         }
         return false;
@@ -112,18 +127,8 @@ public class Game {
         return this.gameName;
     }
 
-    public void playerBombed(int id) {
-        synchronized (players) { //otherwise iterator could broke
-            for (Player player : players) {
-                if (player.getID() == id) {
-                    player.bombed();
-                    if (!player.isAlive()) {
-                        model.removePlayer(id);
-                    }
-                    break;
-                }
-            }
-        }
+    public void playerDied(Player player) {
+        model.removePlayer(player.getID());
     }
 
     public int getGameMaxPlayers() {

@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit.imodel;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -18,7 +19,7 @@ public interface IModel {
 
     void placeBomb(Player player);
 
-    boolean doMove(Player player, int direction);
+    boolean doMove(Player player, Direction direction);
 
     void removePlayer(int playerID);
 

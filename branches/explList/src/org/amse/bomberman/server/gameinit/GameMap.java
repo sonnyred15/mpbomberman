@@ -12,7 +12,7 @@ import org.amse.bomberman.util.Constants;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E.
  */
 public final class GameMap {
 
@@ -162,6 +162,7 @@ public final class GameMap {
             for (int j = 0; j < dim; j++) {
                 if (this.mapArray[i][j] == playerID) {
                     this.mapArray[i][j] = 0;
+                    return; //a little bit optimize
                 }
             }
         }

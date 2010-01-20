@@ -6,7 +6,6 @@ package org.amse.bomberman.server.gameinit.imodel.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -20,7 +19,9 @@ import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- *
+ * Model that is responsable for game rules and responsable for connection
+ * between Map and Game. Additionally responsable for bomb timers and
+ * bombs detonations.
  * @author Kirilchuk V.E.
  */
 public class Model implements IModel {
@@ -29,28 +30,41 @@ public class Model implements IModel {
     private final Game game;
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private final List<Pair> explosionSquares;
-    private final List<Canceller> bombes;
+    private final List<DetonateControl> detonateControls;
 
+    /**
+     * Constructor of Model.
+     * @param map GameMap that correspond to game
+     * @param game Game for which model was created
+     */
     public Model(GameMap map, Game game) {
         this.map = map;
         this.game = game;
         this.explosionSquares = new ArrayList<Pair>(); //what`s about syncronization?
-        this.bombes = new ArrayList<Canceller>();
+        this.detonateControls = new ArrayList<DetonateControl>();
     }
 
+    /**
+     * Return matrix of GameMap.
+     * @return matrix of GameMap
+     */
     public int[][] getMapArray() {
         return this.map.getMapArray();
     }
-    
-    public List<Pair> getExplosionSquares(){
+
+    /**
+     * Return list of explosions.
+     * @return List of explosions
+     */
+    public List<Pair> getExplosionSquares() {
         return this.explosionSquares;
     }
 
     /**
-     * Give x coordinate for player. Search respawn point 
+     * Give x coordinate for player. Search respawn point
      * of this player on map and return x coordinate of this respawn.
      * @param playerID ID of player
-     * @return x coordinate in mapArray
+     * @return x coordinate of player
      */
     public int xCoordOf(int playerID) {
         int[][] mapArray = this.map.getMapArray();
@@ -81,7 +95,13 @@ public class Model implements IModel {
         return 0;
     }
 
-    public boolean doMove(Player player, int direction) {
+    /**
+     * Trying to move the player in defined direction.
+     * @param player Player to move
+     * @param direction Direction of move
+     * @return true if player moved, false otherwise
+     */
+    public synchronized boolean doMove(Player player, Direction direction) {
         int arr[] = newCoords(player.getX(), player.getY(), direction);
         int newX = arr[0];
         int newY = arr[1];
@@ -105,8 +125,9 @@ public class Model implements IModel {
         }
         this.map.setSquare(newX, newY, player.getID());
 
-        if (explosionSquares.contains(new Pair(newX, newY))){
-            this.game.playerBombed(player.getID());
+        //if player is making move to explosion zone.
+        if (explosionSquares.contains(new Pair(newX, newY))) {
+            player.bombed();
         }
 
         player.setX(newX);
@@ -128,11 +149,10 @@ public class Model implements IModel {
         return (this.map.isEmpty(x, y)) ? false : true;
     }
 
-    private int[] newCoords(int x, int y, int direction) { //whats about catch illegalArgumentException
+    private int[] newCoords(int x, int y, Direction direction) { //whats about catch illegalArgumentException???
         int[] arr = new int[2];
-        Direction dir = Direction.fromInt(direction);
 
-        switch (dir) {
+        switch (direction) {
             case DOWN: {
                 arr[0] = x + 1;
                 arr[1] = y;
@@ -153,11 +173,18 @@ public class Model implements IModel {
                 arr[1] = y + 1;
                 break;
             }
+            default: {
+                throw new IllegalArgumentException("Default block " +
+                        "in switch(ENUM). Error in code.");
+            }
         }
 
         return arr;
     }
 
+    /**
+     * Printing matrix of GameMap to console. Maybe would be deleted soon.
+     */
     public void printToConsole() { //useless?
         int dim = this.map.getDimension();
         for (int i = 0; i < dim; i++) {
@@ -170,8 +197,9 @@ public class Model implements IModel {
     }
 
     /**
-     * Remove unused players from mapArray.
-     * @param maxPlayers
+     * Change GameMap for defined in argument number of players by
+     * removing unused players from GameMap.
+     * @param maxPlayers number of players to use
      */
     public void changeMapForCurMaxPlayers(int maxPlayers) {
         this.map.changeMapForCurMaxPlayers(maxPlayers);
@@ -185,72 +213,86 @@ public class Model implements IModel {
         this.map.removePlayer(playerID);
     }
 
-    public void placeBomb(Player player) {
-        if (player.canPlaceBomb()) { //player is alive and have bombs to set up
-            int x = player.getX();
-            int y = player.getY();
-            if (this.map.isBomb(x, y)){
-                return;
+    /**
+     * Trying to place bomb of defined player.
+     * @param player Player which trying to place bomb.
+     */
+    public void placeBomb(Player player) {// whats about synchronization?? //Maybe return value must be boolean type???
+        synchronized (player) {
+            if (player.canPlaceBomb()) { //player is alive and have bombs to set up
+                int x = player.getX();
+                int y = player.getY();
+                if (this.map.isBomb(x, y)) {
+                    return;
+                }
+
+                this.map.setSquare(x, y, Constants.MAP_BOMB);
+                DetonateTask detonationTask = new DetonateTask(player, x, y); //task to execute
+                ScheduledFuture<?> detonation = timer.schedule(detonationTask, //need to cancel detonation
+                        Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
+
+                detonateControls.add(new DetonateControl(x, y, detonation, detonationTask));
             }
-            this.map.setSquare(x, y, Constants.MAP_BOMB);
-            DetonateTask dt = new DetonateTask(player, x, y);
-            ScheduledFuture<?> futureBoom = timer.schedule(dt,Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
-            bombes.add(new Canceller(x, y, futureBoom,dt));
         }
     }
 
+    /**
+     * Return name of GameMap of this Model.
+     * @return Name of GameMap in String
+     */
     public String getMapName() {
         return this.map.getName();
     }
-    
-    private class Canceller{        
-        private int x;
-        private int y;
-        private ScheduledFuture<?> boom;
-        private DetonateTask dt;
-        
-        public Canceller( int x, int y, ScheduledFuture<?> boom, DetonateTask dt){
-            this.x=x;
-            this.y=y;
-            this.boom=boom;
-            this.dt = dt;
+
+    private class DetonateControl {
+
+        private final int bombX;
+        private final int bombY;
+        private final ScheduledFuture<?> detonation; // need to cancel timer Task
+        private final DetonateTask detonationTask;
+
+        public DetonateControl(int x, int y, ScheduledFuture<?> boom, DetonateTask dt) {//public of private. Javadoc???
+            this.bombX = x;
+            this.bombY = y;
+            this.detonation = boom;
+            this.detonationTask = dt;
         }
 
         public boolean isCorrespondTo(int x, int y) {
-            if (this.x == x && this.y == y) {
+            if (this.bombX == x && this.bombY == y) {
                 return true;
             }
             return false;
         }
-        
-        public void cancel(){
-            this.boom.cancel(false);
+
+        public void cancelDetonation() {
+            this.detonation.cancel(false);
         }
 
-        private void execute() {
-           dt.run();
+        private void detonate() {
+            detonationTask.run();
         }
     }
 
-    private class ClearExplosionTask extends TimerTask {
+    private class ClearExplosionTask implements Runnable {
 
-        private List<Pair> explSqToClear;
-        private Player player;
-        private int bombX;
-        private int bombY;
+        private final int bombX;
+        private final int bombY;
+        private final List<Pair> explSqToClear;
+        private final Player player;
 
         public ClearExplosionTask(List<Pair> toClear, Pair bombToClear, Player player) {
-            this.explSqToClear = toClear;
-            this.player = player;
             this.bombX = bombToClear.getX();
             this.bombY = bombToClear.getY();
+            this.explSqToClear = toClear;
+            this.player = player;
         }
 
         @Override
         public void run() {
-            if (player.getX()==bombX && player.getY()==bombY && player.isAlive()){
-                map.setSquare(bombX, bombY, this.player.getID());    
-            }else{
+            if (player.getX() == bombX && player.getY() == bombY && player.isAlive()) {
+                map.setSquare(bombX, bombY, this.player.getID());
+            } else {
                 map.setSquare(bombX, bombY, Constants.MAP_EMPTY); //clear from map    
             }
             for (Pair pair : explSqToClear) { // clear from explosions list
@@ -259,18 +301,18 @@ public class Model implements IModel {
         }
     }
 
-    private class DetonateTask extends TimerTask {
+    private class DetonateTask implements Runnable {
 
+        private final int bombX;
+        private final int bombY;
         private final Player player;
         private final int radius;
-        private final int x;
-        private final int y;
-        //CHECK V THIS//    
+
         public DetonateTask(Player player, int x, int y) {
             this.player = player;
             this.radius = player.getRadius();
-            this.x = x;
-            this.y = y;
+            this.bombX = x;
+            this.bombY = y;
 
             player.placedBomb();
         }
@@ -278,22 +320,24 @@ public class Model implements IModel {
         @Override
         public void run() {
             ArrayList<Pair> explSq = new ArrayList<Pair>();
-            
-            if(this.player.getX()==this.x && this.player.getY()==this.y){
+
+            //if player still staying in bomb square.
+            if (this.player.getX() == this.bombX && this.player.getY() == this.bombY) {
                 player.bombed();
             }
-            map.setSquare(x, y, Constants.MAP_DETONATED_BOMB);
-            bombes.remove(this);
-            //explotion lines
-            int i; // x-line iterator
-            int j; // y-line iterator
-            int k; // radius counter
+
+            map.setSquare(bombX, bombY, Constants.MAP_DETONATED_BOMB);
+            detonateControls.remove(this);
+            //explosion lines
+            int i; // common iterator
+            int k; // common radius counter
+            boolean contin; //common continue boolean
 
             //uplines
             k = radius;
-            for (i = x - 1; (i >= 0 && k > 0); i--, k--) {
-                boolean contin = explodeSquare(i, y);
-                explSq.add(new Pair(i, y));
+            for (i = bombX - 1; (i >= 0 && k > 0); --i, --k) {
+                contin = explodeSquare(i, bombY);
+                explSq.add(new Pair(i, bombY));
                 if (!contin) {
                     break;
                 }
@@ -301,9 +345,9 @@ public class Model implements IModel {
 
             //downlines
             k = radius;
-            for (i = x + 1; (i < map.getDimension() && k > 0); i++, k--) {
-                boolean contin = explodeSquare(i, y);
-                explSq.add(new Pair(i, y));
+            for (i = bombX + 1; (i < map.getDimension() && k > 0); ++i, --k) {
+                contin = explodeSquare(i, bombY);
+                explSq.add(new Pair(i, bombY));
                 if (!contin) {
                     break;
                 }
@@ -311,9 +355,9 @@ public class Model implements IModel {
 
             //leftlines
             k = radius;
-            for (j = y - 1; (j >= 0 && k > 0); j--, k--) {
-                boolean contin = explodeSquare(x, j);
-                explSq.add(new Pair(x, j));
+            for (i = bombY - 1; (i >= 0 && k > 0); --i, ++k) {
+                contin = explodeSquare(bombX, i);
+                explSq.add(new Pair(bombX, i));
                 if (!contin) {
                     break;
                 }
@@ -321,49 +365,53 @@ public class Model implements IModel {
 
             //rightlines
             k = radius;
-            for (j = y + 1; (j < map.getDimension() && k > 0); j++, k--) {
-                boolean contin = explodeSquare(x, j);
-                explSq.add(new Pair(x, j));
+            for (i = bombY + 1; (i < map.getDimension() && k > 0); ++i, --k) {
+                contin = explodeSquare(bombX, i);
+                explSq.add(new Pair(bombX, i));
                 if (!contin) {
                     break;
                 }
             }
-            explosionSquares.addAll(explSq); //add explosion from this to others
-            player.detonatedBomd();           
-            timer.schedule(new ClearExplosionTask(explSq, new Pair(x, y), this.player), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
+
+            explosionSquares.addAll(explSq); //add explosions from this to others
+            player.detonatedBomd();
+            timer.schedule(new ClearExplosionTask(explSq, new Pair(bombX, bombY), this.player), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
         }
 
-        //true if we must put explosion square
+        //true if we must continue cycle
         //false if we must break cycle;
         private boolean explodeSquare(int x, int y) {
-            if (map.isEmpty(x, y)) {                                 //emptySquare
-                //map.setSquare(x, y, Constants.MAP_EXPLOSION_LINE);
-                return true;
-            } else if (map.blockAt(x, y) != -1) {                     //blockSquare
-                if (map.blockAt(x, y) == 1) {                          //undestroyableBlock
-                    //undestroyable so do nothing
-                    } else {
-                    map.setSquare(x, y, map.blockAt(x, y) + 1 - 9);   //destroyable block
+            if (map.isEmpty(x, y)) {
+                if (explosionSquares.contains(new Pair(x, y))) {     //explosion
+                    return false;
+                }
+                return true;                                         //emptySquare
+            } else if (map.blockAt(x, y) != -1) {                    //blockSquare
+                if (map.blockAt(x, y) == 1) {                        //undestroyableBlock
+                    //undestroyable so do nothing //going to return false;
+                    } else {                                         //destroyable block
+                    map.setSquare(x, y, map.blockAt(x, y) + 1 - 9);
                 }
                 return false;
             } else if (map.playerIdAt(x, y) != -1) {                 //playerSquare
                 int id = map.playerIdAt(x, y);
-                game.playerBombed(id);
-
+                game.getPlayer(id).bombed();
                 return false;
-            } else if (map.isBomb(x, y)) {  //another bomb
-                Canceller boomCancel = null;
-                for (Canceller detonateTask : bombes) {
-                    if(detonateTask.isCorrespondTo(x, y)){
-                        boomCancel = detonateTask;
+            } else if (map.isBomb(x, y)) {                           //another bomb
+                DetonateControl bombControl = null;
+                for (DetonateControl control : detonateControls) {
+                    if (control.isCorrespondTo(x, y)) {
+                        bombControl = control;
+                        break;
                     }
                 }
-                boomCancel.cancel(); //removeFromTimer
-                bombes.remove(boomCancel); //removeFromList
-                boomCancel.execute(); //execute
+                bombControl.cancelDetonation(); //removeFromTimer
+                detonateControls.remove(bombControl); //removeFromList
+                bombControl.detonate(); //detonate
                 return false;
             }
-            return true; //CHECK < THIS// is this ok?
-        }
+
+            return true;
         }
     }
+}
