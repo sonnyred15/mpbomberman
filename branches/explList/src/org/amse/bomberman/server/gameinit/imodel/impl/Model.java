@@ -101,17 +101,21 @@ public class Model implements IModel {
      * @param direction Direction of move
      * @return true if player moved, false otherwise
      */
-    public synchronized boolean doMove(Player player, Direction direction) {
-        int arr[] = newCoords(player.getX(), player.getY(), direction);
-        int newX = arr[0];
-        int newY = arr[1];
-        if (!isOutMove(newX, newY)) {
-            if (!isMoveToReserved(newX, newY)) {
-                makeMove(player, newX, newY);
-                return true;
+    public boolean doMove(Player player, Direction direction) {//CHECK THIS
+        synchronized (map) {
+            synchronized (player) {
+                int arr[] = newCoords(player.getX(), player.getY(), direction);
+                int newX = arr[0];
+                int newY = arr[1];
+                if (!isOutMove(newX, newY)) {
+                    if (!isMoveToReserved(newX, newY)) {
+                        makeMove(player, newX, newY);
+                        return true;
+                    }
+                }
+                return false;
             }
         }
-        return false;
     }
 
     private void makeMove(Player player, int newX, int newY) {
@@ -145,7 +149,7 @@ public class Model implements IModel {
         return false;
     }
 
-    private boolean isMoveToReserved(int x, int y) {
+    private boolean isMoveToReserved(int x, int y) {//note that explosions doesnt stores in map!!!
         return (this.map.isEmpty(x, y)) ? false : true;
     }
 
@@ -218,20 +222,22 @@ public class Model implements IModel {
      * @param player Player which trying to place bomb.
      */
     public void placeBomb(Player player) {// whats about synchronization?? //Maybe return value must be boolean type???
-        synchronized (player) {
-            if (player.canPlaceBomb()) { //player is alive and have bombs to set up
-                int x = player.getX();
-                int y = player.getY();
-                if (this.map.isBomb(x, y)) {
-                    return;
+        synchronized (map) {
+            synchronized (player) {           // whats about syncronize(map)???
+                if (player.canPlaceBomb()) { //player is alive and have bombs to set up
+                    int x = player.getX();
+                    int y = player.getY();
+                    if (this.map.isBomb(x, y)) {
+                        return; //if player staying under the bomb
+                    }
+
+                    this.map.setSquare(x, y, Constants.MAP_BOMB);
+                    DetonateTask detonationTask = new DetonateTask(player, x, y); //task to execute
+                    ScheduledFuture<?> detonation = timer.schedule(detonationTask, //need to cancel detonation
+                            Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
+
+                    detonateControls.add(new DetonateControl(x, y, detonation, detonationTask));
                 }
-
-                this.map.setSquare(x, y, Constants.MAP_BOMB);
-                DetonateTask detonationTask = new DetonateTask(player, x, y); //task to execute
-                ScheduledFuture<?> detonation = timer.schedule(detonationTask, //need to cancel detonation
-                        Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
-
-                detonateControls.add(new DetonateControl(x, y, detonation, detonationTask));
             }
         }
     }
@@ -265,8 +271,8 @@ public class Model implements IModel {
             return false;
         }
 
-        public void cancelDetonation() {
-            this.detonation.cancel(false);
+        public boolean cancelDetonation() {
+            return this.detonation.cancel(false);
         }
 
         private void detonate() {
@@ -289,7 +295,7 @@ public class Model implements IModel {
         }
 
         @Override
-        public void run() {
+        public void run() {//whats about syncronization(player,map)
             if (player.getX() == bombX && player.getY() == bombY && player.isAlive()) {
                 map.setSquare(bombX, bombY, this.player.getID());
             } else {
@@ -308,7 +314,7 @@ public class Model implements IModel {
         private final Player player;
         private final int radius;
 
-        public DetonateTask(Player player, int x, int y) {
+        public DetonateTask(Player player, int x, int y) {//whats about syncronization(player)
             this.player = player;
             this.radius = player.getRadius();
             this.bombX = x;
@@ -327,7 +333,7 @@ public class Model implements IModel {
             }
 
             map.setSquare(bombX, bombY, Constants.MAP_DETONATED_BOMB);
-            detonateControls.remove(this);
+            detonateControls.remove(this);            
             //explosion lines
             int i; // common iterator
             int k; // common radius counter
@@ -374,7 +380,7 @@ public class Model implements IModel {
             }
 
             explosionSquares.addAll(explSq); //add explosions from this to others
-            player.detonatedBomd();
+            player.detonatedBomb();
             timer.schedule(new ClearExplosionTask(explSq, new Pair(bombX, bombY), this.player), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
         }
 
@@ -405,9 +411,10 @@ public class Model implements IModel {
                         break;
                     }
                 }
-                bombControl.cancelDetonation(); //removeFromTimer
-                detonateControls.remove(bombControl); //removeFromList
-                bombControl.detonate(); //detonate
+                boolean wasCancelled = bombControl.cancelDetonation(); //removeFromTimer
+                if(wasCancelled){
+                   bombControl.detonate(); //detonate causes remove from detonateControls
+                }
                 return false;
             }
 

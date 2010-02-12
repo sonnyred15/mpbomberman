@@ -20,6 +20,7 @@ public class Player {
     private int speed = 1; // still not used.
     private int explRadius = 2; //for better testing :))
     private int bombs = 0;
+    private final Object BOMBS_LOCK = new Object();
     private int maxBombs = 2; //for better testing :))
 
     public Player(String nickName, int id) {
@@ -46,18 +47,25 @@ public class Player {
     }
 
     public boolean canPlaceBomb() {
-        return ((this.bombs < this.maxBombs) && isAlive());
+        synchronized (BOMBS_LOCK) {
+            return ((this.bombs < this.maxBombs) && isAlive());
+        }
     }
 
     public void placedBomb() {
-        this.bombs += 1;
+        synchronized (BOMBS_LOCK) {
+            this.bombs += 1;
+        }
     }
 
-    public void detonatedBomd() {
-        this.bombs -= 1;
+    public void detonatedBomb() {
+        synchronized (BOMBS_LOCK) {
+            this.bombs -= 1;
+        }
     }
 
-    public void takedBonus(int bonus){
+    @Deprecated
+    public void takedBonus(int bonus){//Bonuses must be enum!
         switch (bonus){
             case 1:{
                 this.lives+=1;
@@ -96,7 +104,7 @@ public class Player {
 
     public synchronized void bombed() { //synchronized(player)
         this.lives -= 1;
-        if (this.lives <= 0){
+        if (this.lives <= 0){//CHECK THIS
             gameListener.playerDied(this);
         }
     }

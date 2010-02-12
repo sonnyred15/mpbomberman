@@ -38,9 +38,9 @@ public class ModelTest {
     private final Game game = new Game(new Server(), map, "testModelGame", -1);
     private Model model = new Model(map, game);
     private Player player1 = new Player("player1", 1);
-    private Player player2 = new Player("player1", 2);
-    private Player player3 = new Player("player1", 3);
-    private Player player4 = new Player("player1", 4);
+    private Player player2 = new Player("player2", 2);
+    private Player player3 = new Player("player3", 3);
+    private Player player4 = new Player("player4", 4);
     {
         player1.setX(0);
         player1.setY(0);
@@ -77,6 +77,7 @@ public class ModelTest {
     public void testDoMove() throws InterruptedException {
         System.out.println();
         System.out.println("Testing concurrent call to doMove");
+        //seting position of two players for test
         model.doMove(player2, Direction.LEFT);
         model.doMove(player2, Direction.LEFT);
         model.doMove(player2, Direction.LEFT); // now position in 0 row is |1 0 2 0 0 0 |
