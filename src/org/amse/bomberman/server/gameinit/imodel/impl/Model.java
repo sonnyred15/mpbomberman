@@ -4,43 +4,62 @@
  */
 package org.amse.bomberman.server.gameinit.imodel.impl;
 
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-import org.amse.bomberman.server.gameinit.Constants;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import org.amse.bomberman.server.gameinit.Bomb;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
- *
+ * Model that is responsable for game rules and responsable for connection
+ * between Map and Game.
  * @author Kirilchuk V.E.
  */
 public class Model implements IModel {
-    //private List<ChangeListener> listeners;
-    private GameMap map;
-    private Game game;
-    private Timer timer = new Timer();
 
-    private Model() {
-    }
+    private final GameMap map;
+    private final Game game;
+    private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    
+    //private final List<DetonateControl> detonateControls;
 
+    /**
+     * Constructor of Model.
+     * @param map GameMap that correspond to game
+     * @param game Game for which model was created
+     */
     public Model(GameMap map, Game game) {
         this.map = map;
-        this.game = game;
-//        this.listeners=new ArrayList<ChangeListener>();
+        this.game = game;        
     }
 
+    /**
+     * Return matrix of GameMap.
+     * @return matrix of GameMap
+     */
     public int[][] getMapArray() {
         return this.map.getMapArray();
     }
 
     /**
-     * Give x coordinate for player. Search respawn point 
+     * Return list of explosions.
+     * @return List of explosions
+     */
+    public List<Pair> getExplosionSquares() {
+        return this.map.getExplosionSquares();
+    }
+
+    /**
+     * Give x coordinate for player. Search respawn point
      * of this player on map and return x coordinate of this respawn.
-     * @param playerID ID of player
-     * @return x coordinate in mapArray
+     * @param id ID of player
+     * @return x coordinate of player
      */
     public int xCoordOf(int playerID) {
         int[][] mapArray = this.map.getMapArray();
@@ -56,7 +75,7 @@ public class Model implements IModel {
 
     /**
      * See xCoordOf
-     * @param playerID
+     * @param id
      * @return
      */
     public int yCoordOf(int playerID) {
@@ -71,38 +90,44 @@ public class Model implements IModel {
         return 0;
     }
 
-    public boolean doMove(Player player, int direction) {
-        int arr[] = newCoords(player.getX(), player.getY(), direction);
-        int newX = arr[0];
-        int newY = arr[1];
-        if (!isOutMove(newX, newY)) {
-            if (!isMoveToReserved(newX, newY)) {
-                makeMove(player, newX, newY);
-                return true;
+    /**
+     * Trying to move the player in defined direction.
+     * @param player Player to move
+     * @param direction Direction of move
+     * @return true if player moved, false otherwise
+     */
+    public boolean doMove(Player player, Direction direction) {//CHECK THIS
+        synchronized (map) {
+            synchronized (player) {
+                int arr[] = newCoords(player.getX(), player.getY(), direction);
+                int newX = arr[0];
+                int newY = arr[1];
+                if (!isOutMove(newX, newY)) {
+                    if (!isMoveToReserved(newX, newY)) {
+                        makeMove(player, newX, newY);
+                        return true;
+                    }
+                }
+                return false;
             }
         }
-        return false;
     }
 
-//    public void addChangeListener(ChangeListener changeModelListener){
-//        this.listeners.add(changeModelListener);
-//    }
-
-//    public void notifyListeners(){
-//        for (ChangeListener changeListener : listeners) {
-//            changeListener.stateChanged(null);
-//        }
-//    }
     private void makeMove(Player player, int newX, int newY) {
         int x = player.getX();
         int y = player.getY();
 
-        if (this.map.isMine(x, y)) {
+        if (this.map.isBomb(x, y)) { //if player setted mine but still in same square
             this.map.setSquare(x, y, Constants.MAP_BOMB);
         } else {
             this.map.setSquare(x, y, Constants.MAP_EMPTY);
         }
         this.map.setSquare(newX, newY, player.getID());
+
+        //if player is making move to explosion zone.
+        if (this.map.isExplosion(new Pair(newX, newY))) {
+            player.bombed();
+        }
 
         player.setX(newX);
         player.setY(newY);
@@ -119,45 +144,47 @@ public class Model implements IModel {
         return false;
     }
 
-    private boolean isMoveToReserved(int x, int y) {
-        if (this.map.isEmpty(x, y)) {
-            return false;
-        } else {
-            return true;
-        }
+    private boolean isMoveToReserved(int x, int y) {//note that on explosions isEmpty = true!!!
+        return (this.map.isEmpty(x, y)) ? false : true;
     }
 
-    private int[] newCoords(int x, int y, int direction) {
+    private int[] newCoords(int x, int y, Direction direction) { //whats about catch illegalArgumentException???
         int[] arr = new int[2];
+
         switch (direction) {
-            case Constants.DIRECTION_DOWN: {
+            case DOWN: {
                 arr[0] = x + 1;
                 arr[1] = y;
                 break;
             }
-            case Constants.DIRECTION_LEFT: {
+            case LEFT: {
                 arr[0] = x;
                 arr[1] = y - 1;
                 break;
             }
-            case Constants.DIRECTION_UP: {
+            case UP: {
                 arr[0] = x - 1;
                 arr[1] = y;
                 break;
             }
-            case Constants.DIRECTION_RIGHT: {
+            case RIGHT: {
                 arr[0] = x;
                 arr[1] = y + 1;
                 break;
             }
             default: {
-                //throw new Exception;
+                throw new IllegalArgumentException("Default block " +
+                        "in switch(ENUM). Error in code.");
             }
         }
+
         return arr;
     }
 
-    public void printToConsole() {
+    /**
+     * Printing matrix of GameMap to console. Maybe would be deleted soon.
+     */
+    public void printToConsole() { //useless?
         int dim = this.map.getDimension();
         for (int i = 0; i < dim; i++) {
             System.out.println();
@@ -169,8 +196,9 @@ public class Model implements IModel {
     }
 
     /**
-     * Remove unused players from mapArray.
-     * @param maxPlayers
+     * Change GameMap for defined in argument number of players by
+     * removing unused players from GameMap.
+     * @param maxPlayers number of players to use
      */
     public void changeMapForCurMaxPlayers(int maxPlayers) {
         this.map.changeMapForCurMaxPlayers(maxPlayers);
@@ -178,148 +206,40 @@ public class Model implements IModel {
 
     /**
      * Remove one player from mapArray
-     * @param playerID ID of player we need to remove
+     * @param id ID of player we need to remove
      */
     public void removePlayer(int playerID) {
         this.map.removePlayer(playerID);
     }
 
-    public void placeBomb(Player player) {
-        if (player.canPlaceBomb()) {
-            int x = player.getX();
-            int y = player.getY();
-            this.map.setSquare(x, y, Constants.MAP_BOMB);
-            this.timer.schedule(new DetonateTask(player, x, y), Constants.stepTime * 10);
-        }
-    }
-
-    public void detonate(Player player, int radius, int x, int y) {
-    }
-
-    private class ClearExplosion extends TimerTask {
-
-        private ArrayList<Pair> squaresToClear;
-
-        public ClearExplosion(ArrayList<Pair> toClear) {
-            this.squaresToClear = toClear;
-        }
-
-        @Override
-        public void run() {
-            for (Pair pair : squaresToClear) {
-                int x = pair.x;
-                int y = pair.y;
-                map.setSquare(x, y, Constants.MAP_EMPTY);
-            }
-        }
-    }
-
-    private class DetonateTask extends TimerTask {
-
-        private final Player player;
-        private final int radius;
-        private final int x;
-        private final int y;
-        //CHECK V THIS//    
-        public DetonateTask(Player player, int x, int y) {
-            this.player = player;
-            this.radius = player.getRadius();
-            this.x = x;
-            this.y = y;
-
-            player.placedBomb();
-        }
-
-        @Override
-        public void run() {
-            ArrayList<Pair> explLines = new ArrayList<Pair>();
-
-            map.setSquare(x, y, Constants.MAP_DETONATED_BOMB);
-            explLines.add(new Pair(x, y));
-            //explotion lines
-            int i; // x-line iterator
-            int j; // y-line iterator
-            int k; // radius counter
-            
-            //uplines
-            k = radius;
-            for (i = x - 1; (i >= 0 && k > 0); i--, k--) {
-                boolean contin = explodeSquare(i, y);
-                if (contin) {
-                    explLines.add(new Pair(i, y));
-                } else {
-                    break;
-                }
-            }
-
-            //downlines
-            k = radius;
-            for (i = x + 1; (i < map.getDimension() && k > 0); i++, k--) {
-                boolean contin = explodeSquare(i, y);
-                if (contin) {
-                    explLines.add(new Pair(i, y));
-                } else {
-                    break;
-                }
-            }
-
-            //leftlines
-            k = radius;
-            for (j = y - 1; (j >= 0 && k > 0); j--, k--) {
-                boolean contin = explodeSquare(x, j);
-                if (contin) {
-                    explLines.add(new Pair(x, j));
-                } else {
-                    break;
-                }
-            }
-
-            //rightlines
-            k = radius;
-            for (j = y + 1; (j < map.getDimension() && k > 0); j++, k--) {
-                boolean contin = explodeSquare(x, j);
-                if (contin) {
-                    explLines.add(new Pair(x, j));
-                } else {
-                    break;
-                }
-            }
-            
-            player.detonatedBomd();
-            timer.schedule(new ClearExplosion(explLines), Constants.stepTime * 3);
-        }
-    }
-    
-    //true if we must put explosion square
-    //false if we must break cycle;
-    private boolean explodeSquare(int x, int y){
-                if (map.isEmpty(x, y)) {                                 //emptySquare
-                    map.setSquare(x, y, Constants.MAP_EXPLOSION_LINE);
-                    return true;
-                } else if (map.blockAt(x, y) != -1) {                     //blockSquare
-                    if (map.blockAt(x, y) == 1) {                          //undestroyableBlock
-                        //undestroyable so do nothing
-                    } else {
-                        map.setSquare(x, y, map.blockAt(x, y) + 1 - 9);   //destroyable block
+    /**
+     * Trying to place bomb of defined player.
+     * @param player Player which trying to place bomb.
+     */
+    public void placeBomb(Player player) {// whats about synchronization?? //Maybe return value must be boolean type???
+        synchronized (map) {
+            synchronized (player) {           // whats about syncronize(map)???
+                if (player.canPlaceBomb()) { //player is alive and have bombs to set up
+                    int x = player.getX();
+                    int y = player.getY();
+                    if (this.map.isBomb(x, y)) {
+                        return; //if player staying under the bomb
                     }
-                    return false;
-                } else if (map.playerIdAt(x, y) != -1) {                 //playerSquare
-                    int id = map.playerIdAt(x, y);
-                    game.playerBombed(id);
-                    
-                    return false;
+                    Bomb bomb = new Bomb(this, player, map, x, y , timer);
                 }
-                return true; //need to be checked!!!!!
+            }
+        }
     }
 
-    private class Pair {
+    public void playerBombed(int id){
+        game.getPlayer(id).bombed();
+    }
 
-        protected int x;
-        protected int y;
-
-        public Pair(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+    /**
+     * Return name of GameMap of this Model.
+     * @return Name of GameMap in String
+     */
+    public String getMapName() {
+        return this.map.getName();
     }
 }
