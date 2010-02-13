@@ -142,7 +142,8 @@ public class Session extends Thread implements ISession {
             }
             case START_GAME: {
                 //"5"
-                startGame();
+                sendAnswer("CURRENTLY UNSUPPORTED");
+                //startGame();
                 break;
             }
             case LEAVE_GAME: {
@@ -274,12 +275,17 @@ public class Session extends Thread implements ISession {
             if (!gameToJoin.isStarted()) {
                 this.player = gameToJoin.join(playerName);
                 if (this.player == null) {
-                    sendAnswer("Game is full. Try to join later.");
-                    writeToLog("Tryed to join to full game, canceled");
+                    sendAnswer("Game is full. Try to join later.");//currently game autostarts when
+                    writeToLog("Tryed to join to full game, canceled");//game is full!!!
                     return;
                 } else {
                     this.game = gameToJoin;
                     sendAnswer("Joined.");
+                    ///////////////AUTOSTART
+                    if(this.game.isFull()){
+                        this.game.startGame();
+                    }
+                    //////////////
                     writeToLog("Tryed to join to the game. Joined." +
                             " GameID=" + gameID +
                             " Player=" + playerName);
@@ -335,10 +341,11 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void startGame() {
+    @Deprecated
+    private void startGame() {//currently game autostarts!
         if (this.game != null) {
             if (!this.game.isStarted()) {
-                this.game.startGame();
+                //this.game.startGame();
                 sendAnswer("Game started.");
                 writeToLog("Started game");
                 return;
@@ -571,7 +578,7 @@ public class Session extends Thread implements ISession {
         if (message.startsWith("Tryed to move, canceled")) {
             return true;
         }
-        if (message.startsWith("Query line received: \'3")) {
+        if (message.startsWith("Query line received: '3")) {
             return true;
         }
         return false;

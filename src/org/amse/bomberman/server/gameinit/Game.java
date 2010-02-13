@@ -24,7 +24,6 @@ public class Game {
     private final IModel model;
     private final List<Player> players;
     private boolean started;
-
     private final DieListener dieListener;
 
     public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
@@ -52,7 +51,7 @@ public class Game {
     public synchronized Player join(String name) {
         Player player = null;
 
-        if (this.players.size() < this.maxPlayers) { 
+        if (this.players.size() < this.maxPlayers) {
             player = new Player(name, this.players.size() + 1);
             //coordinates of players will be set when game would start!!!!
             this.players.add(player);
@@ -62,10 +61,10 @@ public class Game {
         return player;
     }
 
-    public Player getPlayer(int id){
-        synchronized(players){
+    public Player getPlayer(int id) {
+        synchronized (players) {
             for (Player player : players) {
-                if (player.getID()==id){
+                if (player.getID() == id) {
                     return player;
                 }
             }
@@ -121,6 +120,10 @@ public class Game {
 
     public boolean isStarted() {
         return this.started;
+    }
+
+    public boolean isFull() {
+        return (this.players.size()==this.maxPlayers ? true : false);
     }
 
     public String getName() {

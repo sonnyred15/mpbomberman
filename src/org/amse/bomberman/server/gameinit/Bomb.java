@@ -123,7 +123,7 @@ public class Bomb {
     private boolean explodeSquare(int x, int y) {
         if (map.isEmpty(x, y)) {
             if (map.isExplosion(new Pair(x, y))) {     //explosion
-                return false;
+                return true;
             }
             return true;                                         //emptySquare
         } else if (map.blockAt(x, y) != -1) {                    //blockSquare
