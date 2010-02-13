@@ -29,4 +29,6 @@ public interface IServer {
     boolean isShutdowned();
 
     int getPort();
+
+    void writeToLog(String message);
 }
