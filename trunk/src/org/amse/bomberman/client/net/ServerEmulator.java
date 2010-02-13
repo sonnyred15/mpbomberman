@@ -10,7 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.BombMap.Direction;
+import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Player;
 
 /**
@@ -91,18 +91,25 @@ public class ServerEmulator extends Thread{
             case ServerEmulator.JOIN_HOST:{
                 int hostNum=Integer.parseInt(query.substring(1));
                 //joinHost(hostNum);
-                map.addPlayer(new Player("Mavr"),0, 0);
+                //map.addPlayer(new Player("Mavr"),0, 0);
                 sendAnswer("Joined.", null);
                 break;
             }
             case ServerEmulator.DO_MOVE:{
                 int dir=Integer.parseInt(query.substring(1, 2));
-                map.movePlayer(1, Direction.getDirection(dir));
+                //map.movePlayer(1, Direction.getDirection(dir));
                 sendOK();
                 break;
             }
             case ServerEmulator.GET_MAP:{
-                sendMap(map.getMassive());
+                int n = map.getSize();
+                int[][] cells = new int[n][n];
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        cells[i][j] = map.getValue(new Cell(i,j));
+                    }
+                }
+                sendMap(cells);
                 break;
             }
             default: {

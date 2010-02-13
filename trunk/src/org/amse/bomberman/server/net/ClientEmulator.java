@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.net;
 
+import org.amse.bomberman.server.net.tcpimpl.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

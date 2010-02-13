@@ -4,7 +4,10 @@
  */
 package org.amse.bomberman.server.gameinit.imodel;
 
+import java.util.List;
+import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -12,13 +15,19 @@ import org.amse.bomberman.server.gameinit.Player;
  */
 public interface IModel {
 
+    public String getMapName();
+
     void placeBomb(Player player);
 
-    boolean doMove(Player player, int direction);
+    void playerBombed(int playerID);
+
+    boolean doMove(Player player, Direction direction);
 
     void removePlayer(int playerID);
 
     int[][] getMapArray();
+
+    List<Pair> getExplosionSquares();
 
     void printToConsole();
 

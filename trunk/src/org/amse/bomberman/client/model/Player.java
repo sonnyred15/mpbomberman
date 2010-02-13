@@ -13,9 +13,9 @@ public class Player {
 
     public Player(String playerName) {
         name = playerName;
-        bombAmount = 1;
-        bombRange = 1;
-        life = 1;
+        bombAmount = 2;
+        bombRange = 2;
+        life = 3;
         //  do 100 with coefficient ?
         speed = 1;
     }
@@ -37,8 +37,8 @@ public class Player {
     public void incBombRange() {
         bombRange++;
     }
-    public void incLife() {
-        life++;
+    public void setLives(int lives) {
+        life = lives;
     }
     public void incSpeed() {
         speed++;
