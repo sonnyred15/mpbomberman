@@ -10,18 +10,17 @@ package org.amse.bomberman.server.gameinit;
  */
 public class Player {
 
-    private DieListener gameListener;
+    private DieListener playerDieListener;
 
     private String nickName = "unnamed";
     private int lives = 3;
     private int id = 1;
     private int x = 0;
-    private int y = 0;
-    private int speed = 1; // still not used.
+    private int y = 0;    
     private int explRadius = 2; //for better testing :))
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
-    private int maxBombs = 2; //for better testing :))
+    private int maxBombs = 4; //for better testing :))
 
     public Player(String nickName, int id) {
         this.nickName = nickName;
@@ -29,7 +28,7 @@ public class Player {
     }
 
     public void setDieListener(DieListener gameDieListener){
-        this.gameListener = gameDieListener;
+        this.playerDieListener = gameDieListener;
     }
 
     public String getInfo() {
@@ -42,7 +41,7 @@ public class Player {
         return ret;
     }
 
-    public boolean isAlive() {
+    public synchronized boolean isAlive() {
         return (this.lives > 0);
     }
 
@@ -105,7 +104,7 @@ public class Player {
     public synchronized void bombed() { //synchronized(player)
         this.lives -= 1;
         if (this.lives <= 0){//CHECK THIS
-            gameListener.playerDied(this);
+            playerDieListener.playerDied(this);
         }
     }
 

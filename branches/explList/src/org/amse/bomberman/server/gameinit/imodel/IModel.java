@@ -19,6 +19,8 @@ public interface IModel {
 
     void placeBomb(Player player);
 
+    void playerBombed(int playerID);
+
     boolean doMove(Player player, Direction direction);
 
     void removePlayer(int playerID);
