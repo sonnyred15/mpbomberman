@@ -16,6 +16,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.List;
+import org.amse.bomberman.server.gameinit.Bot;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants;
@@ -126,7 +127,7 @@ public class Session extends Thread implements ISession {
                 break;
             }
             case JOIN_GAME: {
-                //"2 gameID playerName"
+                //"2 gameID botName"
                 joinGame(queryArgs);
                 break;
             }
@@ -169,6 +170,11 @@ public class Session extends Thread implements ISession {
             case GET_MAPS_LIST: {
                 //"10"
                 sendMapsList();
+                break;
+            }
+            case ADD_BOT_TO_GAME: {
+                //"11 gameID botName"
+                addBot(queryArgs);
                 break;
             }
             default: { //CHECK < V THIS!!!// never happens!?
@@ -235,12 +241,12 @@ public class Session extends Thread implements ISession {
     }
 
     private void joinGame(String[] queryArgs) {
-        //"2" "gameID" "playerName"
+        //"2" "gameID" "botName"
 
         int gameID = 0;
         String playerName = "defaultPlayer";
         switch (queryArgs.length) {
-            case 2: { //to support command in "short" syntax when player name is ommited
+            case 2: { //to support command in "short" syntax when bot name is ommited
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
@@ -281,11 +287,11 @@ public class Session extends Thread implements ISession {
                 } else {
                     this.game = gameToJoin;
                     sendAnswer("Joined.");
-                    ///////////////AUTOSTART
+                    ///////////////AUTOSTART/////////
                     if(this.game.isFull()){
                         this.game.startGame();
                     }
-                    //////////////
+                    ////////////////////////////////
                     writeToLog("Tryed to join to the game. Joined." +
                             " GameID=" + gameID +
                             " Player=" + playerName);
@@ -377,9 +383,9 @@ public class Session extends Thread implements ISession {
     }
 
     private void placeBomb() {
-        if (this.game != null) { // Always if game!=null player is not null too!
+        if (this.game != null) { // Always if game!=null bot is not null too!
             if (this.game.isStarted()) {
-                this.game.placeBomb(this.player); //is player alive checking in model
+                this.game.placeBomb(this.player); //is bot alive checking in model
                 sendAnswer("Ok.");
                 writeToLog("Tryed to plant bomb." +
                         " playerID=" + this.player.getID() +
@@ -466,6 +472,77 @@ public class Session extends Thread implements ISession {
         } else {
             sendAnswer("No maps on server was founded.");
             writeToLog("Tryed to get maps list. No maps founded on server.");
+            return;
+        }
+    }
+
+    private void addBot(String[] queryArgs){
+       //"11" "gameID" "botName"
+
+        int gameID = 0;
+        String botName = "defaultBot";
+        switch (queryArgs.length) {
+            case 2: { //to support command in "short" syntax when bot name is ommited
+                try {
+                    gameID = Integer.parseInt(queryArgs[1]);
+                } catch (NumberFormatException ex) {
+                    sendAnswer("Wrong command parameters. Error on client side." +
+                            " gameID must be int.");
+                    writeToLog(ex.getMessage() + " Wrong command parameters. " +
+                            "Error on client side. gameID must be int.");
+                }
+                break;
+            }
+            case 3: { //if we getted command in full syntax
+                try {
+                    gameID = Integer.parseInt(queryArgs[1]);
+                } catch (NumberFormatException ex) {
+                    sendAnswer("Wrong command parameters. Error on client side." +
+                            " gameID must be int.");
+                    writeToLog(ex.getMessage() + " Wrong command parameters. " +
+                            "Error on client side. gameID must be int.");
+                }
+                botName = queryArgs[2];
+                break;
+            }
+            default: { //wrong syntax
+                sendAnswer("Wrong command parameters. Error on client side.");
+                writeToLog(" Wrong command parameters. Error on client side.");
+                break;
+            }
+        }
+
+        Game gameToJoin = server.getGame(gameID);
+        if (gameToJoin != null) {
+            if (!gameToJoin.isStarted()) {
+                Bot bot = gameToJoin.joinBot(botName);
+                if (bot == null) {
+                    sendAnswer("Game is full. Try to add bot later.");//currently game autostarts when
+                    writeToLog("Tryed to add bot to full game, canceled");//game is full!!!
+                    return;
+                } else {
+                    //this.game = gameToJoin;
+                    sendAnswer("Bot added.");
+                    ///////////////AUTOSTART/////////
+                    if(gameToJoin.isFull()){
+                        gameToJoin.startGame();
+                    }
+                    ////////////////////////////////
+                    writeToLog("Tryed to add bot to the game. Joined." +
+                            " GameID=" + gameID +
+                            " Player=" + botName);
+                    return;
+                }
+            } else { //if game.isStarted() true
+                sendAnswer("Game was  already started.");
+                writeToLog("Tryed to add bot gameID=" + gameID + " but canceled " +
+                        "cause game is already started ");
+                return;
+            }
+        } else { //if game==null true
+            sendAnswer("No such game.");
+            writeToLog("Tryed to add bot gameID=" + gameID + " but canceled " +
+                    "no such game on server. ");
             return;
         }
     }

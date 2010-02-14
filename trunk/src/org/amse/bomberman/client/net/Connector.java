@@ -192,6 +192,15 @@ public class Connector implements IConnector{
         return answer;
     }
 
+    public boolean joinBotIntoGame(int n) throws IOException{
+        String answer = queryAnswer("11 " + n).get(0);
+        System.out.println(answer);
+        System.out.println();
+        if (answer.equals("Bot added.")) {
+            return true;
+        } else throw new IOException(answer);
+    }
+
     private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {

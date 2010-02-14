@@ -61,6 +61,18 @@ public class Game {
         return player;
     }
 
+    public synchronized Bot joinBot(String name) {
+        Bot bot = null;
+        if (this.players.size() < this.maxPlayers) {
+            bot = this.model.addBot(name, this.players.size() + 1);
+            if (bot != null){
+                this.players.add(bot);
+                bot.setDieListener(dieListener);
+            }
+        }
+        return bot;
+    }
+
     public Player getPlayer(int id) {
         synchronized (players) {
             for (Player player : players) {
@@ -87,7 +99,6 @@ public class Game {
     }
 
     public void startGame() {
-        this.started = true;
         //Here model must change map to support currrent num of players
         //and then give coordinates.
         this.model.changeMapForCurMaxPlayers(this.players.size());
@@ -95,6 +106,8 @@ public class Game {
             player.setX(model.xCoordOf(player.getID()));
             player.setY(model.yCoordOf(player.getID()));
         }
+        this.started = true;
+        this.model.startBots();
     }
 
     private void endGame() {

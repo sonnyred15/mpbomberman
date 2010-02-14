@@ -12,6 +12,8 @@ import org.amse.bomberman.util.Constants.Direction;
  * @author michail korovkin
  */
 public interface IConnector {
+
+     public boolean joinBotIntoGame(int gameNumber) throws IOException;
      public void сonnect(InetAddress address, int port)
              throws UnknownHostException, IOException;
      public void leaveGame();
