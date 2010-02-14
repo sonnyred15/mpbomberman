@@ -22,6 +22,9 @@ public class Player {
     private final Object BOMBS_LOCK = new Object();
     private int maxBombs = 4; //for better testing :))
 
+    public Player() {
+    }
+
     public Player(String nickName, int id) {
         this.nickName = nickName;
         this.id = id;

@@ -4,10 +4,12 @@
  */
 package org.amse.bomberman.server.gameinit.imodel.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.amse.bomberman.server.gameinit.Bomb;
+import org.amse.bomberman.server.gameinit.Bot;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
@@ -26,7 +28,7 @@ public class Model implements IModel {
     private final GameMap map;
     private final Game game;
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    
+    private final List<Thread> bots = new ArrayList<Thread>();
     //private final List<DetonateControl> detonateControls;
 
     /**
@@ -242,4 +244,24 @@ public class Model implements IModel {
     public String getMapName() {
         return this.map.getName();
     }
+
+    public Bot addBot(String name, int id) {
+        Bot bot = new Bot(name, id, this);
+        Thread t = new Thread(bot);
+        t.setDaemon(true);
+        this.bots.add(t);
+        return bot;
+    }
+
+    public GameMap getMap() {
+        return map;
+    }
+
+    public void startBots() {
+        for (Thread thread : bots) {
+            thread.start();
+        }
+    }
+    
+
 }

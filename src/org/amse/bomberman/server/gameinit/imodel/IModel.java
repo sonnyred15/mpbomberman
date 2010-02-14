@@ -5,6 +5,8 @@
 package org.amse.bomberman.server.gameinit.imodel;
 
 import java.util.List;
+import org.amse.bomberman.server.gameinit.Bot;
+import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants.Direction;
@@ -15,7 +17,13 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public interface IModel {
 
-    public String getMapName();
+    void startBots();
+
+    GameMap getMap();
+
+    Bot addBot(String name, int id);
+
+    String getMapName();
 
     void placeBomb(Player player);
 

@@ -74,7 +74,8 @@ public final class Constants {
         PLACE_BOMB(7),
         DOWNLOAD_MAP(8),
         GET_GAME_STATUS(9),
-        GET_MAPS_LIST(10);
+        GET_MAPS_LIST(10),
+        ADD_BOT_TO_GAME(11);
 
         private final int value;
 
@@ -110,9 +111,11 @@ public final class Constants {
                     return GET_GAME_STATUS;
                 case 10:
                     return GET_MAPS_LIST;
+                case 11:
+                    return ADD_BOT_TO_GAME;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
-                            "must be between 0 and 8 inclusive");
+                            "must be between 0 and 11 inclusive");
             }
         }
     }

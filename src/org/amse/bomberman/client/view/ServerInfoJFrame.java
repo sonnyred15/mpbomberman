@@ -120,8 +120,20 @@ public class ServerInfoJFrame extends JFrame{
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n" +
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-
     }
+    
+    private void joinBot(int gameNumber) {
+        IConnector connect = Model.getInstance().getConnector();
+        try {
+            connect.joinBotIntoGame(gameNumber);
+            //this.dispose();
+            //startMap();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n" +
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private int getSelectedGame() {
         int result = -1;
         if (table.getSelectedRow() != -1
@@ -199,26 +211,32 @@ public class ServerInfoJFrame extends JFrame{
         public void actionPerformed(ActionEvent e) {
             int gameNumber = parent.getSelectedGame();
             if (gameNumber != -1) {
-                try {
-                    IConnector connector = Model.getInstance().getConnector();
-                    InetAddress address = connector.getInetAddress();
-                    int port = connector.getPort();
-                    Bot bot = new Bot(gameNumber, address, port);
-                    Model.getInstance().addBot(bot);
-                    parent.refreshTable();
-                    JOptionPane.showMessageDialog(parent, "Bot was successfully added."
-                        , "Sucessful", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, "Cann't add a new bot"
-                        + " to the selected Game", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                JOptionPane.showMessageDialog(parent, "You did't select the game! "
+                parent.joinBot(gameNumber);
+            }else {
+                JOptionPane.showMessageDialog(parent, "You did't select the game for bot! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+//                try {
+//                    IConnector connector = Model.getInstance().getConnector();
+//                    InetAddress address = connector.getInetAddress();
+//                    int port = connector.getPort();
+//                    Bot bot = new Bot(gameNumber, address, port);
+//                    Model.getInstance().addBot(bot);
+                    parent.refreshTable();
+//                    JOptionPane.showMessageDialog(parent, "Bot was successfully added."
+//                        , "Sucessful", JOptionPane.INFORMATION_MESSAGE);
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                    JOptionPane.showMessageDialog(parent, "Cann't add a new bot"
+//                        + " to the selected Game", "Error", JOptionPane.ERROR_MESSAGE);
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(parent, "You did't select the game! "
+//                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
+//            }
         }
     }
+
     private class MyTableModel extends AbstractTableModel {
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         Object[][] data = new Object[50][5];
