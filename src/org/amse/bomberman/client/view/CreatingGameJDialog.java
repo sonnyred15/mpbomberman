@@ -19,6 +19,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -35,7 +36,8 @@ public class CreatingGameJDialog extends JDialog {
     private JButton createJButton = new JButton();
     private JButton cancelJButton = new JButton("Cancel");
     private final int LINE_H = 20;
-    public CreatingGameJDialog(ServerInfoJFrame jframe) {
+    
+    public CreatingGameJDialog(ServerInfoJFrame jframe) throws NetException {
         super(jframe, "Create new Game", true);
         parent = jframe;
         setSize(width, heigth);
@@ -135,6 +137,9 @@ public class CreatingGameJDialog extends JDialog {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(parent,"Can not create new game.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NetException ex2) {
+                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

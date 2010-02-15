@@ -6,11 +6,13 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
 
 /**
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class MapJMenuBar extends JMenuBar {
 
@@ -32,7 +34,12 @@ public class MapJMenuBar extends JMenuBar {
 
             public void actionPerformed(ActionEvent e) {
                 Model.getInstance().removeListener(parent);
-                Model.getInstance().getConnector().leaveGame();
+                try {
+                    Model.getInstance().getConnector().leaveGame();
+                } catch (NetException ex) {
+                    JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 System.exit(0);
             }
         });
@@ -40,7 +47,6 @@ public class MapJMenuBar extends JMenuBar {
     }
 
     public static class LeaveAction extends AbstractAction {
-
         MapJFrame parent;
 
         public LeaveAction(MapJFrame jFrame) {
@@ -53,15 +59,18 @@ public class MapJMenuBar extends JMenuBar {
         public void actionPerformed(ActionEvent e) {
             parent.dispose();
             Model.getInstance().removeListener(parent);
-            Model.getInstance().getConnector().leaveGame();
+            try {
+                Model.getInstance().getConnector().leaveGame();
+            } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
             Model.getInstance().removeBots();
             ServerInfoJFrame serv = new ServerInfoJFrame();
             parent.stopWaitStart();
         }
     }
-
     public static class StartAction extends AbstractAction {
-
         MapJFrame parent;
 
         public StartAction(MapJFrame jFrame) {
@@ -70,11 +79,15 @@ public class MapJMenuBar extends JMenuBar {
             putValue(SHORT_DESCRIPTION, "Start this game.");
             putValue(SMALL_ICON, null);
         }
-
         public void actionPerformed(ActionEvent e) {
             IConnector connect = Model.getInstance().getConnector();
-            connect.startGame();
-        //this.setEnabled(false);
+            try {
+                connect.startGame();
+                //this.setEnabled(false);
+            } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }
