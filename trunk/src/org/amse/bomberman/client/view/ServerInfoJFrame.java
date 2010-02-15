@@ -26,8 +26,8 @@ import org.amse.bomberman.client.net.IConnector;
  *
  * @author michail korovkin
  */
+public class ServerInfoJFrame extends JFrame {
 
-public class ServerInfoJFrame extends JFrame{
     private final int width = 500;
     private final int height = 375;
     private JButton createJButton = new JButton();
@@ -35,8 +35,7 @@ public class ServerInfoJFrame extends JFrame{
     private JButton refreshJButton = new JButton();
     private JButton botJButton = new JButton();
     private JTable table = new JTable(new MyTableModel());
-    private final Dimension buttonSize = new Dimension(200,40);
-
+    private final Dimension buttonSize = new Dimension(200, 40);
 
     public ServerInfoJFrame() {
         super("ServerInfo");
@@ -60,10 +59,9 @@ public class ServerInfoJFrame extends JFrame{
         Container c = getContentPane();
         c.setLayout(new FlowLayout());
         c.add(leftBox);
-        JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
-                , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // how calculate sizes???
-        jsp.setPreferredSize(new Dimension(width-120, height-50));
+        jsp.setPreferredSize(new Dimension(width - 120, height - 50));
         c.add(jsp);
 
         refreshJButton.setAction(new RefreshAction(this));
@@ -73,13 +71,14 @@ public class ServerInfoJFrame extends JFrame{
         setResizable(false);
         setVisible(true);
     }
+
     private void refreshTable() {
         IConnector connect = Model.getInstance().getConnector();
         ArrayList<String> games = connect.takeGamesList();
         // if not "No games"
         if (games.get(0).charAt(0) != 'N') {
             int counter = 0;
-            MyTableModel tableModel = (MyTableModel)table.getModel();
+            MyTableModel tableModel = (MyTableModel) table.getModel();
             tableModel.clear();
             for (String game : games) {
                 String[] buf = game.split(" ");
@@ -93,6 +92,7 @@ public class ServerInfoJFrame extends JFrame{
         }
         table.repaint();
     }
+
     private void setSizesTable() {
         table.getTableHeader().setReorderingAllowed(false);
         TableColumnModel columnModel = table.getColumnModel();
@@ -110,6 +110,7 @@ public class ServerInfoJFrame extends JFrame{
         columnModel.getColumn(3).setResizable(false);
         columnModel.getColumn(4).setResizable(false);
     }
+
     private void join(int gameNumber) {
         IConnector connect = Model.getInstance().getConnector();
         try {
@@ -117,32 +118,33 @@ public class ServerInfoJFrame extends JFrame{
             this.dispose();
             startMap();
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Can not join to the game: \n" +
-                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void joinBot(int gameNumber) {
         IConnector connect = Model.getInstance().getConnector();
         try {
             connect.joinBotIntoGame(gameNumber);
-            //this.dispose();
-            //startMap();
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n" +
-                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private int getSelectedGame() {
         int result = -1;
         if (table.getSelectedRow() != -1
-                    && table.getValueAt(table.getSelectedRow(), 0) != null) {
+                && table.getValueAt(table.getSelectedRow(), 0) != null) {
             result = Integer.parseInt(
                     (String) table.getValueAt(table.getSelectedRow(), 0));
             return result;
-        } else return result;
+        } else {
+            return result;
+        }
     }
+
     private static void startMap() {
         IConnector connect = Model.getInstance().getConnector();
         BombMap map = connect.getMap();
@@ -150,7 +152,9 @@ public class ServerInfoJFrame extends JFrame{
         model.setMap(map);
         MapJFrame frame = new MapJFrame(map);
     }
+
     public static class RefreshAction extends AbstractAction {
+
         ServerInfoJFrame parent;
 
         public RefreshAction(ServerInfoJFrame jFrame) {
@@ -159,12 +163,14 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SHORT_DESCRIPTION, "Refresh information from server");
             putValue(SMALL_ICON, null);
         }
+
         public void actionPerformed(ActionEvent e) {
             parent.refreshTable();
         }
     }
 
     public static class CreateAction extends AbstractAction {
+
         ServerInfoJFrame parent;
 
         public CreateAction(ServerInfoJFrame jFrame) {
@@ -173,14 +179,15 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SHORT_DESCRIPTION, "Create new Game");
             putValue(SMALL_ICON, null);
         }
+
         public void actionPerformed(ActionEvent e) {
             CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
-            //IConnector connect = Model.getInstance().getConnector();
-            //connect.createGame();
             parent.refreshTable();
         }
     }
+
     public static class JoinAction extends AbstractAction {
+
         ServerInfoJFrame parent;
 
         public JoinAction(ServerInfoJFrame jFrame) {
@@ -189,6 +196,7 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SHORT_DESCRIPTION, "Join to the selected Game");
             putValue(SMALL_ICON, null);
         }
+
         public void actionPerformed(ActionEvent e) {
             int gameNumber = parent.getSelectedGame();
             if (gameNumber != -1) {
@@ -199,7 +207,9 @@ public class ServerInfoJFrame extends JFrame{
             }
         }
     }
+
     public static class AddBotAction extends AbstractAction {
+
         ServerInfoJFrame parent;
 
         public AddBotAction(ServerInfoJFrame jFrame) {
@@ -208,61 +218,52 @@ public class ServerInfoJFrame extends JFrame{
             putValue(SHORT_DESCRIPTION, "Add one bot to selected game");
             putValue(SMALL_ICON, null);
         }
+
         public void actionPerformed(ActionEvent e) {
             int gameNumber = parent.getSelectedGame();
             if (gameNumber != -1) {
                 parent.joinBot(gameNumber);
-            }else {
+            } else {
                 JOptionPane.showMessageDialog(parent, "You did't select the game for bot! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-//                try {
-//                    IConnector connector = Model.getInstance().getConnector();
-//                    InetAddress address = connector.getInetAddress();
-//                    int port = connector.getPort();
-//                    Bot bot = new Bot(gameNumber, address, port);
-//                    Model.getInstance().addBot(bot);
-                    parent.refreshTable();
-//                    JOptionPane.showMessageDialog(parent, "Bot was successfully added."
-//                        , "Sucessful", JOptionPane.INFORMATION_MESSAGE);
-//                } catch (IOException ex) {
-//                    ex.printStackTrace();
-//                    JOptionPane.showMessageDialog(parent, "Cann't add a new bot"
-//                        + " to the selected Game", "Error", JOptionPane.ERROR_MESSAGE);
-//                }
-//            } else {
-//                JOptionPane.showMessageDialog(parent, "You did't select the game! "
-//                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-//            }
+            parent.refreshTable();
         }
     }
 
     private class MyTableModel extends AbstractTableModel {
+
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         Object[][] data = new Object[50][5];
+
         public int getRowCount() {
             return data.length;
         }
 
         public int getColumnCount() {
-             return columnNames.length;
+            return columnNames.length;
         }
+
         @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
+
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
+
         @Override
         public void setValueAt(Object value, int row, int col) {
             data[row][col] = value;
             fireTableCellUpdated(row, col);
         }
+
         public void clear() {
             data = new Object[50][5];
         }
