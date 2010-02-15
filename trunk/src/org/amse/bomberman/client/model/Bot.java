@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
-import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Direction;
