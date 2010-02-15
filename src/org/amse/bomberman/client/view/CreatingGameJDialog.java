@@ -28,11 +28,12 @@ import org.amse.bomberman.util.Constants;
 public class CreatingGameJDialog extends JDialog {
     private ServerInfoJFrame parent;
     private int width = 300;
-    private int heigth = 200;
+    private int heigth = 180;
     private JComboBox mapBox;
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
     private JButton createJButton = new JButton();
+    private JButton cancelJButton = new JButton("Cancel");
     private final int LINE_H = 20;
     public CreatingGameJDialog(ServerInfoJFrame jframe) {
         super(jframe, "Create new Game", true);
@@ -44,17 +45,22 @@ public class CreatingGameJDialog extends JDialog {
         if (!maps[0].equals("No maps on server was founded.")) {
             mapBox = new JComboBox(maps);
         }
+
         // creating top line for gameName Field
-        Box topBox = Box.createHorizontalBox();
+        Box topBox = Box.createVerticalBox();
+        Box topBoxContent = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("GameName");
         nameLabel.setPreferredSize(new Dimension(width/4, LINE_H));
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        topBox.add(nameLabel);
+        topBoxContent.add(nameLabel);
         gameNameTF.setPreferredSize(new Dimension(width/2, LINE_H));
         gameNameTF.setText("MyGame");
-        topBox.add(gameNameTF);
-        topBox.add(Box.createHorizontalGlue());
-        topBox.setPreferredSize(new Dimension(width-30, LINE_H));
+        topBoxContent.add(gameNameTF);
+        topBoxContent.add(Box.createHorizontalGlue());
+        topBoxContent.setPreferredSize(new Dimension(width-30, LINE_H));
+        topBox.add(Box.createVerticalStrut(15));
+        topBox.add(topBoxContent);
+
         // creating central line for MaxPlayers Field
         Box centralBox = Box.createHorizontalBox();
         JLabel maxPlLabel = new JLabel("MaxPlayers");
@@ -70,18 +76,21 @@ public class CreatingGameJDialog extends JDialog {
             centralBox.add(Box.createHorizontalGlue());
         }
         centralBox.setPreferredSize(new Dimension(width-30, LINE_H));
+
         // creating bottom line for Map-Select Field
-        Box bottomBox = Box.createHorizontalBox();
+        Box bottomBox = Box.createVerticalBox();
+        Box bottomBoxContent = Box.createHorizontalBox();
         JLabel mapLabel = new JLabel("Map");
         mapLabel.setPreferredSize(new Dimension(width/4, LINE_H));
         mapLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        bottomBox.add(mapLabel);
-        bottomBox.add(mapBox);
+        bottomBoxContent.add(mapLabel);
+        bottomBoxContent.add(mapBox);
         for (int i = 0; i < 4; i++) {
-            bottomBox.add(Box.createHorizontalGlue());
+            bottomBoxContent.add(Box.createHorizontalGlue());
         }
-        bottomBox.setPreferredSize(new Dimension(width-30, LINE_H));
-
+        bottomBoxContent.setPreferredSize(new Dimension(width-30, LINE_H));
+        bottomBox.add(bottomBoxContent);
+        bottomBox.add(Box.createVerticalStrut(15));
 
         Container c = this.getContentPane();
         c.setLayout(new FlowLayout());
@@ -89,7 +98,9 @@ public class CreatingGameJDialog extends JDialog {
         c.add(centralBox);
         c.add(bottomBox);
         c.add(createJButton);
+        c.add(cancelJButton);
         createJButton.setAction(new CreateGameAction(this));
+        cancelJButton.setAction(new CancelAction(this));
 
         setResizable(false);
         setVisible(true);
@@ -125,6 +136,17 @@ public class CreatingGameJDialog extends JDialog {
                 JOptionPane.showMessageDialog(parent,"Can not create new game.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+    public static class CancelAction extends AbstractAction{
+        CreatingGameJDialog parent;
+        public CancelAction(CreatingGameJDialog jframe){
+            parent = jframe;
+            putValue(NAME, "Cancel");
+            putValue(SMALL_ICON, null);
+        }
+        public void actionPerformed(ActionEvent e) {
+            parent.dispose();
         }
     }
 }

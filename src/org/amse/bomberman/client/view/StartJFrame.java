@@ -23,7 +23,7 @@ import org.amse.bomberman.util.Constants;
  * @author michail korovkin
  */
 public class StartJFrame extends JFrame {
-    private final int height = 150;
+    private final int height = 120;
     private final int width = 240;
     private JButton connectJButton = new JButton();
     //private JButton ipDefault = new JButton();
@@ -32,7 +32,7 @@ public class StartJFrame extends JFrame {
     private JTextField portTF = new JTextField();
 
     public StartJFrame() {
-        super("Let's start BomberManing!!!");
+        super("BomberMAN!!!");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(400, 250);
