@@ -7,7 +7,7 @@ import org.amse.bomberman.client.view.IView;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class Model implements IModel{
     private static IModel model= null;

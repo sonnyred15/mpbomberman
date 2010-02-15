@@ -23,6 +23,7 @@ import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.*;
 
 /**
@@ -46,7 +47,7 @@ public class MapJFrame extends JFrame implements IView{
     private final String BURN_ICON_PATH = "org/amse/bomberman/client/icons/burn-48.png";
     // is really nead???
     private boolean dead = false;
-    private MapJFrameListener listener = new MapJFrameListener();
+    private MapJFrameListener listener = new MapJFrameListener(this);
     private final int height = 600;
     private final int width = 500;
     
@@ -149,6 +150,9 @@ public class MapJFrame extends JFrame implements IView{
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
+            } catch (NetException ex2) {
+                // is it good???
+                ex2.printStackTrace();
             }
         }
     }

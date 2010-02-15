@@ -6,8 +6,9 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,13 +19,13 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.Bot;
 import org.amse.bomberman.client.model.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class ServerInfoJFrame extends JFrame {
 
@@ -46,7 +47,7 @@ public class ServerInfoJFrame extends JFrame {
 
         JPanel leftBox = new JPanel();
         // how calculate sizes???
-        leftBox.setPreferredSize(new Dimension(80, 120));
+        leftBox.setPreferredSize(new Dimension(100, 120));
         leftBox.setLayout(new GridLayout(4, 1, 10, 10));
         leftBox.add(createJButton);
         leftBox.add(joinJButton);
@@ -59,7 +60,8 @@ public class ServerInfoJFrame extends JFrame {
         Container c = getContentPane();
         c.setLayout(new FlowLayout());
         c.add(leftBox);
-        JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // how calculate sizes???
         jsp.setPreferredSize(new Dimension(width - 120, height - 50));
         c.add(jsp);
@@ -74,7 +76,13 @@ public class ServerInfoJFrame extends JFrame {
 
     private void refreshTable() {
         IConnector connect = Model.getInstance().getConnector();
-        ArrayList<String> games = connect.takeGamesList();
+        ArrayList<String> games = null;
+        try {
+            games = connect.takeGamesList();
+        } catch (NetException ex) {
+            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         // if not "No games"
         if (games.get(0).charAt(0) != 'N') {
             int counter = 0;
@@ -120,6 +128,9 @@ public class ServerInfoJFrame extends JFrame {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NetException ex2) {
+            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -130,6 +141,9 @@ public class ServerInfoJFrame extends JFrame {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NetException ex2) {
+            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -145,7 +159,7 @@ public class ServerInfoJFrame extends JFrame {
         }
     }
 
-    private static void startMap() {
+    private static void startMap() throws NetException {
         IConnector connect = Model.getInstance().getConnector();
         BombMap map = connect.getMap();
         Model model = (Model) Model.getInstance();
@@ -181,7 +195,12 @@ public class ServerInfoJFrame extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
+            try {
+                CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
+            } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
             parent.refreshTable();
         }
     }

@@ -10,6 +10,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
@@ -33,15 +35,16 @@ public class Connector implements IConnector{
     public void сonnect(InetAddress address, int port) throws UnknownHostException, IOException {
         this.socket = new Socket(address, port);
     }
-    public void leaveGame() {
+    public void leaveGame() throws NetException{
         // true stop timer?
         if (timer != null) {
             timer.cancel();
         }
-        System.out.println(queryAnswer(""+Command.LEAVE_GAME.getValue()).get(0));
+        ArrayList<String> list = queryAnswer(""+Command.LEAVE_GAME.getValue());
+        System.out.println(list.get(0));
         System.out.println();
     }
-    public ArrayList<String> takeGamesList() {
+    public ArrayList<String> takeGamesList() throws NetException{
         ArrayList<String> games = queryAnswer(""+Command.GET_GAMES.getValue());
         for (String string : games) {
             System.out.println(string);
@@ -59,7 +62,7 @@ public class Connector implements IConnector{
      * troubles with arguments.
      */
     public boolean createGame(String gameName, String mapName, int maxPl)
-            throws IOException{
+            throws IOException, NetException{
         ArrayList<String> answer = queryAnswer(""+Command.CREATE_GAME.getValue()
                 +" "+ gameName +" "+ mapName +" "+ maxPl);
         if (answer.get(0).equals("Game created.")) {
@@ -68,39 +71,39 @@ public class Connector implements IConnector{
             throw new IOException(answer.get(0));
         }
     }
-    public boolean joinGame(int n) throws IOException {
-        String answer = queryAnswer("2 " + n).get(0);
+    public boolean joinGame(int n) throws IOException, NetException{
+        ArrayList<String> list = queryAnswer("2 " + n);
+        String answer = list.get(0);
         System.out.println(answer);
         System.out.println();
         if (answer.equals("Joined.")) {
             return true;
         } else throw new IOException(answer);
     }
-    public boolean doMove(Direction dir) {
-        String res = queryAnswer("3 " + dir.getValue()).get(0);
+    public boolean doMove(Direction dir) throws NetException {
+        ArrayList<String> list = queryAnswer("3 " + dir.getValue());
+        String res = list.get(0);
         // if res == "true"
         return (res.charAt(0) == 't');
     }
-    public void startGame(){
-        System.out.println(queryAnswer(""+Command.START_GAME.getValue()).get(0));
-        System.out.println();
+    public void startGame() throws NetException{
+        System.out.println(queryAnswer(""+Command.START_GAME.getValue()));
     }
-    public void beginUpdating() {
+    public void beginUpdating(){
          // must be here or somewhere else???
         timer = new Timer();
         timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
-    public BombMap getMap(){
+    public BombMap getMap() throws NetException{
         ArrayList<String> mp = queryAnswer(""+Command.GET_MAP_ARRAY.getValue());
         Parser parser = new Parser();
         return parser.parse(mp);
     }
-    public void plantBomb() {
-        System.out.println(queryAnswer(""+Command.PLACE_BOMB.getValue()).get(0));
-        //System.out.println();
+    public void plantBomb() throws NetException {
+        System.out.println(queryAnswer(""+Command.PLACE_BOMB.getValue()));
     }
     // if server has not any maps, return one String "No maps on server was founded."
-    public String[] getMaps() {
+    public String[] getMaps() throws NetException {
         ArrayList<String> maps = queryAnswer(""+Command.GET_MAPS_LIST.getValue());
         String[] res = new String[maps.size()];
         for(int i = 0; i < maps.size(); i++) {
@@ -114,7 +117,7 @@ public class Connector implements IConnector{
      * @return true if game is started, false if isn't.
      * @throws java.io.IOException if you are not connected to any game.
      */
-    public boolean isStarted() throws IOException {
+    public boolean isStarted() throws IOException, NetException {
         ArrayList<String> status = queryAnswer(""+Command.GET_GAME_STATUS.getValue());
         if (status.get(0).equals("started.")) {
             return true;
@@ -126,6 +129,15 @@ public class Connector implements IConnector{
             }
         }
     }
+    public boolean joinBotIntoGame(int n) throws IOException, NetException{
+        String answer = queryAnswer("11 " + n).get(0);
+        System.out.println(answer);
+        System.out.println();
+        if (answer.equals("Bot added.")) {
+            return true;
+        } else throw new IOException(answer);
+    }
+
     public InetAddress getInetAddress() {
         return socket.getInetAddress();
     }
@@ -133,7 +145,7 @@ public class Connector implements IConnector{
         return socket.getPort();
     }
     
-    private synchronized ArrayList<String> queryAnswer(String query){
+    private synchronized ArrayList<String> queryAnswer(String query) throws NetException{
         PrintWriter out = null;
         BufferedReader in = null;
         ArrayList<String> answer=null;
@@ -153,27 +165,31 @@ public class Connector implements IConnector{
                 answer.add(oneLine);
             }
             //System.out.println("Client: Answer received.");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
+            throw new NetException();
+        }
+        if (answer == null) {
+            throw new NetException();
         }
         return answer;
     }
-
-    public boolean joinBotIntoGame(int n) throws IOException{
-        String answer = queryAnswer("11 " + n).get(0);
-        System.out.println(answer);
-        System.out.println();
-        if (answer.equals("Bot added.")) {
-            return true;
-        } else throw new IOException(answer);
-    }
-
-    private class UpdateTimerTask extends TimerTask {
+    private class UpdateTimerTask extends TimerTask{
         @Override
         public void run() {
             IModel model = Model.getInstance();
-            model.setMap(getMap());
-            //System.out.println("Map has been updated.");
+            try {
+                model.setMap(getMap());
+                //System.out.println("Map has been updated.");
+            } catch (NetException ex) {
+                // is it good???
+                ex.printStackTrace();
+            }
+        }
+    }
+    public class NetException extends Exception {
+        public NetException(){
+            super("NetException!!! Server is inaccessible now.");
         }
     }
 }

@@ -4,14 +4,17 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
  * Class for adding bots to the games on server
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class Bot extends Thread{
     private Cell target = null;
@@ -31,7 +34,7 @@ public class Bot extends Thread{
      * @param port port to this bot
      * @throws java.io.IOException if occures any troubles with connection to server
      */
-    public Bot(int gameNumber, InetAddress address, int port) throws IOException {
+    public Bot(int gameNumber, InetAddress address, int port) throws IOException, NetException {
         connector = new Connector();
         isDead = false;
         connector.сonnect(address, port);
@@ -85,7 +88,12 @@ public class Bot extends Thread{
                     temp = map.clone();
                     try {
                         Direction direct = findWay(myCoord, target);
-                        connector.doMove(direct);
+                        try {
+                            connector.doMove(direct);
+                        } catch (NetException ex) {
+                            // is it good???
+                            ex.printStackTrace();
+                        }
                     } catch (UnsupportedOperationException ex) {
                         System.out.println("Bot can not find the way to the target cell.");
                         findNewTarget();
