@@ -26,16 +26,16 @@ import org.amse.bomberman.util.Constants;
  * @author Kirilchuck V.E.
  */
 public class ServerFrame extends JFrame {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     private final String BTN_TEXT_RAISE = "Raise";
     private final String BTN_TEXT_DOWN = "Down";
-    
     private IServer server;
-    private JLabel portLabel = new JLabel("Server Port");
-    private JTextField portField = new JTextField("" + Constants.DEFAULT_PORT);
-    private AbstractButton btnControl = new JButton(BTN_TEXT_RAISE);
-    private AbstractButton btnStatus = new JButton("Status");
+    private final ServerInfo info = new ServerInfo();
+    private final JLabel portLabel = new JLabel("Server Port");
+    private final JTextField portField = new JTextField("" + Constants.DEFAULT_PORT);
+    private final AbstractButton btnControl = new JButton(BTN_TEXT_RAISE);
+    private final AbstractButton btnStatus = new JButton("Status");
 
     /** Creates new form ServerFrame */
     public ServerFrame() {
@@ -87,7 +87,7 @@ public class ServerFrame extends JFrame {
     private class StatusButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-          //TO DO
+            info.setVisible(true);
         }
     }
 
@@ -101,9 +101,13 @@ public class ServerFrame extends JFrame {
 
             if (server == null) { //if it is first initialization
                 server = new Server(port);
+                //server.setChangeListener(info);
+                //info.setServer(server);
             } else if (server.getPort() != port) { //if we want to raise server on new port
                 server.writeToLog("Raising server on new port");
                 server = new Server(port);
+                //server.setChangeListener(info);
+                //info.setServer(server);
             }
             server.start();
         } catch (NumberFormatException ex) { //parse errors

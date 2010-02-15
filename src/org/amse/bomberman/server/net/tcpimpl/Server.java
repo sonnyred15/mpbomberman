@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
@@ -25,13 +26,15 @@ import org.amse.bomberman.util.impl.ConsoleLog;
  */
 public class Server implements IServer {
 
-    private ILog log; // could be never initialized. Use writeToLog(...) instead of log.println(...)
+    private ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
     private int port;
     private List<Game> games;
     private ServerSocket serverSocket;
     private boolean shutdowned = true; //true until we start accepting clients.
     private Thread listeningThread;
     private int sessionCounter = 0; //need to generate name of log files.   
+    private ServerChangeListener changeListener;
+    private long startTime;
 
     /**
      * Constructor with default port.
@@ -49,7 +52,8 @@ public class Server implements IServer {
     public Server(int port) {
         this.port = port;
         this.games = Collections.synchronizedList(new LinkedList<Game>());
-        this.log = new ConsoleLog();
+        //this.log = new ConsoleLog();
+        //this.changeListener = Collections.synchronizedList(new ArrayList<ServerChangeListener>());
     }
 
     /**
@@ -80,6 +84,7 @@ public class Server implements IServer {
             throw ex;
         }
 
+        this.startTime = System.currentTimeMillis();
         writeToLog("Server: started.");
     }
 
@@ -92,7 +97,7 @@ public class Server implements IServer {
     public synchronized void shutdown() throws IOException, IllegalStateException {
         try {
 
-            if (!this.shutdowned) {            
+            if (!this.shutdowned) {
                 if (this.listeningThread != null) {
                     this.listeningThread.interrupt(); //throws SecurityException
                     this.listeningThread = null;
@@ -104,9 +109,9 @@ public class Server implements IServer {
                 this.games = null;
                 this.shutdowned = true;
                 if (this.log != null) {
-                    try{
+                    try {
                         this.log.close();
-                    } catch (IOException ex){
+                    } catch (IOException ex) {
                         System.out.println("Shutdown server warning. Can`t close log." +
                                 ex.getMessage());
                     }
@@ -132,19 +137,19 @@ public class Server implements IServer {
             this.games.add(game);
             writeToLog("Game added.");
         } else {
-            writeToLog("Tryed to add game to shutdowned server.");            
+            writeToLog("Tryed to add game to shutdowned server.");
         }
     }
 
     public void removeGame(Game gameToRemove) {
         if (!this.shutdowned) { // is it redundant?
-            if(this.games.remove(gameToRemove)){
+            if (this.games.remove(gameToRemove)) {
                 writeToLog("Game removed");
-            }else{
+            } else {
                 writeToLog("Server removeGame warning. No specified game found.");
             }
         } else {
-            writeToLog("Tryed to remove game from shutdowned server.");            
+            writeToLog("Tryed to remove game from shutdowned server.");
         }
     }
 
@@ -171,9 +176,13 @@ public class Server implements IServer {
         if (!this.shutdowned) { // is it redundant?
             return this.games;
         } else { //if server was stopped.
-            writeToLog("Server getGamesList warning. Tryed to get games list from shutdowned server.");
+            writeToLog("Server getGamesList warning. Tryed to get games list from shutdowned server.");            
             return null;
         }
+    }
+
+    public int getSessionCount() {
+        return sessionCounter;
     }
 
     public synchronized boolean isShutdowned() {
@@ -182,6 +191,14 @@ public class Server implements IServer {
 
     public synchronized int getPort() {
         return this.port;
+    }
+
+    public long getWorkTime(){
+        return System.currentTimeMillis() - startTime;
+    }
+
+    public void setChangeListener(ServerChangeListener listener) {
+        this.changeListener = listener;
     }
 
     private class SocketListen implements Runnable {
@@ -195,7 +212,7 @@ public class Server implements IServer {
         }
 
         public void run() {
-            
+
             writeToLog("Server: Waiting for a new client...");
 
             try {
@@ -232,11 +249,17 @@ public class Server implements IServer {
         }
     }
 
+    public List<String> getLog() {
+        return log.getLog();
+    }
+
     public void writeToLog(String message) {
         if (log == null) {
             System.out.println(message);
         } else {
             log.println(message);
         }
+
+        //this.changeListener.addedToLog(message);
     }
 }

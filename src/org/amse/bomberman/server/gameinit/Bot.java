@@ -2,8 +2,6 @@ package org.amse.bomberman.server.gameinit;
 
 import java.util.Random;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Direction;
@@ -14,91 +12,16 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Bot extends Player implements Runnable {
 
-    private Player player;
+    private static final long BOT_STEP_DELAY = 100L;
+
     private IModel model;
     private Pair target;
     private int cons = 1000; //WHAT IS THIS??
     private int[][] temp;
 
     public Bot(String nickName, int id, IModel model) {
-        this.player = new Player(nickName, id);
+        super(nickName, id);
         this.model = model;
-    }
-
-    @Override
-    public void setDieListener(DieListener gameDieListener) {
-        this.player.setDieListener(gameDieListener);
-    }
-
-    @Override
-    public String getInfo() {
-        return this.player.getInfo();
-    }
-
-    @Override
-    public boolean isAlive() {
-        return this.player.isAlive();
-    }
-
-    @Override
-    public boolean canPlaceBomb() {
-        return this.player.canPlaceBomb();
-    }
-
-    @Override
-    public void placedBomb() {
-       this.player.placedBomb();
-    }
-
-    @Override
-    public void detonatedBomb() {
-        this.player.detonatedBomb();
-    }
-
-    @Deprecated
-    @Override
-    public void takedBonus(int bonus) {//Bonuses must be enum!
-        this.player.takedBonus(bonus);
-    }
-
-    @Override
-    public void setID(int id) {
-        this.player.setID(id);
-    }
-
-    @Override
-    public int getID() {
-        return this.player.getID();
-    }
-
-    @Override
-    public int getX() {
-        return this.player.getX();
-    }
-
-    @Override
-    public int getY() {
-        return this.player.getY();
-    }
-
-    @Override
-    public void setX(int x) {
-        this.player.setX(x);
-    }
-
-    @Override
-    public void setY(int y) {
-        this.player.setY(y);
-    }
-
-    @Override
-    public void bombed() { //synchronized(player)
-        this.player.bombed();
-    }
-
-    @Override
-    public int getRadius() {
-        return this.player.getRadius();
     }
 
     private int[][] cloneField(int[][] mapArray) {
@@ -131,19 +54,19 @@ public class Bot extends Player implements Runnable {
     public void run() {
         GameMap map = model.getMap();
 
-        while (this.player.isAlive()) {
+        while (this.isAlive()) {
 
             findNewTarget();
-            while ((this.player.isAlive()) && ((this.player.getX() != target.getX()) || (this.player.getY() != target.getY()))) {
-                if ((this.player.getX() == target.getX()) && (this.player.getY() == target.getY())) {
+            while ((this.isAlive()) && ((this.getX() != target.getX()) || (this.getY() != target.getY()))) {
+                if ((this.getX() == target.getX()) && (this.getY() == target.getY())) {
                     break;
                 }
                 temp = cloneField(map.getMapArray());
                 try {
-                    Direction direct = findWay(new Pair(this.player.getX(), this.player.getY()), target);
-                    model.doMove(this.player, direct);
+                    Direction direct = findWay(new Pair(this.getX(), this.getY()), target);
+                    model.doMove(this, direct);
                     try {
-                        Thread.sleep(Constants.GAME_STEP_TIME);
+                        Thread.sleep(Bot.BOT_STEP_DELAY);
                     } catch (InterruptedException ex) {
                         System.out.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
                     }

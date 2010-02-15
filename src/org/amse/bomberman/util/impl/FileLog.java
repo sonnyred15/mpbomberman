@@ -7,6 +7,10 @@ package org.amse.bomberman.util.impl;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
 
@@ -26,6 +30,7 @@ public class FileLog implements ILog {
     public FileLog(String fileName) throws IOException {
         this.writer = new PrintWriter(new FileWriter(fileName));
         this.closed = false;
+
     }
     
     public void println(String message) {
@@ -37,5 +42,17 @@ public class FileLog implements ILog {
             this.writer.close();
             this.writer = null;
         }
+    }
+
+    /**
+     * Not supported yet. 
+     * Return unmodifiable List with
+     * one element: "FileLog doesnot support this operation";
+     * @return
+     */
+    public List<String> getLog() {
+        List<String> list= new ArrayList<String>();
+        list.add("FileLog doesnot support this operation");
+        return Collections.unmodifiableList(list);
     }
 }
