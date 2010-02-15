@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.client.model.Model;
-import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.Constants;
 

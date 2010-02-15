@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.net;
+package org.amse.bomberman.client.net.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,16 +11,17 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.impl.Parser;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class Connector implements IConnector{
     private Socket socket;
@@ -87,46 +88,12 @@ public class Connector implements IConnector{
     public void beginUpdating() {
          // must be here or somewhere else???
         timer = new Timer();
-        // period???
         timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     public BombMap getMap(){
         ArrayList<String> mp = queryAnswer(""+Command.GET_MAP_ARRAY.getValue());
-        BombMap map = null;
-        int n = 0;
-        n = Integer.parseInt(mp.get(0));
-        map = new BombMap(n);
-        for (int i = 0; i < n; i++) {
-            String[] numbers = mp.get(i+1).split(" ");
-            for (int j = 0; j < numbers.length; j++) {
-                map.setCell(new Cell(i,j), (int) Integer.parseInt(numbers[j]));
-            }
-        }
-        // receive list of explosive
-        int k = Integer.parseInt(mp.get(n+1));
-        ArrayList<Cell> expl = new ArrayList<Cell>(k);
-        for (int i = 0; i < k; i++) {
-            String[] xy = mp.get(i+n+2).split(" ");
-            Cell buf = new Cell((int) Integer.parseInt(xy[0])
-                    , (int) Integer.parseInt(xy[1]));
-            expl.add(buf);
-        }
-        // receive player info
-        // m == 1 always
-        int m = Integer.parseInt(mp.get(n+k+2));
-        if (m == 1) {
-            String[] info = new String[6];
-            info = mp.get(n + k + 3).split(" ");
-            int x = Integer.parseInt(info[0]);
-            int y = Integer.parseInt(info[1]);
-            String nick = info[2];
-            int lives = Integer.parseInt(info[3]);
-            int bombs = Integer.parseInt(info[4]);
-            int maxBombs = Integer.parseInt(info[5]);
-            Model.getInstance().setPlayerLives(lives);
-        }
-        map.setExplosions(expl);
-        return map;
+        Parser parser = new Parser();
+        return parser.parse(mp);
     }
     public void plantBomb() {
         System.out.println(queryAnswer(""+Command.PLACE_BOMB.getValue()).get(0));
