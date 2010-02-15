@@ -5,6 +5,7 @@
 package org.amse.bomberman.util;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -15,4 +16,6 @@ public interface ILog {
     void println(String message);
 
     void close() throws IOException;
+
+    List<String> getLog();
 }
