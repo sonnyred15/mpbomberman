@@ -3,7 +3,7 @@ package org.amse.bomberman.util;
 /**
  *
  * @author Kirilchuk V.E
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public final class Constants {
     

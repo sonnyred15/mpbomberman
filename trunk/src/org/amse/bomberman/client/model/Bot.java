@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
@@ -68,11 +66,7 @@ public class Bot extends Thread{
     public void run() {
         BombMap map = Model.getInstance().getMap();
         myCoord = findMyCoord(map);
-        //Random random = new Random();
-        //int x = 0;
-        //int y = 0;
         while (!isDead()) {
-            //map = Model.getInstance().getMap();
             findNewTarget();
             while ((!isDead()) &&((myCoord.getX() != target.getX())
                     || (myCoord.getY() != target.getY()))) {

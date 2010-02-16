@@ -24,20 +24,21 @@ import org.amse.bomberman.util.Constants;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class CreatingGameJDialog extends JDialog {
     private ServerInfoJFrame parent;
-    private int width = 300;
+    private int width = 280;
     private int heigth = 180;
     private JComboBox mapBox;
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
     private JButton createJButton = new JButton();
-    private JButton cancelJButton = new JButton("Cancel");
+    private JButton cancelJButton = new JButton();
     private final int LINE_H = 20;
+    private final int LABEL_SIZE = width/3;
     
-    public CreatingGameJDialog(ServerInfoJFrame jframe) throws NetException {
+    public CreatingGameJDialog(ServerInfoJFrame jframe) throws NetException{
         super(jframe, "Create new Game", true);
         parent = jframe;
         setSize(width, heigth);
@@ -52,11 +53,11 @@ public class CreatingGameJDialog extends JDialog {
         Box topBox = Box.createVerticalBox();
         Box topBoxContent = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("GameName");
-        nameLabel.setPreferredSize(new Dimension(width/4, LINE_H));
+        nameLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        topBoxContent.add(nameLabel);
-        gameNameTF.setPreferredSize(new Dimension(width/2, LINE_H));
+        gameNameTF.setPreferredSize(new Dimension(width/3, LINE_H));
         gameNameTF.setText("MyGame");
+        topBoxContent.add(nameLabel);
         topBoxContent.add(gameNameTF);
         topBoxContent.add(Box.createHorizontalGlue());
         topBoxContent.setPreferredSize(new Dimension(width-30, LINE_H));
@@ -66,7 +67,7 @@ public class CreatingGameJDialog extends JDialog {
         // creating central line for MaxPlayers Field
         Box centralBox = Box.createHorizontalBox();
         JLabel maxPlLabel = new JLabel("MaxPlayers");
-        maxPlLabel.setPreferredSize(new Dimension(width/4, LINE_H));
+        maxPlLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         maxPlLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         centralBox.add(maxPlLabel);
         SpinnerModel spModel = new SpinnerNumberModel(Constants.MAX_PLAYERS
@@ -83,7 +84,7 @@ public class CreatingGameJDialog extends JDialog {
         Box bottomBox = Box.createVerticalBox();
         Box bottomBoxContent = Box.createHorizontalBox();
         JLabel mapLabel = new JLabel("Map");
-        mapLabel.setPreferredSize(new Dimension(width/4, LINE_H));
+        mapLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         mapLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         bottomBoxContent.add(mapLabel);
         bottomBoxContent.add(mapBox);
