@@ -10,11 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
@@ -28,12 +26,12 @@ public class Server implements IServer {
 
     private ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
     private int port;
-    private List<Game> games;
+    private final List<Game> games = Collections.synchronizedList(new LinkedList<Game>());
     private ServerSocket serverSocket;
     private boolean shutdowned = true; //true until we start accepting clients.
     private Thread listeningThread;
+    private final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
     private int sessionCounter = 0; //need to generate name of log files.   
-    private ServerChangeListener changeListener;
     private long startTime;
 
     /**
@@ -51,9 +49,6 @@ public class Server implements IServer {
      */
     public Server(int port) {
         this.port = port;
-        this.games = Collections.synchronizedList(new LinkedList<Game>());
-        //this.log = new ConsoleLog();
-        //this.changeListener = Collections.synchronizedList(new ArrayList<ServerChangeListener>());
     }
 
     /**
@@ -64,11 +59,9 @@ public class Server implements IServer {
         try {
 
             if (shutdowned) {
-                this.sessionCounter = 0;
                 this.serverSocket = new ServerSocket(port, 0); // throws IOExeption,SecurityException
                 this.listeningThread = new Thread(new SocketListen(this));
                 this.listeningThread.start();
-                this.games = Collections.synchronizedList(new LinkedList<Game>());
                 this.shutdowned = false;
             } else {
                 throw new IllegalStateException("Already accepting. Can`t raise server.");
@@ -76,11 +69,9 @@ public class Server implements IServer {
 
         } catch (IOException ex) {
             writeToLog("Raise server error. " + ex.getMessage());
-//            this.shutdown();
             throw ex;
         } catch (SecurityException ex) {
             writeToLog("Raise server error. " + ex.getMessage());
-//            this.shutdown();
             throw ex;
         }
 
@@ -94,7 +85,7 @@ public class Server implements IServer {
      * @throws java.io.IOException if an error occurs when closing socket.
      * @throws IllegalStateException if we are trying to shutdown not raised server.
      */
-    public synchronized void shutdown() throws IOException, IllegalStateException {
+    public synchronized void shutdown() throws IOException, IllegalStateException, SecurityException {
         try {
 
             if (!this.shutdowned) {
@@ -102,12 +93,18 @@ public class Server implements IServer {
                     this.listeningThread.interrupt(); //throws SecurityException
                     this.listeningThread = null;
                 }
+
+                //this.sessionCounter = 0;
+                //this.sessions.clear(); SESSIONS MUST AUTOCLEAR BY INTERRUPT!!!
+                this.games.clear();
+
                 if (this.serverSocket != null) {
                     this.serverSocket.close();
                     this.serverSocket = null;
                 }
-                this.games = null;
+
                 this.shutdowned = true;
+
                 if (this.log != null) {
                     try {
                         this.log.close();
@@ -173,12 +170,11 @@ public class Server implements IServer {
     }
 
     public List<Game> getGamesList() {
-        if (!this.shutdowned) { // is it redundant?
-            return this.games;
-        } else { //if server was stopped.
-            writeToLog("Server getGamesList warning. Tryed to get games list from shutdowned server.");            
-            return null;
+        if (this.shutdowned) { // is it redundant?
+            writeToLog("Server getGamesList warning. Tryed to get games list from shutdowned server.");
         }
+
+        return this.games;
     }
 
     public int getSessionCount() {
@@ -193,22 +189,25 @@ public class Server implements IServer {
         return this.port;
     }
 
-    public long getWorkTime(){
-        return System.currentTimeMillis() - startTime;
+    public long getWorkTime() {
+        return (System.currentTimeMillis() - startTime) / 1000;
     }
 
-    public void setChangeListener(ServerChangeListener listener) {
-        this.changeListener = listener;
+    public int getClientsNum() {
+        return sessionCounter;
+    }
+
+    public void sessionTerminated(ISession endedSession) {
+        this.sessions.remove(endedSession);
+        this.sessionCounter--;
     }
 
     private class SocketListen implements Runnable {
 
         private Server net;
-        private List<ISession> sessions;
 
         public SocketListen(Server net) {
             this.net = net;
-            this.sessions = new ArrayList<ISession>();
         }
 
         public void run() {
@@ -226,7 +225,7 @@ public class Server implements IServer {
                     //CHECK V THIS// Is it throwing any exceptions?
                     ISession newSession = new Session(this.net, clientSocket,
                             sessionCounter, this.net.log);
-                    this.sessions.add(newSession);
+                    sessions.add(newSession);
                     newSession.start();
                 }
 
@@ -241,8 +240,13 @@ public class Server implements IServer {
             }
 
             /*must free resources and stop our thread.*/
-            for (ISession session : sessions) {
-                session.interrupt();
+            int i = 1;
+            synchronized (sessions) {
+                for (ISession session : sessions) {
+                    writeToLog("Interrupting session " + i);
+                    session.interruptSession();
+                    ++i;
+                }
             }
 
             writeToLog("Server: listening thread come to end.");
@@ -259,7 +263,5 @@ public class Server implements IServer {
         } else {
             log.println(message);
         }
-
-        //this.changeListener.addedToLog(message);
     }
 }

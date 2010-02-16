@@ -101,13 +101,11 @@ public class ServerFrame extends JFrame {
 
             if (server == null) { //if it is first initialization
                 server = new Server(port);
-                //server.setChangeListener(info);
-                //info.setServer(server);
+                info.setServer(server);
             } else if (server.getPort() != port) { //if we want to raise server on new port
                 server.writeToLog("Raising server on new port");
                 server = new Server(port);
-                //server.setChangeListener(info);
-                //info.setServer(server);
+                info.setServer(server);
             }
             server.start();
         } catch (NumberFormatException ex) { //parse errors

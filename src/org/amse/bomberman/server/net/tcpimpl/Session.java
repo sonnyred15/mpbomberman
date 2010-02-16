@@ -30,7 +30,7 @@ import org.amse.bomberman.util.ILog;
  */
 public class Session extends Thread implements ISession {
 
-    private final Server server;
+    private final IServer server;
     private final Socket clientSocket;
     private final int sessionID;
     private Game game;
@@ -103,7 +103,7 @@ public class Session extends Thread implements ISession {
         Command cmd = null;
         String[] queryArgs = query.split(" ");
         try {
-                        
+
             int command = Integer.parseInt(queryArgs[0]);
             cmd = Command.fromInt(command);
 
@@ -203,7 +203,7 @@ public class Session extends Thread implements ISession {
         String gameName = "defaultGame";
         String mapName = "1";
         int maxPlayers = -1;//defines by GameMap;
-        
+
         if (queryArgs.length == 4) {//if we getted command in full syntax
             gameName = queryArgs[1];
             mapName = queryArgs[2];
@@ -288,7 +288,7 @@ public class Session extends Thread implements ISession {
                     this.game = gameToJoin;
                     sendAnswer("Joined.");
                     ///////////////AUTOSTART/////////
-                    if(this.game.isFull()){
+                    if (this.game.isFull()) {
                         this.game.startGame();
                     }
                     ////////////////////////////////
@@ -476,8 +476,8 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void addBot(String[] queryArgs){
-       //"11" "gameID" "botName"
+    private void addBot(String[] queryArgs) {
+        //"11" "gameID" "botName"
 
         int gameID = 0;
         String botName = "defaultBot";
@@ -524,7 +524,7 @@ public class Session extends Thread implements ISession {
                     //this.game = gameToJoin;
                     sendAnswer("Bot added.");
                     ///////////////AUTOSTART/////////
-                    if(gameToJoin.isFull()){
+                    if (gameToJoin.isFull()) {
                         gameToJoin.startGame();
                     }
                     ////////////////////////////////
@@ -544,6 +544,15 @@ public class Session extends Thread implements ISession {
             writeToLog("Tryed to add bot gameID=" + gameID + " but canceled " +
                     "no such game on server. ");
             return;
+        }
+    }
+
+    public void interruptSession() throws SecurityException {
+        this.interrupt();
+        try {
+            this.clientSocket.close();
+        } catch (IOException ex) {
+            writeToLog("Session interruptSession error. " + ex.getMessage());
         }
     }
 
@@ -570,7 +579,7 @@ public class Session extends Thread implements ISession {
                     answerOnCommand(clientQueryLine);
 
                 } catch (SocketTimeoutException ex) { //if client not responsable
-                    writeToLog("Session: Terminated by socket timeout.");
+                    writeToLog("Session: Terminated by socket timeout. " + ex.getMessage());
                     break;
                 }
             }
@@ -584,7 +593,7 @@ public class Session extends Thread implements ISession {
                     in.close(); //throws IOException     
                 }
             } catch (IOException ex) {
-                writeToLog("IOException in Session run method while closing `in` stream.");
+                writeToLog("IOException in Session run method while closing `in` stream. " + ex.getMessage());
             }
 
             try {
@@ -602,7 +611,7 @@ public class Session extends Thread implements ISession {
                 writeToLog("Session: Ended. Freeing resources.");
                 freeResources();
             } catch (IOException ex) {
-                writeToLog("Session: Error while closing client socket.");
+                writeToLog("Session: Error while closing client socket. " + ex.getMessage());
             }
 
         }
@@ -611,12 +620,9 @@ public class Session extends Thread implements ISession {
     private void freeResources() throws IOException {
         if (this.game != null) {
             this.game.disconnectFromGame(this.player);
-            this.game = null;
-            this.player = null;
         }
         this.clientSocket.close();
-        this.timer = null;
-        this.log = null;
+        this.server.sessionTerminated(this);
     }
 
     private class MyTimer {

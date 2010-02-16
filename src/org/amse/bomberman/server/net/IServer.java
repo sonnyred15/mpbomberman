@@ -6,7 +6,6 @@ package org.amse.bomberman.server.net;
 
 import java.io.IOException;
 import java.util.List;
-import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 
 /**
@@ -15,7 +14,7 @@ import org.amse.bomberman.server.gameinit.Game;
  */
 public interface IServer {
 
-    void setChangeListener(ServerChangeListener listener);
+    void sessionTerminated(ISession endedSession);
 
     void start() throws IOException, IllegalStateException;
 
@@ -32,6 +31,10 @@ public interface IServer {
     boolean isShutdowned();
 
     int getPort();
+
+    int getClientsNum();
+
+    long getWorkTime();
 
     List<String> getLog();
 

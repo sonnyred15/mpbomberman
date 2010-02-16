@@ -12,7 +12,7 @@ public interface ISession { // Session must Extend Thread
 
     void run(); //method from Thread
 
-    void interrupt() throws SecurityException; //must delegate to thread.interrupt()
+    void interruptSession() throws SecurityException; //must delegate to thread.interrupt()
 
     void start(); //method from Thread
 }
