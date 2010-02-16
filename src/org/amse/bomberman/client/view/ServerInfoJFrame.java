@@ -79,26 +79,26 @@ public class ServerInfoJFrame extends JFrame {
         ArrayList<String> games = null;
         try {
             games = connect.takeGamesList();
+            // if not "No games"
+            if (games.get(0).charAt(0) != 'N') {
+                int counter = 0;
+                MyTableModel tableModel = (MyTableModel) table.getModel();
+                tableModel.clear();
+                for (String game : games) {
+                    String[] buf = game.split(" ");
+                    table.setValueAt(buf[0], counter, 0);
+                    table.setValueAt(buf[1], counter, 1);
+                    table.setValueAt(buf[2], counter, 2);
+                    table.setValueAt(buf[3], counter, 3);
+                    table.setValueAt(buf[4], counter, 4);
+                    counter++;
+                }
+            }
+            table.repaint();
         } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        // if not "No games"
-        if (games.get(0).charAt(0) != 'N') {
-            int counter = 0;
-            MyTableModel tableModel = (MyTableModel) table.getModel();
-            tableModel.clear();
-            for (String game : games) {
-                String[] buf = game.split(" ");
-                table.setValueAt(buf[0], counter, 0);
-                table.setValueAt(buf[1], counter, 1);
-                table.setValueAt(buf[2], counter, 2);
-                table.setValueAt(buf[3], counter, 3);
-                table.setValueAt(buf[4], counter, 4);
-                counter++;
-            }
-        }
-        table.repaint();
     }
 
     private void setSizesTable() {
@@ -134,16 +134,13 @@ public class ServerInfoJFrame extends JFrame {
         }
     }
 
-    private void joinBot(int gameNumber) {
+    private void joinBot(int gameNumber) throws NetException {
         IConnector connect = Model.getInstance().getConnector();
         try {
             connect.joinBotIntoGame(gameNumber);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (NetException ex2) {
-            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
-                    + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -197,11 +194,11 @@ public class ServerInfoJFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             try {
                 CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
+                parent.refreshTable();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            parent.refreshTable();
         }
     }
 
@@ -228,7 +225,6 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     public static class AddBotAction extends AbstractAction {
-
         ServerInfoJFrame parent;
 
         public AddBotAction(ServerInfoJFrame jFrame) {
@@ -241,12 +237,17 @@ public class ServerInfoJFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             int gameNumber = parent.getSelectedGame();
             if (gameNumber != -1) {
-                parent.joinBot(gameNumber);
+                try {
+                    parent.joinBot(gameNumber);
+                    parent.refreshTable();
+                } catch (NetException ex) {
+                    JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } else {
                 JOptionPane.showMessageDialog(parent, "You did't select the game for bot! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            parent.refreshTable();
         }
     }
 

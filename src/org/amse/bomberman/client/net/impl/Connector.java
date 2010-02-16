@@ -169,7 +169,7 @@ public class Connector implements IConnector{
             e.printStackTrace();
             throw new NetException();
         }
-        if (answer == null) {
+        if (answer.size() == 0) {
             throw new NetException();
         }
         return answer;
