@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.gameinit;
 
+import org.amse.bomberman.server.gameinit.bot.Bot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,8 +104,9 @@ public class Game {
         //and then give coordinates.
         this.model.changeMapForCurMaxPlayers(this.players.size());
         for (Player player : players) {
-            player.setX(model.xCoordOf(player.getID()));
-            player.setY(model.yCoordOf(player.getID()));
+            int id = player.getID();
+            Pair playerPosition = new Pair(model.xCoordOf(id), model.yCoordOf(id));
+            player.setPosition(playerPosition);
         }
         this.started = true;
         this.model.startBots();

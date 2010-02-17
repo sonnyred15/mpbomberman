@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.amse.bomberman.server.gameinit.Bomb;
-import org.amse.bomberman.server.gameinit.Bot;
+import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.bot.RandomMoveBotStrategy;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 
@@ -101,7 +102,7 @@ public class Model implements IModel {
     public boolean doMove(Player player, Direction direction) {//CHECK THIS
         synchronized (map) {
             synchronized (player) {
-                int arr[] = newCoords(player.getX(), player.getY(), direction);
+                int arr[] = newCoords(player.getPosition(), direction);
                 int newX = arr[0];
                 int newY = arr[1];
                 if (!isOutMove(newX, newY)) {
@@ -116,8 +117,8 @@ public class Model implements IModel {
     }
 
     private void makeMove(Player player, int newX, int newY) {
-        int x = player.getX();
-        int y = player.getY();
+        int x = player.getPosition().getX();
+        int y = player.getPosition().getY();
 
         if (this.map.isBomb(x, y)) { //if player setted mine but still in same square
             this.map.setSquare(x, y, Constants.MAP_BOMB);
@@ -131,8 +132,7 @@ public class Model implements IModel {
             player.bombed();
         }
 
-        player.setX(newX);
-        player.setY(newY);
+        player.setPosition(new Pair(newX, newY));
     }
 
     private boolean isOutMove(int x, int y) {
@@ -150,28 +150,28 @@ public class Model implements IModel {
         return (this.map.isEmpty(x, y)) ? false : true;
     }
 
-    private int[] newCoords(int x, int y, Direction direction) { //whats about catch illegalArgumentException???
+    private int[] newCoords(Pair currentPosition, Direction direction) { //whats about catch illegalArgumentException???
         int[] arr = new int[2];
 
         switch (direction) {
             case DOWN: {
-                arr[0] = x + 1;
-                arr[1] = y;
+                arr[0] = currentPosition.getX() + 1;
+                arr[1] = currentPosition.getY();
                 break;
             }
             case LEFT: {
-                arr[0] = x;
-                arr[1] = y - 1;
+                arr[0] = currentPosition.getX();
+                arr[1] = currentPosition.getY() - 1;
                 break;
             }
             case UP: {
-                arr[0] = x - 1;
-                arr[1] = y;
+                arr[0] = currentPosition.getX() - 1;
+                arr[1] = currentPosition.getY();
                 break;
             }
             case RIGHT: {
-                arr[0] = x;
-                arr[1] = y + 1;
+                arr[0] = currentPosition.getX();
+                arr[1] = currentPosition.getY() + 1;
                 break;
             }
             default: {
@@ -222,12 +222,12 @@ public class Model implements IModel {
         synchronized (map) {
             synchronized (player) {           // whats about syncronize(map)???
                 if (player.canPlaceBomb()) { //player is alive and have bombs to set up
-                    int x = player.getX();
-                    int y = player.getY();
+                    int x = player.getPosition().getX();
+                    int y = player.getPosition().getY();
                     if (this.map.isBomb(x, y)) {
                         return; //if player staying under the bomb
                     }
-                    Bomb bomb = new Bomb(this, player, map, x, y , timer);
+                    Bomb bomb = new Bomb(this, player, map, new Pair(x, y) , timer);
                 }
             }
         }
@@ -246,11 +246,16 @@ public class Model implements IModel {
     }
 
     public Bot addBot(String name, int id) {
-        Bot bot = new Bot(name, id, this);
+        Bot bot = new Bot(name, id, this, new RandomMoveBotStrategy());
         Thread t = new Thread(bot);
         t.setDaemon(true);
         this.bots.add(t);
         return bot;
+    }
+
+    public void removeBot(Bot bot){
+        this.game.disconnectFromGame(bot);
+        this.bots.remove(bot);
     }
 
     public GameMap getMap() {
