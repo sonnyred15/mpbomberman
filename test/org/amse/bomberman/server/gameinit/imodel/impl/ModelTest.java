@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit.imodel.impl;
 
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants.Direction;
@@ -42,17 +43,13 @@ public class ModelTest {
     private Player player3 = new Player("player3", 3);
     private Player player4 = new Player("player4", 4);
     {
-        player1.setX(0);
-        player1.setY(0);
+        player1.setPosition(new Pair(0, 0));
 
-        player2.setX(0);
-        player2.setY(5);
+        player2.setPosition(new Pair(0, 5));
 
-        player3.setX(5);
-        player3.setY(0);
+        player3.setPosition(new Pair(5, 0));
 
-        player4.setX(5);
-        player4.setY(5);
+        player4.setPosition(new Pair(5, 5));
     }
 
     @BeforeClass
@@ -86,7 +83,7 @@ public class ModelTest {
 
             public void run() {
                 for (int i = 0; i < MOVE_ITER; i++) {
-                    if(player1.getY()>1){
+                    if(player1.getPosition().getY()>1){
                         fail("Syncronization problem. Player moved through other player");
                     }
                     model.doMove(player1, Direction.RIGHT);  //trying to go right
@@ -102,7 +99,7 @@ public class ModelTest {
 
             public void run() {
                 for (int i = 0; i < MOVE_ITER; i++) {
-                    if(player2.getY()<1){
+                    if(player2.getPosition().getY()<1){
                         fail("Syncronization problem. Player moved through other player");
                     }
                     model.doMove(player2, Direction.LEFT);  //trying to go left

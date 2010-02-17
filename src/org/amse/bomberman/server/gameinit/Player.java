@@ -15,8 +15,9 @@ public class Player {
     private String nickName = "unnamed";
     private int lives = 3;
     private int id = 1;
-    private int x = 0;
-    private int y = 0;    
+    
+    private Pair position = new Pair();
+    
     private int explRadius = 2; //for better testing :))
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
@@ -35,8 +36,8 @@ public class Player {
     }
 
     public String getInfo() {
-        String ret = this.x + " " +
-                this.y + " " +
+        String ret = this.position.getX() + " " +
+                this.position.getY() + " " +
                 this.nickName + " " +
                 this.lives + " " +
                 this.bombs + " " +
@@ -88,20 +89,12 @@ public class Player {
         return this.id;
     }
 
-    public int getX() {
-        return this.x;
+    public Pair getPosition(){
+        return position;
     }
 
-    public int getY() {
-        return this.y;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+    public void setPosition(Pair position){
+        this.position = position;
     }
 
     public synchronized void bombed() { //synchronized(player)

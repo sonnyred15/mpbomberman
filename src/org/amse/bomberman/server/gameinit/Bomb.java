@@ -21,19 +21,19 @@ public class Bomb {
     private final Player player;
     private final GameMap map;
     private final ScheduledExecutorService timer;
-    private final int bombX;
-    private final int bombY;
+
+    private final Pair bombPosition;
+
     private final int radius;
     private boolean wasDetonated = false;
 
-    public Bomb(IModel model, Player player, GameMap map, int bombX, int bombY, ScheduledExecutorService timer) {
+    public Bomb(IModel model, Player player, GameMap map, Pair bombPosition, ScheduledExecutorService timer) {
         this.model = model;
         this.player = player;
         this.map = map;
         this.timer = timer;
 
-        this.bombX = bombX;
-        this.bombY = bombY;
+        this.bombPosition = bombPosition;
         this.radius = this.player.getRadius();
 
         this.player.placedBomb();
@@ -43,11 +43,11 @@ public class Bomb {
     }
 
     public int getX() {
-        return bombX;
+        return bombPosition.getX();
     }
 
     public int getY() {
-        return bombY;
+        return bombPosition.getY();
     }
 
     public void detonate() {
@@ -58,12 +58,12 @@ public class Bomb {
 
         this.wasDetonated = true;
         this.map.bombStartDetonating(this);
-        map.setSquare(bombX, bombY, Constants.MAP_DETONATED_BOMB);
+        map.setSquare(getX(), getY(), Constants.MAP_DETONATED_BOMB);
 
         ArrayList<Pair> explosions = new ArrayList<Pair>();
 
         //if player still staying in bomb square.
-        if (this.player.getX() == this.bombX && this.player.getY() == this.bombY) {
+        if (this.player.getPosition().equals(this.bombPosition)) {
             this.player.bombed();
         }
 
@@ -73,6 +73,8 @@ public class Bomb {
         int k; // common radius counter
         boolean contin; //common continue boolean
 
+        int bombX = getX();
+        int bombY = getY();
         //uplines
         k = radius;
         for (i = bombX - 1; (i >= 0 && k > 0); --i, --k) {
@@ -159,24 +161,22 @@ public class Bomb {
 
         private class ClearExplosionTask implements Runnable {
 
-        private final int bombX;
-        private final int bombY;
+        private final Pair bombToClear;
         private final List<Pair> explSqToClear;
         private final Player player;
 
         public ClearExplosionTask(List<Pair> toClear, Pair bombToClear, Player player) {
-            this.bombX = bombToClear.getX();
-            this.bombY = bombToClear.getY();
+            this.bombToClear = bombToClear;
             this.explSqToClear = toClear;
             this.player = player;
         }
 
         @Override
         public void run() {//whats about syncronization(player,map)
-            if (player.getX() == bombX && player.getY() == bombY && player.isAlive()) {
-                map.setSquare(bombX, bombY, this.player.getID());
+            if (player.getPosition().equals(bombToClear) && player.isAlive()) {
+                map.setSquare(bombToClear.getX(), bombToClear.getY(), this.player.getID());
             } else {
-                map.setSquare(bombX, bombY, Constants.MAP_EMPTY); //clear from map
+                map.setSquare(bombToClear.getX(), bombToClear.getY(), Constants.MAP_EMPTY); //clear from map
             }
             for (Pair pair : explSqToClear) { // clear from explosions list
                 map.removeExplosion(pair);

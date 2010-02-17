@@ -16,7 +16,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.List;
-import org.amse.bomberman.server.gameinit.Bot;
+import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants;
@@ -387,10 +387,9 @@ public class Session extends Thread implements ISession {
             if (this.game.isStarted()) {
                 this.game.placeBomb(this.player); //is bot alive checking in model
                 sendAnswer("Ok.");
-                writeToLog("Tryed to plant bomb." +
-                        " playerID=" + this.player.getID() +
-                        " x=" + this.player.getX() +
-                        " y=" + this.player.getY());
+                writeToLog("Tryed to plant bomb. " +
+                        "playerID=" + this.player.getID() + " " +
+                        this.player.getPosition().toString());
             }
         } else {
             sendAnswer("Error.Cant place bomb.");
