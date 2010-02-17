@@ -6,7 +6,6 @@
 package org.amse.bomberman.server.gameinit.bot;
 
 import org.amse.bomberman.server.gameinit.imodel.IModel;
-import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**

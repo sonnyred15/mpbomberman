@@ -12,7 +12,7 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Bot extends Player implements Runnable {
 
-    private static final long BOT_STEP_DELAY = 150L;
+    private static final long BOT_STEP_DELAY = 100L;
     private final IModel model;    
     private BotStrategy strategy;
 

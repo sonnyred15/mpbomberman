@@ -15,6 +15,7 @@ import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.bot.RandomFullBotStrategy;
 import org.amse.bomberman.server.gameinit.bot.RandomMoveBotStrategy;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
@@ -246,7 +247,7 @@ public class Model implements IModel {
     }
 
     public Bot addBot(String name, int id) {
-        Bot bot = new Bot(name, id, this, new RandomMoveBotStrategy());
+        Bot bot = new Bot(name, id, this, new RandomFullBotStrategy());
         Thread t = new Thread(bot);
         t.setDaemon(true);
         this.bots.add(t);
@@ -255,7 +256,7 @@ public class Model implements IModel {
 
     public void removeBot(Bot bot){
         this.game.disconnectFromGame(bot);
-        this.bots.remove(bot);
+        //this.bots.remove(bot); //TO DO //bot is PLAYER and bots store THREADS!!!! remove always false!
     }
 
     public GameMap getMap() {

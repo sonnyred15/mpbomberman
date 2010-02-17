@@ -18,11 +18,18 @@ public abstract class BotStrategy {
     protected int[][] temp;
     private int cons = 1000; // on temp map bot put 1000 + num of steps to destination
 
-    public Direction findWay(Pair begin, Pair end, final int[][] mapArray) throws IllegalArgumentException {
+    public Direction findWay(Pair begin, Pair end, final int[][] mapArray) throws
+            IllegalArgumentException {
+
         this.temp = cloneField(mapArray);
-        
+
         rec(begin, cons);
         int steps = temp[end.getX()][end.getY()] - cons;
+        
+        if(steps<0){ //bad desicion...it fixes one bug but error is in alghorithm...
+            throw new IllegalArgumentException();
+        }
+
         Pair currentPair = end;
         for (int i = steps; i > 1; i--) {
             int x = currentPair.getX();
@@ -43,6 +50,7 @@ public abstract class BotStrategy {
                 }
             }
         }
+
         if (currentPair.getX() == begin.getX() + 1) {
             return Direction.DOWN;
         } else {
@@ -55,7 +63,7 @@ public abstract class BotStrategy {
                     if (currentPair.getY() == begin.getY() + 1) {
                         return Direction.RIGHT;
                     } else {
-                        // ???? what is it??? what to do???
+                        // can`t find way
                         throw new IllegalArgumentException();
                     }
                 }
@@ -82,34 +90,35 @@ public abstract class BotStrategy {
         if (y < temp.length - 1) {
             int nextX = x;
             int nextY = y + 1;
-            if ((temp[nextX][nextY] == Constants.MAP_EMPTY) ||
-                    ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
+            if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
         }
         if (y > 0) {
             int nextX = x;
             int nextY = y - 1;
-            if ((temp[nextX][nextY] == Constants.MAP_EMPTY) ||
-                    ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
+            if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
         }
         if (x > 0) {
             int nextX = x - 1;
             int nextY = y;
-            if ((temp[nextX][nextY] == Constants.MAP_EMPTY) ||
-                    ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
+            if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
         }
         if (x < temp.length - 1) {
             int nextX = x + 1;
             int nextY = y;
-            if ((temp[nextX][nextY] == Constants.MAP_EMPTY) ||
-                    ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
+            if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
         }
     }
+
 }
