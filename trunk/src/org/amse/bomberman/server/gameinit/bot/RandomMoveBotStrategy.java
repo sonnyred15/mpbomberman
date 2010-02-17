@@ -29,7 +29,7 @@ public class RandomMoveBotStrategy extends BotStrategy {
         } while (!map.isEmpty(x, y));
 
         Pair dir = new Pair(x, y);
-        System.out.println("Choosed " + dir.toString());
+        //System.out.println("Choosed " + dir.toString());
         return dir;
     }
 
@@ -42,14 +42,17 @@ public class RandomMoveBotStrategy extends BotStrategy {
         Direction direction = null;
         do {
             try {
+                Thread.sleep(75);
                 direction = findWay(bot.getPosition(), target, model.getMapArray());
+                //System.out.println("Direction" + direction.toString());
             } catch (IllegalArgumentException ex) {
                 target = findNewTarget(model);
-                System.out.println("NEW TARGET");
+                //System.out.println("NEW TARGET");
+            } catch (InterruptedException ex){
+                ; //TO DO
             }
         } while (direction == null);
 
         return new MoveAction(direction, bot);
-
     }
 }
