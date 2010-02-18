@@ -66,8 +66,8 @@ public class MapJMenuBar extends JMenuBar {
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             Model.getInstance().removeBots();
-            ServerInfoJFrame serv = new ServerInfoJFrame();
             parent.stopWaitStart();
+            ServerInfoJFrame serv = new ServerInfoJFrame();
         }
     }
     public static class StartAction extends AbstractAction {

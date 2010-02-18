@@ -53,8 +53,12 @@ public class ServerInfoJFrame extends JFrame {
         leftBox.add(joinJButton);
         leftBox.add(refreshJButton);
         leftBox.add(botJButton);
-
-        this.refreshTable();
+        try {
+            this.refreshTable();
+        } catch (NetException ex) {
+            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
         this.setSizesTable();
 
         Container c = getContentPane();
@@ -74,31 +78,26 @@ public class ServerInfoJFrame extends JFrame {
         setVisible(true);
     }
 
-    private void refreshTable() {
+    private void refreshTable() throws NetException {
         IConnector connect = Model.getInstance().getConnector();
         ArrayList<String> games = null;
-        try {
-            games = connect.takeGamesList();
-            // if not "No games"
-            if (games.get(0).charAt(0) != 'N') {
-                int counter = 0;
-                MyTableModel tableModel = (MyTableModel) table.getModel();
-                tableModel.clear();
-                for (String game : games) {
-                    String[] buf = game.split(" ");
-                    table.setValueAt(buf[0], counter, 0);
-                    table.setValueAt(buf[1], counter, 1);
-                    table.setValueAt(buf[2], counter, 2);
-                    table.setValueAt(buf[3], counter, 3);
-                    table.setValueAt(buf[4], counter, 4);
-                    counter++;
-                }
+        games = connect.takeGamesList();
+        // if not "No games"
+        if (games.get(0).charAt(0) != 'N') {
+            int counter = 0;
+            MyTableModel tableModel = (MyTableModel) table.getModel();
+            tableModel.clear();
+            for (String game : games) {
+                String[] buf = game.split(" ");
+                table.setValueAt(buf[0], counter, 0);
+                table.setValueAt(buf[1], counter, 1);
+                table.setValueAt(buf[2], counter, 2);
+                table.setValueAt(buf[3], counter, 3);
+                table.setValueAt(buf[4], counter, 4);
+                counter++;
             }
-            table.repaint();
-        } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        table.repaint();
     }
 
     private void setSizesTable() {
@@ -165,7 +164,6 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     public static class RefreshAction extends AbstractAction {
-
         ServerInfoJFrame parent;
 
         public RefreshAction(ServerInfoJFrame jFrame) {
@@ -176,7 +174,12 @@ public class ServerInfoJFrame extends JFrame {
         }
 
         public void actionPerformed(ActionEvent e) {
-            parent.refreshTable();
+            try {
+                parent.refreshTable();
+            } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
