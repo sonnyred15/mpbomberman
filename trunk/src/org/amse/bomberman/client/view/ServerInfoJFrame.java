@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -55,27 +53,28 @@ public class ServerInfoJFrame extends JFrame {
         leftBox.add(botJButton);
         try {
             this.refreshTable();
+            this.setSizesTable();
+
+            Container c = getContentPane();
+            c.setLayout(new FlowLayout());
+            c.add(leftBox);
+            JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            // how calculate sizes???
+            jsp.setPreferredSize(new Dimension(width - 120, height - 50));
+            c.add(jsp);
+
+            refreshJButton.setAction(new RefreshAction(this));
+            createJButton.setAction(new CreateAction(this));
+            joinJButton.setAction(new JoinAction(this));
+            botJButton.setAction(new AddBotAction(this));
+            setResizable(false);
+            setVisible(true);
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            StartJFrame jFrame = new StartJFrame();
         }
-        this.setSizesTable();
-
-        Container c = getContentPane();
-        c.setLayout(new FlowLayout());
-        c.add(leftBox);
-        JScrollPane jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
-                , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        // how calculate sizes???
-        jsp.setPreferredSize(new Dimension(width - 120, height - 50));
-        c.add(jsp);
-
-        refreshJButton.setAction(new RefreshAction(this));
-        createJButton.setAction(new CreateAction(this));
-        joinJButton.setAction(new JoinAction(this));
-        botJButton.setAction(new AddBotAction(this));
-        setResizable(false);
-        setVisible(true);
     }
 
     private void refreshTable() throws NetException {
@@ -130,6 +129,8 @@ public class ServerInfoJFrame extends JFrame {
         } catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+            StartJFrame jFrame = new StartJFrame();
         }
     }
 
@@ -179,12 +180,13 @@ public class ServerInfoJFrame extends JFrame {
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.dispose();
+                StartJFrame jFrame = new StartJFrame();
             }
         }
     }
 
     public static class CreateAction extends AbstractAction {
-
         ServerInfoJFrame parent;
 
         public CreateAction(ServerInfoJFrame jFrame) {
@@ -201,12 +203,13 @@ public class ServerInfoJFrame extends JFrame {
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.dispose();
+                StartJFrame jFrame = new StartJFrame();
             }
         }
     }
 
     public static class JoinAction extends AbstractAction {
-
         ServerInfoJFrame parent;
 
         public JoinAction(ServerInfoJFrame jFrame) {
@@ -246,6 +249,8 @@ public class ServerInfoJFrame extends JFrame {
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    parent.dispose();
+                    StartJFrame jFrame = new StartJFrame();
                 }
             } else {
                 JOptionPane.showMessageDialog(parent, "You did't select the game for bot! "

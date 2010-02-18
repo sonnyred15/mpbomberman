@@ -10,8 +10,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.Model;
@@ -189,7 +187,7 @@ public class Connector implements IConnector{
     }
     public class NetException extends Exception {
         public NetException(){
-            super("NetException!!! Server is inaccessible now.");
+            super("NetException!!!\nServer is inaccessible now.\nPlease reconnect!");
         }
     }
 }
