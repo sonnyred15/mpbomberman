@@ -54,7 +54,7 @@ public class Bot extends Thread{
                 x = random.nextInt(map.getSize() - 1);
                 y = random.nextInt(map.getSize() - 1);
             }
-            target = new Cell(x, y);
+        target = new Cell(x, y);
     }
     private boolean isDead() {
         return (isDead);
