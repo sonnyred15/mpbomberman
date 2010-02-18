@@ -3,12 +3,12 @@ package org.amse.bomberman.client.view;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.Constants.Direction;
 /**
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class MapJFrameListener implements KeyListener{
     private MapJFrame parent;

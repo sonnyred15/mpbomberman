@@ -1,7 +1,8 @@
-package org.amse.bomberman.client.model;
+package org.amse.bomberman.client.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
 
