@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.IParser;
 
 /**

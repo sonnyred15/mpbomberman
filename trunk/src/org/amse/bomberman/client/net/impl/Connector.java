@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Command;
@@ -182,6 +182,7 @@ public class Connector implements IConnector{
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();
+                this.cancel();
             }
         }
     }

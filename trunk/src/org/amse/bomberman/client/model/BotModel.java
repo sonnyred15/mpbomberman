@@ -1,11 +1,10 @@
 package org.amse.bomberman.client.model;
 
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.impl.Model;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class BotModel extends Model implements IModel{
     private static IModel botModel= null;
@@ -19,5 +18,4 @@ public class BotModel extends Model implements IModel{
         }
         return botModel;
     }
-
 }

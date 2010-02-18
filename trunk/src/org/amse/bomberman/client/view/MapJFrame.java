@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,20 +14,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
-import org.amse.bomberman.client.model.Model;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.*;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
@@ -153,6 +151,7 @@ public class MapJFrame extends JFrame implements IView{
             } catch (NetException ex2) {
                 // is it good???
                 ex2.printStackTrace();
+                this.cancel();
             }
         }
     }
@@ -191,7 +190,6 @@ public class MapJFrame extends JFrame implements IView{
             this.setOpaque(true);
         }
         public void checkExplosion(int mapValue){
-            Color value = EMPTY_COLOR;
             ImageIcon icon = null;
             ClassLoader cl = Main.class.getClassLoader();
             // if it is wall
@@ -202,18 +200,12 @@ public class MapJFrame extends JFrame implements IView{
                 // if it is player
                 if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
                     icon = getPlayerIcon(mapValue);
-                    value = PL_EXPL_COLOR;
+                    this.setBackground(PL_EXPL_COLOR);
                 } else {
                     // if it is center of Explosion
                     icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
-                    if (mapValue == Constants.MAP_DETONATED_BOMB) {
-                        
-                    } else {
-                        //value = BEAM_COLOR;
-                    }
                 }
             }
-            this.setBackground(value);
             this.setIcon(icon);
         }
     }
