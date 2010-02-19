@@ -4,6 +4,8 @@
  */
 package org.amse.bomberman.server.gameinit;
 
+import org.amse.bomberman.util.Constants;
+
 /**
  *
  * @author Kirilchuk V.E
@@ -21,7 +23,7 @@ public class Player {
     private int explRadius = 2; //for better testing :))
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
-    private int maxBombs = 4; //for better testing :))
+    private int maxBombs = Constants.PLAYER_MAX_BOMBS; //for better testing :))
 
     public Player() {
     }

@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.net.IServer;
 
@@ -22,23 +23,25 @@ import org.amse.bomberman.server.net.IServer;
  *
  * @author Kirilchuk V.E.
  */
-public class ServerInfo extends JFrame {
+public class ServerInfo extends JFrame implements LogChangeListener{
 
     private static final long serialVersionUID = 1L;
+    private final String SHUTDOWNED_LABEL_TEXT = "Shutdowned: ";
+    private final String STARTED_GAMES_LABEL_TEXT = "Started games: ";
+    private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
+    private final String CLIENTS_LABEL_TEXT = "Clients: ";
+    private final String TIME_LABEL_TEXT = "Working time(sec.): ";
+    private final String PORT_LABEL_TEXT = "Port: ";
+    //
     private IServer server = null;
     private final JTextArea log = new JTextArea();
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private final String SHUTDOWNED_LABEL_TEXT = "Shutdowned: ";
+    //
     private final JLabel labelShutdowned = new JLabel(SHUTDOWNED_LABEL_TEXT);
-    private final String PORT_LABEL_TEXT = "Port: ";
     private final JLabel labelPort = new JLabel(PORT_LABEL_TEXT);
-    private final String STARTED_GAMES_LABEL_TEXT = "Started games: ";
     private final JLabel labelStartedGames = new JLabel(STARTED_GAMES_LABEL_TEXT);
-    private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
     private final JLabel labelUnstartedGames = new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
-    private final String CLIENTS_LABEL_TEXT = "Clients: ";
     private final JLabel labelClients = new JLabel(CLIENTS_LABEL_TEXT);
-    private final String TIME_LABEL_TEXT = "Working time(sec.): ";
     private final JLabel labelTime = new JLabel(TIME_LABEL_TEXT);
 
     public ServerInfo() {
@@ -47,8 +50,8 @@ public class ServerInfo extends JFrame {
         this.setTitle("server status");
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setMinimumSize(new Dimension(400, 300));
-        this.setResizable(false);
-        this.setLocationRelativeTo(null); //null for center position
+        this.setResizable(true);
+        //this.setLocationRelativeTo(null); //null for center position
 
         /*setting main layout of server control JFrame*/
         this.setLayout(new GridLayout(2, 1));
@@ -67,7 +70,7 @@ public class ServerInfo extends JFrame {
         log.setEditable(false);
 
         /*adding log to down panel*/
-        JPanel logPanel = new JPanel(new GridLayout());
+        JPanel logPanel = new JPanel(new GridLayout());        
         logPanel.add(new JScrollPane(log));
         this.add(logPanel);
 
@@ -109,7 +112,12 @@ public class ServerInfo extends JFrame {
     }
 
     public synchronized void addedToLog(String line) {
-        //log.append(line + "\n");
+        log.append(line + "\n");
+        log.setCaretPosition(log.getText().length() - 1-line.length());
+    }
+
+    public synchronized void clearLog(){
+        log.setText("");
     }
 
     public void initLogArea() {
