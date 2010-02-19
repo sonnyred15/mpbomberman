@@ -13,6 +13,7 @@ import java.nio.channels.IllegalBlockingModeException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import org.amse.bomberman.server.LogChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
@@ -33,7 +34,7 @@ public class Server implements IServer {
     private final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
     private int sessionCounter = 0; //need to generate name of log files.   
     private long startTime;
-
+    private LogChangeListener logListener;
     /**
      * Constructor with default port.
      */
@@ -202,6 +203,10 @@ public class Server implements IServer {
         this.sessionCounter--;
     }
 
+    public void setLogListener(LogChangeListener logListener) {
+        this.logListener = logListener;
+    }
+
     private class SocketListen implements Runnable {
 
         private Server net;
@@ -262,6 +267,10 @@ public class Server implements IServer {
             System.out.println(message);
         } else {
             log.println(message);
+        }
+
+        if (logListener!=null){
+            logListener.addedToLog(message);
         }
     }
 }
