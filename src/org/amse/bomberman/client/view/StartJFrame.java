@@ -27,9 +27,7 @@ public class StartJFrame extends JFrame {
     private final int height = 120;
     private final int width = 240;
     private JButton connectJButton = new JButton();
-    //private JButton ipDefault = new JButton();
     private JTextField ipTF = new JTextField();
-    //private JButton portDefault = new JButton();
     private JTextField portTF = new JTextField();
 
     public StartJFrame() {
