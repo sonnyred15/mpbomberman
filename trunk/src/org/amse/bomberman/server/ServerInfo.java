@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.net.IServer;
 
@@ -112,7 +111,11 @@ public class ServerInfo extends JFrame implements LogChangeListener{
     }
 
     public synchronized void addedToLog(String line) {
-        log.append(line + "\n");
+        try{
+            log.append(line + "\n");
+        }catch (Error t) {
+            System.out.println("EEEEEERRRROOOOOOOOOOOOOOORRRRRRRRRRR while appending. " + t.getMessage());
+        }
         log.setCaretPosition(log.getText().length() - 1-line.length());
     }
 

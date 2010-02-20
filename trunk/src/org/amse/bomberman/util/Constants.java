@@ -22,13 +22,13 @@ public final class Constants {
     public static final long BOMB_TIMER_VALUE = 200L*10;
     public static final long BOMB_DETONATION_TIME = 200L*3;
 
-    public static final int PLAYER_MAX_BOMBS = 4;
+    public static final int PLAYER_MAX_BOMBS = 3;
 
     public static final int DEFAULT_PORT = 10500;
     public static final int DEFAULT_ACCEPT_TIMEOUT = 60000;
     public static final int DEFAULT_CLIENT_TIMEOUT = 60000;
     
-    public static final String DEFAULT_FILE_LOG_NAME = "fileLog.log";
+    public static final String DEFAULT_FILE_LOG_NAME = "server.log";
 
     public static enum Direction {
 

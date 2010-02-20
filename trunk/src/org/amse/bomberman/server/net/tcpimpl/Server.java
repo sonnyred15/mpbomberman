@@ -26,7 +26,7 @@ import org.amse.bomberman.util.impl.ConsoleLog;
 public class Server implements IServer {
 
     private ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
-    private int port;
+    private final int port;
     private final List<Game> games = Collections.synchronizedList(new LinkedList<Game>());
     private ServerSocket serverSocket;
     private boolean shutdowned = true; //true until we start accepting clients.
@@ -65,14 +65,14 @@ public class Server implements IServer {
                 this.listeningThread.start();
                 this.shutdowned = false;
             } else {
-                throw new IllegalStateException("Already accepting. Can`t raise server.");
+                throw new IllegalStateException("Server: start error. Already accepting. Can`t raise.");
             }
 
         } catch (IOException ex) {
-            writeToLog("Raise server error. " + ex.getMessage());
+            writeToLog("Server: start error. " + ex.getMessage());
             throw ex;
         } catch (SecurityException ex) {
-            writeToLog("Raise server error. " + ex.getMessage());
+            writeToLog("Server: start error. " + ex.getMessage());
             throw ex;
         }
 
@@ -110,20 +110,19 @@ public class Server implements IServer {
                     try {
                         this.log.close();
                     } catch (IOException ex) {
-                        System.out.println("Shutdown server warning. Can`t close log." +
+                        System.out.println("Server: stop warning. Can`t close log." +
                                 ex.getMessage());
                     }
                 }
             } else {
-                throw new IllegalStateException("Server is not raised. Can`t shutdown it.");
+                throw new IllegalStateException("Server: stop error. Is not raised. Can`t shutdown.");
             }
 
         } catch (IOException ex) {
-            writeToLog("Shutdown server error. " + ex.getMessage());
+            writeToLog("Server: stop error. " + ex.getMessage());
             throw ex;
         } catch (SecurityException ex) {
-            writeToLog("Shutdown server error.  " +
-                    ex.getMessage());
+            writeToLog("Server: stop error. " + ex.getMessage());
             throw ex;
         }
 
@@ -133,21 +132,21 @@ public class Server implements IServer {
     public void addGame(Game game) {
         if (!this.shutdowned) { // is it redundant?
             this.games.add(game);
-            writeToLog("Game added.");
+            writeToLog("Server: game added.");
         } else {
-            writeToLog("Tryed to add game to shutdowned server.");
+            writeToLog("Server: addGame warning. Tryed to add game to shutdowned server.");
         }
     }
 
     public void removeGame(Game gameToRemove) {
         if (!this.shutdowned) { // is it redundant?
             if (this.games.remove(gameToRemove)) {
-                writeToLog("Game removed");
+                writeToLog("Server: game removed.");
             } else {
-                writeToLog("Server removeGame warning. No specified game found.");
+                writeToLog("Server: removeGame warning. No specified game found.");
             }
         } else {
-            writeToLog("Tryed to remove game from shutdowned server.");
+            writeToLog("Server: removeGame warning. Tryed to remove game from shutdowned server.");
         }
     }
 
@@ -162,17 +161,17 @@ public class Server implements IServer {
             try {
                 game = this.games.get(n);
             } catch (IndexOutOfBoundsException ex) {
-                writeToLog("Server getGame warning. Tryed to get game with illegal ID. Canceled.");
+                writeToLog("Server: getGame warning. Tryed to get game with illegal ID.");
             }
         } else {
-            writeToLog("Tryed to get game from shutdowned server.");
+            writeToLog("Server: getGame warning. Tryed to get game from shutdowned server.");
         }
         return game;
     }
 
     public List<Game> getGamesList() {
         if (this.shutdowned) { // is it redundant?
-            writeToLog("Server getGamesList warning. Tryed to get games list from shutdowned server.");
+            writeToLog("Server: getGamesList warning. Tryed to get games list from shutdowned server.");
         }
 
         return this.games;
@@ -186,7 +185,7 @@ public class Server implements IServer {
         return this.shutdowned;
     }
 
-    public synchronized int getPort() {
+    public int getPort() {
         return this.port;
     }
 
@@ -217,7 +216,7 @@ public class Server implements IServer {
 
         public void run() {
 
-            writeToLog("Server: Waiting for a new client...");
+            writeToLog("Server: waiting for a new client...");
 
             try {
 
@@ -225,7 +224,7 @@ public class Server implements IServer {
                     //throws IO, Security, SocketTimeout, IllegalBlockingMode
                     //exceptions
                     Socket clientSocket = serverSocket.accept();
-                    writeToLog("Server: Client connected. Starting new session thread...");
+                    writeToLog("Server: client connected. Starting new session thread...");
                     sessionCounter++;
                     //CHECK V THIS// Is it throwing any exceptions?
                     ISession newSession = new Session(this.net, clientSocket,
@@ -235,26 +234,30 @@ public class Server implements IServer {
                 }
 
             } catch (SocketTimeoutException ex) { //never happen in current realization
-                writeToLog("Server error." + ex.getMessage());
+                writeToLog("Server: run warning. " + ex.getMessage());
             } catch (IOException ex) { //if an I/O error occurs when waiting for a connection.
-                writeToLog("Server error." + ex.getMessage()); //or socket closed
+                if(ex.getMessage().equalsIgnoreCase("Socket closed")){
+                    writeToLog("Server: " + ex.getMessage()); //server socket closed
+                }else{
+                    writeToLog("Server: error. " + ex.getMessage()); //else exception
+                }
             } catch (SecurityException ex) { //accept wasn`t allowed
-                writeToLog("Server error." + ex.getMessage());
+                writeToLog("Server: run error. " + ex.getMessage());
             } catch (IllegalBlockingModeException ex) { //CHECK < THIS// what comments should i write?
-                writeToLog("Server error." + ex.getMessage());
+                writeToLog("Server: run error. " + ex.getMessage());
             }
 
             /*must free resources and stop our thread.*/
             int i = 1;
             synchronized (sessions) {
                 for (ISession session : sessions) {
-                    writeToLog("Interrupting session " + i);
+                    writeToLog("Server: interrupting session " + i + "...");
                     session.interruptSession();
                     ++i;
                 }
             }
 
-            writeToLog("Server: listening thread come to end.");
+            writeToLog("Server: listening(run) thread come to end.");
         }
     }
 
