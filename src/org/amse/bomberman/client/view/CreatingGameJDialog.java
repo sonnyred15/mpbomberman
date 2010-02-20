@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.Constants;
 
@@ -44,7 +44,7 @@ public class CreatingGameJDialog extends JDialog {
         setSize(width, heigth);
         setLocation(parent.getX()-width, parent.getY());
 
-        String[] maps =  Model.getInstance().getConnector().getMaps();
+        String[] maps =  Connector.getInstance().getMaps();
         if (!maps[0].equals("No maps on server was founded.")) {
             mapBox = new JComboBox(maps);
         }
@@ -126,7 +126,7 @@ public class CreatingGameJDialog extends JDialog {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector con = Model.getInstance().getConnector();
+            IConnector con = Connector.getInstance();
             try {
                 String mapName = parent.getMap();
                 mapName = mapName.substring(0, mapName.indexOf('.'));

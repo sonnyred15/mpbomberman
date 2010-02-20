@@ -2,10 +2,8 @@ package org.amse.bomberman.client.model;
 
 import org.amse.bomberman.util.Constants.Direction;
 
-
 /**
- *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class Cell {
     private int myX;

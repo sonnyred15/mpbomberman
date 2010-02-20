@@ -19,6 +19,7 @@ import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 
 /**
@@ -78,7 +79,7 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     private void refreshTable() throws NetException {
-        IConnector connect = Model.getInstance().getConnector();
+        IConnector connect = Connector.getInstance();
         ArrayList<String> games = null;
         games = connect.takeGamesList();
         // if not "No games"
@@ -118,7 +119,7 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     private void join(int gameNumber) {
-        IConnector connect = Model.getInstance().getConnector();
+        IConnector connect = Connector.getInstance();
         try {
             connect.joinGame(gameNumber);
             this.dispose();
@@ -135,7 +136,7 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     private void joinBot(int gameNumber) throws NetException {
-        IConnector connect = Model.getInstance().getConnector();
+        IConnector connect = Connector.getInstance();
         try {
             connect.joinBotIntoGame(gameNumber);
         } catch (IOException ex) {
@@ -157,7 +158,7 @@ public class ServerInfoJFrame extends JFrame {
     }
 
     private static void startMap() throws NetException {
-        IConnector connect = Model.getInstance().getConnector();
+        IConnector connect = Connector.getInstance();
         BombMap map = connect.getMap();
         Model model = (Model) Model.getInstance();
         model.setMap(map);

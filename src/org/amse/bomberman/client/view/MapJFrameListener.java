@@ -3,8 +3,8 @@ package org.amse.bomberman.client.view;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.Constants.Direction;
 /**
@@ -21,23 +21,27 @@ public class MapJFrameListener implements KeyListener{
     }
 
     public void keyPressed(KeyEvent e) {
-        IConnector connector = Model.getInstance().getConnector();
+        IConnector connector = Connector.getInstance();
         try {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT: {
                     connector.doMove(Direction.LEFT);
+                    parent.tryScroll(Direction.LEFT);
                     break;
                 }
                 case KeyEvent.VK_UP: {
                     connector.doMove(Direction.UP);
+                    parent.tryScroll(Direction.UP);
                     break;
                 }
                 case KeyEvent.VK_RIGHT: {
                     connector.doMove(Direction.RIGHT);
+                    parent.tryScroll(Direction.RIGHT);
                     break;
                 }
                 case KeyEvent.VK_DOWN: {
                     connector.doMove(Direction.DOWN);
+                    parent.tryScroll(Direction.DOWN);
                     break;
                 }
                 case KeyEvent.VK_SPACE: {

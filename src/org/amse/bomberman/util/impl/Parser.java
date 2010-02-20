@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
+import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.IParser;
 
@@ -44,7 +45,10 @@ public class Parser implements IParser{
             int lives = Integer.parseInt(info[3]);
             int bombs = Integer.parseInt(info[4]);
             int maxBombs = Integer.parseInt(info[5]);
-            Model.getInstance().setPlayerLives(lives);
+            IModel model = Model.getInstance();
+            model.setPlayerLives(lives);
+            model.setPlayerCoord(new Cell(x,y));
+            model.setPlayerBombs(bombs);
         }
         map.setExplosions(expl);
         return map;

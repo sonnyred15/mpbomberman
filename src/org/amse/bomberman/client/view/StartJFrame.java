@@ -78,8 +78,6 @@ public class StartJFrame extends JFrame {
         //portDefault.setAction(new DefaultPortAction(this));
         connectJButton.setAction(new ConnectAction(this));
 
-        IConnector connector = new Connector();
-        Model.getInstance().setConnector(connector);
         setResizable(false);
         setVisible(true);
     }
@@ -97,36 +95,6 @@ public class StartJFrame extends JFrame {
         sb.append(portValue);
         portTF.setText(sb.toString());
     }
-    /*public static class DefaultIPAction extends AbstractAction {
-        StartJFrame parent;
-
-        public DefaultIPAction(StartJFrame jFrame) {
-            parent = jFrame;
-            putValue(NAME, "Default IP");
-            putValue(SHORT_DESCRIPTION, "Set default IP");
-            putValue(SMALL_ICON, null);
-        }
-        public void actionPerformed(ActionEvent e) {
-            try {
-                parent.setIP(InetAddress.getByName("localhost").getHostAddress());
-            } catch (UnknownHostException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-    public static class DefaultPortAction extends AbstractAction {
-        StartJFrame parent;
-
-        public DefaultPortAction(StartJFrame jFrame) {
-            parent = jFrame;
-            putValue(NAME, "Default Port");
-            putValue(SHORT_DESCRIPTION, "Set default Port");
-            putValue(SMALL_ICON, null);
-        }
-        public void actionPerformed(ActionEvent e) {
-            parent.setPort(PORT);
-        }
-    }*/
     public static class ConnectAction extends AbstractAction {
         StartJFrame parent;
 
@@ -138,7 +106,7 @@ public class StartJFrame extends JFrame {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector con = Model.getInstance().getConnector();
+            IConnector con = Connector.getInstance();
             try {
                 con.сonnect(parent.getIPAddress(), parent.getPort());
                 parent.dispose();
