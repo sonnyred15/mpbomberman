@@ -34,7 +34,8 @@ public class MapJFrame extends JFrame implements IView{
     private final int height = 600;
     private final int width = 500;
     // amount of cells at the one line on the Screen
-    private final int range = 10;
+    private final int range;
+    private final int defaultRange = 10;
     // amount of cells at one line in the Full map
     private final int size;
     // Cell that is the most Left and Up at the screen
@@ -50,7 +51,12 @@ public class MapJFrame extends JFrame implements IView{
         setLocation(400, 100);
         setMinimumSize(new Dimension(width / 2, height / 2));
         size = map.getSize();
-        //myCoord = map.
+        if (size < defaultRange) {
+            range = size;
+        } else {
+            range = defaultRange;
+        }
+        myCoord = Model.getInstance().getPlayerCoord();
         
         Container c = getContentPane();
         c.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
@@ -62,12 +68,12 @@ public class MapJFrame extends JFrame implements IView{
         this.findEyeShot();
         int num = map.getSize();
         JPanel field = new JPanel();
-        field.setLayout(new GridLayout(num,num,0,0));
-        cells = new MyJPanel[num][num];
-        for (int i = 0; i < num; i++) {
-            for (int j = 0; j < num; j++) {
+        field.setLayout(new GridLayout(range,range,0,0));
+        cells = new MyJPanel[range][range];
+        for (int i = 0; i < range; i++) {
+            for (int j = 0; j < range; j++) {
                 cells[i][j] = new MyJPanel(48);
-                cells[i][j].setContent(map.getValue(new Cell(i,j)));
+                cells[i][j].setContent(map.getValue(new Cell(i+LUCell.getX(),j+LUCell.getY())));
                 field.add(cells[i][j]);
             }
         }
@@ -111,10 +117,14 @@ public class MapJFrame extends JFrame implements IView{
         if (changes != null) {
             List<Cell> expl = map.getExplosions();
             for (Cell cell : changes) {
-                if (expl.contains(cell)) {
-                    cells[cell.getX()][cell.getY()].checkExplosion(map.getValue(cell));
+                if (isInEyeShot(cell) && expl.contains(cell)) {
+                    cells[cell.getX()-LUCell.getX()][cell.getY()-LUCell.getY()]
+                            .checkExplosion(map.getValue(cell));
                 } else {
-                    cells[cell.getX()][cell.getY()].setContent(map.getValue(cell));
+                    if (isInEyeShot(cell)) {
+                        cells[cell.getX()-LUCell.getX()][cell.getY()-LUCell.getY()]
+                                .setContent(map.getValue(cell));
+                    }
                 }
                 // why it isn't need???
                 //cells[cell.getX()][cell.getY()].repaint();
@@ -122,6 +132,46 @@ public class MapJFrame extends JFrame implements IView{
         }
     }
     public void tryScroll(Direction direct) {
+        /*if (range >= size) {
+            return;
+        }
+        BombMap map = Model.getInstance().getMap();
+        switch(direct) {
+            case RIGHT: {
+                if (RDCell.getY() < size - 1) {
+                    for (int j = 0; j < range - 1; j++) {
+                        for (int i = 0; i < range; i++) {
+                            cells[i][j] = cells[i][j + 1];
+                            cells[i][j].repaint();
+                        }
+                    }
+                    for (int i = 0; i < range; i++) {
+                        cells[i][range - 1].setContent(map.getValue(new Cell
+                                (i + LUCell.getX(), range + LUCell.getY())));
+                        cells[i][range-1].repaint();
+                    }
+                    LUCell = LUCell.nextCell(direct);
+                    RDCell = RDCell.nextCell(direct);
+                    break;
+                }
+            }
+            case DOWN: {
+
+                break;
+            }
+            case LEFT: {
+
+                break;
+            }
+            case UP: {
+
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("Incorrect value of direction:"
+                        + direct.toString());
+            }
+        }*/
     }
     private void checkStart() {
         timer = new Timer();
@@ -132,7 +182,28 @@ public class MapJFrame extends JFrame implements IView{
             LUCell = new Cell(0,0);
             RDCell = new Cell(size-1, size-1);
         } else {
-            //if ()
+            int x1;
+            int x2;
+            int y1;
+            int y2;
+            if (myCoord.getX() <= (range-1)/2) {
+                x1 = 0;
+            } else {
+                x1 = myCoord.getX() - (range-1)/2;
+            }
+            if (myCoord.getY() <= (range-1)/2) {
+                y1 = 0;
+            } else {
+                y1 = myCoord.getY() - (range-1)/2;
+            }
+            x2 = x1 + range - 1;
+            y2 = y1 + range - 1;
+            LUCell = new Cell(x1,y1);
+            RDCell = new Cell(x2, y2);
         }
+    }
+    private boolean isInEyeShot(Cell cell) {
+        return ((cell.getX() >= LUCell.getX()) && (cell.getX() <= RDCell.getX())
+                && (cell.getY() >= LUCell.getY()) && (cell.getY() <= RDCell.getY()));
     }
 }
