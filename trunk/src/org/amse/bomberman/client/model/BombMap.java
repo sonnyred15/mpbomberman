@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class BombMap {
     private int[][] cells;
@@ -79,38 +79,7 @@ public class BombMap {
         }
         explosions = expl;
     }
-    /*public void addPlayer(Player player, int x, int y) throws UnsupportedOperationException {
-        if (cells[x][y] == BombMap.EMPTY ) {
-            if (players.size() < BombMap.MAX_PLAYERS) {
-                players.add(player);
-                cells[x][y] = players.size();
-            } else {
-                throw new UnsupportedOperationException("Too many players.");
-            }
-        } else {
-            throw new UnsupportedOperationException("Cell is filled already.");
-        }
-    }*/
-    // perhaps Player or PlayerName in stead of playerNumber
-    /*public boolean movePlayer(int playerNumber, Direction direction) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (cells[i][j] == playerNumber) {
-                    try {
-                        Cell nextCell = nextCell(new Cell(i,j),direction);
-                        if (canGoToCell(nextCell)) {
-                            cells[i][j] = BombMap.EMPTY;
-                            goToCell(nextCell, playerNumber);
-                            return true;
-                        }
-                    } catch (UnsupportedOperationException ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                }
-            }
-        }
-        return false;
-    }*/
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -161,18 +130,6 @@ public class BombMap {
         res.setExplosions((ArrayList)expl);
         return res;
     }
-    /*private void goToCell(Cell cell, int playerNumber) {
-        if (cells[cell.myX][cell.myY] < BombMap.BOMB_PROOF_WALL) {
-            // different bonuses!!!
-            players.get(playerNumber).incBomb();
-        }
-        cells[cell.myX][cell.myY] = playerNumber;
-    }
-    
-    private boolean canGoToCell(Cell cell) {
-        return (cells[cell.getX()][cell.getY()] == BombMap.EMPTY
-                || cells[cell.getX()][cell.getY()] < BombMap.BOMB_PROOF_WALL);
-    }*/
     private boolean checkCell(Cell cell) {
         return (cell.getX() >= 0 && cell.getX() < cells.length
                 && cell.getY() >= 0 && cell.getY() < cells.length);

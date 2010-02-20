@@ -3,7 +3,7 @@ import org.amse.bomberman.client.view.StartJFrame;
 
 /**
  *
- * @author michail korovkin
+ * @author Michail Korovkin
  */
 public class Main {
     /**

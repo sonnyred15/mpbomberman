@@ -1,28 +1,24 @@
 package org.amse.bomberman.client.view;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.net.IConnector;
-import org.amse.bomberman.client.net.impl.Connector.NetException;
+import org.amse.bomberman.client.view.MapJFrameUtil.CheckTimerTask;
+import org.amse.bomberman.client.view.MapJFrameUtil.MyJPanel;
 import org.amse.bomberman.util.*;
+import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
@@ -32,22 +28,20 @@ public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private JLabel livesJLabel;
     private Timer timer;
-    private final Color EMPTY_COLOR = Color.LIGHT_GRAY;
-    private final Color PL_EXPL_COLOR = new Color(63,255,255);
-    private final Color EXPLODE_COLOR = Color.RED;
-    private final Color BEAM_COLOR = Color.ORANGE;
-    private final String BOMB_ICON_PATH = "org/amse/bomberman/client/icons/bomb2.png";
-    private final String WALL_ICON_PATH = "org/amse/bomberman/client/icons/wall_blue-48.png";
-    private final String PL1_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-1.png";
-    private final String PL2_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-2.png";
-    private final String PL3_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-3.png";
-    private final String PL4_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-4.png";
-    private final String BURN_ICON_PATH = "org/amse/bomberman/client/icons/burn-48.png";
     // is really nead???
     private boolean dead = false;
     private MapJFrameListener listener = new MapJFrameListener(this);
     private final int height = 600;
     private final int width = 500;
+    // amount of cells at the one line on the Screen
+    private final int range = 10;
+    // amount of cells at one line in the Full map
+    private final int size;
+    // Cell that is the most Left and Up at the screen
+    private Cell LUCell;
+    // Cell that is the most Right and Down at the screen
+    private Cell RDCell;
+    private Cell myCoord;
     
     public MapJFrame(BombMap map) {
         super("BomberMan");
@@ -55,6 +49,8 @@ public class MapJFrame extends JFrame implements IView{
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocation(400, 100);
         setMinimumSize(new Dimension(width / 2, height / 2));
+        size = map.getSize();
+        //myCoord = map.
         
         Container c = getContentPane();
         c.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
@@ -63,8 +59,8 @@ public class MapJFrame extends JFrame implements IView{
         livesJLabel.setPreferredSize(new Dimension(width, 30));
         livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
         c.add(livesJLabel);
+        this.findEyeShot();
         int num = map.getSize();
-        int size = (width - 50) / num;
         JPanel field = new JPanel();
         field.setLayout(new GridLayout(num,num,0,0));
         cells = new MyJPanel[num][num];
@@ -125,98 +121,18 @@ public class MapJFrame extends JFrame implements IView{
             }
         }
     }
+    public void tryScroll(Direction direct) {
+    }
     private void checkStart() {
         timer = new Timer();
         timer.schedule(new CheckTimerTask(this), (long)0,(long) Constants.GAME_STEP_TIME);
     }
-    private class CheckTimerTask extends TimerTask {
-        MapJFrame parent;
-        public CheckTimerTask(MapJFrame jframe) {
-            parent = jframe;
-        }
-        @Override
-        public void run() {
-            IConnector connect = Model.getInstance().getConnector();
-            try {
-                if (connect.isStarted()) {
-                    Model.getInstance().addListener(parent);
-                    connect.beginUpdating();
-                    Model.getInstance().startBots();
-                    // block JMenuItem "Start"
-                    parent.getJMenuBar().getMenu(0).getItem(0).setEnabled(false);
-                    this.cancel();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (NetException ex2) {
-                // is it good???
-                ex2.printStackTrace();
-                this.cancel();
-            }
-        }
-    }
-    private class MyJPanel extends JLabel {
-        public MyJPanel(int size) {
-            this.setPreferredSize(new Dimension(size, size));
-        }
-        public void setContent(int key) {
-            Color color = EMPTY_COLOR;
-            ImageIcon icon = null;
-            ClassLoader cl = Main.class.getClassLoader();
-            switch (key) {
-                case Constants.MAP_EMPTY: {
-                    icon = null;
-                    break;
-                }
-                case Constants.MAP_BOMB: {
-                    icon = new ImageIcon(cl.getResource(BOMB_ICON_PATH));
-                    break;
-                }
-                case Constants.MAP_DETONATED_BOMB: {
-                    icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
-                    break;
-                }
-            }
-            if (key < Constants.MAP_EMPTY && key >= Constants.MAP_PROOF_WALL) {
-                icon = new ImageIcon(cl.getResource(WALL_ICON_PATH));
-            } else {
-                if (key > Constants.MAP_EMPTY && key <= Constants.MAX_PLAYERS) {
-                    icon = getPlayerIcon(key);
-                    
-                }
-            }
-            this.setBackground(color);
-            this.setIcon(icon);
-            this.setOpaque(true);
-        }
-        public void checkExplosion(int mapValue){
-            ImageIcon icon = null;
-            ClassLoader cl = Main.class.getClassLoader();
-            // if it is wall
-            if (mapValue < Constants.MAP_EMPTY && mapValue >= Constants.MAP_PROOF_WALL) {
-                //value = WALL_EXPL_COLOR;
-                icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
-            } else {
-                // if it is player
-                if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
-                    icon = getPlayerIcon(mapValue);
-                    this.setBackground(PL_EXPL_COLOR);
-                } else {
-                    // if it is center of Explosion
-                    icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
-                }
-            }
-            this.setIcon(icon);
-        }
-    }
-    private ImageIcon getPlayerIcon(int mapValue) {
-        ClassLoader cl = Main.class.getClassLoader();
-        switch(mapValue) {
-            case 1: return new ImageIcon(cl.getResource(PL1_ICON_PATH));
-            case 2: return new ImageIcon(cl.getResource(PL2_ICON_PATH));
-            case 3: return new ImageIcon(cl.getResource(PL3_ICON_PATH));
-            case 4: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
-            default: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
+    private void findEyeShot() {
+        if (range >= size) {
+            LUCell = new Cell(0,0);
+            RDCell = new Cell(size-1, size-1);
+        } else {
+            //if ()
         }
     }
 }

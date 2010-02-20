@@ -9,6 +9,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
 
 /**
@@ -35,7 +36,7 @@ public class MapJMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Model.getInstance().removeListener(parent);
                 try {
-                    Model.getInstance().getConnector().leaveGame();
+                    Connector.getInstance().leaveGame();
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -60,12 +61,11 @@ public class MapJMenuBar extends JMenuBar {
             parent.dispose();
             Model.getInstance().removeListener(parent);
             try {
-                Model.getInstance().getConnector().leaveGame();
+                Connector.getInstance().leaveGame();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            Model.getInstance().removeBots();
             parent.stopWaitStart();
             ServerInfoJFrame serv = new ServerInfoJFrame();
         }
@@ -80,7 +80,7 @@ public class MapJMenuBar extends JMenuBar {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector connect = Model.getInstance().getConnector();
+            IConnector connect = Connector.getInstance();
             try {
                 connect.startGame();
                 //this.setEnabled(false);

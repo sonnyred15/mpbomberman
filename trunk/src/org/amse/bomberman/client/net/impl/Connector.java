@@ -26,8 +26,15 @@ import org.amse.bomberman.util.impl.Parser;
 public class Connector implements IConnector{
     private Socket socket;
     private Timer timer;
+    private static IConnector connector = null;
 
-    public Connector() {
+    private Connector() {
+    }
+    public static IConnector getInstance() {
+        if (connector == null) {
+            connector = new Connector();
+        }
+        return connector;
     }
 
     public void сonnect(InetAddress address, int port) throws UnknownHostException, IOException {
