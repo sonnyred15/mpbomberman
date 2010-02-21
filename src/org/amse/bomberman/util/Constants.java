@@ -77,7 +77,10 @@ public final class Constants {
         DOWNLOAD_MAP(8),
         GET_GAME_STATUS(9),
         GET_MAPS_LIST(10),
-        ADD_BOT_TO_GAME(11);
+        ADD_BOT_TO_GAME(11),
+        GET_MY_GAME_INFO(12),
+        CHAT_ADD_MSG(13),
+        CHAT_GET_NEW_MSGS(14);
 
         private final int value;
 
@@ -115,9 +118,15 @@ public final class Constants {
                     return GET_MAPS_LIST;
                 case 11:
                     return ADD_BOT_TO_GAME;
+                case 12:
+                    return GET_MY_GAME_INFO;
+                case 13:
+                    return CHAT_ADD_MSG;
+                case 14:
+                    return CHAT_GET_NEW_MSGS;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
-                            "must be between 0 and 11 inclusive");
+                            "must be between 0 and 14 inclusive");
             }
         }
     }

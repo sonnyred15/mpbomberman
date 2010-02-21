@@ -246,8 +246,8 @@ public class Model implements IModel {
         return this.map.getName();
     }
 
-    public Bot addBot(String name, int id) {
-        Bot bot = new Bot(name, id, this, new RandomFullBotStrategy());
+    public Bot addBot(String name) {
+        Bot bot = new Bot(name, this, new RandomFullBotStrategy());
         Thread t = new Thread(bot);
         t.setDaemon(true);
         this.bots.add(t);

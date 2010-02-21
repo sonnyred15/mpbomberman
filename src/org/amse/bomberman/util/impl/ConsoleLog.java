@@ -36,4 +36,8 @@ public class ConsoleLog implements ILog {
     public List<String> getLog(){
         return Collections.unmodifiableList(temporaryLog);
     }
+
+    public boolean isClosed() {
+        return false;
+    }
 }

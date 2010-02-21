@@ -1,9 +1,7 @@
 package org.amse.bomberman.server.gameinit.bot;
 
-import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
-import org.amse.bomberman.util.Constants.Direction;
 
 /**
  * Class for adding bots to the games.
@@ -12,12 +10,12 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class Bot extends Player implements Runnable {
 
-    private static final long BOT_STEP_DELAY = 100L;
+    private static final long BOT_STEP_DELAY = 150L;
     private final IModel model;    
     private BotStrategy strategy;
 
-    public Bot(String nickName, int id, IModel model, BotStrategy strategy) {
-        super(nickName, id);
+    public Bot(String nickName, IModel model, BotStrategy strategy) {
+        super(nickName);
         this.model = model;
         this.strategy = strategy;
     }

@@ -20,6 +20,8 @@ import org.amse.bomberman.util.Constants.Direction;
 public class Game {
 
     private final IServer server;
+    private Player owner;
+
     private final String gameName;
     private final int maxPlayers;
     private final IModel model;
@@ -45,6 +47,10 @@ public class Game {
         this.started = false;
     }
 
+    public void setOwner(Player owner){
+        this.owner = owner;
+    }
+
     public String getMapName() {
         return this.model.getMapName();
     }
@@ -53,7 +59,7 @@ public class Game {
         Player player = null;
 
         if (this.players.size() < this.maxPlayers) {
-            player = new Player(name, this.players.size() + 1);
+            player = new Player(name);
             //coordinates of players will be set when game would start!!!!
             this.players.add(player);
             player.setDieListener(dieListener);
@@ -65,7 +71,7 @@ public class Game {
     public synchronized Bot joinBot(String name) {
         Bot bot = null;
         if (this.players.size() < this.maxPlayers) {
-            bot = this.model.addBot(name, this.players.size() + 1);
+            bot = this.model.addBot(name);
             if (bot != null){
                 this.players.add(bot);
                 bot.setDieListener(dieListener);
@@ -88,7 +94,7 @@ public class Game {
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
         this.model.removePlayer(player.getID());
-        if (this.players.size() == 0) {
+        if (player == this.owner) {
             this.endGame();
         }
     }
@@ -103,10 +109,12 @@ public class Game {
         //Here model must change map to support currrent num of players
         //and then give coordinates.
         this.model.changeMapForCurMaxPlayers(this.players.size());
+        int i = 1; //giving id`s to players
         for (Player player : players) {
-            int id = player.getID();
-            Pair playerPosition = new Pair(model.xCoordOf(id), model.yCoordOf(id));
+            player.setID(i);
+            Pair playerPosition = new Pair(model.xCoordOf(i), model.yCoordOf(i));
             player.setPosition(playerPosition);
+            ++i;
         }
         this.started = true;
         this.model.startBots();
@@ -153,7 +161,15 @@ public class Game {
         return this.maxPlayers;
     }
 
-    public int getCurrentPlayers() {
+    public List<Player> getCurrentPlayers(){
+        return Collections.unmodifiableList(players);
+    }
+
+    public int getCurrentPlayersNum() {
         return this.players.size();
+    }
+
+    public Player getOwner() {
+        return owner;
     }
 }

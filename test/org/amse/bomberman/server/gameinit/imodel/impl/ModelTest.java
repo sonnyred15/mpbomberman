@@ -38,10 +38,10 @@ public class ModelTest {
     private final GameMap map = new GameMap(GAME_MAP);
     private final Game game = new Game(new Server(), map, "testModelGame", -1);
     private Model model = new Model(map, game);
-    private Player player1 = new Player("player1", 1);
-    private Player player2 = new Player("player2", 2);
-    private Player player3 = new Player("player3", 3);
-    private Player player4 = new Player("player4", 4);
+    private Player player1 = new Player("player1");
+    private Player player2 = new Player("player2");
+    private Player player3 = new Player("player3");
+    private Player player4 = new Player("player4");
     {
         player1.setPosition(new Pair(0, 0));
 
