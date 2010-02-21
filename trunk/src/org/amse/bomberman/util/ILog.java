@@ -18,4 +18,6 @@ public interface ILog {
     void close() throws IOException;
 
     List<String> getLog();
+
+    boolean isClosed();
 }

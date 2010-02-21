@@ -28,9 +28,8 @@ public class Player {
     public Player() {
     }
 
-    public Player(String nickName, int id) {
-        this.nickName = nickName;
-        this.id = id;
+    public Player(String nickName) {
+        this.nickName = nickName;       
     }
 
     public void setDieListener(DieListener gameDieListener){
@@ -108,5 +107,9 @@ public class Player {
 
     public int getRadius() {
         return this.explRadius;
+    }
+
+    public String getNickName() {
+        return nickName;
     }
 }

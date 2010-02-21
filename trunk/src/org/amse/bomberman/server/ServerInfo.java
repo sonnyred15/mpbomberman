@@ -22,7 +22,7 @@ import org.amse.bomberman.server.net.IServer;
  *
  * @author Kirilchuk V.E.
  */
-public class ServerInfo extends JFrame implements LogChangeListener{
+public class ServerInfo extends JFrame implements LogChangeListener {
 
     private static final long serialVersionUID = 1L;
     private final String SHUTDOWNED_LABEL_TEXT = "Shutdowned: ";
@@ -69,11 +69,11 @@ public class ServerInfo extends JFrame implements LogChangeListener{
         log.setEditable(false);
 
         /*adding log to down panel*/
-        JPanel logPanel = new JPanel(new GridLayout());        
+        JPanel logPanel = new JPanel(new GridLayout());
         logPanel.add(new JScrollPane(log));
         this.add(logPanel);
 
-    //pack();
+        //pack();
     }
 
     public void setServer(IServer server) {
@@ -83,8 +83,9 @@ public class ServerInfo extends JFrame implements LogChangeListener{
             public void run() {
                 stateChanged();
             }
+
         }, 1000, 1000, TimeUnit.MILLISECONDS);
-    //initLogArea();
+        //initLogArea();
     }
 
     public void stateChanged() {
@@ -111,15 +112,11 @@ public class ServerInfo extends JFrame implements LogChangeListener{
     }
 
     public synchronized void addedToLog(String line) {
-        try{
-            log.append(line + "\n");
-        }catch (Error t) {
-            System.out.println("EEEEEERRRROOOOOOOOOOOOOOORRRRRRRRRRR while appending. " + t.getMessage());
-        }
-        log.setCaretPosition(log.getText().length() - 1-line.length());
+        log.append(line + "\n");
+        log.setCaretPosition(log.getText().length() - 1 - line.length());
     }
 
-    public synchronized void clearLog(){
+    public synchronized void clearLog() {
         log.setText("");
     }
 
@@ -129,4 +126,5 @@ public class ServerInfo extends JFrame implements LogChangeListener{
         //    addedToLog(string);
         //}
     }
+
 }

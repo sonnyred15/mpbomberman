@@ -90,8 +90,10 @@ public class Server implements IServer {
         try {
 
             if (!this.shutdowned) {
+                
+                this.shutdowned = true;
+
                 if (this.listeningThread != null) {
-                    this.listeningThread.interrupt(); //throws SecurityException
                     this.listeningThread = null;
                 }
 
@@ -103,9 +105,7 @@ public class Server implements IServer {
                     this.serverSocket.close();
                     this.serverSocket = null;
                 }
-
-                this.shutdowned = true;
-
+               
                 if (this.log != null) {
                     try {
                         this.log.close();
@@ -200,6 +200,7 @@ public class Server implements IServer {
     public void sessionTerminated(ISession endedSession) {
         this.sessions.remove(endedSession);
         this.sessionCounter--;
+        writeToLog("Server: session removed.");
     }
 
     public void setLogListener(LogChangeListener logListener) {
@@ -220,7 +221,7 @@ public class Server implements IServer {
 
             try {
 
-                while (!Thread.interrupted()) {
+                while (!shutdowned) {
                     //throws IO, Security, SocketTimeout, IllegalBlockingMode
                     //exceptions
                     Socket clientSocket = serverSocket.accept();
@@ -266,7 +267,7 @@ public class Server implements IServer {
     }
 
     public void writeToLog(String message) {
-        if (log == null) {
+        if (log == null || log.isClosed()) {
             System.out.println(message);
         } else {
             log.println(message);

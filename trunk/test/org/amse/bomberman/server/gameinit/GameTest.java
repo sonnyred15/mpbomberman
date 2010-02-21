@@ -93,7 +93,7 @@ public class GameTest {
             }           
         }
 
-        assertEquals(0,game.getCurrentPlayers());
+        assertEquals(0,game.getCurrentPlayersNum());
     }
 
 

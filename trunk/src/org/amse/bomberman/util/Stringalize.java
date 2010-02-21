@@ -6,7 +6,7 @@ package org.amse.bomberman.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.List;  
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
@@ -15,7 +15,11 @@ import org.amse.bomberman.server.gameinit.Player;
  *
  * @author Kirilchuk V.E
  */
-public class Stringalize {
+public final class Stringalize {
+
+
+    private Stringalize() {
+    }
 
     public static String gameStatus(Game game) {
         if (game.isStarted()){
@@ -49,7 +53,7 @@ public class Stringalize {
                         unstartedGames.add(i + " " +
                                 g.getName() + " " +
                                 g.getMapName() + " " +
-                                g.getCurrentPlayers() + " " +
+                                g.getCurrentPlayersNum() + " " +
                                 g.getGameMaxPlayers());
                     }
                 }
@@ -83,5 +87,22 @@ public class Stringalize {
 
     public static String playerInfo(Player player) { //CHECK < THIS!!!//
         return player.getInfo();
+    }
+
+    public static List<String> gameInfo(Game game, Player player) {
+        List<String> lst = new ArrayList<String>();
+        if(player == game.getOwner()){
+            lst.add("true");
+        }else{
+            lst.add("false");
+        }
+
+        List<Player> players = game.getCurrentPlayers();
+        lst.add("" + players.size());
+        for (Player player1 : players) {
+            lst.add(player1.getNickName());
+        }
+        
+        return lst;
     }
 }

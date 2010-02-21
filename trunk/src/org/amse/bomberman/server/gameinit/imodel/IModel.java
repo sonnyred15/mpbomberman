@@ -21,7 +21,7 @@ public interface IModel {
 
     GameMap getMap();
 
-    Bot addBot(String name, int id);
+    Bot addBot(String name);
 
     void removeBot(Bot bot);
 

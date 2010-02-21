@@ -55,4 +55,8 @@ public class FileLog implements ILog {
         list.add("FileLog doesnot support this operation");
         return Collections.unmodifiableList(list);
     }
+
+    public boolean isClosed() {
+        return closed;
+    }
 }
