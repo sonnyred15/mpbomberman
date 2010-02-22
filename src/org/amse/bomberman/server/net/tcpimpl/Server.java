@@ -60,10 +60,10 @@ public class Server implements IServer {
         try {
 
             if (shutdowned) {
+                this.shutdowned = false;
                 this.serverSocket = new ServerSocket(port, 0); // throws IOExeption,SecurityException
                 this.listeningThread = new Thread(new SocketListen(this));
-                this.listeningThread.start();
-                this.shutdowned = false;
+                this.listeningThread.start();                
             } else {
                 throw new IllegalStateException("Server: start error. Already accepting. Can`t raise.");
             }
