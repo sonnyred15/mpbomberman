@@ -14,23 +14,23 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public interface IConnector {
 
-     public boolean joinBotIntoGame(int gameNumber) throws IOException, NetException;
      public void сonnect(InetAddress address, int port)
              throws UnknownHostException, IOException;
      public boolean leaveGame() throws NetException;
      public List<String> takeGamesList() throws NetException;
      public boolean createGame(String gameName, String mapName, int maxPl) 
-             throws IOException, NetException;
-     public boolean joinGame(int gameID) throws IOException, NetException;
+             throws NetException;
+     public boolean joinGame(int gameID) throws NetException;
      public boolean doMove(Direction dir) throws NetException;
      public boolean startGame() throws NetException;
      public BombMap getMap() throws NetException;
      public boolean plantBomb() throws NetException;
+     public boolean joinBotIntoGame(int gameNumber) throws NetException;
      // must be here???
-     public void beginUpdating() throws NetException;
+     public String[] getMaps() throws NetException;
+     public boolean isStarted() throws NetException;
+     public List<String> getMyGameInfo() throws NetException;
      public InetAddress getInetAddress();
      public int getPort();
-     public String[] getMaps() throws NetException;
-     public boolean isStarted() throws IOException, NetException;
-     public List<String> getMyGameInfo() throws NetException;
+     public void beginUpdating() throws NetException;
 }

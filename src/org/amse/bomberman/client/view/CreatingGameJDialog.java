@@ -144,11 +144,11 @@ public class CreatingGameJDialog extends JDialog {
                 parent.dispose();
                 parent.closeParent();
                 GameInfoJFrame gameInfo = new GameInfoJFrame(gameNumber, players);
-            }catch (IOException ex) {
+            }/*catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(parent,"Can not create new game.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (NetException ex2) {
+            }*/ catch (NetException ex2) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 parent.dispose();

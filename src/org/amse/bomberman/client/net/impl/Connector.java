@@ -62,27 +62,25 @@ public class Connector implements IConnector{
      * @param gameName Name of game.
      * @param mapName Name of map of new game.
      * @param maxPl maximum value of players that can connect to this new game.
-     * @return true if game is created. Don't return false :)
-     * @throws java.io.IOException if game isn't created and server has some
-     * troubles with arguments.
+     * @return true if game is created. Return false if something wrong :)
      */
     public boolean createGame(String gameName, String mapName, int maxPl)
-            throws IOException, NetException{
+            throws NetException{
         ArrayList<String> answer = queryAnswer(""+Command.CREATE_GAME.getValue()
                 +" "+ gameName +" "+ mapName +" "+ maxPl);
         if (answer.get(0).equals("Game created.")) {
             return true;
         } else {
-            throw new IOException(answer.get(0));
+            return false;
         }
     }
-    public boolean joinGame(int n) throws IOException, NetException{
+    public boolean joinGame(int n) throws NetException{
         ArrayList<String> list = queryAnswer("2 " + n);
         String answer = list.get(0);
         System.out.println(answer);
         if (answer.equals("Joined.")) {
             return true;
-        } else throw new IOException(answer);
+        } else return false;
     }
     public boolean doMove(Direction dir) throws NetException {
         ArrayList<String> list = queryAnswer("3 " + dir.getValue());
@@ -93,11 +91,6 @@ public class Connector implements IConnector{
         List<String> list = queryAnswer(""+Command.START_GAME.getValue());
         System.out.println(list);
         return (list.get(0).equals("Game started."));
-    }
-    public void beginUpdating(){
-         // must be here or somewhere else???
-        timer = new Timer();
-        timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     public BombMap getMap() throws NetException{
         ArrayList<String> mp = queryAnswer(""+Command.GET_MAP_ARRAY.getValue());
@@ -124,26 +117,22 @@ public class Connector implements IConnector{
      * @return true if game is started, false if isn't.
      * @throws java.io.IOException if you are not connected to any game.
      */
-    public boolean isStarted() throws IOException, NetException {
+    public boolean isStarted() throws NetException {
         ArrayList<String> status = queryAnswer(""+Command.GET_GAME_STATUS.getValue());
         if (status.get(0).equals("started.")) {
             return true;
         } else {
-            if (status.get(0).equals("not started.")) {
-                return false;
-            } else {
-                throw new IOException(status.get(0));
-            }
+            return false;
         }
     }
-    public boolean joinBotIntoGame(int n) throws IOException, NetException{
+    public boolean joinBotIntoGame(int n) throws NetException{
         // bot name???!!!
         String answer = queryAnswer("" + Command.ADD_BOT_TO_GAME.getValue()
                 +" "+n +" BOT!!!").get(0);
         System.out.println(answer);
         if (answer.equals("Bot added.")) {
             return true;
-        } else throw new IOException(answer);
+        } else return false;
     }
     // if you are nit joined to any games, return one String "Not joined to any game."
     public List<String> getMyGameInfo() throws NetException{
@@ -186,6 +175,11 @@ public class Connector implements IConnector{
             throw new NetException();
         }
         return answer;
+    }
+    public void beginUpdating(){
+         // must be here or somewhere else???
+        timer = new Timer();
+        timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     private class UpdateTimerTask extends TimerTask{
         @Override

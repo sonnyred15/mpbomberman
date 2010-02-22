@@ -125,10 +125,10 @@ public class ServerInfoJFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "You did't select the game! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (IOException ex) {
+        }/* catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (NetException ex2) {
+        }*/ catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.dispose();
