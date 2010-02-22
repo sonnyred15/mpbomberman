@@ -2,8 +2,6 @@ package org.amse.bomberman.client.view.mapjframe;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.IOException;
-import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import org.amse.bomberman.client.Main;

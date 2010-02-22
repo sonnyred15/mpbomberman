@@ -6,9 +6,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
-import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
@@ -30,16 +29,17 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Michail Korovkin
  */
-public class GameInfoJFrame extends JFrame{
+public class GameInfoJFrame extends JFrame implements IView{
     private int serverNumber;
     private int playersNum;
     private JLabel[] players = new JLabel[Constants.MAX_PLAYERS];
     private JButton startJButton = new JButton();
     private JButton botJButton = new JButton();
     private JButton cancelJButton = new JButton();
-    private Timer timer;
+    private Timer timer = new Timer();
     private final int width = 400;
     private final int height = 300;
+    private final long checkStartDelay = 50;
 
     public GameInfoJFrame(int myNumber, int number) {
         super("GameInfo");
@@ -59,9 +59,9 @@ public class GameInfoJFrame extends JFrame{
         cancelJButton.setAction(new CancelAction(this));
         try {
             List<String> gameInfo = Connector.getInstance().getMyGameInfo();
-            System.out.println(gameInfo.get(0));
             if (gameInfo.get(0).equals("false")) {
                 startJButton.setEnabled(false);
+                botJButton.setEnabled(false);
             }
             for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
                 players[i].setText(gameInfo.get(i+2));
@@ -85,8 +85,9 @@ public class GameInfoJFrame extends JFrame{
             c.setLayout(new FlowLayout());
             c.add(leftPanel);
             c.add(rightPanel);
-            
 
+            this.checkingStart();
+            this.startUpdating();
             setResizable(false);
             setVisible(true);
         } catch (NetException ex) {
@@ -96,13 +97,39 @@ public class GameInfoJFrame extends JFrame{
         }
     }
 
+    public void update() {
+        try {
+            List<String> gameInfo = Connector.getInstance().getMyGameInfo();
+            for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
+                players[i].setText(gameInfo.get(i+2));
+            }
+        } catch (NetException ex) {
+            this.stopTimers();
+            this.dispose();
+            StartJFrame jFrame = new StartJFrame();
+        }
+    }
     public int getGameNumber() {
         return serverNumber;
     }
-    public void stopWaitStart() {
+    public void stopTimers() {
         timer.cancel();
     }
-
+    private void checkingStart() {
+        timer.schedule(new StartTimerTask(), (long)0, checkStartDelay);
+    }
+    private void startUpdating() {
+        timer.schedule(new UpdateTimerTask(), (long)0, checkStartDelay);
+    }
+    private void startGame() throws NetException {
+        this.stopTimers();
+        this.dispose();
+        IModel model = Model.getInstance();
+        model.setMap(Connector.getInstance().getMap());
+        MapJFrame jframe = new MapJFrame();
+        Model.getInstance().addListener(jframe);
+        Connector.getInstance().beginUpdating();
+    }
     public static class StartAction extends AbstractAction {
         GameInfoJFrame parent;
 
@@ -117,16 +144,11 @@ public class GameInfoJFrame extends JFrame{
             IConnector connect = Connector.getInstance();
             try {
                 connect.startGame();
-                parent.dispose();
-                BombMap map = connect.getMap();
-                IModel model = Model.getInstance();
-                model.setMap(map);
-                MapJFrame jframe = new MapJFrame();
-                Model.getInstance().addListener(jframe);
-                Connector.getInstance().beginUpdating();
+                parent.startGame();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.stopTimers();
                 parent.dispose();
                 StartJFrame jFrame = new StartJFrame();
             }
@@ -151,12 +173,13 @@ public class GameInfoJFrame extends JFrame{
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.stopTimers();
                 parent.dispose();
                 StartJFrame jFrame = new StartJFrame();
-            } catch (IOException ex) {
+            } /*catch (IOException ex) {
                 JOptionPane.showMessageDialog(parent, "Can not join bot to the game: \n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            }*/
         }
     }
     public static class CancelAction extends AbstractAction{
@@ -167,8 +190,32 @@ public class GameInfoJFrame extends JFrame{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
+            parent.stopTimers();
             parent.dispose();
             ServerInfoJFrame jframe = new ServerInfoJFrame();
+        }
+    }
+    private class StartTimerTask extends TimerTask{
+        @Override
+        public void run() {
+            IConnector connector = Connector.getInstance();
+            try {
+                boolean flag = connector.isStarted();
+                if (flag) {
+                    this.cancel();
+                    startGame();
+                }
+            } catch (NetException ex) {
+                // is it good???
+                ex.printStackTrace();
+                this.cancel();
+            }
+        }
+    }
+    private class UpdateTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            update();
         }
     }
 }
