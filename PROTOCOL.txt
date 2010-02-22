@@ -19,8 +19,8 @@ GET_GAME_STATUS  |9               | status          | "started" or "not started"
 GET_MAPS_LIST    |10              | maps list       | "mapName.map" each map on next line.                         |
 ADD_BOT_TO_GAME  |11 gameID botN  | Confirm         | "Bot added."                                                 |
 GET_MY_GAME_INFO |12              | gameInfo        | *watch (gameInfo)                                            |
-CHAT_ADD_MSG     |13 message      | Confirm         | "NOT SUPPORTED YET!"                                         |
-CHAT_GET_NEW_MSGS|14              | messages        | "NOT SUPPORTED YET!"                                         |
+CHAT_ADD_MSG     |13 message      | messages        | new chat messages.                                           |
+CHAT_GET_NEW_MSGS|14              | messages        | new chat messages.                                           |
 -------------------------------------------------------------------------------------------------------------------
 where gN,gameN,gameName is game name.
       mN,mapN,mapName   is map name(must exist on server) WITHOUT .map!
@@ -98,6 +98,7 @@ Now answers if all is not ok:
 
 (12) "Not joined to any game." - if you are not joined to any game and trying to get gameInfo
 
-(13) "NOT SUPPORTED YET!"
+(13) "Not joined to any game." - if you are not joined to any game and trying to get add message to chat
+     "Wrong query. Not enough arguments" - if you client didn`t send message argument.
 
-(14) "NOT SUPPORTED YET!"
+(14) "Not joined to any game." - if you are not joined to any game and trying to get new chat messages
