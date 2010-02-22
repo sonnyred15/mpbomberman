@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -108,6 +109,10 @@ public class CreatingGameJDialog extends JDialog {
         setResizable(false);
         setVisible(true);
     }
+    // ????????????????????????????????? HOW????? STUPID...
+    public void closeParent() {
+        parent.dispose();
+    }
     private String getGameName() {
         return gameNameTF.getText();
     }
@@ -131,9 +136,14 @@ public class CreatingGameJDialog extends JDialog {
                 String mapName = parent.getMap();
                 mapName = mapName.substring(0, mapName.indexOf('.'));
                 con.createGame(parent.getGameName(), mapName, parent.getMaxPlayers());
+                // !!!!! is it safe method to know gameNumber???    !!!!!!!!!!!!
+                List<String> games = Connector.getInstance().takeGamesList();
+                String[] buf = games.get(games.size()-1).split(" ");
+                int gameNumber = Integer.parseInt(buf[0]);
+                int players = Integer.parseInt(buf[buf.length-1]);
                 parent.dispose();
-                JOptionPane.showMessageDialog(parent,"Game is created successfully."
-                    , "Game created", JOptionPane.INFORMATION_MESSAGE);
+                parent.closeParent();
+                GameInfoJFrame gameInfo = new GameInfoJFrame(gameNumber, players);
             }catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(parent,"Can not create new game.\n"
@@ -141,6 +151,8 @@ public class CreatingGameJDialog extends JDialog {
             } catch (NetException ex2) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.dispose();
+                StartJFrame jframe = new StartJFrame();
             }
         }
     }

@@ -6,7 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,8 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.impl.Connector.NetException;
@@ -33,7 +31,6 @@ public class ServerInfoJFrame extends JFrame {
     private JButton createJButton = new JButton();
     private JButton joinJButton = new JButton();
     private JButton refreshJButton = new JButton();
-    private JButton botJButton = new JButton();
     private JTable table = new JTable(new MyTableModel());
     private final Dimension buttonSize = new Dimension(200, 40);
 
@@ -51,7 +48,6 @@ public class ServerInfoJFrame extends JFrame {
         leftBox.add(createJButton);
         leftBox.add(joinJButton);
         leftBox.add(refreshJButton);
-        leftBox.add(botJButton);
         try {
             this.refreshTable();
             this.setSizesTable();
@@ -67,7 +63,6 @@ public class ServerInfoJFrame extends JFrame {
             refreshJButton.setAction(new RefreshAction(this));
             createJButton.setAction(new CreateAction(this));
             joinJButton.setAction(new JoinAction(this));
-            botJButton.setAction(new AddBotAction(this));
             setResizable(false);
             setVisible(true);
         } catch (NetException ex) {
@@ -80,7 +75,7 @@ public class ServerInfoJFrame extends JFrame {
 
     private void refreshTable() throws NetException {
         IConnector connect = Connector.getInstance();
-        ArrayList<String> games = null;
+        List<String> games = null;
         games = connect.takeGamesList();
         // if not "No games"
         if (games.get(0).charAt(0) != 'N') {
@@ -123,7 +118,13 @@ public class ServerInfoJFrame extends JFrame {
         try {
             connect.joinGame(gameNumber);
             this.dispose();
-            startMap();
+            int maxPlayers = this.getSelectedMaxPl();
+            if (maxPlayers != -1) {
+                GameInfoJFrame jframe = new GameInfoJFrame(gameNumber, maxPlayers);
+            } else {
+                JOptionPane.showMessageDialog(this, "You did't select the game! "
+                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -135,16 +136,17 @@ public class ServerInfoJFrame extends JFrame {
         }
     }
 
-    private void joinBot(int gameNumber) throws NetException {
-        IConnector connect = Connector.getInstance();
-        try {
-            connect.joinBotIntoGame(gameNumber);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Can not join bot to the game: \n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    private int getSelectedMaxPl() {
+        int result = -1;
+        if (table.getSelectedRow() != -1
+                && table.getValueAt(table.getSelectedRow(), 4) != null) {
+            result = Integer.parseInt(
+                    (String) table.getValueAt(table.getSelectedRow(), 4));
+            return result;
+        } else {
+            return result;
         }
     }
-
     private int getSelectedGame() {
         int result = -1;
         if (table.getSelectedRow() != -1
@@ -155,14 +157,6 @@ public class ServerInfoJFrame extends JFrame {
         } else {
             return result;
         }
-    }
-
-    private static void startMap() throws NetException {
-        IConnector connect = Connector.getInstance();
-        BombMap map = connect.getMap();
-        Model model = (Model) Model.getInstance();
-        model.setMap(map);
-        MapJFrame frame = new MapJFrame(map);
     }
 
     public static class RefreshAction extends AbstractAction {
@@ -200,7 +194,6 @@ public class ServerInfoJFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             try {
                 CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
-                parent.refreshTable();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -231,68 +224,32 @@ public class ServerInfoJFrame extends JFrame {
         }
     }
 
-    public static class AddBotAction extends AbstractAction {
-        ServerInfoJFrame parent;
-
-        public AddBotAction(ServerInfoJFrame jFrame) {
-            parent = jFrame;
-            putValue(NAME, "Add Bot");
-            putValue(SHORT_DESCRIPTION, "Add one bot to selected game");
-            putValue(SMALL_ICON, null);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            int gameNumber = parent.getSelectedGame();
-            if (gameNumber != -1) {
-                try {
-                    parent.joinBot(gameNumber);
-                    parent.refreshTable();
-                } catch (NetException ex) {
-                    JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    parent.dispose();
-                    StartJFrame jFrame = new StartJFrame();
-                }
-            } else {
-                JOptionPane.showMessageDialog(parent, "You did't select the game for bot! "
-                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
     private class MyTableModel extends AbstractTableModel {
-
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         Object[][] data = new Object[50][5];
 
         public int getRowCount() {
             return data.length;
         }
-
         public int getColumnCount() {
             return columnNames.length;
         }
-
         @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
-
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }
-
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
-
         @Override
         public void setValueAt(Object value, int row, int col) {
             data[row][col] = value;
             fireTableCellUpdated(row, col);
         }
-
         public void clear() {
             data = new Object[50][5];
         }
