@@ -187,13 +187,13 @@ public class Session extends Thread implements ISession {
                 break;//TODO
             }
             case CHAT_ADD_MSG: {
-                //"13"
-                sendAnswer("NOT SUPPORTED YET!"); //TODO
+                //"13 message"
+                addMessageToChat(queryArgs);
                 break;//TODO
             }
             case CHAT_GET_NEW_MSGS: {
                 //"14"
-                sendAnswer("NOT SUPPORTED YET!"); //TODO
+                getNewMessagesFromChat();
                 break;//TODO
             }
             default: {
@@ -484,7 +484,7 @@ public class Session extends Thread implements ISession {
             }
         } else { //if arguments!=2
             sendAnswer("Wrong query. Not enough arguments");
-            writeToLog("Tryed to download map. Canceled. Wrong query.");
+            writeToLog("Session: sendMap error. Client tryed to download map, canceled. Wrong query.");
             return;
         }
 
@@ -598,6 +598,39 @@ public class Session extends Thread implements ISession {
         }else{
             sendAnswer("Not joined to any game.");
             writeToLog("Session: sendGameInfo warning. Client tryed to get game info, canceled. Not joined to any game.");
+            return;
+        }
+    }
+
+    private void addMessageToChat(String[] queryArgs) {
+        if (queryArgs.length == 2) {
+            if (this.game != null) {
+                this.game.addMessageToChat(this.player, queryArgs[1]);
+                List<String> toSend = this.game.getNewMessagesFromChat(this.player);
+                sendAnswer(toSend);
+                writeToLog("Session: client added message to game chat. message=" + queryArgs[1]);
+                return;
+            } else {
+                sendAnswer("Not joined to any game.");
+                writeToLog("Session: addMessageToChat warning. Client tryed to add message, canceled. Not joined to any game.");
+                return;
+            }
+        } else {
+            sendAnswer("Wrong query. Not enough arguments");
+            writeToLog("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
+            return;
+        }
+    }
+
+    private void getNewMessagesFromChat() {
+        if (this.game != null) {
+            List<String> toSend = this.game.getNewMessagesFromChat(this.player);
+            sendAnswer(toSend);
+            writeToLog("Session: client getted new messages from chat. count=" + toSend.size());
+            return;
+        } else {
+            sendAnswer("Not joined to any game.");
+            writeToLog("Session: getNewMessagesFromChat warning. Client tryed to get messages, canceled. Not joined to any game.");
             return;
         }
     }

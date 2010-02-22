@@ -21,13 +21,13 @@ public class Game {
 
     private final IServer server;
     private Player owner;
-
     private final String gameName;
     private final int maxPlayers;
     private final IModel model;
     private final List<Player> players;
     private boolean started;
     private final DieListener dieListener;
+    private final Chat chat;
 
     public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
         this.server = server;
@@ -39,6 +39,7 @@ public class Game {
         } else {
             this.maxPlayers = mapMaxPlayers;
         }
+        this.chat = new Chat(this.maxPlayers);
 
         this.model = new Model(map, this);
         this.players = Collections.synchronizedList(new ArrayList<Player>());
@@ -47,7 +48,7 @@ public class Game {
         this.started = false;
     }
 
-    public void setOwner(Player owner){
+    public void setOwner(Player owner) {
         this.owner = owner;
     }
 
@@ -72,7 +73,7 @@ public class Game {
         Bot bot = null;
         if (this.players.size() < this.maxPlayers) {
             bot = this.model.addBot(name);
-            if (bot != null){
+            if (bot != null) {
                 this.players.add(bot);
                 bot.setDieListener(dieListener);
             }
@@ -80,7 +81,7 @@ public class Game {
         return bot;
     }
 
-    public Player getPlayer(int id) {
+    public Player getPlayer(int id) {//MUST BE USED ONLY AFTER GAME IS STARTED!!
         synchronized (players) {
             for (Player player : players) {
                 if (player.getID() == id) {
@@ -93,7 +94,9 @@ public class Game {
 
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
-        this.model.removePlayer(player.getID());
+        if (this.started) {//removing player from GameMap
+            this.model.removePlayer(player.getID());
+        }
         if (player == this.owner) {
             this.endGame();
         }
@@ -133,6 +136,25 @@ public class Game {
         return false;
     }
 
+    public void addMessageToChat(Player player, String message) {
+        synchronized (this.chat) {
+            int chatID = this.players.indexOf(player);
+            if (chatID != -1) {
+                this.chat.addMessage(maxPlayers, player.getNickName(), message);
+            }
+        }
+    }
+
+    public List<String> getNewMessagesFromChat(Player player){
+        synchronized(this.chat){
+            int chatID = this.players.indexOf(player);
+            if (chatID != -1) {
+                return this.chat.getNewMessages(chatID);
+            }
+        }
+        return null;
+    }
+
     public int[][] getMapArray() {
         return this.model.getMapArray();
     }
@@ -146,7 +168,7 @@ public class Game {
     }
 
     public boolean isFull() {
-        return (this.players.size()==this.maxPlayers ? true : false);
+        return (this.players.size() == this.maxPlayers ? true : false);
     }
 
     public String getName() {
@@ -161,7 +183,7 @@ public class Game {
         return this.maxPlayers;
     }
 
-    public List<Player> getCurrentPlayers(){
+    public List<Player> getCurrentPlayers() {
         return Collections.unmodifiableList(players);
     }
 
