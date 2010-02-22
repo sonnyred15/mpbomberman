@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view;
+package org.amse.bomberman.client.view.mapjframe;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -7,10 +7,6 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import org.amse.bomberman.client.Main;
-import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.net.IConnector;
-import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.net.impl.Connector.NetException;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -40,31 +36,6 @@ public class MapJFrameUtil {
             case 3: return new ImageIcon(cl.getResource(PL3_ICON_PATH));
             case 4: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
             default: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
-        }
-    }
-    public static class CheckTimerTask extends TimerTask {
-        MapJFrame parent;
-        public CheckTimerTask(MapJFrame jframe) {
-            parent = jframe;
-        }
-        @Override
-        public void run() {
-            IConnector connect = Connector.getInstance();
-            try {
-                if (connect.isStarted()) {
-                    Model.getInstance().addListener(parent);
-                    connect.beginUpdating();
-                    // block JMenuItem "Start"
-                    parent.getJMenuBar().getMenu(0).getItem(0).setEnabled(false);
-                    this.cancel();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } catch (NetException ex2) {
-                // is it good???
-                ex2.printStackTrace();
-                this.cancel();
-            }
         }
     }
     public static class MyJPanel extends JLabel {

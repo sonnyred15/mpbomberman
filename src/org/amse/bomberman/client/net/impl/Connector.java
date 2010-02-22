@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.amse.bomberman.client.model.BombMap;
@@ -40,21 +41,20 @@ public class Connector implements IConnector{
     public void сonnect(InetAddress address, int port) throws UnknownHostException, IOException {
         this.socket = new Socket(address, port);
     }
-    public void leaveGame() throws NetException{
+    public boolean leaveGame() throws NetException{
         // true stop timer?
         if (timer != null) {
             timer.cancel();
         }
         ArrayList<String> list = queryAnswer(""+Command.LEAVE_GAME.getValue());
         System.out.println(list.get(0));
-        System.out.println();
+        return (list.get(0).equals("Disconnected."));
     }
-    public ArrayList<String> takeGamesList() throws NetException{
+    public List<String> takeGamesList() throws NetException{
         ArrayList<String> games = queryAnswer(""+Command.GET_GAMES.getValue());
         for (String string : games) {
             System.out.println(string);
         }
-        System.out.println();
         return games;
     }
     /**
@@ -80,7 +80,6 @@ public class Connector implements IConnector{
         ArrayList<String> list = queryAnswer("2 " + n);
         String answer = list.get(0);
         System.out.println(answer);
-        System.out.println();
         if (answer.equals("Joined.")) {
             return true;
         } else throw new IOException(answer);
@@ -88,11 +87,12 @@ public class Connector implements IConnector{
     public boolean doMove(Direction dir) throws NetException {
         ArrayList<String> list = queryAnswer("3 " + dir.getValue());
         String res = list.get(0);
-        // if res == "true"
-        return (res.charAt(0) == 't');
+        return (res.equals("true"));
     }
-    public void startGame() throws NetException{
-        System.out.println(queryAnswer(""+Command.START_GAME.getValue()));
+    public boolean startGame() throws NetException{
+        List<String> list = queryAnswer(""+Command.START_GAME.getValue());
+        System.out.println(list);
+        return (list.get(0).equals("Game started."));
     }
     public void beginUpdating(){
          // must be here or somewhere else???
@@ -104,8 +104,10 @@ public class Connector implements IConnector{
         Parser parser = new Parser();
         return parser.parse(mp);
     }
-    public void plantBomb() throws NetException {
-        System.out.println(queryAnswer(""+Command.PLACE_BOMB.getValue()));
+    public boolean plantBomb() throws NetException {
+        List<String> list = queryAnswer(""+Command.PLACE_BOMB.getValue());
+        System.out.println(list.get(0));
+        return (list.get(0).equals("Ok."));
     }
     // if server has not any maps, return one String "No maps on server was founded."
     public String[] getMaps() throws NetException {
@@ -135,12 +137,18 @@ public class Connector implements IConnector{
         }
     }
     public boolean joinBotIntoGame(int n) throws IOException, NetException{
-        String answer = queryAnswer("11 " + n).get(0);
+        // bot name???!!!
+        String answer = queryAnswer("" + Command.ADD_BOT_TO_GAME.getValue()
+                +" "+n +" BOT!!!").get(0);
         System.out.println(answer);
-        System.out.println();
         if (answer.equals("Bot added.")) {
             return true;
         } else throw new IOException(answer);
+    }
+    // if you are nit joined to any games, return one String "Not joined to any game."
+    public List<String> getMyGameInfo() throws NetException{
+        List<String> answer = queryAnswer(""+Command.GET_MY_GAME_INFO.getValue());
+        return answer;
     }
 
     public InetAddress getInetAddress() {

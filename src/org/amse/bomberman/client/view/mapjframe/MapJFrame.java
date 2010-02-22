@@ -1,11 +1,10 @@
-package org.amse.bomberman.client.view;
+package org.amse.bomberman.client.view.mapjframe;
 
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.Timer;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -15,9 +14,11 @@ import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.view.MapJFrameUtil.CheckTimerTask;
-import org.amse.bomberman.client.view.MapJFrameUtil.MyJPanel;
-import org.amse.bomberman.util.*;
+import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.net.impl.Connector.NetException;
+import org.amse.bomberman.client.view.IView;
+import org.amse.bomberman.client.view.StartJFrame;
+import org.amse.bomberman.client.view.mapjframe.MapJFrameUtil.MyJPanel;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -27,70 +28,73 @@ import org.amse.bomberman.util.Constants.Direction;
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private JLabel livesJLabel;
-    private Timer timer;
     // is really nead???
     private boolean dead = false;
     private MapJFrameListener listener = new MapJFrameListener(this);
     private final int height = 600;
     private final int width = 500;
     // amount of cells at the one line on the Screen
-    private final int range;
+    private int range;
     private final int defaultRange = 10;
     // amount of cells at one line in the Full map
-    private final int size;
+    private int size;
     // Cell that is the most Left and Up at the screen
     private Cell LUCell;
     // Cell that is the most Right and Down at the screen
     private Cell RDCell;
     private Cell myCoord;
     
-    public MapJFrame(BombMap map) {
+    public MapJFrame() {
         super("BomberMan");
         setSize(width, height);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocation(400, 100);
         setMinimumSize(new Dimension(width / 2, height / 2));
-        size = map.getSize();
-        if (size < defaultRange) {
-            range = size;
-        } else {
-            range = defaultRange;
-        }
-        myCoord = Model.getInstance().getPlayerCoord();
-        
-        Container c = getContentPane();
-        c.setLayout(new FlowLayout(FlowLayout.CENTER,0,0));
-        livesJLabel = new JLabel("Lives: 0");
-        // ???
-        livesJLabel.setPreferredSize(new Dimension(width, 30));
-        livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        c.add(livesJLabel);
-        this.findEyeShot();
-        int num = map.getSize();
-        JPanel field = new JPanel();
-        field.setLayout(new GridLayout(range,range,0,0));
-        cells = new MyJPanel[range][range];
-        for (int i = 0; i < range; i++) {
-            for (int j = 0; j < range; j++) {
-                cells[i][j] = new MyJPanel(48);
-                cells[i][j].setContent(map.getValue(new Cell(i+LUCell.getX(),j+LUCell.getY())));
-                field.add(cells[i][j]);
+        BombMap map;
+        try {
+            map = Connector.getInstance().getMap();
+            size = map.getSize();
+            if (size < defaultRange) {
+                range = size;
+            } else {
+                range = defaultRange;
             }
+            myCoord = Model.getInstance().getPlayerCoord();
+
+            Container c = getContentPane();
+            c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            livesJLabel = new JLabel("Lives: 0");
+            // ???
+            livesJLabel.setPreferredSize(new Dimension(width, 30));
+            livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            c.add(livesJLabel);
+            this.findEyeShot();
+            int num = map.getSize();
+            JPanel field = new JPanel();
+            field.setLayout(new GridLayout(range, range, 0, 0));
+            cells = new MyJPanel[range][range];
+            for (int i = 0; i < range; i++) {
+                for (int j = 0; j < range; j++) {
+                    cells[i][j] = new MyJPanel(48);
+                    cells[i][j].setContent(map.getValue(new Cell(i + LUCell.getX(), j + LUCell.getY())));
+                    field.add(cells[i][j]);
+                }
+            }
+            c.add(field);
+            List<Cell> changes = Model.getInstance().getChanges();
+            //this.refresh(changes, map);
+            this.addKeyListener(listener);
+            this.setJMenuBar(new MapJMenuBar(this));
+
+            setResizable(true);
+            setVisible(true);
+        } catch (NetException ex) {
+             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+             StartJFrame jframe = new StartJFrame();
         }
-        c.add(field);
-        List<Cell> changes = Model.getInstance().getChanges();
-        //this.refresh(changes, map);
-        this.addKeyListener(listener);
-        this.setJMenuBar(new MapJMenuBar(this));
-
-        checkStart();
-        setResizable(true);
-        setVisible(true);
     }
 
-    public void stopWaitStart() {
-        timer.cancel();
-    }
     public void update() {
         IModel model = Model.getInstance();
         List<Cell> changes = model.getChanges();
@@ -173,10 +177,10 @@ public class MapJFrame extends JFrame implements IView{
             }
         }*/
     }
-    private void checkStart() {
+    /*private void checkStart() {
         timer = new Timer();
         timer.schedule(new CheckTimerTask(this), (long)0,(long) Constants.GAME_STEP_TIME);
-    }
+    }*/
     private void findEyeShot() {
         if (range >= size) {
             LUCell = new Cell(0,0);

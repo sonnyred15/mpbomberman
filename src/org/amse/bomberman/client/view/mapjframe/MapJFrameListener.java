@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view;
+package org.amse.bomberman.client.view.mapjframe;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
