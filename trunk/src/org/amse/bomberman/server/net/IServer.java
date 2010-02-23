@@ -6,7 +6,7 @@ package org.amse.bomberman.server.net;
 
 import java.io.IOException;
 import java.util.List;
-import org.amse.bomberman.server.LogChangeListener;
+import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 
 /**
@@ -41,5 +41,5 @@ public interface IServer {
 
     void writeToLog(String message);
 
-    void setLogListener(LogChangeListener logListener);
+    void setChangeListener(ServerChangeListener logListener);
 }

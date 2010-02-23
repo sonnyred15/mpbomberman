@@ -9,8 +9,10 @@ package org.amse.bomberman.server;
  *
  * @author Kirilchuk V.E
  */
-public interface LogChangeListener {
+public interface ServerChangeListener {
 
     void addedToLog(String line);
+
+    void switchedState(boolean started);
     
 }

@@ -13,7 +13,7 @@ import java.nio.channels.IllegalBlockingModeException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.amse.bomberman.server.LogChangeListener;
+import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
@@ -34,7 +34,7 @@ public class Server implements IServer {
     private final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
     private int sessionCounter = 0; //need to generate name of log files.   
     private long startTime;
-    private LogChangeListener logListener;
+    private ServerChangeListener changeListener;
     /**
      * Constructor with default port.
      */
@@ -77,6 +77,9 @@ public class Server implements IServer {
         }
 
         this.startTime = System.currentTimeMillis();
+        if(this.changeListener != null){
+            this.changeListener.switchedState(true);
+        }
         writeToLog("Server: started.");
     }
 
@@ -126,6 +129,9 @@ public class Server implements IServer {
             throw ex;
         }
 
+        if(this.changeListener != null){
+            this.changeListener.switchedState(false);
+        }
         writeToLog("Server: shutdowned.");
     }
 
@@ -203,8 +209,8 @@ public class Server implements IServer {
         writeToLog("Server: session removed.");
     }
 
-    public void setLogListener(LogChangeListener logListener) {
-        this.logListener = logListener;
+    public void setChangeListener(ServerChangeListener logListener) {
+        this.changeListener = logListener;
     }
 
     private class SocketListen implements Runnable {
@@ -273,8 +279,8 @@ public class Server implements IServer {
             log.println(message);
         }
 
-        if (logListener!=null){
-            logListener.addedToLog(message);
+        if (changeListener!=null){
+            changeListener.addedToLog(message);
         }
     }
 }
