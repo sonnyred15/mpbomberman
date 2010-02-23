@@ -136,12 +136,4 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
     public synchronized void clearLog() {
         log.setText("");
     }
-
-    public void initLogArea() {
-        //List<String> lines = server.getLog();
-        //for (String string : lines) {
-        //    addedToLog(string);
-        //}
-    }
-
 }

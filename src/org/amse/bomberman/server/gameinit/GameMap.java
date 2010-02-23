@@ -21,8 +21,7 @@ public final class GameMap {
     private final int dimension;
     private final int[][] mapArray;
     private final String mapName;
-    private final List<Pair> explosionSquares = new ArrayList<Pair>();
-    private final List<Bomb> bombs = new ArrayList<Bomb>();
+
     private int maxPlayers = Constants.MAX_PLAYERS;
 
     public GameMap(int[][] mapArray) { //CHECK < THIS// What if we get non square matrix???
@@ -66,10 +65,6 @@ public final class GameMap {
                 reader.close();
             }
         }
-    }
-
-    public List<Pair> getExplosionSquares() {
-        return explosionSquares;
     }
 
     public int[][] getMapArray() {
@@ -121,10 +116,6 @@ public final class GameMap {
         return (this.mapArray[x][y] == Constants.MAP_BOMB);
     }
 
-    public boolean isExplosion(Pair coords) {
-        return this.explosionSquares.contains(coords);
-    }
-
     /**
      *
      * @param x
@@ -147,34 +138,6 @@ public final class GameMap {
 
     public boolean isEmpty(int x, int y) {
         return this.mapArray[x][y] == Constants.MAP_EMPTY;
-    }
-
-    public void addBomb(Bomb bomb) {
-        this.bombs.add(bomb);
-        this.setSquare(bomb.getX(), bomb.getY(), Constants.MAP_BOMB);
-    }
-
-    public void addExplosions(List<Pair> explSq) {
-        this.explosionSquares.addAll(explSq);
-    }
-
-    public void detonateBomb(int x, int y) {
-        Bomb bombToDetonate = null;
-        for (Bomb bomb : bombs) {
-            if (bomb.getX() == x && bomb.getY() == y) {
-                bombToDetonate = bomb;
-                break;
-            }
-        }
-        bombToDetonate.detonate();
-    }
-
-    public void bombStartDetonating(Bomb bomb) {
-            this.bombs.remove(bomb);
-    }
-
-    void removeExplosion(Pair explosion) {
-        this.explosionSquares.remove(explosion);
     }
 
     //count maxPlayers for this mapArray.
