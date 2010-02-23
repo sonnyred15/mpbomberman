@@ -128,7 +128,7 @@ public class Connector implements IConnector{
     public boolean joinBotIntoGame(int n) throws NetException{
         // bot name???!!!
         String answer = queryAnswer("" + Command.ADD_BOT_TO_GAME.getValue()
-                +" "+n +" BOT!!!").get(0);
+                +" "+n +" BOT").get(0);
         System.out.println(answer);
         if (answer.equals("Bot added.")) {
             return true;

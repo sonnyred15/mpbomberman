@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,8 +39,11 @@ public class GameInfoJFrame extends JFrame implements IView{
     private JButton cancelJButton = new JButton();
     private Timer timer = new Timer();
     private final int width = 400;
-    private final int height = 300;
+    private final int height = 600;
+    private final Dimension defaultButton = new Dimension(100,20);
     private final long checkStartDelay = 50;
+    private final String emptyName = "EMPTY";
+    private final String closedName = "Closed";
 
     public GameInfoJFrame(int myNumber, int number) {
         super("GameInfo");
@@ -49,14 +53,20 @@ public class GameInfoJFrame extends JFrame implements IView{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(400, 150);
         setMinimumSize(new Dimension(width / 2, height / 2));
-        for (int i = 0; i < playersNum; i++) {
+        // add closed places or not???
+        for (int i = 0; i < Constants.MAX_PLAYERS; i++) {
             players[i] = new JLabel();
-            players[i].setBorder(new LineBorder(Color.DARK_GRAY));
             players[i].setHorizontalAlignment(SwingConstants.CENTER);
+            if (i >= playersNum) {
+                this.setPlayer(i, closedName);
+            }
         }
         startJButton.setAction(new StartAction(this));
+        startJButton.setPreferredSize(defaultButton);
         botJButton.setAction(new AddBotAction(this));
+        botJButton.setPreferredSize(defaultButton);
         cancelJButton.setAction(new CancelAction(this));
+        cancelJButton.setPreferredSize(defaultButton);
         try {
             List<String> gameInfo = Connector.getInstance().getMyGameInfo();
             if (gameInfo.get(0).equals("false")) {
@@ -64,27 +74,33 @@ public class GameInfoJFrame extends JFrame implements IView{
                 botJButton.setEnabled(false);
             }
             for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
-                players[i].setText(gameInfo.get(i+2));
+                this.setPlayer(i, gameInfo.get(i+2));
+            }
+            for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
+                this.setPlayer(i, emptyName);
             }
 
             JPanel leftPanel = new JPanel();
-            leftPanel.setLayout(new GridLayout(playersNum, 1, 10, 10));
-            leftPanel.setPreferredSize(new Dimension(100, 150));
-            for (int i = 0; i < playersNum; i++) {
+            leftPanel.setLayout(new GridLayout(Constants.MAX_PLAYERS, 1, 10, 10));
+            leftPanel.setPreferredSize(new Dimension(100, height - 100));
+            for (int i = 0; i < Constants.MAX_PLAYERS; i++) {
                 leftPanel.add(players[i]);
             }
-            JPanel rightPanel = new JPanel();
+            Box bottomBox = Box.createHorizontalBox();
             // how calculate sizes???
-            rightPanel.setPreferredSize(new Dimension(100, 80));
-            rightPanel.setLayout(new GridLayout(3, 1, 10, 10));
-            rightPanel.add(startJButton);
-            rightPanel.add(botJButton);
-            rightPanel.add(cancelJButton);
+            bottomBox.setPreferredSize(new Dimension(width, 25));
+            bottomBox.add(Box.createHorizontalGlue());
+            bottomBox.add(botJButton);
+            bottomBox.add(Box.createHorizontalGlue());
+            bottomBox.add(startJButton);
+            bottomBox.add(Box.createHorizontalGlue());
+            bottomBox.add(cancelJButton);
+            bottomBox.add(Box.createHorizontalGlue());
 
             Container c = this.getContentPane();
             c.setLayout(new FlowLayout());
             c.add(leftPanel);
-            c.add(rightPanel);
+            c.add(bottomBox);
 
             this.checkingStart();
             this.startUpdating();
@@ -100,14 +116,38 @@ public class GameInfoJFrame extends JFrame implements IView{
     public void update() {
         try {
             List<String> gameInfo = Connector.getInstance().getMyGameInfo();
-            for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
-                players[i].setText(gameInfo.get(i+2));
+            if (Integer.parseInt(gameInfo.get(1)) > 0) {
+                for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
+                    this.setPlayer(i, gameInfo.get(i+2));
+                }
+            }
+            for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
+                this.setPlayer(i, emptyName);
             }
         } catch (NetException ex) {
             this.stopTimers();
             this.dispose();
             StartJFrame jFrame = new StartJFrame();
         }
+    }
+    private void setPlayer(int id, String name) {
+        players[id].setText(name);
+        LineBorder border = null;
+        Color color = null;
+        if (name.equals(emptyName)) {
+            border = new LineBorder(Color.GRAY);
+            color = Color.GRAY;
+        } else {
+            if (name.equals(closedName)) {
+                border = new LineBorder(Color.LIGHT_GRAY);
+                color = Color.LIGHT_GRAY;
+            } else {
+                border = new LineBorder(Color.BLACK);
+                color = Color.BLACK;
+            }
+        }
+        players[id].setBorder(border);
+        players[id].setForeground(color);
     }
     public int getGameNumber() {
         return serverNumber;
@@ -168,8 +208,6 @@ public class GameInfoJFrame extends JFrame implements IView{
         public void actionPerformed(ActionEvent e) {
             try {
                 Connector.getInstance().joinBotIntoGame(parent.getGameNumber());
-                // refresh info of players
-                //parent.refreshTable();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -190,6 +228,10 @@ public class GameInfoJFrame extends JFrame implements IView{
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
+            try {
+                Connector.getInstance().leaveGame();
+            } catch (NetException ex) {
+            }
             parent.stopTimers();
             parent.dispose();
             ServerInfoJFrame jframe = new ServerInfoJFrame();
