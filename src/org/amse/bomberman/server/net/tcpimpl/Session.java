@@ -607,9 +607,13 @@ public class Session extends Thread implements ISession {
     }
 
     private void addMessageToChat(String[] queryArgs) {
-        if (queryArgs.length == 2) {
+        if (queryArgs.length < 2) {
             if (this.game != null) {
-                this.game.addMessageToChat(this.player, queryArgs[1]);
+                StringBuilder message = new StringBuilder();
+                for (int i = 0; i < queryArgs.length; ++i) {
+                    message.append(queryArgs[i]);
+                }
+                this.game.addMessageToChat(this.player, message.toString());
                 List<String> toSend = this.game.getNewMessagesFromChat(this.player);
                 sendAnswer(toSend);
                 writeToLog("Session: client added message to game chat. message=" + queryArgs[1]);
