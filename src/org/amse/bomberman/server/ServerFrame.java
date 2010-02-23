@@ -41,7 +41,7 @@ public class ServerFrame extends JFrame {
     public ServerFrame() {
 
         /*initial form properties*/
-        this.setTitle("server control");
+        super("server control");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(200, 100));
         this.setResizable(false);
@@ -95,26 +95,26 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText()); //throws NumberFormatException
 
-            if (port < 0 || port > 65535) {
-                throw new NumberFormatException(); //catching
-            }
-
             if (server == null) { //if it is first initialization
                 server = new Server(port);
                 info.setServer(server);
-                server.setLogListener(info);
+                server.setChangeListener(info);
             } else if (server.getPort() != port) { //if we want to raise server on new port
                 server.writeToLog("Raising server on new port");
                 server = new Server(port);                
                 info.setServer(server);
                 info.clearLog();
-                server.setLogListener(info);
+                server.setChangeListener(info);
             }
             server.start();
         } catch (NumberFormatException ex) { //parse errors
             showErrorMessage(ex.getMessage());
             return;
-        } catch (IOException ex) { //sockets errors. Server logging them.
+        } catch (IllegalArgumentException ex) { // wrong port(not in 0..65535)
+            showErrorMessage(ex.getMessage());
+            return;
+        }
+        catch (IOException ex) { //sockets errors. Server logging them.
             showErrorMessage(ex.getMessage());
             return;
         } catch (IllegalStateException ex) {//must never happen

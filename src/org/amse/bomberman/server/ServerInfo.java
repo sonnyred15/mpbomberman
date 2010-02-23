@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,7 +23,7 @@ import org.amse.bomberman.server.net.IServer;
  *
  * @author Kirilchuk V.E.
  */
-public class ServerInfo extends JFrame implements LogChangeListener {
+public class ServerInfo extends JFrame implements ServerChangeListener {
 
     private static final long serialVersionUID = 1L;
     private final String SHUTDOWNED_LABEL_TEXT = "Shutdowned: ";
@@ -35,6 +36,7 @@ public class ServerInfo extends JFrame implements LogChangeListener {
     private IServer server = null;
     private final JTextArea log = new JTextArea();
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> timerTaskControl;
     //
     private final JLabel labelShutdowned = new JLabel(SHUTDOWNED_LABEL_TEXT);
     private final JLabel labelPort = new JLabel(PORT_LABEL_TEXT);
@@ -46,7 +48,7 @@ public class ServerInfo extends JFrame implements LogChangeListener {
     public ServerInfo() {
 
         /*initial form properties*/
-        this.setTitle("server status");
+        super("server status");
         this.setDefaultCloseOperation(HIDE_ON_CLOSE);
         this.setMinimumSize(new Dimension(400, 300));
         this.setResizable(true);
@@ -76,16 +78,8 @@ public class ServerInfo extends JFrame implements LogChangeListener {
         //pack();
     }
 
-    public void setServer(IServer server) {
-        this.server = server;
-        timer.scheduleAtFixedRate(new Runnable() {
-
-            public void run() {
-                stateChanged();
-            }
-
-        }, 1000, 1000, TimeUnit.MILLISECONDS);
-        //initLogArea();
+    public void setServer(IServer server) {        
+        this.server = server;        
     }
 
     public void stateChanged() {
@@ -94,21 +88,44 @@ public class ServerInfo extends JFrame implements LogChangeListener {
             this.labelClients.setText(CLIENTS_LABEL_TEXT + this.server.getClientsNum());
             this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + this.server.isShutdowned());
 
-            List<Game> games = this.server.getGamesList();
-            int startedGamesCount = 0;
-            int unstartedGamesCount = 0;
-            for (Game game : games) {
-                if (game.isStarted()) {
-                    startedGamesCount++;
-                } else if (!game.isStarted()) {
-                    unstartedGamesCount++;
-                }
-            }
+            if (!this.server.isShutdowned()) {
 
-            this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT + startedGamesCount);
-            this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT + unstartedGamesCount);
-            this.labelTime.setText(TIME_LABEL_TEXT + this.server.getWorkTime());
+                List<Game> games = this.server.getGamesList();
+                int startedGamesCount = 0;
+                int unstartedGamesCount = 0;
+                for (Game game : games) {
+                    if (game.isStarted()) {
+                        startedGamesCount++;
+                    } else if (!game.isStarted()) {
+                        unstartedGamesCount++;
+                    }
+                }
+
+                this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT + startedGamesCount);
+                this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT + unstartedGamesCount);
+                this.labelTime.setText(TIME_LABEL_TEXT + this.server.getWorkTime());
+            } else {
+                this.labelStartedGames.setText(this.labelStartedGames.getText() + "(was)");
+                this.labelUnstartedGames.setText(this.labelUnstartedGames.getText() + "(was)");
+            }
         }
+    }
+
+    public void switchedState(boolean started) {
+        if (!started) {
+            if (this.timerTaskControl != null) { //canceling previous task
+                this.timerTaskControl.cancel(false);
+            }
+        } else {
+            this.timerTaskControl = timer.scheduleAtFixedRate(new Runnable() {
+
+                public void run() {
+                    stateChanged();
+                }
+            }, 1000, 1000, TimeUnit.MILLISECONDS);
+        }
+
+        stateChanged();
     }
 
     public synchronized void addedToLog(String line) {
