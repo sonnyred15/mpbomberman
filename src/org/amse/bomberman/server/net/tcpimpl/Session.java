@@ -607,7 +607,7 @@ public class Session extends Thread implements ISession {
     }
 
     private void addMessageToChat(String[] queryArgs) {
-        if (queryArgs.length < 2) {
+        if (queryArgs.length >= 2) {
             if (this.game != null) {
                 StringBuilder message = new StringBuilder();
                 for (int i = 0; i < queryArgs.length; ++i) {
