@@ -16,6 +16,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import org.amse.bomberman.client.model.IModel;
@@ -37,6 +40,9 @@ public class GameInfoJFrame extends JFrame implements IView{
     private JButton startJButton = new JButton();
     private JButton botJButton = new JButton();
     private JButton cancelJButton = new JButton();
+    private JButton chatJButton = new JButton();
+    private JTextArea chatTA = new JTextArea();
+    private JTextField messageTF = new JTextField();
     private Timer timer = new Timer();
     private final int width = 400;
     private final int height = 600;
@@ -86,6 +92,21 @@ public class GameInfoJFrame extends JFrame implements IView{
             for (int i = 0; i < Constants.MAX_PLAYERS; i++) {
                 leftPanel.add(players[i]);
             }
+
+            JPanel rightPanel = new JPanel(new FlowLayout());
+            rightPanel.setPreferredSize(new Dimension(250, height - 100));
+            JPanel chatPanel = new JPanel(new GridLayout());
+            chatPanel.setPreferredSize(new Dimension(240, height - 150));
+            chatPanel.add(new JScrollPane(chatTA));
+            chatTA.setEditable(false);
+            chatTA.setLineWrap(true);
+            messageTF.setPreferredSize(new Dimension(150, 25));
+            chatJButton.setPreferredSize(new Dimension(85,25));
+            chatJButton.setAction(new ChatAction(this));
+            rightPanel.add(chatPanel);
+            rightPanel.add(messageTF);
+            rightPanel.add(chatJButton);
+
             Box bottomBox = Box.createHorizontalBox();
             // how calculate sizes???
             bottomBox.setPreferredSize(new Dimension(width, 25));
@@ -100,6 +121,7 @@ public class GameInfoJFrame extends JFrame implements IView{
             Container c = this.getContentPane();
             c.setLayout(new FlowLayout());
             c.add(leftPanel);
+            c.add(rightPanel);
             c.add(bottomBox);
 
             this.checkingStart();
@@ -149,10 +171,20 @@ public class GameInfoJFrame extends JFrame implements IView{
         players[id].setBorder(border);
         players[id].setForeground(color);
     }
-    public int getGameNumber() {
+    private int getGameNumber() {
         return serverNumber;
     }
-    public void stopTimers() {
+    private String getMessage() {
+        String message = messageTF.getText();
+        messageTF.setText("");
+        return message;
+    }
+    private void setNewMessages(List<String> messages) {
+        for (String message: messages) {
+            chatTA.append(message + "\n");
+        }
+    }
+    private void stopTimers() {
         timer.cancel();
     }
     private void checkingStart() {
@@ -231,10 +263,37 @@ public class GameInfoJFrame extends JFrame implements IView{
             try {
                 Connector.getInstance().leaveGame();
             } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
+                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             parent.stopTimers();
             parent.dispose();
             ServerInfoJFrame jframe = new ServerInfoJFrame();
+        }
+    }
+    public static class ChatAction extends AbstractAction{
+        GameInfoJFrame parent;
+        public ChatAction(GameInfoJFrame jframe){
+            parent = jframe;
+            putValue(NAME, "Send");
+            putValue(SMALL_ICON, null);
+        }
+        public void actionPerformed(ActionEvent e) {
+            try {
+                String message = parent.getMessage();
+                if (message.length() > 0) {
+                    List<String> list = Connector.getInstance().sendChatMessage
+                            (message);
+                    parent.setNewMessages(list);
+                }
+            } catch (NetException ex) {
+                JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
+                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.stopTimers();
+                parent.dispose();
+                ServerInfoJFrame jframe = new ServerInfoJFrame();
+            }
+            
         }
     }
     private class StartTimerTask extends TimerTask{

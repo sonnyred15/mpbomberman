@@ -139,6 +139,15 @@ public class Connector implements IConnector{
         List<String> answer = queryAnswer(""+Command.GET_MY_GAME_INFO.getValue());
         return answer;
     }
+    public List<String> sendChatMessage(String message) throws NetException {
+        List<String> answer = queryAnswer(""+Command.CHAT_ADD_MSG.getValue()
+                + " " + message);
+        return answer;
+    }
+    public List<String> getNewChatMessages() throws NetException {
+        List<String> answer = queryAnswer(""+Command.CHAT_GET_NEW_MSGS.getValue());
+        return answer;
+    }
 
     public InetAddress getInetAddress() {
         return socket.getInetAddress();
