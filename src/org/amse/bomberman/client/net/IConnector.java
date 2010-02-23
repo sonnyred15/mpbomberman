@@ -26,10 +26,11 @@ public interface IConnector {
      public BombMap getMap() throws NetException;
      public boolean plantBomb() throws NetException;
      public boolean joinBotIntoGame(int gameNumber) throws NetException;
-     // must be here???
      public String[] getMaps() throws NetException;
      public boolean isStarted() throws NetException;
      public List<String> getMyGameInfo() throws NetException;
+     public List<String> sendChatMessage(String message) throws NetException;
+     public List<String> getNewChatMessages() throws NetException;
      public InetAddress getInetAddress();
      public int getPort();
      public void beginUpdating() throws NetException;
