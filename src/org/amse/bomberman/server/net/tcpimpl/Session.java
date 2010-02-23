@@ -110,14 +110,18 @@ public class Session extends Thread implements ISession {
         try {
 
             int command = Integer.parseInt(queryArgs[0]);
-            cmd = Command.fromInt(command);
+            cmd = Command.fromInt(command); //throws IllegalArgumentException
 
         } catch (NumberFormatException ex) {
+            sendAnswer("Wrong query.");
             writeToLog("Session: answerOnCommand error. Wrong first part of query. "
                     + "Wrong query from client. " + ex.getMessage());
+            return;
         } catch (IllegalArgumentException ex) {
+            sendAnswer("Wrong query. Not supported command.");
             writeToLog("Session: answerOnCommand error. Non supported command int from client. "
                     + ex.getMessage());
+            return;
         }
 
         switch (cmd) {
@@ -197,8 +201,8 @@ public class Session extends Thread implements ISession {
                 break;//TODO
             }
             default: {
-                sendAnswer("Wrong query. Unrecognized command!");
-                writeToLog("Session: answerOnCommand warning. Getted wrong query. Unrecognized.");
+                sendAnswer("Unrecognized command!");
+                writeToLog("Session: answerOnCommand error. Getted unrecognized command.");
             }
         }
     }
