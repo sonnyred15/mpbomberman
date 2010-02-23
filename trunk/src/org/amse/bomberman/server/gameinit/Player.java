@@ -18,12 +18,12 @@ public class Player {
     private int lives = 3;
     private int id = 1;
     
-    private Pair position = new Pair();
+    private Pair position;
     
     private int explRadius = 2; //for better testing :))
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
-    private int maxBombs = Constants.PLAYER_MAX_BOMBS; //for better testing :))
+    private int maxBombs = Constants.PLAYER_MAX_BOMBS;
 
     public Player() {
     }
@@ -50,7 +50,7 @@ public class Player {
         return (this.lives > 0);
     }
 
-    public boolean canPlaceBomb() {
+    public boolean canPlaceBomb() {//CHECK THIS is deadLock possible by isAlive lock?
         synchronized (BOMBS_LOCK) {
             return ((this.bombs < this.maxBombs) && isAlive());
         }

@@ -23,6 +23,14 @@ public class Pair {
         this.y = y;
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public int getX() {
         return this.x;
     }
@@ -41,6 +49,14 @@ public class Pair {
         }
         Pair pair = (Pair) obj;
         return ((this.x == pair.x) && (this.y == pair.y));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + this.x;
+        hash = 97 * hash + this.y;
+        return hash;
     }
 
     @Override

@@ -21,9 +21,7 @@ public class Bomb {
     private final Player player;
     private final GameMap map;
     private final ScheduledExecutorService timer;
-
-    private final Pair bombPosition;
-
+    private final Pair position; //still can change position by this.position methods.
     private final int radius;
     private boolean wasDetonated = false;
 
@@ -33,21 +31,29 @@ public class Bomb {
         this.map = map;
         this.timer = timer;
 
-        this.bombPosition = bombPosition;
+        this.position = bombPosition;
         this.radius = this.player.getRadius();
 
         this.player.placedBomb();
-        this.map.addBomb(this);
+        this.model.addBomb(this);
         timer.schedule(new DetonateTask(),
-                            Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
+                Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
+    }
+
+    public void setX(int x){
+        this.position.setX(x);
+    }
+
+    public void setY(int y){
+       this.position.setY(y);
     }
 
     public int getX() {
-        return bombPosition.getX();
+        return position.getX();
     }
 
     public int getY() {
-        return bombPosition.getY();
+        return position.getY();
     }
 
     public void detonate() {
@@ -57,24 +63,23 @@ public class Bomb {
         }
 
         this.wasDetonated = true;
-        this.map.bombStartDetonating(this);
-        map.setSquare(getX(), getY(), Constants.MAP_DETONATED_BOMB);
+        this.model.bombStartDetonating(this);        
 
         ArrayList<Pair> explosions = new ArrayList<Pair>();
 
         //if player still staying in bomb square.
-        if (this.player.getPosition().equals(this.bombPosition)) {
-            this.player.bombed();
+        if (this.player.getPosition().equals(this.position)) {
+            this.model.playerBombed(this.player, this.player);
         }
 
-        
         //explosion lines
         int i; // common iterator
         int k; // common radius counter
         boolean contin; //common continue boolean
 
-        int bombX = getX();
-        int bombY = getY();
+        int bombX = this.position.getX();
+        int bombY = this.position.getY();
+
         //uplines
         k = radius;
         for (i = bombX - 1; (i >= 0 && k > 0); --i, --k) {
@@ -115,7 +120,7 @@ public class Bomb {
             }
         }
 
-        this.map.addExplosions(explosions); //add explosions to map
+        this.model.addExplosions(explosions); //add explosions to model
         this.player.detonatedBomb();
         timer.schedule(new ClearExplosionTask(explosions, new Pair(bombX, bombY), this.player), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
     }
@@ -124,7 +129,7 @@ public class Bomb {
     //false if we must break cycle;
     private boolean explodeSquare(int x, int y) {
         if (map.isEmpty(x, y)) {
-            if (map.isExplosion(new Pair(x, y))) {     //explosion
+            if (this.model.isExplosion(new Pair(x, y))) {     //explosion
                 return true;
             }
             return true;                                         //emptySquare
@@ -138,10 +143,10 @@ public class Bomb {
             return false;
         } else if (map.playerIdAt(x, y) != -1) {                 //playerSquare
             int id = map.playerIdAt(x, y);
-            this.model.playerBombed(id);
+            this.model.playerBombed(this.player, id);
             return false;
         } else if (map.isBomb(x, y)) {                           //another bomb
-            map.detonateBomb(x,y);
+            this.model.detonateBomb(x, y);
             return false;
         }
 
@@ -159,7 +164,7 @@ public class Bomb {
         }
     }
 
-        private class ClearExplosionTask implements Runnable {
+    private class ClearExplosionTask implements Runnable {
 
         private final Pair bombToClear;
         private final List<Pair> explSqToClear;
@@ -179,9 +184,8 @@ public class Bomb {
                 map.setSquare(bombToClear.getX(), bombToClear.getY(), Constants.MAP_EMPTY); //clear from map
             }
             for (Pair pair : explSqToClear) { // clear from explosions list
-                map.removeExplosion(pair);
+                model.removeExplosion(pair);
             }
         }
     }
-
 }

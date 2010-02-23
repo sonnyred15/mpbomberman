@@ -32,6 +32,8 @@ public class Model implements IModel {
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private final List<Thread> bots = new ArrayList<Thread>();
     //private final List<DetonateControl> detonateControls;
+    private final List<Pair> explosionSquares = new ArrayList<Pair>();
+    private final List<Bomb> bombs = new ArrayList<Bomb>();
 
     /**
      * Constructor of Model.
@@ -40,7 +42,7 @@ public class Model implements IModel {
      */
     public Model(GameMap map, Game game) {
         this.map = map;
-        this.game = game;        
+        this.game = game;
     }
 
     /**
@@ -56,7 +58,7 @@ public class Model implements IModel {
      * @return List of explosions
      */
     public List<Pair> getExplosionSquares() {
-        return this.map.getExplosionSquares();
+        return this.explosionSquares;
     }
 
     /**
@@ -129,7 +131,7 @@ public class Model implements IModel {
         this.map.setSquare(newX, newY, player.getID());
 
         //if player is making move to explosion zone.
-        if (this.map.isExplosion(new Pair(newX, newY))) {
+        if (isExplosion(new Pair(newX, newY))) {
             player.bombed();
         }
 
@@ -149,6 +151,10 @@ public class Model implements IModel {
 
     private boolean isMoveToReserved(int x, int y) {//note that on explosions isEmpty = true!!!
         return (this.map.isEmpty(x, y)) ? false : true;
+    }
+
+    public boolean isExplosion(Pair coords) {
+        return this.explosionSquares.contains(coords);
     }
 
     private int[] newCoords(Pair currentPosition, Direction direction) { //whats about catch illegalArgumentException???
@@ -182,6 +188,35 @@ public class Model implements IModel {
         }
 
         return arr;
+    }
+
+    public void addExplosions(List<Pair> explSq) {
+        this.explosionSquares.addAll(explSq);
+    }
+
+    public void addBomb(Bomb bomb) {
+        this.bombs.add(bomb);
+        this.map.setSquare(bomb.getX(), bomb.getY(), Constants.MAP_BOMB);
+    }
+
+    public void detonateBomb(int x, int y) {
+        Bomb bombToDetonate = null;
+        for (Bomb bomb : bombs) {
+            if (bomb.getX() == x && bomb.getY() == y) {
+                bombToDetonate = bomb;
+                break;
+            }
+        }
+        bombToDetonate.detonate();
+    }
+
+    public void bombStartDetonating(Bomb bomb) {
+        this.bombs.remove(bomb);
+        this.map.setSquare(bomb.getX(), bomb.getY(), Constants.MAP_DETONATED_BOMB);
+    }
+
+    public void removeExplosion(Pair explosion) {
+        this.explosionSquares.remove(explosion);
     }
 
     /**
@@ -228,22 +263,21 @@ public class Model implements IModel {
                     if (this.map.isBomb(x, y)) {
                         return; //if player staying under the bomb
                     }
-                    Bomb bomb = new Bomb(this, player, map, new Pair(x, y) , timer);
+                    Bomb bomb = new Bomb(this, player, map, new Pair(x, y), timer);
                 }
             }
         }
     }
 
-    public void playerBombed(int id){
-        game.getPlayer(id).bombed();
+    public void playerBombed(Player atacker, int victimID) {
+        Player victim = game.getPlayer(victimID);
+        victim.bombed();
+        this.game.addMessageToChat(victim, "was bombed by " + atacker.getNickName());
     }
 
-    /**
-     * Return name of GameMap of this Model.
-     * @return Name of GameMap in String
-     */
-    public String getMapName() {
-        return this.map.getName();
+    public void playerBombed(Player atacker, Player victim){
+        victim.bombed();
+        this.game.addMessageToChat(victim, "was bombed by " + atacker.getNickName());
     }
 
     public Bot addBot(String name) {
@@ -254,13 +288,9 @@ public class Model implements IModel {
         return bot;
     }
 
-    public void removeBot(Bot bot){
+    public void removeBot(Bot bot) {
         this.game.disconnectFromGame(bot);
-        //this.bots.remove(bot); //TO DO //bot is PLAYER and bots store THREADS!!!! remove always false!
-    }
-
-    public GameMap getMap() {
-        return map;
+    //this.bots.remove(bot); //TO DO //bot is PLAYER and bots store THREADS!!!! remove always false!
     }
 
     public void startBots() {
@@ -268,6 +298,17 @@ public class Model implements IModel {
             thread.start();
         }
     }
-    
+
+    /**
+     * Return name of GameMap of this Model.
+     * @return Name of GameMap in String
+     */
+    public String getMapName() {
+        return this.map.getName();
+    }
+
+    public GameMap getMap() {
+        return map;
+    }
 
 }

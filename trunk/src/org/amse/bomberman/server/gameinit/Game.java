@@ -120,6 +120,7 @@ public class Game {
             ++i;
         }
         this.started = true;
+        this.chat.clear();
         this.model.startBots();
     }
 
