@@ -20,24 +20,8 @@ import org.amse.bomberman.server.net.IServer;
 public class Creator {
 
     public static String[] createMapsList() {
-        String[] maps = null;
-        try {
-            maps = new File(".").list(new FilenameFilter() {
-
-                public boolean accept(File dir, String name) {
-                    if (name.endsWith(".map")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            });
-        } catch (SecurityException ex) {
-            System.out.println(ex.getMessage() +
-                    " Can`t read files in directory. Acess denied");
-        } catch (NullPointerException ex){
-            System.out.println(ex.getMessage());
-        }
+        String[] maps = new String[Constants.maps.size()];
+        maps = Constants.maps.toArray(maps);
         return maps;
     }
 

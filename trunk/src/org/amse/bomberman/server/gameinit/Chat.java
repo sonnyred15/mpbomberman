@@ -34,6 +34,10 @@ public class Chat {
         }
         this.lastTakedMessageIndexes[chatID] = this.messages.size();
 
+        if(result.size()==0){
+            result.add("No new messages.");
+        }
+
         return result;
     }
 

@@ -1,5 +1,8 @@
 package org.amse.bomberman.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Kirilchuk V.E
@@ -29,6 +32,14 @@ public final class Constants {
     public static final int DEFAULT_CLIENT_TIMEOUT = 60000;
     
     public static final String DEFAULT_FILE_LOG_NAME = "server.log";
+
+    public static final List<String> maps = new ArrayList<String>(3);
+
+    static {
+        maps.add("1.map");
+        maps.add("19.map");
+        maps.add("2.map");
+    }
 
     public static enum Direction {
 

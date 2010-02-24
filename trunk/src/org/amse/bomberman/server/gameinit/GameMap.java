@@ -6,10 +6,11 @@ package org.amse.bomberman.server.gameinit;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import org.amse.bomberman.server.Main;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -38,9 +39,16 @@ public final class GameMap {
      * @throws java.io.IOException if an error occurs while reading from file.
      */
     public GameMap(String fileName) throws FileNotFoundException, IOException {
+        InputStream is = Main.class.getResourceAsStream("/org/amse/bomberman/server/resources/" + fileName);
+        if(is==null){
+            throw new FileNotFoundException("null returned by getResourceAsStream." + fileName);
+        }
+        InputStreamReader isr = new InputStreamReader(is);
+
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(fileName));
+            //reader = new BufferedReader(new FileReader(fileName));
+            reader = new BufferedReader(isr);
             int buf = Integer.parseInt(reader.readLine());
             this.dimension = buf;
 
