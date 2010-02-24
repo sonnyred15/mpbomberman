@@ -195,7 +195,6 @@ public class Connector implements IConnector{
             IModel model = Model.getInstance();
             try {
                 model.setMap(getMap());
-                //System.out.println("Map has been updated.");
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();
