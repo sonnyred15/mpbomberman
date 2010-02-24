@@ -33,12 +33,13 @@ public final class Constants {
     
     public static final String DEFAULT_FILE_LOG_NAME = "server.log";
 
-    public static final List<String> maps = new ArrayList<String>(3);
+    public static final List<String> maps = new ArrayList<String>(4);
 
     static {
         maps.add("1.map");
-        maps.add("19.map");
         maps.add("2.map");
+        maps.add("16.map");
+        maps.add("19.map");
     }
 
     public static enum Direction {

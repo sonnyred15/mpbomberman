@@ -26,22 +26,22 @@ public class MapJFrameListener implements KeyListener{
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT: {
                     connector.doMove(Direction.LEFT);
-                    parent.tryScroll(Direction.LEFT);
+                    //parent.tryScroll(Direction.LEFT);
                     break;
                 }
                 case KeyEvent.VK_UP: {
                     connector.doMove(Direction.UP);
-                    parent.tryScroll(Direction.UP);
+                    //parent.tryScroll(Direction.UP);
                     break;
                 }
                 case KeyEvent.VK_RIGHT: {
                     connector.doMove(Direction.RIGHT);
-                    parent.tryScroll(Direction.RIGHT);
+                    //parent.tryScroll(Direction.RIGHT);
                     break;
                 }
                 case KeyEvent.VK_DOWN: {
                     connector.doMove(Direction.DOWN);
-                    parent.tryScroll(Direction.DOWN);
+                    //parent.tryScroll(Direction.DOWN);
                     break;
                 }
                 case KeyEvent.VK_SPACE: {

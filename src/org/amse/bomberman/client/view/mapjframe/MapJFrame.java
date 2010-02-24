@@ -43,6 +43,7 @@ public class MapJFrame extends JFrame implements IView{
     // Cell that is the most Right and Down at the screen
     private Cell RDCell;
     private Cell myCoord;
+    private final int step = 2;
     
     public MapJFrame() {
         super("BomberMan");
@@ -76,13 +77,11 @@ public class MapJFrame extends JFrame implements IView{
             for (int i = 0; i < range; i++) {
                 for (int j = 0; j < range; j++) {
                     cells[i][j] = new MyJPanel(48);
-                    cells[i][j].setContent(map.getValue(new Cell(i + LUCell.getX(), j + LUCell.getY())));
+                    cells[i][j].setContent(map.getValue(parseToRealCoord(new Cell(i,j))));
                     field.add(cells[i][j]);
                 }
             }
             c.add(field);
-            List<Cell> changes = Model.getInstance().getChanges();
-            //this.refresh(changes, map);
             this.addKeyListener(listener);
             this.setJMenuBar(new MapJMenuBar(this));
 
@@ -97,10 +96,26 @@ public class MapJFrame extends JFrame implements IView{
 
     public void update() {
         IModel model = Model.getInstance();
-        List<Cell> changes = model.getChanges();
+        myCoord = model.getPlayerCoord();
+        int x = myCoord.getX();
+        int y = myCoord.getY();
         BombMap newMap = model.getMap();
+        if ((x - step < LUCell.getX() && LUCell.getX() > 0)
+            || (x+step > RDCell.getX() && RDCell.getX() < size-1)
+            || (y-step < LUCell.getY() && LUCell.getY() > 0)
+            || (y+step > RDCell.getY() && RDCell.getY() < size-1))  {
+            this.findEyeShot();
+            for (int i = 0; i < range; i++) {
+                for (int j = 0; j < range; j++) {
+                    cells[i][j].setContent(newMap.getValue(parseToRealCoord
+                            (new Cell(i,j))));
+                }
+            }
+        } else {
+            List<Cell> changes = model.getChanges();
+            this.refresh(changes, newMap);
+        }
         int lives = model.getPlayerLives();
-        this.refresh(changes, newMap);
         this.refreshLives(lives);
         if (lives <= 0) {
             if (!dead) {
@@ -135,8 +150,22 @@ public class MapJFrame extends JFrame implements IView{
             }
         }
     }
-    public void tryScroll(Direction direct) {
-        /*if (range >= size) {
+    private Cell parseToRealCoord(Cell myCell) {
+        Cell result;
+        int x = myCell.getX() + LUCell.getX();
+        int y = myCell.getY() + LUCell.getY();
+        result = new Cell(x,y);
+        return result;
+    }
+    private Cell parseToMyCoord(Cell realCell) {
+        Cell result;
+        int x = realCell.getX() - LUCell.getX();
+        int y = realCell.getX() - LUCell.getY();
+        result = new Cell(x,y);
+        return result;
+    }
+    /*public void tryScroll(Direction direct) {
+        if (range >= size) {
             return;
         }
         BombMap map = Model.getInstance().getMap();
@@ -175,11 +204,7 @@ public class MapJFrame extends JFrame implements IView{
                 throw new UnsupportedOperationException("Incorrect value of direction:"
                         + direct.toString());
             }
-        }*/
-    }
-    /*private void checkStart() {
-        timer = new Timer();
-        timer.schedule(new CheckTimerTask(this), (long)0,(long) Constants.GAME_STEP_TIME);
+        }
     }*/
     private void findEyeShot() {
         if (range >= size) {
@@ -193,12 +218,20 @@ public class MapJFrame extends JFrame implements IView{
             if (myCoord.getX() <= (range-1)/2) {
                 x1 = 0;
             } else {
-                x1 = myCoord.getX() - (range-1)/2;
+                if (myCoord.getX() >=(size-1)-(range-1)/2) {
+                    x1 = size - range;
+                } else {
+                    x1 = myCoord.getX() - (range-1)/2;
+                }
             }
             if (myCoord.getY() <= (range-1)/2) {
                 y1 = 0;
             } else {
-                y1 = myCoord.getY() - (range-1)/2;
+                if (myCoord.getY() >= (size-1)-(range-1)/2) {
+                    y1 = size - range;
+                } else {
+                    y1 = myCoord.getY() - (range-1)/2;
+                }
             }
             x2 = x1 + range - 1;
             y2 = y1 + range - 1;
