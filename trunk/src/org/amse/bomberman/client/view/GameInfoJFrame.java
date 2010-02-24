@@ -47,7 +47,7 @@ public class GameInfoJFrame extends JFrame implements IView{
     private final int width = 400;
     private final int height = 600;
     private final Dimension defaultButton = new Dimension(100,20);
-    private final long checkStartDelay = 50;
+    private final long checkStartDelay = 150;
     private final String emptyName = "EMPTY";
     private final String closedName = "Closed";
 
@@ -124,7 +124,6 @@ public class GameInfoJFrame extends JFrame implements IView{
             c.add(rightPanel);
             c.add(bottomBox);
 
-            this.checkingStart();
             this.startUpdating();
             setResizable(false);
             setVisible(true);
@@ -146,8 +145,10 @@ public class GameInfoJFrame extends JFrame implements IView{
             for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
                 this.setPlayer(i, emptyName);
             }
-            //List<String> messages = Connector.getInstance().getNewChatMessages();
-            //this.setNewMessages(messages);
+            List<String> messages = Connector.getInstance().getNewChatMessages();
+            if (!messages.get(0).equals("No new messages.")) {
+                this.setNewMessages(messages);
+            }
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -190,9 +191,6 @@ public class GameInfoJFrame extends JFrame implements IView{
     }
     private void stopTimers() {
         timer.cancel();
-    }
-    private void checkingStart() {
-        timer.schedule(new StartTimerTask(), (long)0, checkStartDelay);
     }
     private void startUpdating() {
         timer.schedule(new UpdateTimerTask(), (long)0, checkStartDelay);
@@ -300,12 +298,12 @@ public class GameInfoJFrame extends JFrame implements IView{
             
         }
     }
-    private class StartTimerTask extends TimerTask{
+    private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
-            IConnector connector = Connector.getInstance();
+            update();
             try {
-                boolean flag = connector.isStarted();
+                boolean flag = Connector.getInstance().isStarted();
                 if (flag) {
                     this.cancel();
                     startGame();
@@ -313,14 +311,10 @@ public class GameInfoJFrame extends JFrame implements IView{
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();
+                stopTimers();
+                dispose();
                 this.cancel();
             }
-        }
-    }
-    private class UpdateTimerTask extends TimerTask {
-        @Override
-        public void run() {
-            update();
         }
     }
 }
