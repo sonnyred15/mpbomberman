@@ -146,7 +146,11 @@ public class GameInfoJFrame extends JFrame implements IView{
             for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
                 this.setPlayer(i, emptyName);
             }
+            //List<String> messages = Connector.getInstance().getNewChatMessages();
+            //this.setNewMessages(messages);
         } catch (NetException ex) {
+            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.stopTimers();
             this.dispose();
             StartJFrame jFrame = new StartJFrame();
