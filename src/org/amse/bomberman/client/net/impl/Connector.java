@@ -175,7 +175,6 @@ public class Connector implements IConnector{
                 }
                 answer.add(oneLine);
             }
-            //System.out.println("Client: Answer received.");
         } catch (IOException e) {
             e.printStackTrace();
             throw new NetException();
