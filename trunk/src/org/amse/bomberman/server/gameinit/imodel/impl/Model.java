@@ -13,6 +13,7 @@ import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.MoveableMapObject;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.gameinit.bot.RandomFullBotStrategy;
@@ -102,15 +103,27 @@ public class Model implements IModel {
      * @param direction Direction of move
      * @return true if player moved, false otherwise
      */
-    public boolean doMove(Player player, Direction direction) {//CHECK THIS
+    public boolean doMove(MoveableMapObject objectToMove, Direction direction) {//CHECK THIS
         synchronized (map) {
-            synchronized (player) {
-                int arr[] = newCoords(player.getPosition(), direction);
+            synchronized (objectToMove) {
+                int arr[] = newCoords(objectToMove.getPosition(), direction);
                 int newX = arr[0];
                 int newY = arr[1];
                 if (!isOutMove(newX, newY)) {
+
+                    if(this.map.isBomb(newX, newY)){
+                        Bomb bombToMove = null;
+                        for (Bomb bomb : bombs) {
+                            if(bomb.getPosition().equals(new Pair(newX, newY))){
+                                bombToMove = bomb;
+                                break;
+                            }
+                        }
+                        doMove(bombToMove, direction);
+                    }
+
                     if (!isMoveToReserved(newX, newY)) {
-                        makeMove(player, newX, newY);
+                        makeMove(objectToMove, newX, newY);
                         return true;
                     }
                 }
@@ -119,23 +132,30 @@ public class Model implements IModel {
         }
     }
 
-    private void makeMove(Player player, int newX, int newY) {
-        int x = player.getPosition().getX();
-        int y = player.getPosition().getY();
+    private void makeMove(MoveableMapObject objectToMove, int newX, int newY) {
+        int x = objectToMove.getPosition().getX();
+        int y = objectToMove.getPosition().getY();
 
-        if (this.map.isBomb(x, y)) { //if player setted mine but still in same square
-            this.map.setSquare(x, y, Constants.MAP_BOMB);
-        } else {
+        if(objectToMove instanceof Player){
+            if (this.map.isBomb(x, y)) { //if player setted mine but still in same square
+                this.map.setSquare(x, y, Constants.MAP_BOMB);
+            }else{
+                this.map.setSquare(x, y, Constants.MAP_EMPTY);
+            }
+            this.map.setSquare(newX, newY, objectToMove.getID());
+        }else if (objectToMove instanceof Bomb){
             this.map.setSquare(x, y, Constants.MAP_EMPTY);
+            this.map.setSquare(newX, newY, objectToMove.getID());
         }
-        this.map.setSquare(newX, newY, player.getID());
+
+        Pair newPosition = new Pair(newX, newY);
+
+        objectToMove.setPosition(newPosition);
 
         //if player is making move to explosion zone.
-        if (isExplosion(new Pair(newX, newY))) {
-            player.bombed();
+        if (isExplosion(newPosition)) {
+            objectToMove.bombed();
         }
-
-        player.setPosition(new Pair(newX, newY));
     }
 
     private boolean isOutMove(int x, int y) {
@@ -196,13 +216,15 @@ public class Model implements IModel {
 
     public void addBomb(Bomb bomb) {
         this.bombs.add(bomb);
-        this.map.setSquare(bomb.getX(), bomb.getY(), Constants.MAP_BOMB);
+        Pair bombPosition = bomb.getPosition();
+        this.map.setSquare(bombPosition.getX(), bombPosition.getY(), Constants.MAP_BOMB);
     }
 
     public void detonateBomb(int x, int y) {
         Bomb bombToDetonate = null;
+        Pair square = new Pair(x, y);
         for (Bomb bomb : bombs) {
-            if (bomb.getX() == x && bomb.getY() == y) {
+            if (bomb.getPosition().equals(square)) {
                 bombToDetonate = bomb;
                 break;
             }
@@ -212,7 +234,8 @@ public class Model implements IModel {
 
     public void bombStartDetonating(Bomb bomb) {
         this.bombs.remove(bomb);
-        this.map.setSquare(bomb.getX(), bomb.getY(), Constants.MAP_DETONATED_BOMB);
+        Pair bombPosition = bomb.getPosition();
+        this.map.setSquare(bombPosition.getX(), bombPosition.getY(), Constants.MAP_DETONATED_BOMB);
     }
 
     public void removeExplosion(Pair explosion) {
@@ -275,7 +298,7 @@ public class Model implements IModel {
         this.game.addMessageToChat(victim, "was bombed by " + atacker.getNickName());
     }
 
-    public void playerBombed(Player atacker, Player victim){
+    public void playerBombed(Player atacker, Player victim) {
         victim.bombed();
         this.game.addMessageToChat(victim, "was bombed by " + atacker.getNickName());
     }
@@ -310,5 +333,4 @@ public class Model implements IModel {
     public GameMap getMap() {
         return map;
     }
-
 }

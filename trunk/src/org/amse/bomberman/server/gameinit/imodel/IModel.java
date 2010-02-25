@@ -9,6 +9,7 @@ import java.util.List;
 import org.amse.bomberman.server.gameinit.Bomb;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.MoveableMapObject;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants.Direction;
@@ -41,7 +42,7 @@ public interface IModel {
 
     void playerBombed(Player atacker, Player victim);
 
-    boolean doMove(Player player, Direction direction);
+    boolean doMove(MoveableMapObject objectToMove, Direction direction);
 
     void removePlayer(int playerID);
 
