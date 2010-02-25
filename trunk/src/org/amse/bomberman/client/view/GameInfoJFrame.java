@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -73,6 +75,32 @@ public class GameInfoJFrame extends JFrame implements IView{
         botJButton.setPreferredSize(defaultButton);
         cancelJButton.setAction(new CancelAction(this));
         cancelJButton.setPreferredSize(defaultButton);
+        messageTF.addKeyListener(new KeyListener() {
+            public void keyTyped(KeyEvent e) {
+            }
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ENTER: {
+                        try {
+                            String message = getMessage();
+                            if (message.length() > 0) {
+                                List<String> list = Connector.getInstance()
+                                        .sendChatMessage(message);
+                                setNewMessages(list);
+                            }
+                        } catch (NetException ex) {
+                            // is it good?
+                            ex.printStackTrace();
+                            stopTimers();
+                            dispose();
+                            ServerInfoJFrame jframe = new ServerInfoJFrame();
+                        }
+                    }
+                }
+            }
+            public void keyReleased(KeyEvent e) {
+            }
+        });
         try {
             List<String> gameInfo = Connector.getInstance().getMyGameInfo();
             if (gameInfo.get(0).equals("false")) {
