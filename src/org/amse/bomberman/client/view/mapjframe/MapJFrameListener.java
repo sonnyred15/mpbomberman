@@ -17,7 +17,6 @@ public class MapJFrameListener implements KeyListener{
     }
 
     public void keyTyped(KeyEvent e) {
-        System.out.println("keyTyped: " + e);
     }
 
     public void keyPressed(KeyEvent e) {
@@ -58,7 +57,6 @@ public class MapJFrameListener implements KeyListener{
     }
 
     public void keyReleased(KeyEvent e) {
-        System.out.println("keyReleased: " + e);
     }
 
 }
