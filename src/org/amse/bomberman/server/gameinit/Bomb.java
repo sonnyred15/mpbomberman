@@ -15,7 +15,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Kirilchuk V.E.
  */
-public class Bomb {
+public class Bomb implements MoveableMapObject{
 
     private final IModel model;
     private final Player player;
@@ -38,22 +38,6 @@ public class Bomb {
         this.model.addBomb(this);
         timer.schedule(new DetonateTask(),
                 Constants.BOMB_TIMER_VALUE, TimeUnit.MILLISECONDS);
-    }
-
-    public void setX(int x){
-        this.position.setX(x);
-    }
-
-    public void setY(int y){
-       this.position.setY(y);
-    }
-
-    public int getX() {
-        return position.getX();
-    }
-
-    public int getY() {
-        return position.getY();
     }
 
     public void detonate() {
@@ -151,6 +135,23 @@ public class Bomb {
         }
 
         return true;
+    }
+
+    public Pair getPosition() {
+        return this.position;
+    }
+
+    public int getID() {
+        return Constants.MAP_BOMB;
+    }
+
+    public void setPosition(Pair newPosition) {
+        this.position.setX(newPosition.getX());
+        this.position.setY(newPosition.getY());
+    }
+
+    public void bombed() {
+        this.model.detonateBomb(this.position.getX(), this.position.getY());
     }
 
     private class DetonateTask implements Runnable {

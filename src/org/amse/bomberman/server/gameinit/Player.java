@@ -10,7 +10,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Kirilchuk V.E
  */
-public class Player {
+public class Player implements MoveableMapObject{
 
     private DieListener playerDieListener;
 
