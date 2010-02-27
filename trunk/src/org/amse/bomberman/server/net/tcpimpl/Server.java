@@ -31,7 +31,7 @@ public class Server implements IServer {
     private ServerSocket serverSocket;
     private boolean shutdowned = true; //true until we start accepting clients.
     private Thread listeningThread;
-    private final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
+    protected final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
     private int sessionCounter = 0; //need to generate name of log files.   
     private long startTime;
     private ServerChangeListener changeListener;
@@ -135,13 +135,16 @@ public class Server implements IServer {
         writeToLog("Server: shutdowned.");
     }
 
-    public void addGame(Game game) {
+    public int addGame(Game game) {
+        int n = -1;
         if (!this.shutdowned) { // is it redundant?
             this.games.add(game);
+            n = this.games.indexOf(game);
             writeToLog("Server: game added.");
         } else {
             writeToLog("Server: addGame warning. Tryed to add game to shutdowned server.");
         }
+        return n;
     }
 
     public void removeGame(Game gameToRemove) {
@@ -212,6 +215,20 @@ public class Server implements IServer {
     public void setChangeListener(ServerChangeListener logListener) {
         this.changeListener = logListener;
     }
+
+    public void notifyAllClients(String message) {
+        throw new UnsupportedOperationException("Not supported in this implementation.");
+    }
+
+    public void notifyAllClients(List<String> messages) {
+        throw new UnsupportedOperationException("Not supported in this implementation.");
+    }
+
+    public void notifySomeClients(List<ISession> sessions, List<String> messages) {
+        throw new UnsupportedOperationException("Not supported in this implementation.");
+    }
+
+
 
     private class SocketListen implements Runnable {
 

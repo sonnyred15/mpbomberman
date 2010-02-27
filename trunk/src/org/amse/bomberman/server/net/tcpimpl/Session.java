@@ -34,13 +34,13 @@ import org.amse.bomberman.util.ILog;
  */
 public class Session extends Thread implements ISession {
 
-    private final IServer server;
-    private final Socket clientSocket;
-    private final int sessionID;
-    private Game game;
-    private Player player;
-    private final MyTimer timer = new MyTimer(System.currentTimeMillis());
-    private ILog log = null; //it can be null. So use writeToLog() instead of log.println()
+    protected final IServer server;
+    protected final Socket clientSocket;
+    protected final int sessionID;
+    protected Game game;
+    protected Player player;
+    protected final MyTimer timer = new MyTimer(System.currentTimeMillis());
+    protected ILog log = null; //it can be null. So use writeToLog() instead of log.println()
 
     public Session(Server server, Socket clientSocket, int sessionID, ILog log) {
         this.setDaemon(true);
@@ -50,7 +50,7 @@ public class Session extends Thread implements ISession {
         this.log = log;
     }
 
-    private void sendAnswer(String shortAnswer) {
+    public void sendAnswer(String shortAnswer) {
         BufferedWriter out = null;
         try {
             OutputStream os = this.clientSocket.getOutputStream();
@@ -72,7 +72,7 @@ public class Session extends Thread implements ISession {
      * Send strings from linesToSend to client.
      * @param linesToSend lines to send.
      */
-    private void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
+    public void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
         BufferedWriter out = null;
         try {
             OutputStream os = this.clientSocket.getOutputStream();//throws IOException
@@ -101,7 +101,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void answerOnCommand(String query) {
+    protected void answerOnCommand(String query) {
         writeToLog("Session: query received. query=" + query);
         if (query.length() == 0) {
             sendAnswer("Empty query. Error on client side.");
@@ -212,7 +212,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void sendGames() {
+    protected void sendGames() {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
 
         if (linesToSend.size() == 0) {
@@ -226,7 +226,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void createGame(String[] queryArgs) {
+    protected void createGame(String[] queryArgs) {
         //Example queryArgs = "1" "gameName" "mapName" "maxpl"
         String gameName = "defaultGameName";
         String mapName = "1";
@@ -256,8 +256,8 @@ public class Session extends Thread implements ISession {
             }
 
             this.game = newGame;
-            //TODO
-            this.player = this.game.join("HOST");
+            //TODO 
+            this.player = this.game.join("HOST",this);
             this.game.setOwner(this.player);
             sendAnswer("Game created.");
             writeToLog("Session: client created game."
@@ -279,7 +279,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void joinGame(String[] queryArgs) {
+    protected void joinGame(String[] queryArgs) {
         //"2" "gameID" "botName"
 
         int gameID = 0;
@@ -326,7 +326,7 @@ public class Session extends Thread implements ISession {
         Game gameToJoin = server.getGame(gameID);
         if (gameToJoin != null) {
             if (!gameToJoin.isStarted()) {
-                this.player = gameToJoin.join(playerName);
+                this.player = gameToJoin.join(playerName,this);
                 if (this.player == null) {//if game is full
                     sendAnswer("Game is full. Try to join later.");
                     writeToLog(
@@ -354,7 +354,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void doMove(String[] queryArgs) {
+    protected void doMove(String[] queryArgs) {
         if (this.game != null) {
             if (timer.getDiff() > Constants.GAME_STEP_TIME) {
                 int dir = 0;
@@ -391,7 +391,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void startGame() {
+    protected void startGame() {
         if (this.game != null) {
             if (!this.game.isStarted()) {
                 if (this.player == this.game.getOwner()) { //ONLY HOST(CREATER) CAN START GAME!!!
@@ -417,7 +417,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void leaveGame() {
+    protected void leaveGame() {
         if (this.game != null) {
             this.game.disconnectFromGame(this.player);
             this.game = null;
@@ -433,7 +433,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void placeBomb() {
+    protected void placeBomb() {
         if (this.game != null) { // Always if game!=null player is not null too!
             if (this.game.isStarted()) {
                 this.game.placeBomb(this.player); //is player alive checking in model
@@ -450,14 +450,10 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void sendMapArray() {
+    protected void sendMapArray() {
         if (this.game != null) {
-            List<String> linesToSend = Stringalize.map(this.game.getMapArray());
-
-            linesToSend.addAll(Stringalize.explosions(this.game.getExplosionSquares()));
-
-            linesToSend.add("" + 1);
-            linesToSend.add(Stringalize.playerInfo(this.player));
+            List<String> linesToSend = 
+                    Stringalize.mapAndExplosionsAndPlayerInfo(this.game, this.player);
 
             sendAnswer(linesToSend);
             writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
@@ -469,7 +465,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void sendMap(String[] queryArgs) {
+    protected void sendMap(String[] queryArgs) {
         int[][] ret = null;
         String mapFileName = queryArgs[1] + ".map";
 
@@ -505,7 +501,7 @@ public class Session extends Thread implements ISession {
 
     }
 
-    private void sendGameStatus() {
+    protected void sendGameStatus() {
         if (this.game != null) {
             String ret = Stringalize.gameStatus(this.game);
             sendAnswer(ret);
@@ -518,7 +514,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    public void sendMapsList() {
+    protected void sendMapsList() {
         List<String> maps = Stringalize.mapsList(Creator.createMapsList());
         if (maps != null || maps.size()>0) {
             sendAnswer(maps);
@@ -531,7 +527,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void addBot(String[] queryArgs) {
+    protected void addBot(String[] queryArgs) {
         //"11" "gameID" "botName"
 
         int gameID = 0;
@@ -598,7 +594,7 @@ public class Session extends Thread implements ISession {
     }
 
 
-    private void sendGameInfo() {
+    protected void sendGameInfo() {
         if (this.game!=null){
             List<String> info = Stringalize.gameInfo(this.game, this.player);
             sendAnswer(info);
@@ -611,7 +607,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void addMessageToChat(String[] queryArgs) {
+    protected void addMessageToChat(String[] queryArgs) {
         if (queryArgs.length >= 2) {
             if (this.game != null) {
                 StringBuilder message = new StringBuilder();
@@ -635,7 +631,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void getNewMessagesFromChat() {
+    protected void getNewMessagesFromChat() {
         if (this.game != null) {
             List<String> toSend = this.game.getNewMessagesFromChat(this.player);
             sendAnswer(toSend);
@@ -655,6 +651,17 @@ public class Session extends Thread implements ISession {
         } catch (IOException ex) {
             writeToLog("Session: interruptSession error. " + ex.getMessage());
         }
+    }
+
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public boolean correspondTo(Player player) {
+        if (this.player==player){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -719,14 +726,14 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private void freeResources() throws IOException {
+    protected void freeResources() throws IOException {
         if (this.game != null) {
             this.game.disconnectFromGame(this.player);
         }
         this.server.sessionTerminated(this);
     }
 
-    private class MyTimer {
+    protected class MyTimer {
 
         private long startTime;
 
@@ -744,7 +751,7 @@ public class Session extends Thread implements ISession {
 
     }
 
-    private void writeToLog(String message) {
+    protected void writeToLog(String message) {
         if (this.log != null && !filtred(message)) {
             this.log.println(message + "(sessionID=" + sessionID + ")");
         }

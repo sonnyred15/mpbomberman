@@ -29,6 +29,23 @@ public final class Stringalize {
         }
     }
 
+    public static List<String> mapAndExplosionsInfo(Game game) {
+        List<String> result = Stringalize.map(game.getMapArray());
+
+        result.addAll(Stringalize.explosions(game.getExplosionSquares()));
+
+        return result;
+    }
+
+    public static List<String> mapAndExplosionsAndPlayerInfo(Game game, Player player) {
+            List<String> result = Stringalize.mapAndExplosionsInfo(game);
+
+            result.add("" + 1);
+            result.add(Stringalize.playerInfo(player));
+
+            return result;
+    }
+
     public static List<String> mapsList(String[] mapsList) {
         String[] maps = Creator.createMapsList();
         ArrayList<String> ret = null;
@@ -41,20 +58,32 @@ public final class Stringalize {
         return ret;
     }
 
+    public static String game(Game game, int gameIndex){
+        StringBuilder result = new StringBuilder();
+
+        result.append(gameIndex);
+        result.append(' ');
+        result.append(game.getName());
+        result.append(' ');
+        result.append(game.getMapName());
+        result.append(' ');
+        result.append(game.getCurrentPlayersNum());
+        result.append(' ');
+        result.append(game.getGameMaxPlayers());
+
+        return result.toString();
+    }
+
     public static List<String> unstartedGames(List<Game> allGames) {
         List<String> unstartedGames = new ArrayList<String>();
         if (allGames != null) {
             synchronized (allGames) {
                 Iterator<Game> it = allGames.iterator();
                 for (int i = 0; it.hasNext(); ++i) {
-                    Game g = it.next();
-                    //send only allGames that are not started!!!
-                    if (!g.isStarted()) {
-                        unstartedGames.add(i + " " +
-                                g.getName() + " " +
-                                g.getMapName() + " " +
-                                g.getCurrentPlayersNum() + " " +
-                                g.getGameMaxPlayers());
+                    Game game = it.next();
+                    //send only games that are not started!!!
+                    if (!game.isStarted()) {
+                        unstartedGames.add(Stringalize.game(game, i));
                     }
                 }
             }

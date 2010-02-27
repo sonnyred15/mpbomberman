@@ -21,7 +21,13 @@ public interface IServer {
 
     void shutdown() throws IOException, IllegalStateException;
 
-    void addGame(Game game);
+    void notifyAllClients(String message);
+    
+    void notifyAllClients(List<String> messages);
+
+    void notifySomeClients(List<ISession> sessions, List<String> messages);
+
+    int addGame(Game game);
 
     void removeGame(Game game);
 
