@@ -136,17 +136,21 @@ public class Model implements IModel {
         int x = objectToMove.getPosition().getX();
         int y = objectToMove.getPosition().getY();
 
-        if(objectToMove instanceof Player){
+        if(objectToMove instanceof Player) {
             if (this.map.isBomb(x, y)) { //if player setted mine but still in same square
                 this.map.setSquare(x, y, Constants.MAP_BOMB);
+            } else {
+                this.map.setSquare(x, y, Constants.MAP_EMPTY);
+            }
+        } else if (objectToMove instanceof Bomb) {
+            Bomb bomb = (Bomb) objectToMove;
+            if (bomb.getOwner().getPosition().equals(bomb.getPosition())){
+                this.map.setSquare(x, y, bomb.getOwner().getID());
             }else{
                 this.map.setSquare(x, y, Constants.MAP_EMPTY);
             }
-            this.map.setSquare(newX, newY, objectToMove.getID());
-        }else if (objectToMove instanceof Bomb){
-            this.map.setSquare(x, y, Constants.MAP_EMPTY);
-            this.map.setSquare(newX, newY, objectToMove.getID());
         }
+        this.map.setSquare(newX, newY, objectToMove.getID());
 
         Pair newPosition = new Pair(newX, newY);
 
