@@ -11,6 +11,7 @@ import java.util.List;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -25,6 +26,7 @@ public class Game {
     private final int maxPlayers;
     private final IModel model;
     private final List<Player> players;
+    private final List<ISession> sessions;
     private boolean started;
     private final DieListener dieListener;
     private final Chat chat;
@@ -42,6 +44,7 @@ public class Game {
         this.chat = new Chat(this.maxPlayers);
 
         this.model = new Model(map, this);
+        this.sessions = Collections.synchronizedList(new ArrayList<ISession>());
         this.players = Collections.synchronizedList(new ArrayList<Player>());
         this.dieListener = new DieListener(this);
 
@@ -56,13 +59,14 @@ public class Game {
         return this.model.getMapName();
     }
 
-    public synchronized Player join(String name) {
+    public synchronized Player join(String name, ISession session) {
         Player player = null;
 
         if (this.players.size() < this.maxPlayers) {
             player = new Player(name);
             //coordinates of players will be set when game would start!!!!
             this.players.add(player);
+
             player.setDieListener(dieListener);
         }
 
@@ -94,6 +98,16 @@ public class Game {
 
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
+
+        synchronized(this.sessions){
+            for (ISession session : sessions) {
+                if(session.correspondTo(player)){
+                    this.sessions.remove(session);
+                    break;
+                }
+            }
+        }
+
         if (this.started) {//removing player from GameMap
             this.model.removePlayer(player.getID());
         }
@@ -194,5 +208,9 @@ public class Game {
 
     public Player getOwner() {
         return owner;
+    }
+
+    public List<ISession> getSessions(){//mb unmodifiable
+        return this.sessions;
     }
 }
