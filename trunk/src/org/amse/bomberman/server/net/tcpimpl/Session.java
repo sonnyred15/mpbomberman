@@ -9,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
@@ -51,7 +53,9 @@ public class Session extends Thread implements ISession {
     private void sendAnswer(String shortAnswer) {
         BufferedWriter out = null;
         try {
-            out = new BufferedWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
+            OutputStream os = this.clientSocket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+            out = new BufferedWriter(osw);
             writeToLog("Session: sending answer...");
             out.write(shortAnswer);
             out.newLine();
@@ -71,8 +75,9 @@ public class Session extends Thread implements ISession {
     private void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
         BufferedWriter out = null;
         try {
-            out = new BufferedWriter(new OutputStreamWriter(
-                    this.clientSocket.getOutputStream()));//throws IOException
+            OutputStream os = this.clientSocket.getOutputStream();//throws IOException
+            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+            out = new BufferedWriter(osw);
 
             writeToLog("Session: sending answer...");
 
@@ -662,7 +667,9 @@ public class Session extends Thread implements ISession {
         }
         writeToLog("Session: waiting query from client...");
         try {
-            in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+            InputStream is = this.clientSocket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is,"UTF-8");
+            in = new BufferedReader(isr);
             String clientQueryLine;
 
             while (!Thread.interrupted()) {

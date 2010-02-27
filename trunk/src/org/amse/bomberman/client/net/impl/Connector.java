@@ -2,7 +2,10 @@ package org.amse.bomberman.client.net.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -161,12 +164,16 @@ public class Connector implements IConnector{
         BufferedReader in = null;
         ArrayList<String> answer=null;
         try {
-            out = new PrintWriter(this.socket.getOutputStream());
+            OutputStream os = this.socket.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+            out = new PrintWriter(osw);
             //System.out.println("Client: Sending query: '"+query+"'.");
             out.println(query);
             out.flush();
 
-            in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            InputStream is = this.socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is,"UTF-8");
+            in = new BufferedReader(isr);
             String oneLine;
             answer = new ArrayList<String>();
             while ((oneLine = in.readLine()) != null) {
