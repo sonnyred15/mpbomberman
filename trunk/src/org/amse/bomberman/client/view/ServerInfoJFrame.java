@@ -18,7 +18,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.net.impl.Connector.NetException;
+import org.amse.bomberman.client.net.NetException;
 
 /**
  *

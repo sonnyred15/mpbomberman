@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.net.impl.Connector.NetException;
+import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.ServerInfoJFrame;
 
 /**
