@@ -33,7 +33,7 @@ public class AsynchroSession extends Session {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
 
         if (linesToSend.size() == 0) {
-            linesToSend.add("Games list.");
+            linesToSend.add(0, "Games list.");
             linesToSend.add("No unstarted games finded.");
             this.sendAnswer(linesToSend);
             writeToLog("Session: client tryed to get games list. No unstarted games finded.");

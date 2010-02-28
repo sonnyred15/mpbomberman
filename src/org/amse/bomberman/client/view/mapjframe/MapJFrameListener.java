@@ -5,7 +5,7 @@ import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.net.impl.Connector.NetException;
+import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.util.Constants.Direction;
 /**
  * @author Michail Korovkin

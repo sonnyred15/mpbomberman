@@ -18,6 +18,7 @@ import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.util.*;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
@@ -209,9 +210,5 @@ public class Connector implements IConnector{
             }
         }
     }
-    public class NetException extends Exception {
-        public NetException(){
-            super("NetException!!!\nServer is inaccessible now.\nPlease reconnect!");
-        }
-    }
+
 }
