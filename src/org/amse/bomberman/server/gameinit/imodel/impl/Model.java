@@ -121,7 +121,9 @@ public class Model implements IModel {
                         }
                         doMove(bombToMove, direction);
                     }
-
+                    if (this.map.isBonus(newX, newY) && objectToMove instanceof Player) {
+                        takeBonus((Player)objectToMove, newX, newY);
+                    }
                     if (!isMoveToReserved(newX, newY)) {
                         makeMove(objectToMove, newX, newY);
                         return true;
@@ -129,6 +131,18 @@ public class Model implements IModel {
                 }
                 return false;
             }
+        }
+    }
+    private void takeBonus(Player player, int x, int y) {
+        int bonus = this.map.bonusAt(x, y);
+        if (bonus == -1 ) {
+            return;
+        } else {
+            this.map.setSquare(player.getPosition().getX()
+                    , player.getPosition().getY(), Constants.MAP_EMPTY);
+            player.setPosition(new Pair(x,y));
+            player.takeBonus(bonus);
+            this.map.setSquare(x, y, player.getID());
         }
     }
 

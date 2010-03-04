@@ -68,20 +68,6 @@ public class Player implements MoveableMapObject{
         }
     }
 
-    @Deprecated
-    public void takedBonus(int bonus){//Bonuses must be enum!
-        switch (bonus){
-            case 1:{
-                this.lives+=1;
-                break;
-            }
-            default:{
-                throw new IllegalArgumentException("Such bonus is not supported." +
-                        " Bonus = " + bonus);
-            }
-        }
-    }
-
     public void setID(int id) {
         this.id = id;
     }
@@ -111,5 +97,25 @@ public class Player implements MoveableMapObject{
 
     public String getNickName() {
         return nickName;
+    }
+    public void takeBonus(int bonusID) {
+        switch (bonusID) {
+            case Constants.MAP_BONUS_LIFE : {
+                this.lives++;
+                break;
+            }
+            case Constants.MAP_BONUS_BOMB_COUNT : {
+                this.maxBombs++;
+                break;
+            }
+            case Constants.MAP_BONUS_BOMB_RADIUS : {
+                this.explRadius++;
+                break;
+            }
+            default: {
+                throw new IllegalArgumentException("Such bonus is not supported." +
+                        " Bonus = " + bonusID);
+            }
+        }
     }
 }

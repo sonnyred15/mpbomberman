@@ -19,11 +19,10 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.view.StartJFrame;
 import org.amse.bomberman.client.view.mapjframe.MapJFrameUtil.MyJPanel;
-import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
 public class MapJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
