@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Random;
 import org.amse.bomberman.server.Main;
 import org.amse.bomberman.util.Constants;
 
@@ -170,7 +171,7 @@ public final class GameMap {
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
                 if (this.mapArray[i][j] == playerID) {
-                    this.mapArray[i][j] = 0;
+                    this.mapArray[i][j] = Constants.MAP_EMPTY;
                     return; //a little bit optimize
                 }
             }
@@ -181,6 +182,26 @@ public final class GameMap {
     public void changeMapForCurMaxPlayers(int curMaxPlayers) {
         for (int i = curMaxPlayers + 1; i <= this.maxPlayers; ++i) {
             removePlayer(i);
+        }
+    }
+    public void destroyBlock(int x, int y) {
+        if (this.mapArray[x][y] != -1) {
+            return;
+        }
+        Random generator = new Random();
+        int random = generator.nextInt(99);
+        if (random < 5) {
+            this.mapArray[x][y] = Constants.MAP_BONUS_LIFE;
+        } else {
+            if (random < 10) {
+                this.mapArray[x][y] = Constants.MAP_BONUS_BOMB_COUNT;
+            } else {
+                if (random < 15) {
+                    this.mapArray[x][y] = Constants.MAP_BONUS_BOMB_RADIUS;
+                } else {
+                    this.mapArray[x][y] = Constants.MAP_EMPTY;
+                }
+            }
         }
     }
 }
