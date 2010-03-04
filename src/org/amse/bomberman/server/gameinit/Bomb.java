@@ -122,7 +122,11 @@ public class Bomb implements MoveableMapObject{
                 //undestroyable so do nothing
                 //going to return false;
             } else {                                         //destroyable block
-                map.setSquare(x, y, map.blockAt(x, y) + 1 - 9);
+                if (map.blockAt(x, y) == 8) {                // destroyed block
+                    map.destroyBlock(x, y);
+                } else {
+                    map.setSquare(x, y, map.blockAt(x, y) + 1 - 9);
+                }
             }
             return false;
         } else if (map.playerIdAt(x, y) != -1) {                 //playerSquare

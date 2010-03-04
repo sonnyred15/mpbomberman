@@ -9,7 +9,7 @@ import org.amse.bomberman.util.Constants;
 
 /**
  *
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
 public class MapJFrameUtil {
     private static final Color EMPTY_COLOR = Color.LIGHT_GRAY;
@@ -22,6 +22,9 @@ public class MapJFrameUtil {
     private static final String PL3_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-3.png";
     private static final String PL4_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-4.png";
     private static final String BURN_ICON_PATH = "org/amse/bomberman/client/icons/burn-48.png";
+    private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart-48.png";
+    private static final String B_RADIUS_ICON_PATH = "org/amse/bomberman/client/icons/b_radius-48.png";
+    private static final String B_COUNT_ICON_PATH = "org/amse/bomberman/client/icons/b_count-48.png";
     
     private MapJFrameUtil() {
         
@@ -55,6 +58,18 @@ public class MapJFrameUtil {
                 }
                 case Constants.MAP_DETONATED_BOMB: {
                     icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
+                    break;
+                }
+                case Constants.MAP_BONUS_LIFE: {
+                    icon = new ImageIcon(cl.getResource(LIFE_ICON_PATH));
+                    break;
+                }
+                case Constants.MAP_BONUS_BOMB_COUNT: {
+                    icon = new ImageIcon(cl.getResource(B_COUNT_ICON_PATH));
+                    break;
+                }
+                case Constants.MAP_BONUS_BOMB_RADIUS: {
+                    icon = new ImageIcon(cl.getResource(B_RADIUS_ICON_PATH));
                     break;
                 }
             }

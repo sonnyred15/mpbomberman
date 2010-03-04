@@ -164,48 +164,6 @@ public class MapJFrame extends JFrame implements IView{
         result = new Cell(x,y);
         return result;
     }
-    /*public void tryScroll(Direction direct) {
-        if (range >= size) {
-            return;
-        }
-        BombMap map = Model.getInstance().getMap();
-        switch(direct) {
-            case RIGHT: {
-                if (RDCell.getY() < size - 1) {
-                    for (int j = 0; j < range - 1; j++) {
-                        for (int i = 0; i < range; i++) {
-                            cells[i][j] = cells[i][j + 1];
-                            cells[i][j].repaint();
-                        }
-                    }
-                    for (int i = 0; i < range; i++) {
-                        cells[i][range - 1].setContent(map.getValue(new Cell
-                                (i + LUCell.getX(), range + LUCell.getY())));
-                        cells[i][range-1].repaint();
-                    }
-                    LUCell = LUCell.nextCell(direct);
-                    RDCell = RDCell.nextCell(direct);
-                    break;
-                }
-            }
-            case DOWN: {
-
-                break;
-            }
-            case LEFT: {
-
-                break;
-            }
-            case UP: {
-
-                break;
-            }
-            default: {
-                throw new UnsupportedOperationException("Incorrect value of direction:"
-                        + direct.toString());
-            }
-        }
-    }*/
     private void findEyeShot() {
         if (range >= size) {
             LUCell = new Cell(0,0);
