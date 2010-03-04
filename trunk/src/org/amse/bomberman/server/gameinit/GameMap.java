@@ -124,6 +124,11 @@ public final class GameMap {
     public boolean isBomb(int x, int y) {
         return (this.mapArray[x][y] == Constants.MAP_BOMB);
     }
+    public boolean isBonus(int x, int y) {
+        return (this.mapArray[x][y] == Constants.MAP_BONUS_LIFE ||
+                this.mapArray[x][y] == Constants.MAP_BONUS_BOMB_RADIUS ||
+                this.mapArray[x][y] == Constants.MAP_BONUS_BOMB_COUNT);
+    }
 
     /**
      *
@@ -140,9 +145,20 @@ public final class GameMap {
         }
         return square + 9;
     }
-
+    /**
+     * return value of bonus at specific cell with coords x and y.
+     * @param x coord in line.
+     * @param y coord in column.
+     * @return integer value of bonus and -1 if it is not a bonus.
+     */
     public int bonusAt(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet");
+        if (this.mapArray[x][y] == Constants.MAP_BONUS_BOMB_COUNT ||
+                this.mapArray[x][y] == Constants.MAP_BONUS_BOMB_RADIUS ||
+                this.mapArray[x][y] == Constants.MAP_BONUS_LIFE) {
+            return this.mapArray[x][y];
+        } else {
+            return -1;
+        }
     }
 
     public boolean isEmpty(int x, int y) {
