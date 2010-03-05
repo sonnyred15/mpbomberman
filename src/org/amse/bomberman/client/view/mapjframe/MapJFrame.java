@@ -42,7 +42,7 @@ public class MapJFrame extends JFrame implements IView{
     // Cell that is the most Right and Down at the screen
     private Cell RDCell;
     private Cell myCoord;
-    private final int step = 2;
+    private final int step = 4;
     
     public MapJFrame() {
         super("BomberMan");
@@ -77,6 +77,7 @@ public class MapJFrame extends JFrame implements IView{
                 for (int j = 0; j < range; j++) {
                     cells[i][j] = new MyJPanel(48);
                     cells[i][j].setContent(map.getValue(parseToRealCoord(new Cell(i,j))));
+                    cells[i][j].setDoubleBuffered(true);
                     field.add(cells[i][j]);
                 }
             }
@@ -99,10 +100,11 @@ public class MapJFrame extends JFrame implements IView{
         int x = myCoord.getX();
         int y = myCoord.getY();
         BombMap newMap = model.getMap();
+        // bad hack with scroll sizes
         if ((x - step < LUCell.getX() && LUCell.getX() > 0)
-            || (x+step > RDCell.getX() && RDCell.getX() < size-1)
+            || (x+1+step > RDCell.getX() && RDCell.getX() < size-1)
             || (y-step < LUCell.getY() && LUCell.getY() > 0)
-            || (y+step > RDCell.getY() && RDCell.getY() < size-1))  {
+            || (y+1+step > RDCell.getY() && RDCell.getY() < size-1))  {
             this.findEyeShot();
             for (int i = 0; i < range; i++) {
                 for (int j = 0; j < range; j++) {
@@ -139,7 +141,7 @@ public class MapJFrame extends JFrame implements IView{
                     cells[cell.getX()-LUCell.getX()][cell.getY()-LUCell.getY()]
                             .checkExplosion(map.getValue(cell));
                 } else {
-                    if (isInEyeShot(cell)) {
+                    if (isInEyeShot(cell) && !expl.contains(cell)) {
                         cells[cell.getX()-LUCell.getX()][cell.getY()-LUCell.getY()]
                                 .setContent(map.getValue(cell));
                     }
@@ -172,9 +174,11 @@ public class MapJFrame extends JFrame implements IView{
             int x2;
             int y1;
             int y2;
+            // if player is on the left border of map
             if (myCoord.getX() <= (range-1)/2) {
                 x1 = 0;
             } else {
+                // if player is on the right border of map
                 if (myCoord.getX() >=(size-1)-(range-1)/2) {
                     x1 = size - range;
                 } else {
