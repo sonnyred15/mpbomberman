@@ -22,21 +22,30 @@ public class MapJFrameUtil {
     private static final String PL3_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-3.png";
     private static final String PL4_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-4.png";
     private static final String BURN_ICON_PATH = "org/amse/bomberman/client/icons/burn-48.png";
-    private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart-48.png";
+    private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart4-48.png";
     private static final String B_RADIUS_ICON_PATH = "org/amse/bomberman/client/icons/b_radius-48.png";
     private static final String B_COUNT_ICON_PATH = "org/amse/bomberman/client/icons/b_count-48.png";
+    private static ImageIcon ICON_PL1 = new ImageIcon(Main.class.getClassLoader().getResource(PL1_ICON_PATH));
+    private static ImageIcon ICON_PL2 = new ImageIcon(Main.class.getClassLoader().getResource(PL2_ICON_PATH));
+    private static ImageIcon ICON_PL3 = new ImageIcon(Main.class.getClassLoader().getResource(PL3_ICON_PATH));
+    private static ImageIcon ICON_PL4 = new ImageIcon(Main.class.getClassLoader().getResource(PL4_ICON_PATH));;
+    private static ImageIcon ICON_BONUS_LIFE = new ImageIcon(Main.class.getClassLoader().getResource(LIFE_ICON_PATH));;
+    private static ImageIcon ICON_BONUS_B_RADIUS = new ImageIcon(Main.class.getClassLoader().getResource(B_RADIUS_ICON_PATH));;
+    private static ImageIcon ICON_BONUS_B_COUNT = new ImageIcon(Main.class.getClassLoader().getResource(B_COUNT_ICON_PATH));;
+    private static ImageIcon ICON_WALL = new ImageIcon(Main.class.getClassLoader().getResource(WALL_ICON_PATH));;
+    private static ImageIcon ICON_BOMB = new ImageIcon(Main.class.getClassLoader().getResource(BOMB_ICON_PATH));;
+    private static ImageIcon ICON_BURN = new ImageIcon(Main.class.getClassLoader().getResource(BURN_ICON_PATH));;
     
     private MapJFrameUtil() {
-        
+
     }
     public static ImageIcon getPlayerIcon(int mapValue) {
-        ClassLoader cl = Main.class.getClassLoader();
         switch(mapValue) {
-            case 1: return new ImageIcon(cl.getResource(PL1_ICON_PATH));
-            case 2: return new ImageIcon(cl.getResource(PL2_ICON_PATH));
-            case 3: return new ImageIcon(cl.getResource(PL3_ICON_PATH));
-            case 4: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
-            default: return new ImageIcon(cl.getResource(PL4_ICON_PATH));
+            case 1: return ICON_PL1;
+            case 2: return ICON_PL2;
+            case 3: return ICON_PL3;
+            case 4: return ICON_PL4;
+            default: return ICON_PL1;
         }
     }
     public static class MyJPanel extends JLabel {
@@ -46,35 +55,34 @@ public class MapJFrameUtil {
         public void setContent(int key) {
             Color color = EMPTY_COLOR;
             ImageIcon icon = null;
-            ClassLoader cl = Main.class.getClassLoader();
             switch (key) {
                 case Constants.MAP_EMPTY: {
                     icon = null;
                     break;
                 }
                 case Constants.MAP_BOMB: {
-                    icon = new ImageIcon(cl.getResource(BOMB_ICON_PATH));
+                    icon = ICON_BOMB;
                     break;
                 }
                 case Constants.MAP_DETONATED_BOMB: {
-                    icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
+                    icon = ICON_BURN;
                     break;
                 }
                 case Constants.MAP_BONUS_LIFE: {
-                    icon = new ImageIcon(cl.getResource(LIFE_ICON_PATH));
+                    icon = ICON_BONUS_LIFE;
                     break;
                 }
                 case Constants.MAP_BONUS_BOMB_COUNT: {
-                    icon = new ImageIcon(cl.getResource(B_COUNT_ICON_PATH));
+                    icon = ICON_BONUS_B_COUNT;
                     break;
                 }
                 case Constants.MAP_BONUS_BOMB_RADIUS: {
-                    icon = new ImageIcon(cl.getResource(B_RADIUS_ICON_PATH));
+                    icon = ICON_BONUS_B_RADIUS;
                     break;
                 }
             }
             if (key < Constants.MAP_EMPTY && key >= Constants.MAP_PROOF_WALL) {
-                icon = new ImageIcon(cl.getResource(WALL_ICON_PATH));
+                icon = ICON_WALL;
             } else {
                 if (key > Constants.MAP_EMPTY && key <= Constants.MAX_PLAYERS) {
                     icon = MapJFrameUtil.getPlayerIcon(key);
@@ -86,11 +94,10 @@ public class MapJFrameUtil {
         }
         public void checkExplosion(int mapValue){
             ImageIcon icon = null;
-            ClassLoader cl = Main.class.getClassLoader();
             // if it is wall
             if (mapValue < Constants.MAP_EMPTY && mapValue >= Constants.MAP_PROOF_WALL) {
                 //value = WALL_EXPL_COLOR;
-                icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
+                icon = ICON_BURN;
             } else {
                 // if it is player
                 if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
@@ -98,7 +105,7 @@ public class MapJFrameUtil {
                     this.setBackground(PL_EXPL_COLOR);
                 } else {
                     // if it is center of Explosion
-                    icon = new ImageIcon(cl.getResource(BURN_ICON_PATH));
+                    icon = ICON_BURN;
                 }
             }
             this.setIcon(icon);
