@@ -13,7 +13,7 @@ import org.amse.bomberman.server.gameinit.Game;
  *
  * @author chibis
  */
-public interface IServer {
+public interface IServer {   
 
     void sessionTerminated(ISession endedSession);
 
@@ -24,6 +24,8 @@ public interface IServer {
     void notifyAllClients(String message);
     
     void notifyAllClients(List<String> messages);
+
+    void notifyAllClientsExceptOne(List<String> messages, ISession sessionToIgnore);
 
     void notifySomeClients(List<ISession> sessions, List<String> messages);
 

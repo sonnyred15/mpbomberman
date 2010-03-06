@@ -4,11 +4,10 @@
  */
 package org.amse.bomberman.util;
 
-import java.io.File;
+import java.awt.Component;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.List;
+import javax.swing.JOptionPane;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.net.IServer;
@@ -36,6 +35,10 @@ public class Creator {
             throws FileNotFoundException, IOException {
         GameMap map = new GameMap(mapName + ".map");
         return new Game(server, map, gameName, maxPlayers);
+    }
+
+    public static void createErrorDialog(Component parent,String description, String message){
+        JOptionPane.showMessageDialog(parent, description + "\n" +message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     private Creator() {

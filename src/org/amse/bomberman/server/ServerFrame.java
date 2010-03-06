@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.tcpimpl.AsynchroServer;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants;
 
@@ -101,7 +102,7 @@ public class ServerFrame extends JFrame {
                 server.setChangeListener(info);
             } else if (server.getPort() != port) { //if we want to raise server on new port
                 server.writeToLog("Raising server on new port");
-                server = new Server(port);                
+                server = new Server(port);
                 info.setServer(server);
                 info.clearLog();
                 server.setChangeListener(info);

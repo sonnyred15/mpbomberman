@@ -25,16 +25,16 @@ import org.amse.bomberman.util.impl.ConsoleLog;
  */
 public class Server implements IServer {
 
-    private ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
-    private final int port;
-    private final List<Game> games = Collections.synchronizedList(new LinkedList<Game>());
-    private ServerSocket serverSocket;
-    private boolean shutdowned = true; //true until we start accepting clients.
-    private Thread listeningThread;
+    protected ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
+    protected final int port;
+    protected final List<Game> games = Collections.synchronizedList(new LinkedList<Game>());
+    protected ServerSocket serverSocket;
+    protected boolean shutdowned = true; //true until we start accepting clients.
+    protected Thread listeningThread;
     protected final List<ISession> sessions = Collections.synchronizedList(new LinkedList<ISession>());
-    private int sessionCounter = 0; //need to generate name of log files.   
-    private long startTime;
-    private ServerChangeListener changeListener;
+    protected int sessionCounter = 0; //need to generate name of log files.
+    protected long startTime;
+    protected ServerChangeListener changeListener;
     /**
      * Constructor with default port.
      */
@@ -225,6 +225,10 @@ public class Server implements IServer {
     }
 
     public void notifySomeClients(List<ISession> sessions, List<String> messages) {
+        throw new UnsupportedOperationException("Not supported in this implementation.");
+    }
+
+    public void notifyAllClientsExceptOne(List<String> messages, ISession sessionToIgnore) {
         throw new UnsupportedOperationException("Not supported in this implementation.");
     }
 
