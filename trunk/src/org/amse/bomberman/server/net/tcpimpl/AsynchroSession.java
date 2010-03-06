@@ -31,15 +31,14 @@ public class AsynchroSession extends Session {
     @Override
     protected void sendGames() {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
+        linesToSend.add(0, "Games list.");
 
-        if (linesToSend.size() == 0) {
-            linesToSend.add(0, "Games list.");
+        if (linesToSend.size() == 1) {//only "Games list." phraze
             linesToSend.add("No unstarted games finded.");
             this.sendAnswer(linesToSend);
             writeToLog("Session: client tryed to get games list. No unstarted games finded.");
             return;
         } else {
-            linesToSend.add(0, "Games list.");
             this.sendAnswer(linesToSend);
             writeToLog("Session: sended games list to client.");
             return;
@@ -53,16 +52,24 @@ public class AsynchroSession extends Session {
         String mapName = "1";
         int maxPlayers = -1;//-1 for: defines by GameMap.
 
+        List<String> messages = new ArrayList<String>();
+        messages.add(0,"Create game status.");
+
         if (queryArgs.length == 4) {//if we getted command in full syntax
             gameName = queryArgs[1];
             mapName = queryArgs[2];
             try {
                 maxPlayers = Integer.parseInt(queryArgs[3]);
             } catch (NumberFormatException ex) {
-                sendAnswer("Wrong query parameters for creating game.");
+                messages.add("Wrong query parameters for creating game.");
                 writeToLog("Session: createGame error. Client tryed to create game, canceled. " + "Wrong command parameters. Error on client side. " + ex.getMessage());
+                sendAnswer(messages);
                 return;
             }
+        }else{ // if command have more or less arguments than must have.
+            messages.add("Wrong query parameters for creating game.");
+            sendAnswer(messages);
+            return;
         }
 
         try {
@@ -76,16 +83,14 @@ public class AsynchroSession extends Session {
             }
 
             this.game = newGame;
-            //TODO
             this.player = this.game.join("HOST", this);
             this.game.setOwner(this.player);
-            sendAnswer("Created game.");
-
-            List<String> messages = new ArrayList<String>();
-            messages.add("New game was created.");
-            messages.add(Stringalize.game(newGame, index));
-            this.server.notifyAllClients(messages);
-
+            messages.add("Created game.");
+            sendAnswer(messages);
+            messages.remove(messages.size()-1);
+            
+            messages.add("New game was created.");            
+            this.server.notifyAllClientsExceptOne(messages, this);
 
             writeToLog("Session: client created game." + " Map=" + mapName + " gameName=" + gameName + " maxPlayers=" + maxPlayers);
             return;
@@ -104,6 +109,9 @@ public class AsynchroSession extends Session {
     protected void joinGame(String[] queryArgs) {
         //"2" "gameID" "playerName"
 
+        List<String> messages = new ArrayList<String>();
+        messages.add(0,"Join game info.");
+
         int gameID = 0;
         String playerName = "defaultPlayer";
         switch (queryArgs.length) {
@@ -111,22 +119,25 @@ public class AsynchroSession extends Session {
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
-                    sendAnswer("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    messages.add("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    sendAnswer(messages);
                     writeToLog("Session: joinGame error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
+                    return;
                 }
                 playerName = queryArgs[2];
                 break;
             }
             default: { //wrong syntax
-                sendAnswer("Wrong query. Error on client side.");
-                writeToLog(
-                        "Session: joinGame error. Wrong command parameters. Error on client side.");
-                break;
+                messages.add("Wrong query. Error on client side.");
+                sendAnswer(messages);
+                writeToLog("Session: joinGame error. Wrong command parameters. Error on client side.");
+                return;
             }
         }
 
         if (this.game != null) {
-            sendAnswer("Leave another game first.");
+            messages.add("Leave another game first.");
+            sendAnswer(messages);
             writeToLog("Session: joinGame warning. Client tryed to join game, canceled. Already in other game.");
             return;
         }
@@ -137,33 +148,37 @@ public class AsynchroSession extends Session {
             if (!gameToJoin.isStarted()) {
                 this.player = gameToJoin.join(playerName, this);
                 if (this.player == null) {//if game is full
-                    sendAnswer("Game is full. Try to join later.");
-                    writeToLog(
-                            "Session: joinGame warning. Client tryed to join to full game, canceled.");
+                    messages.add("Game is full. Try to join later.");
+                    sendAnswer(messages);
+                    writeToLog("Session: joinGame warning. Client tryed to join to full game, canceled.");
                     return;
                 } else {
                     this.game = gameToJoin;
-                    sendAnswer("Joined.");
+                    messages.add("Joined.");
+                    sendAnswer(messages);
 
                     List<ISession> sessionsToNotify = this.game.getSessions();
-                    List<String> messages = new ArrayList<String>(1);
+                    messages = new ArrayList<String>(1);
                     messages.add(0, "Update game info.");
-                    this.server.notifySomeClients(sessionsToNotify, messages);
+                    this.server.notifyAllClients(messages);//TODO
+                    //this.server.notifySomeClients(sessionsToNotify, messages);
 
                     List<String> messages2 = new ArrayList<String>(1);
-                    messages.add(0, "Update games info.");
+                    messages2.add(0, "Update games info.");
                     this.server.notifyAllClients(messages2);
 
                     writeToLog("Session: client joined to game." + " GameID=" + gameID + " Player=" + playerName);
                     return;
                 }
             } else { //if game.isStarted() true
-                sendAnswer("Game was already started.");
+                messages.add("Game was already started.");
+                sendAnswer(messages);
                 writeToLog("Session: joinGame warning. Client tryed to join gameID=" + gameID + " ,canceled." + " Game is already started. ");
                 return;
             }
         } else { //if gameToJoin==null true
-            sendAnswer("No such game.");
+            messages.add("No such game.");
+            sendAnswer(messages);
             writeToLog("Session: client tryed to join gameID=" + gameID + " ,canceled." + " No such game on server.");
             return;
         }
@@ -430,14 +445,16 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void sendGameInfo() {
+        List<String> info = new ArrayList<String>();
+        info.add(0,"Game info.");
         if (this.game != null) {
-            List<String> info = Stringalize.gameInfo(this.game, this.player);
-            info.add(0,"Game info.");
+            info.addAll(Stringalize.gameInfo(this.game, this.player));
             sendAnswer(info);
             writeToLog("Session: sended gameInfo to client.");
             return;
         } else {
-            sendAnswer("Not joined to any game.");
+            info.add("Not joined to any game.");
+            sendAnswer(info);
             writeToLog("Session: sendGameInfo warning. Client tryed to get game info, canceled. Not joined to any game.");
             return;
         }

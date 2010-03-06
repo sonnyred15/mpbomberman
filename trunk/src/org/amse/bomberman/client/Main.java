@@ -1,5 +1,4 @@
 package org.amse.bomberman.client;
-import org.amse.bomberman.client.view.StartJFrame;
 
 /**
  *
@@ -10,6 +9,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        StartJFrame sjf = new StartJFrame();
+//        Controller controller = new Controller();
+//        controller.showConnectionFrame();
+        new org.amse.bomberman.client.view.StartJFrame();
     }
 }
