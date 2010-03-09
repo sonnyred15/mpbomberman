@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view.mapjframe;
+package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,7 +11,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Michael Korovkin
  */
-public class MapJFrameUtil {
+public class GameJFrameUtil {
     private static final Color EMPTY_COLOR = Color.LIGHT_GRAY;
     private static final Color PL_EXPL_COLOR = new Color(63,255,255);
     private static final Color EXPLODE_COLOR = Color.RED;
@@ -36,7 +36,7 @@ public class MapJFrameUtil {
     private static ImageIcon ICON_BOMB = new ImageIcon(Main.class.getClassLoader().getResource(BOMB_ICON_PATH));;
     private static ImageIcon ICON_BURN = new ImageIcon(Main.class.getClassLoader().getResource(BURN_ICON_PATH));;
     
-    private MapJFrameUtil() {
+    private GameJFrameUtil() {
 
     }
     public static ImageIcon getPlayerIcon(int mapValue) {
@@ -85,7 +85,7 @@ public class MapJFrameUtil {
                 icon = ICON_WALL;
             } else {
                 if (key > Constants.MAP_EMPTY && key <= Constants.MAX_PLAYERS) {
-                    icon = MapJFrameUtil.getPlayerIcon(key);
+                    icon = GameJFrameUtil.getPlayerIcon(key);
                 }
             }
             this.setBackground(color);
@@ -101,7 +101,7 @@ public class MapJFrameUtil {
             } else {
                 // if it is player
                 if (mapValue > Constants.MAP_EMPTY && mapValue <= Constants.MAX_PLAYERS) {
-                    icon = MapJFrameUtil.getPlayerIcon(mapValue);
+                    icon = GameJFrameUtil.getPlayerIcon(mapValue);
                     this.setBackground(PL_EXPL_COLOR);
                 } else {
                     // if it is center of Explosion

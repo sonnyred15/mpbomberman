@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view.mapjframe;
+package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,14 +15,14 @@ import org.amse.bomberman.client.view.ServerInfoJFrame;
 /**
  * @author Michail Korovkin
  */
-public class MapJMenuBar extends JMenuBar {
+public class GameJMenuBar extends JMenuBar {
 
-    private MapJFrame parent = null;
+    private GameJFrame parent = null;
     JMenu game = new JMenu("Game");
     JMenuItem leave = new JMenuItem();
     JMenuItem exit = new JMenuItem("Exit");
 
-    public MapJMenuBar(MapJFrame frame) {
+    public GameJMenuBar(GameJFrame frame) {
         parent = frame;
         game.add(leave);
         game.addSeparator();
@@ -45,9 +45,9 @@ public class MapJMenuBar extends JMenuBar {
     }
 
     public static class LeaveAction extends AbstractAction {
-        MapJFrame parent;
+        GameJFrame parent;
 
-        public LeaveAction(MapJFrame jFrame) {
+        public LeaveAction(GameJFrame jFrame) {
             parent = jFrame;
             putValue(NAME, "Leave");
             putValue(SHORT_DESCRIPTION, "Leave this game.");
