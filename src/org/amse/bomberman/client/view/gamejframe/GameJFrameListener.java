@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view.mapjframe;
+package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -10,9 +10,9 @@ import org.amse.bomberman.util.Constants.Direction;
 /**
  * @author Michail Korovkin
  */
-public class MapJFrameListener implements KeyListener{
-    private MapJFrame parent;
-    public MapJFrameListener(MapJFrame jframe) {
+public class GameJFrameListener implements KeyListener{
+    private GameJFrame parent;
+    public GameJFrameListener(GameJFrame jframe) {
         parent = jframe;
     }
 

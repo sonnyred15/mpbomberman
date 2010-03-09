@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.view.mapjframe;
+package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -18,18 +18,18 @@ import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.view.StartJFrame;
-import org.amse.bomberman.client.view.mapjframe.MapJFrameUtil.MyJPanel;
+import org.amse.bomberman.client.view.gamejframe.GameJFrameUtil.MyJPanel;
 
 /**
  *
  * @author Michael Korovkin
  */
-public class MapJFrame extends JFrame implements IView{
+public class GameJFrame extends JFrame implements IView{
     private MyJPanel[][] cells;
     private JLabel livesJLabel;
     // is really nead???
     private boolean dead = false;
-    private MapJFrameListener listener = new MapJFrameListener(this);
+    private GameJFrameListener listener = new GameJFrameListener(this);
     private final int height = 600;
     private final int width = 500;
     // amount of cells at the one line on the Screen
@@ -44,7 +44,7 @@ public class MapJFrame extends JFrame implements IView{
     private Cell myCoord;
     private final int step = 4;
     
-    public MapJFrame() {
+    public GameJFrame() {
         super("BomberMan");
         setSize(width, height);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -83,7 +83,7 @@ public class MapJFrame extends JFrame implements IView{
             }
             c.add(field);
             this.addKeyListener(listener);
-            this.setJMenuBar(new MapJMenuBar(this));
+            this.setJMenuBar(new GameJMenuBar(this));
 
             setResizable(true);
             setVisible(true);

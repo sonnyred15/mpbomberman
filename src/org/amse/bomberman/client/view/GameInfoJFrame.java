@@ -28,7 +28,7 @@ import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.mapjframe.MapJFrame;
+import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -228,7 +228,7 @@ public class GameInfoJFrame extends JFrame implements IView{
         this.dispose();
         IModel model = Model.getInstance();
         model.setMap(Connector.getInstance().getMap());
-        MapJFrame jframe = new MapJFrame();
+        GameJFrame jframe = new GameJFrame();
         Model.getInstance().addListener(jframe);
         Connector.getInstance().beginUpdating();
     }
