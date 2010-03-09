@@ -19,8 +19,9 @@ public class Player implements MoveableMapObject{
     private int id = 1;
     
     private Pair position;
-    
-    private int explRadius = 2; //for better testing :))
+
+    private final int minExplRadius = 2;
+    private int explRadius = minExplRadius; //for better testing :))
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
     private int maxBombs = Constants.PLAYER_MAX_BOMBS;
@@ -86,6 +87,7 @@ public class Player implements MoveableMapObject{
 
     public synchronized void bombed() { //synchronized(player)
         this.lives -= 1;
+        this.decBonuses();
         if (this.lives <= 0){//CHECK THIS
             playerDieListener.playerDied(this);
         }
@@ -116,6 +118,14 @@ public class Player implements MoveableMapObject{
                 throw new IllegalArgumentException("Such bonus is not supported." +
                         " Bonus = " + bonusID);
             }
+        }
+    }
+    private void decBonuses() {
+        if (explRadius > minExplRadius) {
+            explRadius--;
+        }
+        if (maxBombs > 1) {
+            maxBombs--;
         }
     }
 }
