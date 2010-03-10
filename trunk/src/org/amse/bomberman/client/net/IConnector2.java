@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- *
+ * 
  * @author Kirilchuk V.E
  */
 public interface IConnector2 {
@@ -47,9 +47,12 @@ public interface IConnector2 {
 
     public void getNewChatMessages() throws NetException;
 
+    @Deprecated
     public InetAddress getInetAddress();
 
+    @Deprecated
     public int getPort();
 
+    @Deprecated
     public void beginUpdating() throws NetException;//???
 }

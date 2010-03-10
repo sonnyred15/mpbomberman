@@ -16,11 +16,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.asynchronous.Controller;
+import org.amse.bomberman.client.view.control.Controller;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
 
@@ -163,45 +162,21 @@ public class AsynchroConnector implements IConnector2 {
 
             /* Games list getted from server.*/
             if (firstLine.startsWith("Games list")) {
-                String secondLine = message.get(1);
-                List<String> gamesList = null;
-                if (!secondLine.startsWith("No")) {
-                    gamesList = new ArrayList<String>();
-                    ListIterator<String> listIterator = message.listIterator(1);
-                    while (listIterator.hasNext()) {
-                        String next = listIterator.next();
-                        gamesList.add(next);
-                    }
-                }
-                controller.updateGamesList(gamesList);
+                message.remove(0);
+                controller.updateGamesList(message);
 
             /* Create game info*/
             } else if (firstLine.startsWith("Create game")) {
-                String secondLine = message.get(1);
-                if (secondLine.startsWith("Created game") ||
-                        secondLine.startsWith("No such map on server") ||
-                        secondLine.startsWith("Error on server side") ||
-                        secondLine.startsWith("Wrong")) {
-
-                    controller.updateCreateGameResult(secondLine);
-                } else if (secondLine.startsWith("New game")) {
-                    controller.requestGamesList();
-                }
+                controller.updateCreateGameResult(message.get(1));
 
             /* My game info */
             } else if (firstLine.startsWith("Game info")) {
-                String secondLine = message.get(1);
-                if (secondLine.startsWith("Not joined")) {
-                    System.out.println("TODO IN GAME INFO NOT JOINED!");
-                //TODO
-                } else {
-                    message.remove(0);//removing "Game info"
-                    controller.updateGameInfo(message);
-                }
+                message.remove(0);
+                controller.updateGameInfo(message);
+
             /* Join game info*/
-            } else if (firstLine.startsWith("Join game")) {
-                String secondLine = message.get(1);
-                controller.updateJoinGameResult(secondLine);
+            } else if (firstLine.startsWith("Join game")) {                
+                controller.updateJoinGameResult(message.get(1));
 
             /* Advise to update game info*/
             } else if (firstLine.startsWith("Update game info")) {
@@ -210,6 +185,7 @@ public class AsynchroConnector implements IConnector2 {
             /* Advise to update games list info*/
             } else if (firstLine.startsWith("Update games info")) {
                 controller.requestGamesList();
+                
             } else { //all other messages
                 JOptionPane.showMessageDialog(null, "Uncatched message in processServerMessage \n" +
                         " " + firstLine);
