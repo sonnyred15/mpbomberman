@@ -215,12 +215,12 @@ public class AsynchroConnector implements IConnector2 {
                 controller.updateGameInfo(message);
 
             /* Game maps list*/
-            } else if (firstLine.startsWith("Maps list")) {
+            } else if (firstLine.startsWith("Game maps list")) {
                 message.remove(0);
                 controller.updateMapsList(message);
 
             /* Add bot result*/
-            } else if (firstLine.startsWith("BOT TODOTODOTODOTDOTOD")) {
+            } else if (firstLine.startsWith("BOT TODOTODOTODOTDOTODO")) {
 
                 //TODO
 
@@ -229,9 +229,13 @@ public class AsynchroConnector implements IConnector2 {
                 controller.requestGameInfo();
                 
             /* Advise to update games list info*/
-            } else if (firstLine.startsWith("Update games info")) {
+            } else if (firstLine.startsWith("Update games list")) {
                 controller.requestGamesList();
-                
+
+            /* Advise to update game map*/
+            } else if (firstLine.startsWith("Update game map")) {
+                controller.requestGameMap();
+
             } else { //all other messages //TODO ADD CHAT MESSAGE AND GET CHAT MESSAGES
                 JOptionPane.showMessageDialog(null, "Uncatched message in processServerMessage \n" +
                         " " + firstLine);

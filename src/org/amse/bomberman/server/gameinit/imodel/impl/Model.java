@@ -126,6 +126,7 @@ public class Model implements IModel {
                     }
                     if (!isMoveToReserved(newX, newY)) {
                         makeMove(objectToMove, newX, newY);
+                        this.game.notifyGameMapUpdateListeners();
                         return true;
                     }
                 }
@@ -230,12 +231,14 @@ public class Model implements IModel {
 
     public void addExplosions(List<Pair> explSq) {
         this.explosionSquares.addAll(explSq);
+        this.game.notifyGameMapUpdateListeners();
     }
 
     public void addBomb(Bomb bomb) {
         this.bombs.add(bomb);
         Pair bombPosition = bomb.getPosition();
         this.map.setSquare(bombPosition.getX(), bombPosition.getY(), Constants.MAP_BOMB);
+        this.game.notifyGameMapUpdateListeners();
     }
 
     public void detonateBomb(int x, int y) {
@@ -254,10 +257,12 @@ public class Model implements IModel {
         this.bombs.remove(bomb);
         Pair bombPosition = bomb.getPosition();
         this.map.setSquare(bombPosition.getX(), bombPosition.getY(), Constants.MAP_DETONATED_BOMB);
+        this.game.notifyGameMapUpdateListeners();
     }
 
     public void removeExplosion(Pair explosion) {
         this.explosionSquares.remove(explosion);
+        this.game.notifyGameMapUpdateListeners();
     }
 
     /**
@@ -305,6 +310,7 @@ public class Model implements IModel {
                         return; //if player staying under the bomb
                     }
                     Bomb bomb = new Bomb(this, player, map, new Pair(x, y), timer);
+                    this.game.notifyGameMapUpdateListeners();
                 }
             }
         }
