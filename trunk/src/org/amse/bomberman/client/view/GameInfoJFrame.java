@@ -67,14 +67,9 @@ public class GameInfoJFrame extends JFrame implements IView{
             players[i].setHorizontalAlignment(SwingConstants.CENTER);
             if (i >= playersNum) {
                 this.setPlayer(i, closedName);
+                players[i].setVisible(false);
             }
         }
-        startJButton.setAction(new StartAction(this));
-        startJButton.setPreferredSize(defaultButton);
-        botJButton.setAction(new AddBotAction(this));
-        botJButton.setPreferredSize(defaultButton);
-        cancelJButton.setAction(new CancelAction(this));
-        cancelJButton.setPreferredSize(defaultButton);
         messageTF.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent e) {
             }
@@ -103,9 +98,18 @@ public class GameInfoJFrame extends JFrame implements IView{
         });
         try {
             List<String> gameInfo = Connector.getInstance().getMyGameInfo();
+            cancelJButton.setAction(new CancelAction(this));
+            cancelJButton.setPreferredSize(defaultButton);
+            startJButton.setPreferredSize(defaultButton);
+            botJButton.setPreferredSize(defaultButton);
             if (gameInfo.get(0).equals("false")) {
                 startJButton.setEnabled(false);
+                startJButton.setVisible(false);
                 botJButton.setEnabled(false);
+                botJButton.setVisible(false);
+            } else {
+                startJButton.setAction(new StartAction(this));
+                botJButton.setAction(new AddBotAction(this));
             }
             for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
                 this.setPlayer(i, gameInfo.get(i+2));

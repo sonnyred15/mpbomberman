@@ -18,7 +18,6 @@ import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.view.StartJFrame;
-import org.amse.bomberman.client.view.gamejframe.GameJFrameUtil.MyJPanel;
 
 /**
  *
