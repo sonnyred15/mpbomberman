@@ -31,13 +31,15 @@ public interface IConnector2 {
 
     public void requestStartGame() throws NetException;
 
-    public void requestMap() throws NetException;
+    public void requestGameMap() throws NetException;
+
+    public void requestDownloadGameMap(String gameMapName) throws NetException;
 
     public void requestPlantBomb() throws NetException;
 
     public void requestJoinBotIntoGame(int gameNumber) throws NetException;
 
-    public void requestMapsList() throws NetException;
+    public void requestGameMapsList() throws NetException;
 
     public void requestIsGameStarted() throws NetException;
 
@@ -45,7 +47,7 @@ public interface IConnector2 {
 
     public void sendChatMessage(String message) throws NetException;
 
-    public void getNewChatMessages() throws NetException;
+    public void requestNewChatMessages() throws NetException;
 
     @Deprecated
     public InetAddress getInetAddress();

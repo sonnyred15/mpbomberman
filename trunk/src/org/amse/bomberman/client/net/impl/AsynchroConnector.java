@@ -87,7 +87,7 @@ public class AsynchroConnector implements IConnector2 {
         sendRequest("" + Command.START_GAME.getValue());
     }
 
-    public void requestMap() throws NetException {
+    public void requestGameMap() throws NetException {
         sendRequest("" + Command.GET_MAP_ARRAY.getValue());
     }
 
@@ -99,7 +99,7 @@ public class AsynchroConnector implements IConnector2 {
         sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " " + gameID + " BOT");
     }
 
-    public void requestMapsList() throws NetException {
+    public void requestGameMapsList() throws NetException {
     }
 
     public void requestIsGameStarted() throws NetException {
@@ -114,7 +114,7 @@ public class AsynchroConnector implements IConnector2 {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void getNewChatMessages() throws NetException {
+    public void requestNewChatMessages() throws NetException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -128,6 +128,11 @@ public class AsynchroConnector implements IConnector2 {
 
     public void beginUpdating() throws NetException {
         throw new UnsupportedOperationException("Not supported in current implementation.");
+    }
+
+    public void requestDownloadGameMap(String gameMapName) throws NetException {
+        //TODO
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private class ServerListen implements Runnable {
@@ -169,7 +174,7 @@ public class AsynchroConnector implements IConnector2 {
             } else if (firstLine.startsWith("Create game")) {
                 controller.updateCreateGameResult(message.get(1));
 
-            /* My game info */
+            /* Game info */ //owner players and so on
             } else if (firstLine.startsWith("Game info")) {
                 message.remove(0);
                 controller.updateGameInfo(message);
@@ -177,6 +182,47 @@ public class AsynchroConnector implements IConnector2 {
             /* Join game info*/
             } else if (firstLine.startsWith("Join game")) {                
                 controller.updateJoinGameResult(message.get(1));
+
+            /* Do move info*/
+            } else if (firstLine.startsWith("Do move")) {
+                controller.updateDoMoveResult(message.get(1));
+
+            /* GameMap array+explosions+playerInfo*/
+            } else if (firstLine.startsWith("Game map info")) {
+                message.remove(0);
+                controller.updateGameMap(message);
+
+            /* Start game info*/
+            } else if (firstLine.startsWith("Start game")) {
+                controller.updateStartGameResult(message.get(1));
+
+            /* Leave game*/
+            } else if (firstLine.startsWith("Leave game")) {
+                controller.updateLeaveGameResult(message.get(1));
+
+            /* Place bomb info*/
+            } else if (firstLine.startsWith("Plant bomb")) {
+                controller.updatePlantBombResult(message.get(1));
+
+            /* Download game map*/
+            } else if (firstLine.startsWith("Game map download")) {
+                message.remove(0);
+                controller.updateDownloadGameMap(message);
+            
+            /* Game status info*/ //started or not
+            } else if (firstLine.startsWith("Game status info")) {
+                message.remove(0);
+                controller.updateGameInfo(message);
+
+            /* Game maps list*/
+            } else if (firstLine.startsWith("Maps list")) {
+                message.remove(0);
+                controller.updateMapsList(message);
+
+            /* Add bot result*/
+            } else if (firstLine.startsWith("BOT TODOTODOTODOTDOTOD")) {
+
+                //TODO
 
             /* Advise to update game info*/
             } else if (firstLine.startsWith("Update game info")) {
@@ -186,7 +232,7 @@ public class AsynchroConnector implements IConnector2 {
             } else if (firstLine.startsWith("Update games info")) {
                 controller.requestGamesList();
                 
-            } else { //all other messages
+            } else { //all other messages //TODO ADD CHAT MESSAGE AND GET CHAT MESSAGES
                 JOptionPane.showMessageDialog(null, "Uncatched message in processServerMessage \n" +
                         " " + firstLine);
 

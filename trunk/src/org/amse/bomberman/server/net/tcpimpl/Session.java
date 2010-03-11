@@ -243,6 +243,10 @@ public class Session extends Thread implements ISession {
                         + "Wrong command parameters. Error on client side. " + ex.getMessage());
                 return;
             }
+        } else{ // if command have more or less arguments than must have.
+            sendAnswer("Wrong query parameters. Error on client side.");
+            writeToLog("Session: createGame error. Client tryed to create game, canceled. " + "Wrong command parameters. Error on client side.");
+            return;
         }
 
         try {
@@ -280,7 +284,7 @@ public class Session extends Thread implements ISession {
     }
 
     protected void joinGame(String[] queryArgs) {
-        //"2" "gameID" "botName"
+        //"2" "gameID" "playerName"
 
         int gameID = 0;
         String playerName = "defaultPlayer";
@@ -514,7 +518,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void sendMapsList() {
+    protected void sendMapsList() {//TODO if no maps NPE FIX
         List<String> maps = Stringalize.mapsList(Creator.createMapsList());
         if (maps != null || maps.size()>0) {
             sendAnswer(maps);
