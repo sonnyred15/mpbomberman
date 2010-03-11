@@ -5,13 +5,14 @@
 package org.amse.bomberman.server.net;
 
 import java.util.List;
+import org.amse.bomberman.server.gameinit.GameMapUpdateListener;
 import org.amse.bomberman.server.gameinit.Player;
 
 /**
  *
  * @author chibis
  */
-public interface ISession { // Session must Extend Thread
+public interface ISession extends GameMapUpdateListener{ // Session must Extend Thread
 
     void run(); //method from Thread
 

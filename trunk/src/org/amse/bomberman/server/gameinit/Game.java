@@ -30,6 +30,7 @@ public class Game {
     private boolean started;
     private final DieListener dieListener;
     private final Chat chat;
+    private final List<GameMapUpdateListener> gameMapUpdateListeners;
 
     public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
         this.server = server;
@@ -46,6 +47,7 @@ public class Game {
         this.model = new Model(map, this);
         this.sessions = Collections.synchronizedList(new ArrayList<ISession>());
         this.players = Collections.synchronizedList(new ArrayList<Player>());
+        this.gameMapUpdateListeners = Collections.synchronizedList(new ArrayList<GameMapUpdateListener>());
         this.dieListener = new DieListener(this);
 
         this.started = false;
@@ -69,7 +71,8 @@ public class Game {
 
             player.setDieListener(dieListener);
         }
-
+        this.sessions.add(session);
+        this.addGameMapUpdateListener(session);
         return player;
     }
 
@@ -98,11 +101,11 @@ public class Game {
 
     public void disconnectFromGame(Player player) {
         this.players.remove(player);
-
-        synchronized(this.sessions){
+        synchronized (this.sessions) {
             for (ISession session : sessions) {
-                if(session.correspondTo(player)){
+                if (session.correspondTo(player)) {
                     this.sessions.remove(session);
+                    this.removeGameMapUpdateListener(session);
                     break;
                 }
             }
@@ -110,6 +113,7 @@ public class Game {
 
         if (this.started) {//removing player from GameMap
             this.model.removePlayer(player.getID());
+            this.notifyGameMapUpdateListeners();
         }
         if (player == this.owner) {
             this.endGame();
@@ -160,8 +164,8 @@ public class Game {
         }
     }
 
-    public List<String> getNewMessagesFromChat(Player player){
-        synchronized(this.chat){
+    public List<String> getNewMessagesFromChat(Player player) {
+        synchronized (this.chat) {
             int chatID = this.players.indexOf(player);
             if (chatID != -1) {
                 return this.chat.getNewMessages(chatID);
@@ -210,7 +214,23 @@ public class Game {
         return owner;
     }
 
-    public List<ISession> getSessions(){//mb unmodifiable
-        return this.sessions;
+    public void addGameMapUpdateListener(GameMapUpdateListener listener){
+        this.gameMapUpdateListeners.add(listener);
+    }
+
+    public void removeGameMapUpdateListener(GameMapUpdateListener listener){
+        this.gameMapUpdateListeners.remove(listener);
+    }
+
+    public void notifyGameMapUpdateListeners(){
+        synchronized(gameMapUpdateListeners){
+            for (GameMapUpdateListener gameMapUpdateListener : gameMapUpdateListeners) {
+                gameMapUpdateListener.gameMapChanged();
+            }
+        }
+    }
+
+    public List<ISession> getSessions() {
+        return Collections.unmodifiableList(this.sessions);
     }
 }

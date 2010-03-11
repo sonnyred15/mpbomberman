@@ -737,6 +737,10 @@ public class Session extends Thread implements ISession {
         this.server.sessionTerminated(this);
     }
 
+    public void gameMapChanged() {
+        throw new UnsupportedOperationException("Not supported in current implementation.");
+    }
+
     protected class MyTimer {
 
         private long startTime;

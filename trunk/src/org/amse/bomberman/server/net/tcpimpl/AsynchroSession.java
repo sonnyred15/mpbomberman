@@ -29,6 +29,16 @@ public class AsynchroSession extends Session {
     }
 
     @Override
+    public void gameMapChanged() {
+        if (this.game != null) {
+            List<String> messages = new ArrayList<String>();
+            List<ISession> sessionsToNotify = this.game.getSessions();
+            messages.add("Update game map.");
+            this.server.notifySomeClients(sessionsToNotify, messages);
+        }
+    }
+
+    @Override
     protected void sendGames() {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
         linesToSend.add(0, "Games list.");
@@ -88,10 +98,10 @@ public class AsynchroSession extends Session {
             this.game.setOwner(this.player);
             messages.add("Game created.");
             sendAnswer(messages);
-            messages.remove(messages.size() - 1);
 
-            messages.add("New game was created.");
-            this.server.notifyAllClientsExceptOne(messages, this);
+            messages.clear();
+            messages.add("Update games list. New game was created.");
+            this.server.notifyAllClientsExceptOne(messages, this);//PENDING EXCEPT OR NOT?
 
             writeToLog("Session: client created game." + " Map=" + mapName + " gameName=" + gameName + " maxPlayers=" + maxPlayers);
             return;
@@ -161,11 +171,10 @@ public class AsynchroSession extends Session {
                     List<ISession> sessionsToNotify = this.game.getSessions();
                     messages = new ArrayList<String>(1);
                     messages.add(0, "Update game info.");
-                    this.server.notifyAllClients(messages);//TODO //game.getSessions always return null.
-                    //this.server.notifySomeClients(sessionsToNotify, messages);
+                    this.server.notifySomeClients(sessionsToNotify, messages);
 
                     List<String> messages2 = new ArrayList<String>(1);
-                    messages2.add(0, "Update games info.");
+                    messages2.add(0, "Update games list.");
                     this.server.notifyAllClients(messages2);
 
                     writeToLog("Session: client joined to game." + " GameID=" + gameID + " Player=" + playerName);
@@ -217,10 +226,11 @@ public class AsynchroSession extends Session {
                 sendAnswer(messages);
 
                 if (moved) {
-                    List<ISession> sessionsToNotify = this.game.getSessions();
-                    messages = new ArrayList<String>(1);
-                    messages.add(0, "Update map.");
-                    this.server.notifySomeClients(sessionsToNotify, messages);
+//                    List<ISession> sessionsToNotify = this.game.getSessions();
+//                    messages = new ArrayList<String>(1);
+//                    messages.add(0, "Update game map.");
+//                    this.server.notifySomeClients(sessionsToNotify, messages);
+                    this.timer.setStartTime(System.currentTimeMillis());
                 }
                 return;
             } else { //timer.getDiff < gameStep true
@@ -298,15 +308,30 @@ public class AsynchroSession extends Session {
         messages.add(0, "Leave game info.");
 
         if (this.game != null) {
+            Game temp = this.game;
+
             this.game.disconnectFromGame(this.player);
             this.game = null;
             this.player = null;
             messages.add("Disconnected.");
             sendAnswer(messages);
 
-            messages.remove(1);
-            messages.add("Another player disconnected from game. Do update.");
-            this.server.notifyAllClientsExceptOne(messages, this);
+            List<ISession> sessionsToNotify = temp.getSessions();
+
+            if (temp.isStarted()) {
+//                messages.clear();
+//                messages.add("Update game map.");
+//                this.server.notifySomeClients(sessionsToNotify, messages);
+            } else {
+                messages.clear();
+                messages.add("Update game info.");
+                this.server.notifySomeClients(sessionsToNotify, messages);
+            }
+
+            messages.clear();
+            messages.add("Update games list");
+            this.server.notifyAllClients(messages);
+
             writeToLog("Session: player has been disconnected from the game.");
             return;
         } else {
@@ -329,10 +354,10 @@ public class AsynchroSession extends Session {
                 messages.add("Ok.");
                 sendAnswer(messages);
 
-                List<ISession> sessionsToNotify = this.game.getSessions();
-                messages.remove(1);
-                messages.add("Update map.");
-                this.server.notifySomeClients(sessionsToNotify, messages);
+//                List<ISession> sessionsToNotify = this.game.getSessions();
+//                messages.clear();
+//                messages.add("Update map.");
+//                this.server.notifySomeClients(sessionsToNotify, messages);
 
                 writeToLog("Session: tryed to plant bomb. " + "playerID=" + this.player.getID() + " " + this.player.getPosition().toString());
             }
@@ -401,7 +426,7 @@ public class AsynchroSession extends Session {
     @Override
     protected void sendMapsList() {//TODO if no maps NPE FIX
         List<String> messages = Stringalize.mapsList(Creator.createMapsList());
-        messages.add(0, "Maps list.");
+        messages.add(0, "Game maps list.");
 
         if (messages.size() > 1) {
             sendAnswer(messages);
@@ -416,7 +441,7 @@ public class AsynchroSession extends Session {
     }
 
     @Override
-    protected void addBot(String[] queryArgs) {
+    protected void addBot(String[] queryArgs) {//TODO
         //"11" "gameID" "botName"
 
         int gameID = 0;
@@ -455,6 +480,10 @@ public class AsynchroSession extends Session {
                     List<String> messages = new ArrayList<String>(1);
                     messages.add(0, "Update game info.");
                     this.server.notifySomeClients(sessionsToNotify, messages);
+
+                    messages.clear();
+                    messages.add("Update games list.");
+                    this.server.notifyAllClients(messages);
 
                     writeToLog("Session: added bot to game." + " GameID=" + gameID + " Player=" + botName);
                     return;
