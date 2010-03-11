@@ -20,4 +20,15 @@ public interface IModel {
     public String getPlayerName();
     public void setPlayerBombs(int amount);
     public int getPlayerBombs();
+    //needed from controller
+    public void setGamesList(List<String> gamesList);
+    public void setCreated(boolean created);
+    public void setJoined(boolean joined);
+    public void setStarted(boolean started);
+    public void setLeavedGame(boolean leaved);
+    public void downloadedGameMap(List<String> gameMap);
+    public void setGameMapsList(List<String> gameMapsList);
+    public void setBotAdded(boolean wasAdded);
+    public void setGameInfo(List<String> gameInfo);
+    public void setNewChatMessages(List<String> newChatMessages);
 }

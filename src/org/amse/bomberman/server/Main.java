@@ -4,6 +4,8 @@
  */
 package org.amse.bomberman.server;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author chibis
@@ -14,6 +16,10 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args){
-        new ServerFrame();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new ServerFrame();
+            }
+        });
     }
 }
