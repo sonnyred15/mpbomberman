@@ -44,7 +44,7 @@ public class ServerFrame extends JFrame {
         /*initial form properties*/
         super("server control");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setMinimumSize(new Dimension(200, 100));
+        this.setMinimumSize(new Dimension(240, 100));
         this.setResizable(false);
         this.setLocationRelativeTo(null); //null for center position
 
