@@ -738,7 +738,7 @@ public class Session extends Thread implements ISession {
     }
 
     public void gameMapChanged() {
-        throw new UnsupportedOperationException("Not supported in current implementation.");
+        ;//do nothing
     }
 
     protected class MyTimer {
