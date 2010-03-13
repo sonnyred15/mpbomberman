@@ -65,7 +65,7 @@ public class Controller {
                    NumberFormatException,
                    IOException {
 
-        this.connector = new AsynchroConnector(this);
+        this.connector = AsynchroConnector.getInstance();
         this.connector.сonnect(serverIP, serverPort);
     }
 
