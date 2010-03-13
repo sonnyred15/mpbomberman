@@ -1,5 +1,7 @@
 package org.amse.bomberman.client;
 
+import org.amse.bomberman.client.view.mywizard.MainWizard;
+
 /**
  *
  * @author Michail Korovkin
@@ -12,6 +14,7 @@ public class Main {
         //Controller controller = new Controller();
         //YOURMEGANEWVIEW view = new YOURMEGANEWVIEW(controller);
         //view.setVisible(true);
-        new org.amse.bomberman.client.view.StartJFrame();
+        //new org.amse.bomberman.client.view.StartJFrame();
+        MainWizard wizard = new MainWizard();
     }
 }

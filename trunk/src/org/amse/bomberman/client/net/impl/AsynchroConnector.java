@@ -30,10 +30,19 @@ import org.amse.bomberman.util.Constants.Direction;
 public class AsynchroConnector implements IConnector2 {
 
     private Socket socket;
-    private final Controller controller;
+    private static Controller controller;
+    private static IConnector2 connector = null;
 
-    public AsynchroConnector(Controller controller) {
-        this.controller = controller;
+    private AsynchroConnector() {
+        if (controller == null) {
+            controller = new Controller();
+        }
+    }
+    public static IConnector2 getInstance() {
+        if (connector == null) {
+            connector = new AsynchroConnector();
+        }
+        return connector;
     }
 
     public void сonnect(InetAddress address, int port) throws
