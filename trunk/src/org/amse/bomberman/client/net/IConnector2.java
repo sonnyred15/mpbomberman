@@ -15,46 +15,37 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public interface IConnector2 {
 
-    public void сonnect(InetAddress address, int port)
+    void сonnect(InetAddress address, int port)
             throws UnknownHostException, IOException;
 
-    public void requestLeaveGame() throws NetException;
+    void requestLeaveGame() throws NetException;
 
-    public void requestGamesList() throws NetException;
+    void requestGamesList() throws NetException;
 
-    public void requestCreateGame(String gameName, String mapName, int maxPl)
+    void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException;
 
-    public void requestJoinGame(int gameID) throws NetException;
+    void requestJoinGame(int gameID) throws NetException;
 
-    public void requestDoMove(Direction dir) throws NetException;
+    void requestDoMove(Direction dir) throws NetException;
 
-    public void requestStartGame() throws NetException;
+    void requestStartGame() throws NetException;
 
-    public void requestGameMap() throws NetException;
+    void requestGameMap() throws NetException;
 
-    public void requestDownloadGameMap(String gameMapName) throws NetException;
+    void requestDownloadGameMap(String gameMapName) throws NetException;
 
-    public void requestPlantBomb() throws NetException;
+    void requestPlantBomb() throws NetException;
 
-    public void requestJoinBotIntoGame(int gameNumber) throws NetException;
+    void requestJoinBotIntoGame(int gameNumber) throws NetException;
 
-    public void requestGameMapsList() throws NetException;
+    void requestGameMapsList() throws NetException;
 
-    public void requestIsGameStarted() throws NetException;
+    void requestIsGameStarted() throws NetException;
 
-    public void requestGameInfo() throws NetException;
+    void requestGameInfo() throws NetException;
 
-    public void sendChatMessage(String message) throws NetException;
+    void sendChatMessage(String message) throws NetException;
 
-    public void requestNewChatMessages() throws NetException;
-
-    @Deprecated
-    public InetAddress getInetAddress();
-
-    @Deprecated
-    public int getPort();
-
-    @Deprecated
-    public void beginUpdating() throws NetException;//???
+    void requestNewChatMessages() throws NetException;
 }

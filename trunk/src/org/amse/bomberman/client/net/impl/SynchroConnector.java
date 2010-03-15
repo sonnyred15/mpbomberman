@@ -16,14 +16,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.control.Controller;
-import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
@@ -33,7 +31,6 @@ public class SynchroConnector implements IConnector2 {
 
     private Socket socket;
     private final Controller controller;
-    private Timer timer;
 
     public SynchroConnector(Controller controller) {
         this.controller = controller;
@@ -42,17 +39,15 @@ public class SynchroConnector implements IConnector2 {
     public void сonnect(InetAddress address, int port) throws
             UnknownHostException,
             IOException {
+
         this.socket = new Socket(address, port);
     }
 
     public void requestLeaveGame() throws NetException {
-        // true stop timer?
-        if (timer != null) {
-            timer.cancel();
-        }
         List<String> answer = queryAnswer("" + Command.LEAVE_GAME.getValue());
         System.out.println(answer.get(0));
-        this.controller.updateLeaveGameResult(answer.get(0));
+        answer.add(0, ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
+        this.controller.receivedRequestResult(answer);
     }
 
     public void requestGamesList() throws NetException {
@@ -60,84 +55,97 @@ public class SynchroConnector implements IConnector2 {
         for (String string : games) {
             System.out.println(string);
         }
-        this.controller.updateGamesList(games);
+        games.add(0, ProtocolConstants.CAPTION_GAMES_LIST);
+        this.controller.receivedRequestResult(games);
     }
 
     public void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException {
+
         List<String> answer = queryAnswer("" + Command.CREATE_GAME.getValue() +
                 " " + gameName + " " + mapName + " " + maxPl);
-        this.controller.updateCreateGameResult(answer.get(0));
+
+        answer.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
+        this.controller.receivedRequestResult(answer);
     }
 
     public void requestJoinGame(int gameID) throws NetException {
         List<String> list = queryAnswer("2 " + gameID);
-        String answer = list.get(0);
-        System.out.println(answer);
-        this.controller.updateJoinGameResult(answer);
+        System.out.println(list.get(0));
+        list.add(0, ProtocolConstants.CAPTION_JOIN_GAME);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestDoMove(Direction dir) throws NetException {
         List<String> list = queryAnswer("3 " + dir.getValue());
-        String answer = list.get(0);
-        this.controller.updateDoMoveResult(answer);
+        list.add(0, ProtocolConstants.CAPTION_DO_MOVE);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestStartGame() throws NetException {
         List<String> list = queryAnswer("" + Command.START_GAME.getValue());
         System.out.println(list);
-        this.controller.updateStartGameResult(list.get(0));
+        list.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestGameMap() throws NetException {
-        List<String> gameMap = queryAnswer("" + Command.GET_MAP_ARRAY.getValue());
-        this.controller.updateGameMap(gameMap);
+        List<String> gameMap = queryAnswer("" + Command.GET_GAME_MAP_INFO.getValue());
+        gameMap.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
+        this.controller.receivedRequestResult(gameMap);
     }
 
     public void requestPlantBomb() throws NetException {
         List<String> list = queryAnswer("" + Command.PLACE_BOMB.getValue());
         System.out.println(list.get(0));
-        this.controller.updatePlantBombResult(list.get(0));
+        list.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_INFO);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestJoinBotIntoGame(int gameID) throws NetException {
         // bot name???!!!
         List<String> list = queryAnswer("" +
                 Command.ADD_BOT_TO_GAME.getValue() + " " + gameID + " BOT");
-        String answer = list.get(0);
-        System.out.println(answer);
-        this.controller.updateJoinBotResult(answer);
+        System.out.println(list.get(0));
+        list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestGameMapsList() throws NetException {
-        List<String> gameMaps = queryAnswer("" + Command.GET_MAPS_LIST.getValue());
-        this.controller.updateMapsList(gameMaps);
+        List<String> gameMaps = queryAnswer("" + Command.GET_GAME_MAPS_LIST.getValue());
+        gameMaps.add(0, ProtocolConstants.CAPTION_GAME_MAPS_LIST);
+        this.controller.receivedRequestResult(gameMaps);
     }
 
     public void requestIsGameStarted() throws NetException {
         List<String> list = queryAnswer("" + Command.GET_GAME_STATUS.getValue());
-        this.controller.updateIsGameStarted(list.get(0));
+        list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
+        this.controller.receivedRequestResult(list);
     }
 
     public void requestGameInfo() throws NetException {
         List<String> list = queryAnswer("" + Command.GET_MY_GAME_INFO.getValue());
-        this.controller.updateGameInfo(list);
+        list.add(0, ProtocolConstants.CAPTION_GAME_INFO);
+        this.controller.receivedRequestResult(list);
     }
 
     public void sendChatMessage(String message) throws NetException {
         List<String> answer = queryAnswer("" + Command.CHAT_ADD_MSG.getValue() +
                 " " + message);
-        this.controller.updateNewChatMessages(answer);
+        answer.add(0, ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO);
+        this.controller.receivedRequestResult(answer);
     }
 
     public void requestNewChatMessages() throws NetException {
         List<String> answer = queryAnswer("" + Command.CHAT_GET_NEW_MSGS.getValue());
-        this.controller.updateNewChatMessages(answer);
+        answer.add(0, ProtocolConstants.CAPTION_GET_CHAT_MSGS);
+        this.controller.receivedRequestResult(answer);
     }
 
     public void requestDownloadGameMap(String gameMapName) throws NetException {
-        List<String> answer = queryAnswer("" + Command.DOWNLOAD_MAP + " " + gameMapName);
-        this.controller.updateDownloadGameMap(answer);
+        List<String> answer = queryAnswer("" + Command.DOWNLOAD_GAME_MAP + " " + gameMapName);
+        answer.add(0, ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP);
+        this.controller.receivedRequestResult(answer);
     }
 
     private synchronized ArrayList<String> queryAnswer(String query) throws
@@ -172,33 +180,5 @@ public class SynchroConnector implements IConnector2 {
             throw new NetException();
         }
         return answer;
-    }
-
-    public InetAddress getInetAddress() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public int getPort() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void beginUpdating() {
-        // must be here or somewhere else???
-        timer = new Timer();
-        timer.schedule(new UpdateTimerTask(), (long) 0, (long) Constants.GAME_STEP_TIME);
-    }
-
-    private class UpdateTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            try {
-                requestGameMap();//will call this.controller.updateGameMap and update it in model
-            } catch (NetException ex) {
-                // is it good???
-                ex.printStackTrace();
-                this.cancel();
-            }
-        }
     }
 }

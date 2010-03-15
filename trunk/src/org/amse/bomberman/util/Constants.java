@@ -85,13 +85,13 @@ public final class Constants {
         CREATE_GAME(1),
         JOIN_GAME(2),
         DO_MOVE(3),
-        GET_MAP_ARRAY(4),
+        GET_GAME_MAP_INFO(4),
         START_GAME(5),
         LEAVE_GAME(6),
         PLACE_BOMB(7),
-        DOWNLOAD_MAP(8),
+        DOWNLOAD_GAME_MAP(8),
         GET_GAME_STATUS(9),
-        GET_MAPS_LIST(10),
+        GET_GAME_MAPS_LIST(10),
         ADD_BOT_TO_GAME(11),
         GET_MY_GAME_INFO(12),
         CHAT_ADD_MSG(13),
@@ -118,7 +118,7 @@ public final class Constants {
                 case 3:
                     return DO_MOVE;
                 case 4:
-                    return GET_MAP_ARRAY;
+                    return GET_GAME_MAP_INFO;
                 case 5:
                     return START_GAME;
                 case 6:
@@ -126,11 +126,11 @@ public final class Constants {
                 case 7:
                     return PLACE_BOMB;
                 case 8:
-                    return DOWNLOAD_MAP;
+                    return DOWNLOAD_GAME_MAP;
                 case 9:
                     return GET_GAME_STATUS;
                 case 10:
-                    return GET_MAPS_LIST;
+                    return GET_GAME_MAPS_LIST;
                 case 11:
                     return ADD_BOT_TO_GAME;
                 case 12:
