@@ -61,7 +61,7 @@ public class ServerInfoJFrame extends JFrame {
             c.add(jsp);
 
             refreshJButton.setAction(new RefreshAction(this));
-            createJButton.setAction(new CreateAction(this));
+            //createJButton.setAction(new CreateAction(this));
             joinJButton.setAction(new JoinAction(this));
             setResizable(false);
             setVisible(true);
@@ -181,7 +181,7 @@ public class ServerInfoJFrame extends JFrame {
         }
     }
 
-    public static class CreateAction extends AbstractAction {
+    /*public static class CreateAction extends AbstractAction {
         ServerInfoJFrame parent;
 
         public CreateAction(ServerInfoJFrame jFrame) {
@@ -201,7 +201,7 @@ public class ServerInfoJFrame extends JFrame {
                 StartJFrame jFrame = new StartJFrame();
             }
         }
-    }
+    }*/
 
     public static class JoinAction extends AbstractAction {
         ServerInfoJFrame parent;

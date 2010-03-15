@@ -3,8 +3,12 @@ package org.amse.bomberman.client.view.mywizard;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -14,6 +18,7 @@ import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.view.CreatingGameJDialog;
 
 /**
  *
@@ -22,44 +27,40 @@ import org.amse.bomberman.client.net.impl.Connector;
 public class Panel2 extends JPanel{
     private final int height = 480;
     private final int width = 640;
+    private MyWizard parent;
     private JButton createJButton = new JButton();
-    private JButton joinJButton = new JButton();
     private JButton refreshJButton = new JButton();
     private JTable table = new JTable(new MyTableModel());
     private final Dimension buttonSize = new Dimension(200, 40);
 
-    public Panel2() {
+    public Panel2(MyWizard jframe) {
         this.setSize(width, height);
+        parent = jframe;
 
         JPanel leftBox = new JPanel();
         // how calculate sizes???
-        leftBox.setPreferredSize(new Dimension(100, 120));
-        leftBox.setLayout(new GridLayout(4, 1, 10, 10));
+        leftBox.setPreferredSize(new Dimension(100, 70));
+        leftBox.setLayout(new GridLayout(2, 1, 10, 10));
         leftBox.add(createJButton);
-        leftBox.add(joinJButton);
         leftBox.add(refreshJButton);
-        //try {
-            //this.refreshTable();
-            this.setSizesTable();
+        this.setSizesTable();
 
-            this.setLayout(new FlowLayout());
-            this.add(leftBox);
-            JScrollPane jsp = new JScrollPane(table, JScrollPane
-                    .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            // how calculate sizes???
-            jsp.setPreferredSize(new Dimension(width - 120, height - 50));
-            this.add(jsp);
+        this.setLayout(new FlowLayout());
+        this.add(leftBox);
+        JScrollPane jsp = new JScrollPane(table, JScrollPane
+                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // how calculate sizes???
+        jsp.setPreferredSize(new Dimension(width - 120, height - 50));
+        this.add(jsp);
 
-            //refreshJButton.setAction(new RefreshAction(this));
-            //createJButton.setAction(new CreateAction(this));
-            //joinJButton.setAction(new JoinAction(this));
-        //} catch (NetException ex) {
-        //    JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-        //            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            //this.dispose();
-            //StartJFrame jFrame = new StartJFrame();
-        //}
-            this.setVisible(true);
+        refreshJButton.setAction(new RefreshAction(this));
+        createJButton.setAction(new CreateAction(this));
+        this.setVisible(true);
+    }
+    // !!!!!!!!!!!!!!!!!!!!  is it really need???
+    @Override
+    public MyWizard getParent() {
+        return parent;
     }
     private void refreshTable() throws NetException {
         IConnector connect = Connector.getInstance();
@@ -146,11 +147,11 @@ public class Panel2 extends JPanel{
         }
     }
 
-    /*public static class RefreshAction extends AbstractAction {
-        ServerInfoJFrame parent;
+    private class RefreshAction extends AbstractAction {
+        Panel2 parent;
 
-        public RefreshAction(ServerInfoJFrame jFrame) {
-            parent = jFrame;
+        public RefreshAction(Panel2 panel) {
+            parent = panel;
             putValue(NAME, "Refresh");
             putValue(SHORT_DESCRIPTION, "Refresh information from server");
             putValue(SMALL_ICON, null);
@@ -162,17 +163,16 @@ public class Panel2 extends JPanel{
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                parent.dispose();
-                StartJFrame jFrame = new StartJFrame();
+                getParent().setCurrentJPanel(0);
             }
         }
     }
 
-    public static class CreateAction extends AbstractAction {
-        ServerInfoJFrame parent;
+    private class CreateAction extends AbstractAction {
+        Panel2 myParent;
 
-        public CreateAction(ServerInfoJFrame jFrame) {
-            parent = jFrame;
+        public CreateAction(Panel2 panel) {
+            myParent = panel;
             putValue(NAME, "Create");
             putValue(SHORT_DESCRIPTION, "Create new Game");
             putValue(SMALL_ICON, null);
@@ -180,32 +180,32 @@ public class Panel2 extends JPanel{
 
         public void actionPerformed(ActionEvent e) {
             try {
-                CreatingGameJDialog jframe = new CreatingGameJDialog(parent);
+                CreatingGameJDialog jframe = new CreatingGameJDialog(myParent.getParent());
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                JOptionPane.showMessageDialog(myParent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                parent.dispose();
-                StartJFrame jFrame = new StartJFrame();
+                getParent().setCurrentJPanel(0);
             }
         }
     }
 
+    /*
     public static class JoinAction extends AbstractAction {
-        ServerInfoJFrame parent;
+        ServerInfoJFrame myParent;
 
         public JoinAction(ServerInfoJFrame jFrame) {
-            parent = jFrame;
+            myParent = jFrame;
             putValue(NAME, "Join");
             putValue(SHORT_DESCRIPTION, "Join to the selected Game");
             putValue(SMALL_ICON, null);
         }
 
         public void actionPerformed(ActionEvent e) {
-            int gameNumber = parent.getSelectedGame();
+            int gameNumber = myParent.getSelectedGame();
             if (gameNumber != -1) {
-                parent.join(gameNumber);
+                myParent.join(gameNumber);
             } else {
-                JOptionPane.showMessageDialog(parent, "You did't select the game! "
+                JOptionPane.showMessageDialog(myParent, "You did't select the game! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
