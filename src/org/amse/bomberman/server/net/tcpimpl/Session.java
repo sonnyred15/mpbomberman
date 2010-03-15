@@ -54,7 +54,7 @@ public class Session extends Thread implements ISession {
         BufferedWriter out = null;
         try {
             OutputStream os = this.clientSocket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
             out = new BufferedWriter(osw);
             writeToLog("Session: sending answer...");
             out.write(shortAnswer);
@@ -72,20 +72,19 @@ public class Session extends Thread implements ISession {
      * Send strings from linesToSend to client.
      * @param linesToSend lines to send.
      */
-    public void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
+    public void sendAnswer(List<String> linesToSend) throws
+            IllegalArgumentException {
         BufferedWriter out = null;
         try {
             OutputStream os = this.clientSocket.getOutputStream();//throws IOException
-            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
             out = new BufferedWriter(osw);
 
             writeToLog("Session: sending answer...");
 
             if (linesToSend == null || linesToSend.size() == 0) {
-                writeToLog("Session: sendAnswer error. Realization error."
-                        + " Tryed to send 0 strings to client.");
-                throw new IllegalArgumentException("Session sendAnswer method must send"
-                        + " at least one string to client.");
+                writeToLog("Session: sendAnswer error. Realization error." + " Tryed to send 0 strings to client.");
+                throw new IllegalArgumentException("Session sendAnswer method must send" + " at least one string to client.");
             } else {
                 for (String string : linesToSend) {
                     out.write(string);
@@ -119,13 +118,11 @@ public class Session extends Thread implements ISession {
 
         } catch (NumberFormatException ex) {
             sendAnswer("Wrong query.");
-            writeToLog("Session: answerOnCommand error. Wrong first part of query. "
-                    + "Wrong query from client. " + ex.getMessage());
+            writeToLog("Session: answerOnCommand error. Wrong first part of query. " + "Wrong query from client. " + ex.getMessage());
             return;
         } catch (IllegalArgumentException ex) {
             sendAnswer("Wrong query. Not supported command.");
-            writeToLog("Session: answerOnCommand error. Non supported command int from client. "
-                    + ex.getMessage());
+            writeToLog("Session: answerOnCommand error. Non supported command int from client. " + ex.getMessage());
             return;
         }
 
@@ -150,9 +147,9 @@ public class Session extends Thread implements ISession {
                 doMove(queryArgs);
                 break;
             }
-            case GET_MAP_ARRAY: {
+            case GET_GAME_MAP_INFO: {
                 //"4"
-                sendMapArray();
+                sendGameMapArray();
                 break;
             }
             case START_GAME: {
@@ -170,9 +167,9 @@ public class Session extends Thread implements ISession {
                 placeBomb();
                 break;
             }
-            case DOWNLOAD_MAP: {
+            case DOWNLOAD_GAME_MAP: {
                 //"8 mapName"
-                sendMap(queryArgs);
+                sendDownloadingGameMap(queryArgs);
                 break;
             }
             case GET_GAME_STATUS: {
@@ -180,9 +177,9 @@ public class Session extends Thread implements ISession {
                 sendGameStatus();
                 break;
             }
-            case GET_MAPS_LIST: {
+            case GET_GAME_MAPS_LIST: {
                 //"10"
-                sendMapsList();
+                sendGameMapsList();
                 break;
             }
             case ADD_BOT_TO_GAME: {
@@ -239,11 +236,10 @@ public class Session extends Thread implements ISession {
                 maxPlayers = Integer.parseInt(queryArgs[3]);
             } catch (NumberFormatException ex) {
                 sendAnswer("Wrong query parameters. Error on client side.");
-                writeToLog("Session: createGame error. Client tryed to create game, canceled. "
-                        + "Wrong command parameters. Error on client side. " + ex.getMessage());
+                writeToLog("Session: createGame error. Client tryed to create game, canceled. " + "Wrong command parameters. Error on client side. " + ex.getMessage());
                 return;
             }
-        } else{ // if command have more or less arguments than must have.
+        } else { // if command have more or less arguments than must have.
             sendAnswer("Wrong query parameters. Error on client side.");
             writeToLog("Session: createGame error. Client tryed to create game, canceled. " + "Wrong command parameters. Error on client side.");
             return;
@@ -261,24 +257,18 @@ public class Session extends Thread implements ISession {
 
             this.game = newGame;
             //TODO 
-            this.player = this.game.join("HOST",this);
+            this.player = this.game.join("HOST", this);
             this.game.setOwner(this.player);
             sendAnswer("Game created.");
-            writeToLog("Session: client created game."
-                    + " Map=" + mapName
-                    + " gameName=" + gameName
-                    + " maxPlayers=" + maxPlayers);
+            writeToLog("Session: client created game." + " Map=" + mapName + " gameName=" + gameName + " maxPlayers=" + maxPlayers);
             return;
         } catch (FileNotFoundException ex) {
             sendAnswer("No such map on server.");
-            writeToLog("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Map wasn`t founded on server."
-                    + " Map=" + mapName);
+            writeToLog("Session: createGame warning. Client tryed to create game, canceled. " + "Map wasn`t founded on server." + " Map=" + mapName);
             return;
         } catch (IOException ex) {
             sendAnswer("Error on server side, while loading map.");
-            writeToLog("Session: createGame error while loadimg map. "
-                    + " Map=" + mapName + " " + ex.getMessage());
+            writeToLog("Session: createGame error while loadimg map. " + " Map=" + mapName + " " + ex.getMessage());
             return;
         }
     }
@@ -293,10 +283,8 @@ public class Session extends Thread implements ISession {
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
-                    sendAnswer("Wrong command parameters. Error on client side."
-                            + " gameID must be int.");
-                    writeToLog("Session: joinGame error. " + " Wrong command parameters. "
-                            + "Error on client side. gameID must be int. " + ex.getMessage());
+                    sendAnswer("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    writeToLog("Session: joinGame error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
                 }
                 break;
             }
@@ -304,10 +292,8 @@ public class Session extends Thread implements ISession {
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
-                    sendAnswer("Wrong command parameters. Error on client side."
-                            + " gameID must be int.");
-                    writeToLog("Session: joinGame error. " + " Wrong command parameters. "
-                            + "Error on client side. gameID must be int. " + ex.getMessage());
+                    sendAnswer("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    writeToLog("Session: joinGame error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
                 }
                 playerName = queryArgs[2];
                 break;
@@ -319,8 +305,8 @@ public class Session extends Thread implements ISession {
                 break;
             }
         }
-        
-        if(this.game!=null){
+
+        if (this.game != null) {
             sendAnswer("Leave another game first.");
             writeToLog("Session: joinGame warning. Client tryed to join game, canceled. Already in other game.");
             return;
@@ -330,7 +316,7 @@ public class Session extends Thread implements ISession {
         Game gameToJoin = server.getGame(gameID);
         if (gameToJoin != null) {
             if (!gameToJoin.isStarted()) {
-                this.player = gameToJoin.join(playerName,this);
+                this.player = gameToJoin.join(playerName, this);
                 if (this.player == null) {//if game is full
                     sendAnswer("Game is full. Try to join later.");
                     writeToLog(
@@ -339,21 +325,17 @@ public class Session extends Thread implements ISession {
                 } else {
                     this.game = gameToJoin;
                     sendAnswer("Joined.");
-                    writeToLog("Session: client joined to game."
-                            + " GameID=" + gameID
-                            + " Player=" + playerName);
+                    writeToLog("Session: client joined to game." + " GameID=" + gameID + " Player=" + playerName);
                     return;
                 }
             } else { //if game.isStarted() true
                 sendAnswer("Game was already started.");
-                writeToLog("Session: joinGame warning. Client tryed to join gameID=" + gameID + " ,canceled."
-                        + " Game is already started. ");
+                writeToLog("Session: joinGame warning. Client tryed to join gameID=" + gameID + " ,canceled." + " Game is already started. ");
                 return;
             }
         } else { //if gameToJoin==null true
             sendAnswer("No such game.");
-            writeToLog("Session: client tryed to join gameID=" + gameID + " ,canceled."
-                    + " No such game on server.");
+            writeToLog("Session: client tryed to join gameID=" + gameID + " ,canceled." + " No such game on server.");
             return;
         }
     }
@@ -368,11 +350,9 @@ public class Session extends Thread implements ISession {
                     Direction direction = Direction.fromInt(dir); //throws IllegalArgumentException
                     moved = this.game.doMove(player, direction);
                 } catch (NumberFormatException ex) {
-                    writeToLog("Session: doMove error. Unsupported direction(not int). Error on client side."
-                            + " direction=" + queryArgs[1]);
+                    writeToLog("Session: doMove error. Unsupported direction(not int). Error on client side." + " direction=" + queryArgs[1]);
                 } catch (IllegalArgumentException ex) {
-                    writeToLog("Session: doMove error. Unsupported direction. Error on client side."
-                            + " direction=" + dir);
+                    writeToLog("Session: doMove error. Unsupported direction. Error on client side." + " direction=" + dir);
                 }
 
                 if (moved) {
@@ -383,8 +363,7 @@ public class Session extends Thread implements ISession {
                 return;
             } else { //timer.getDiff < gameStep true
                 sendAnswer("false");
-                writeToLog("Session: doMove warning. Client tryed to move, canceled. Moves allowed only every "
-                        + Constants.GAME_STEP_TIME + "ms.");
+                writeToLog("Session: doMove warning. Client tryed to move, canceled. Moves allowed only every " + Constants.GAME_STEP_TIME + "ms.");
                 return;
             }
         } else { //game == null true
@@ -442,11 +421,13 @@ public class Session extends Thread implements ISession {
             if (this.game.isStarted()) {
                 this.game.placeBomb(this.player); //is player alive checking in model
                 sendAnswer("Ok.");
-                writeToLog("Session: tryed to plant bomb. "
-                        + "playerID=" + this.player.getID() + " "
-                        + this.player.getPosition().toString());
+                writeToLog("Session: tryed to plant bomb. " + "playerID=" + this.player.getID() + " " + this.player.getPosition().toString());
+                return;
+            } else {
+                sendAnswer("Game is not started. Can`t place bomb.");//TODO add this to protocol!!!
+                writeToLog("Session: placew bomb warning. Cancelled, Game is not started.");
+                return;
             }
-            return;
         } else {
             sendAnswer("Not joined to any game.");
             writeToLog("Session: place bomb warning. Canceled. Not joined to any game.");
@@ -454,9 +435,9 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void sendMapArray() {
+    protected void sendGameMapArray() {
         if (this.game != null) {
-            List<String> linesToSend = 
+            List<String> linesToSend =
                     Stringalize.mapAndExplosionsAndPlayerInfo(this.game, this.player);
 
             sendAnswer(linesToSend);
@@ -469,7 +450,7 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void sendMap(String[] queryArgs) {
+    protected void sendDownloadingGameMap(String[] queryArgs) {
         int[][] ret = null;
         String mapFileName = queryArgs[1] + ".map";
 
@@ -478,17 +459,11 @@ public class Session extends Thread implements ISession {
                 ret = Creator.createMapAndGetArray(mapFileName);
             } catch (FileNotFoundException ex) {
                 sendAnswer("No such map on server.");
-                writeToLog("Session: sendMap warning. Client tryed to download map, canceled. "
-                        + "Map wasn`t founded on server."
-                        + " Map=" + mapFileName
-                        + " " + ex.getMessage());
+                writeToLog("Session: sendMap warning. Client tryed to download map, canceled. " + "Map wasn`t founded on server." + " Map=" + mapFileName + " " + ex.getMessage());
                 return;
             } catch (IOException ex) {
                 sendAnswer("Error on server side, while loading map.");
-                writeToLog("Session: sendMap error. Client tryed to download map, canceled. "
-                        + "Error on server side while loading map."
-                        + " Map=" + mapFileName
-                        + " " + ex.getMessage());
+                writeToLog("Session: sendMap error. Client tryed to download map, canceled. " + "Error on server side while loading map." + " Map=" + mapFileName + " " + ex.getMessage());
                 return;
             }
         } else { //if arguments!=2
@@ -500,8 +475,7 @@ public class Session extends Thread implements ISession {
         //if all is OK.
         List<String> lst = Stringalize.map(ret);
         sendAnswer(lst);
-        writeToLog("Session: client downloaded map."
-                + " Map=" + mapFileName);
+        writeToLog("Session: client downloaded map." + " Map=" + mapFileName);
 
     }
 
@@ -518,9 +492,9 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void sendMapsList() {//TODO if no maps NPE FIX
+    protected void sendGameMapsList() {//TODO if no maps NPE FIX
         List<String> maps = Stringalize.mapsList(Creator.createMapsList());
-        if (maps != null || maps.size()>0) {
+        if (maps != null || maps.size() > 0) {
             sendAnswer(maps);
             writeToLog("Session: sended maps list to client. Maps count=" + maps.size());
             return;
@@ -541,10 +515,8 @@ public class Session extends Thread implements ISession {
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
-                    sendAnswer("Wrong command parameters. Error on client side."
-                            + " gameID must be int.");
-                    writeToLog("Session: addBot error. " + " Wrong command parameters. "
-                            + "Error on client side. gameID must be int. " + ex.getMessage());
+                    sendAnswer("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    writeToLog("Session: addBot error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
                 }
                 break;
             }
@@ -552,10 +524,8 @@ public class Session extends Thread implements ISession {
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
-                    sendAnswer("Wrong command parameters. Error on client side."
-                            + " gameID must be int.");
-                    writeToLog("Session: addBot error. " + " Wrong command parameters. "
-                            + "Error on client side. gameID must be int. " + ex.getMessage());
+                    sendAnswer("Wrong command parameters. Error on client side." + " gameID must be int.");
+                    writeToLog("Session: addBot error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
                 }
                 botName = queryArgs[2];
                 break;
@@ -578,33 +548,28 @@ public class Session extends Thread implements ISession {
                 } else {
                     //this.game = gameToJoin;
                     sendAnswer("Bot added.");
-                    writeToLog("Session: added bot to game."
-                            + " GameID=" + gameID
-                            + " Player=" + botName);
+                    writeToLog("Session: added bot to game." + " GameID=" + gameID + " Player=" + botName);
                     return;
                 }
             } else { //if game.isStarted() true
                 sendAnswer("Game was already started.");
-                writeToLog("Session: addbot warning. Tryed to add bot to game(gameID=" + gameID + ") ,canceled."
-                        + " Game is already started.");
+                writeToLog("Session: addbot warning. Tryed to add bot to game(gameID=" + gameID + ") ,canceled." + " Game is already started.");
                 return;
             }
         } else { //if game==null true
             sendAnswer("No such game.");
-            writeToLog("Session: addBot warning. Tryed to add bot to game(gameID=" + gameID + ") ,canceled."
-                    + " No such game.");
+            writeToLog("Session: addBot warning. Tryed to add bot to game(gameID=" + gameID + ") ,canceled." + " No such game.");
             return;
         }
     }
 
-
     protected void sendGameInfo() {
-        if (this.game!=null){
+        if (this.game != null) {
             List<String> info = Stringalize.gameInfo(this.game, this.player);
             sendAnswer(info);
             writeToLog("Session: sended gameInfo to client.");
             return;
-        }else{
+        } else {
             sendAnswer("Not joined to any game.");
             writeToLog("Session: sendGameInfo warning. Client tryed to get game info, canceled. Not joined to any game.");
             return;
@@ -662,7 +627,7 @@ public class Session extends Thread implements ISession {
     }
 
     public boolean correspondTo(Player player) {
-        if (this.player==player){
+        if (this.player == player) {
             return true;
         }
         return false;
@@ -679,7 +644,7 @@ public class Session extends Thread implements ISession {
         writeToLog("Session: waiting query from client...");
         try {
             InputStream is = this.clientSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is,"UTF-8");
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
             in = new BufferedReader(isr);
             String clientQueryLine;
 
@@ -724,8 +689,7 @@ public class Session extends Thread implements ISession {
                 }
             } catch (IOException ex) {
                 // can`t close log stream. Log wont be saved
-                System.out.println("Session: run error. Can`t close log stream. Log won`t be saved. "
-                        + ex.getMessage());
+                System.out.println("Session: run error. Can`t close log stream. Log won`t be saved. " + ex.getMessage());
             }
         }
     }
@@ -756,7 +720,6 @@ public class Session extends Thread implements ISession {
         public long getDiff() {
             return System.currentTimeMillis() - this.startTime;
         }
-
     }
 
     protected void writeToLog(String message) {
@@ -768,5 +731,4 @@ public class Session extends Thread implements ISession {
     private boolean filtred(String message) {
         return false;
     }
-
 }

@@ -16,6 +16,7 @@ import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ILog;
+import org.amse.bomberman.util.ProtocolConstants;
 import org.amse.bomberman.util.Stringalize;
 
 /**
@@ -33,15 +34,17 @@ public class AsynchroSession extends Session {
         if (this.game != null) {
             List<String> messages = new ArrayList<String>();
             List<ISession> sessionsToNotify = this.game.getSessions();
-            messages.add("Update game map.");
+            messages.add(ProtocolConstants.UPDATE_GAME_MAP);
             this.server.notifySomeClients(sessionsToNotify, messages);
+        } else {
+            writeToLog("Session: GAME MAP CHANGED CALLED. BUT GAME=NULL. FIX PLZ.");
         }
     }
 
     @Override
     protected void sendGames() {
         List<String> linesToSend = Stringalize.unstartedGames(this.server.getGamesList());
-        linesToSend.add(0, "Games list.");
+        linesToSend.add(0, ProtocolConstants.CAPTION_GAMES_LIST);
 
         if (linesToSend.size() == 1) {//only "Games list." phraze
             linesToSend.add("No unstarted games finded.");
@@ -57,13 +60,20 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void createGame(String[] queryArgs) {
-        //Example queryArgs = "1" "gameName" "mapName" "maxpl"
-        String gameName = "defaultGameName";
-        String mapName = "1";
-        int maxPlayers = -1;//-1 for: defines by GameMap.
-
+        //Example queryArgs = "1" "gameName" "mapName" "maxpl"        
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Create game info.");
+        messages.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
+
+        if (this.game != null) {
+            messages.add("Leave another game first.");
+            sendAnswer(messages);
+            writeToLog("Session: createGame warning. Client tryed to join game, canceled. Already in other game.");
+            return;
+        }
+
+        String gameName = null;
+        String mapName = null;
+        int maxPlayers = -1;//-1 for: defines by GameMap.
 
         if (queryArgs.length == 4) {//if we getted command in full syntax
             gameName = queryArgs[1];
@@ -85,23 +95,17 @@ public class AsynchroSession extends Session {
 
         try {
             Game newGame = Creator.createGame(this.server, mapName, gameName, maxPlayers);
-            int index = this.server.addGame(newGame);
-
-            if (this.game != null) { //if not correct client can create multiple games
-                if (this.player != null) {//we must disconnect him from first game!
-                    this.game.disconnectFromGame(this.player);
-                }
-            }
+            this.server.addGame(newGame);
 
             this.game = newGame;
             this.player = this.game.join("HOST", this);
-            this.game.setOwner(this.player);
-            messages.add("Game created.");
+            this.game.setOwner(this.player);//TODO owner is session NOT PLAYER!!
+
             sendAnswer(messages);
 
             messages.clear();
-            messages.add("Update games list. New game was created.");
-            this.server.notifyAllClientsExceptOne(messages, this);//PENDING EXCEPT OR NOT?
+            messages.add(ProtocolConstants.UPDATE_GAMES_LIST + " New game was created.");
+            this.server.notifyAllClients(messages);
 
             writeToLog("Session: client created game." + " Map=" + mapName + " gameName=" + gameName + " maxPlayers=" + maxPlayers);
             return;
@@ -119,32 +123,8 @@ public class AsynchroSession extends Session {
     @Override
     protected void joinGame(String[] queryArgs) {
         //"2" "gameID" "playerName"
-
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Join game info.");
-
-        int gameID = 0;
-        String playerName = "defaultPlayer";
-        switch (queryArgs.length) {
-            case 3: { //if we getted command in full syntax
-                try {
-                    gameID = Integer.parseInt(queryArgs[1]);
-                } catch (NumberFormatException ex) {
-                    messages.add("Wrong command parameters. Error on client side." + " gameID must be int.");
-                    sendAnswer(messages);
-                    writeToLog("Session: joinGame error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
-                    return;
-                }
-                playerName = queryArgs[2];
-                break;
-            }
-            default: { //wrong syntax
-                messages.add("Wrong query. Error on client side.");
-                sendAnswer(messages);
-                writeToLog("Session: joinGame error. Wrong command parameters. Error on client side.");
-                return;
-            }
-        }
+        messages.add(0, ProtocolConstants.CAPTION_JOIN_GAME);
 
         if (this.game != null) {
             messages.add("Leave another game first.");
@@ -153,11 +133,33 @@ public class AsynchroSession extends Session {
             return;
         }
 
+        int gameID = 0;
+        String playerName = null;
+
+        if (queryArgs.length == 3) { //if we getted command in full syntax
+
+            try {
+                gameID = Integer.parseInt(queryArgs[1]);
+            } catch (NumberFormatException ex) {
+                messages.add("Wrong command parameters. Error on client side." + " gameID must be int.");
+                sendAnswer(messages);
+                writeToLog("Session: joinGame error. " + " Wrong command parameters. " + "Error on client side. gameID must be int. " + ex.getMessage());
+                return;
+            }
+            playerName = queryArgs[2];
+
+        } else { //wrong syntax
+            messages.add("Wrong query. Error on client side.");
+            sendAnswer(messages);
+            writeToLog("Session: joinGame error. Wrong command parameters. Error on client side.");
+            return;
+        }
+
         //all is ok
         Game gameToJoin = server.getGame(gameID);
         if (gameToJoin != null) {
             if (!gameToJoin.isStarted()) {
-                this.player = gameToJoin.join(playerName, this);
+                this.player = gameToJoin.join(playerName, this);//TODO join must return int. Player not part of Session!!!
                 if (this.player == null) {//if game is full
                     messages.add("Game is full. Try to join later.");
                     sendAnswer(messages);
@@ -170,11 +172,11 @@ public class AsynchroSession extends Session {
 
                     List<ISession> sessionsToNotify = this.game.getSessions();
                     messages = new ArrayList<String>(1);
-                    messages.add(0, "Update game info.");
+                    messages.add(0, ProtocolConstants.UPDATE_GAME_INFO);
                     this.server.notifySomeClients(sessionsToNotify, messages);
 
                     List<String> messages2 = new ArrayList<String>(1);
-                    messages2.add(0, "Update games list.");
+                    messages2.add(0, ProtocolConstants.UPDATE_GAMES_LIST);
                     this.server.notifyAllClients(messages2);
 
                     writeToLog("Session: client joined to game." + " GameID=" + gameID + " Player=" + playerName);
@@ -197,7 +199,7 @@ public class AsynchroSession extends Session {
     @Override
     protected void doMove(String[] queryArgs) {
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Do move info.");
+        messages.add(0, ProtocolConstants.CAPTION_DO_MOVE);
 
         if (this.game != null) {
             if (timer.getDiff() > Constants.GAME_STEP_TIME) {
@@ -206,7 +208,8 @@ public class AsynchroSession extends Session {
                 try {
                     dir = Integer.parseInt(queryArgs[1]);//throws NumberFormatException
                     Direction direction = Direction.fromInt(dir); //throws IllegalArgumentException
-                    moved = this.game.doMove(player, direction);
+                    moved =
+                            this.game.doMove(player, direction);
                 } catch (NumberFormatException ex) {
                     messages.add("Wrong move value.");
                     sendAnswer(messages);
@@ -226,13 +229,10 @@ public class AsynchroSession extends Session {
                 sendAnswer(messages);
 
                 if (moved) {
-//                    List<ISession> sessionsToNotify = this.game.getSessions();
-//                    messages = new ArrayList<String>(1);
-//                    messages.add(0, "Update game map.");
-//                    this.server.notifySomeClients(sessionsToNotify, messages);
                     this.timer.setStartTime(System.currentTimeMillis());
                 }
                 return;
+
             } else { //timer.getDiff < gameStep true
                 sendAnswer("false");
                 writeToLog("Session: doMove warning. Client tryed to move, canceled. Moves allowed only every " + Constants.GAME_STEP_TIME + "ms.");
@@ -247,9 +247,9 @@ public class AsynchroSession extends Session {
     }
 
     @Override
-    protected void sendMapArray() {
+    protected void sendGameMapArray() {
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Game map info.");
+        messages.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
 
         if (this.game != null) {
             List<String> linesToSend =
@@ -268,9 +268,8 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void startGame() {
-
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Start game info.");
+        messages.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
 
         if (this.game != null) {
             if (!this.game.isStarted()) {
@@ -303,15 +302,14 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void leaveGame() {
-
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Leave game info.");
+        messages.add(0, ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
 
         if (this.game != null) {
             Game temp = this.game;
 
-            this.game.disconnectFromGame(this.player);
-            this.game = null;
+            this.game.disconnectFromGame(this.player);//TODO must disconnect session NOT PLAYER
+            this.game = null;                         //but first game call model to remove player
             this.player = null;
             messages.add("Disconnected.");
             sendAnswer(messages);
@@ -319,17 +317,15 @@ public class AsynchroSession extends Session {
             List<ISession> sessionsToNotify = temp.getSessions();
 
             if (temp.isStarted()) {
-//                messages.clear();
-//                messages.add("Update game map.");
-//                this.server.notifySomeClients(sessionsToNotify, messages);
+                ;// do nothing
             } else {
                 messages.clear();
-                messages.add("Update game info.");
+                messages.add(ProtocolConstants.UPDATE_GAME_INFO);
                 this.server.notifySomeClients(sessionsToNotify, messages);
             }
 
             messages.clear();
-            messages.add("Update games list");
+            messages.add(ProtocolConstants.UPDATE_GAMES_LIST);
             this.server.notifyAllClients(messages);
 
             writeToLog("Session: player has been disconnected from the game.");
@@ -344,9 +340,8 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void placeBomb() {
-
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Plant bomb info.");
+        messages.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_INFO);
 
         if (this.game != null) { // Always if game!=null player is not null too!
             if (this.game.isStarted()) {
@@ -354,14 +349,12 @@ public class AsynchroSession extends Session {
                 messages.add("Ok.");
                 sendAnswer(messages);
 
-//                List<ISession> sessionsToNotify = this.game.getSessions();
-//                messages.clear();
-//                messages.add("Update map.");
-//                this.server.notifySomeClients(sessionsToNotify, messages);
-
                 writeToLog("Session: tryed to plant bomb. " + "playerID=" + this.player.getID() + " " + this.player.getPosition().toString());
+                return;
+            }else{
+                messages.add("Game is not started. Can`t place bomb.");
+                writeToLog("Session: placew bomb warning. Cancelled, Game is not started.");
             }
-            return;
         } else {
             sendAnswer("Not joined to any game.");
             writeToLog("Session: place bomb warning. Canceled. Not joined to any game.");
@@ -370,10 +363,9 @@ public class AsynchroSession extends Session {
     }
 
     @Override
-    protected void sendMap(String[] queryArgs) {
-
+    protected void sendDownloadingGameMap(String[] queryArgs) {
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Game map download.");
+        messages.add(0, ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP);
 
         int[][] ret = null;
         String mapFileName = queryArgs[1] + ".map";
@@ -404,9 +396,8 @@ public class AsynchroSession extends Session {
 
     @Override
     protected void sendGameStatus() {
-
         List<String> messages = new ArrayList<String>();
-        messages.add(0, "Game status info.");
+        messages.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
 
         if (this.game != null) {
             String ret = Stringalize.gameStatus(this.game);
@@ -424,13 +415,13 @@ public class AsynchroSession extends Session {
     }
 
     @Override
-    protected void sendMapsList() {//TODO if no maps NPE FIX
+    protected void sendGameMapsList() {//TODO if no maps NPE FIX
         List<String> messages = Stringalize.mapsList(Creator.createMapsList());
-        messages.add(0, "Game maps list.");
+        messages.add(0, ProtocolConstants.CAPTION_GAME_MAPS_LIST);
 
         if (messages.size() > 1) {
             sendAnswer(messages);
-            writeToLog("Session: sended maps list to client. Maps count=" + messages.size());
+            writeToLog("Session: sended maps list to client. Maps count=" + (messages.size()-1));
             return;
         } else {
             messages.add("No maps on server was founded.");
@@ -441,7 +432,7 @@ public class AsynchroSession extends Session {
     }
 
     @Override
-    protected void addBot(String[] queryArgs) {//TODO
+    protected void addBot(String[] queryArgs) {//TODO write for asynchro
         //"11" "gameID" "botName"
 
         int gameID = 0;
@@ -503,7 +494,8 @@ public class AsynchroSession extends Session {
     @Override
     protected void sendGameInfo() {
         List<String> info = new ArrayList<String>();
-        info.add(0, "Game info.");
+        info.add(0, ProtocolConstants.CAPTION_GAME_INFO);
+
         if (this.game != null) {
             info.addAll(Stringalize.gameInfo(this.game, this.player));
             sendAnswer(info);
@@ -522,7 +514,8 @@ public class AsynchroSession extends Session {
         if (queryArgs.length >= 2) {
             if (this.game != null) {
                 StringBuilder message = new StringBuilder();
-                for (int i = 1; i < queryArgs.length; ++i) {
+                for (int i = 1; i <
+                        queryArgs.length; ++i) {
                     message.append(queryArgs[i] + " ");
                 }
                 this.game.addMessageToChat(this.player, message.toString());

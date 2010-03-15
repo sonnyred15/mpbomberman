@@ -97,7 +97,7 @@ public class Connector implements IConnector{
         return (list.get(0).equals("Game started."));
     }
     public BombMap getMap() throws NetException{
-        ArrayList<String> mp = queryAnswer(""+Command.GET_MAP_ARRAY.getValue());
+        ArrayList<String> mp = queryAnswer(""+Command.GET_GAME_MAP_INFO.getValue());
         Parser parser = new Parser();
         return parser.parse(mp);
     }
@@ -108,7 +108,7 @@ public class Connector implements IConnector{
     }
     // if server has not any maps, return one String "No maps on server was founded."
     public String[] getMaps() throws NetException {
-        ArrayList<String> maps = queryAnswer(""+Command.GET_MAPS_LIST.getValue());
+        ArrayList<String> maps = queryAnswer(""+Command.GET_GAME_MAPS_LIST.getValue());
         String[] res = new String[maps.size()];
         for(int i = 0; i < maps.size(); i++) {
             res[i] = maps.get(i);
