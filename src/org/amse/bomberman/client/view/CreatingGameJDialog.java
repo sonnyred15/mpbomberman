@@ -11,6 +11,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
@@ -21,6 +22,8 @@ import javax.swing.SwingConstants;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
+import org.amse.bomberman.client.view.mywizard.MyWizard;
+import org.amse.bomberman.client.view.mywizard.Panel2;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -28,7 +31,7 @@ import org.amse.bomberman.util.Constants;
  * @author Michail Korovkin
  */
 public class CreatingGameJDialog extends JDialog {
-    private ServerInfoJFrame parent;
+    private MyWizard parent;
     private int width = 280;
     private int heigth = 180;
     private JComboBox mapBox;
@@ -39,9 +42,9 @@ public class CreatingGameJDialog extends JDialog {
     private final int LINE_H = 20;
     private final int LABEL_SIZE = width/3;
     
-    public CreatingGameJDialog(ServerInfoJFrame jframe) throws NetException{
-        super(jframe, "Create new Game", true);
-        parent = jframe;
+    public CreatingGameJDialog(MyWizard wizard) throws NetException{
+        super(wizard, "Create new Game", true);
+        parent = wizard;
         setSize(width, heigth);
         setLocation(parent.getX()-width, parent.getY());
 
@@ -109,10 +112,6 @@ public class CreatingGameJDialog extends JDialog {
         setResizable(false);
         setVisible(true);
     }
-    // ????????????????????????????????? HOW????? STUPID...
-    public void closeParent() {
-        parent.dispose();
-    }
     private String getGameName() {
         return gameNameTF.getText();
     }
@@ -122,10 +121,10 @@ public class CreatingGameJDialog extends JDialog {
     private String getMap() {
         return (String)mapBox.getSelectedItem();
     }
-    public static class CreateGameAction extends AbstractAction {
-        CreatingGameJDialog parent;
+    private class CreateGameAction extends AbstractAction {
+        CreatingGameJDialog myParent;
         public CreateGameAction(CreatingGameJDialog jDialog) {
-            parent = jDialog;
+            myParent = jDialog;
             putValue(NAME, "Create");
             putValue(SHORT_DESCRIPTION, "Create game with selected arguments.");
             putValue(SMALL_ICON, null);
@@ -133,25 +132,24 @@ public class CreatingGameJDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             IConnector con = Connector.getInstance();
             try {
-                String mapName = parent.getMap();
+                String mapName = myParent.getMap();
                 mapName = mapName.substring(0, mapName.indexOf('.'));
-                con.createGame(parent.getGameName(), mapName, parent.getMaxPlayers());
+                con.createGame(myParent.getGameName(), mapName, myParent.getMaxPlayers());
                 // !!!!! is it safe method to know gameNumber???    !!!!!!!!!!!!
                 List<String> games = Connector.getInstance().takeGamesList();
                 String[] buf = games.get(games.size()-1).split(" ");
                 int gameNumber = Integer.parseInt(buf[0]);
                 int players = Integer.parseInt(buf[buf.length-1]);
-                parent.dispose();
-                parent.closeParent();
-                GameInfoJFrame gameInfo = new GameInfoJFrame(gameNumber, players);
+                myParent.dispose();
+                parent.goNext();
             }/*catch (IOException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(parent,"Can not create new game.\n"
+                JOptionPane.showMessageDialog(myParent,"Can not create new game.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }*/ catch (NetException ex2) {
-                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                JOptionPane.showMessageDialog(myParent,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                parent.dispose();
+                myParent.dispose();
                 StartJFrame jframe = new StartJFrame();
             }
         }

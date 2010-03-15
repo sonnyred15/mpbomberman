@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.view.mywizard;
 
-import org.amse.bomberman.client.view.mywizard.MyWizard;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -11,9 +10,6 @@ import javax.swing.JPanel;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.view.mywizard.Panel1;
-import org.amse.bomberman.client.view.mywizard.Panel2;
-import org.amse.bomberman.client.view.mywizard.Panel3;
 
 /**
  *
@@ -23,12 +19,12 @@ public class MainWizard extends MyWizard{
     public MainWizard() {
         super(new Dimension(700, 520), "Let's BOMBERMANNING!!!");
         this.addNextJPanel(new Panel1(), "CONNECT_PANEL");
-        this.addNextJPanel(new Panel2(), "CREATE_PANEL");
+        this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
         this.addNextJPanel(new Panel3(), "GAME_PANEL");
         this.setCurrentJPanel(0);
-        this.setVisible(true);
         this.setNextAction(new NextAction(this));
         this.setBackAction(new BackAction(this));
+        this.setVisible(true);
     }
 
 
