@@ -48,6 +48,7 @@ public class MyWizard  extends JFrame{
         myPanelNames.add(panelName);
         myPanels.add(panel);
         cardPanel.add(panel, panelName);
+        //cardLayout.addLayoutComponent(panel, panelName);
     }
     public JPanel getCurrentJPanel() {
         return myPanels.get(currentID);
@@ -96,7 +97,7 @@ public class MyWizard  extends JFrame{
             cardLayout.next(cardPanel);
             //cardLayout.show(cardPanel, myPanelNames.get(currentID));
             if (currentID == myPanels.size() - 1) {
-                nextJButton.setEnabled(false);
+                nextJButton.setText("Finish");
             }
             if (!backJButton.isEnabled()) {
                 backJButton.setEnabled(true);

@@ -11,6 +11,7 @@ import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.ServerInfoJFrame;
+import org.amse.bomberman.client.view.mywizard.MainWizard;
 
 /**
  * @author Michail Korovkin
@@ -63,7 +64,10 @@ public class GameJMenuBar extends JMenuBar {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            ServerInfoJFrame serv = new ServerInfoJFrame();
+            MainWizard wizard = new MainWizard();
+            wizard.setCurrentJPanel(1);
+            wizard.updateCurrentPanel();
+            //ServerInfoJFrame serv = new ServerInfoJFrame();
         }
     }
 }

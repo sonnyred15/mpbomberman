@@ -2,13 +2,12 @@ package org.amse.bomberman.client.view.mywizard;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,30 +17,30 @@ import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.view.CreatingGameJDialog;
 
 /**
  *
  * @author Michael Korovkin
  */
-public class Panel2 extends JPanel{
-    private final int height = 480;
+public class Panel2 extends JPanel implements Updating{
     private final int width = 640;
+    private final int height = 480;
     private MyWizard parent;
-    private JButton createJButton = new JButton();
     private JButton refreshJButton = new JButton();
     private JTable table = new JTable(new MyTableModel());
     private final Dimension buttonSize = new Dimension(200, 40);
+    private CreatingGameJPanel createPanel;
 
-    public Panel2(MyWizard jframe) {
+    public Panel2(MyWizard jframe){
         this.setSize(width, height);
         parent = jframe;
+        createPanel = new CreatingGameJPanel(parent);
 
         JPanel leftBox = new JPanel();
         // how calculate sizes???
-        leftBox.setPreferredSize(new Dimension(100, 70));
-        leftBox.setLayout(new GridLayout(2, 1, 10, 10));
-        leftBox.add(createJButton);
+        leftBox.setPreferredSize(new Dimension(200, 240));
+        leftBox.setLayout(new FlowLayout());
+        leftBox.add(createPanel);
         leftBox.add(refreshJButton);
         this.setSizesTable();
 
@@ -50,11 +49,10 @@ public class Panel2 extends JPanel{
         JScrollPane jsp = new JScrollPane(table, JScrollPane
                 .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         // how calculate sizes???
-        jsp.setPreferredSize(new Dimension(width - 120, height - 50));
+        jsp.setPreferredSize(new Dimension(width - 200, height - 50));
         this.add(jsp);
 
         refreshJButton.setAction(new RefreshAction(this));
-        createJButton.setAction(new CreateAction(this));
         this.setVisible(true);
     }
     // !!!!!!!!!!!!!!!!!!!!  is it really need???
@@ -119,8 +117,7 @@ public class Panel2 extends JPanel{
         }*/ catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            //this.dispose();
-            //StartJFrame jFrame = new StartJFrame();
+            parent.setCurrentJPanel(0);
         }
     }
 
@@ -135,7 +132,7 @@ public class Panel2 extends JPanel{
             return result;
         }
     }
-    private int getSelectedGame() {
+    public int getSelectedGame() {
         int result = -1;
         if (table.getSelectedRow() != -1
                 && table.getValueAt(table.getSelectedRow(), 0) != null) {
@@ -144,6 +141,29 @@ public class Panel2 extends JPanel{
             return result;
         } else {
             return result;
+        }
+    }
+
+    public void getServerInfo() {
+        String[] maps;
+        try {
+            // HUCK!!!--------------------------------------------------
+            refreshJButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    ((JButton) e.getComponent()).doClick();
+                }
+            });
+            // -----------------------------------------------------------
+            maps = Connector.getInstance().getMaps();
+            if (!maps[0].equals("No maps on server was founded.")) {
+                createPanel.setMaps(maps);
+            }
+            refreshTable();
+        } catch (NetException ex) {
+            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            parent.setCurrentJPanel(0);
         }
     }
 
@@ -162,27 +182,6 @@ public class Panel2 extends JPanel{
                 parent.refreshTable();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                getParent().setCurrentJPanel(0);
-            }
-        }
-    }
-
-    private class CreateAction extends AbstractAction {
-        Panel2 myParent;
-
-        public CreateAction(Panel2 panel) {
-            myParent = panel;
-            putValue(NAME, "Create");
-            putValue(SHORT_DESCRIPTION, "Create new Game");
-            putValue(SMALL_ICON, null);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            try {
-                CreatingGameJDialog jframe = new CreatingGameJDialog(myParent.getParent());
-            } catch (NetException ex) {
-                JOptionPane.showMessageDialog(myParent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 getParent().setCurrentJPanel(0);
             }
