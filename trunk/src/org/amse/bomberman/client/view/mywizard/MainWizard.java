@@ -7,9 +7,11 @@ import java.net.UnknownHostException;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 
 /**
  *
@@ -18,46 +20,72 @@ import org.amse.bomberman.client.net.impl.Connector;
 public class MainWizard extends MyWizard{
     public MainWizard() {
         super(new Dimension(700, 520), "Let's BOMBERMANNING!!!");
-        this.addNextJPanel(new Panel1(), "CONNECT_PANEL");
+        this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
         this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
-        this.addNextJPanel(new Panel3(), "GAME_PANEL");
+        this.addNextJPanel(new Panel3(this), "GAME_PANEL");
         this.setCurrentJPanel(0);
         this.setNextAction(new NextAction(this));
         this.setBackAction(new BackAction(this));
         this.setVisible(true);
     }
-
-
-    public static class NextAction extends AbstractAction {
-        MyWizard parent;
-
-        public NextAction(MyWizard jframe) {
-            parent = jframe;
-            putValue(NAME, "Next");
-            putValue(SMALL_ICON, null);
-        }
-        public void actionPerformed(ActionEvent e) {
-            JPanel current = parent.getCurrentJPanel();
-            
-            if (current instanceof Panel1) {
-                Panel1 panel = (Panel1)current;
-                IConnector con = Connector.getInstance();
-                try {
-                    con.сonnect(panel.getIPAddress(), panel.getPort());
-                } catch (UnknownHostException ex) {
-                    //ex.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, "Can not connect to the server.\n"
-                            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                } catch (IOException ex) {
-                    //ex.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, "Can not connect to the server.\n"
-                            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-            parent.goNext();
-        }
+    public void slideNext() {
+        this.goNext();
+        Updating nextPanel = (Updating) this.getCurrentJPanel();
+        nextPanel.getServerInfo();
     }
-    public static class BackAction extends AbstractAction {
+    public void slideBack() {
+        this.goBack();
+        updateCurrentPanel();
+    }
+    public void updateCurrentPanel() {
+        Updating nextPanel = (Updating) this.getCurrentJPanel();
+        nextPanel.getServerInfo();
+    }
+
+   private class NextAction extends AbstractAction {
+       MyWizard parent;
+       public NextAction(MyWizard jframe) {
+           putValue(NAME, "Next");
+           putValue(SMALL_ICON, null);
+           parent = jframe;
+       }
+       public void actionPerformed(ActionEvent e) {
+           IConnector con = Connector.getInstance();
+           try {
+               JPanel current = parent.getCurrentJPanel();
+               if (current instanceof Panel1) {
+                   Panel1 panel1 = (Panel1) current;
+                   con.сonnect(panel1.getIPAddress(), panel1.getPort());
+                   slideNext();
+               }
+               if (current instanceof Panel2) {
+                   Panel2 panel2 = (Panel2) current;
+                   int gameNumber = panel2.getSelectedGame();
+                   if (gameNumber != -1) {
+                       con.joinGame(gameNumber);
+                       slideNext();
+                   } else {
+                       JOptionPane.showMessageDialog(parent, "You did't select the game! "
+                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
+                   }
+               }
+               if (current instanceof Panel3) {
+                   Panel3 panel3 = (Panel3) current;
+                   panel3.startGame();
+               }
+           } catch (UnknownHostException ex) {
+               JOptionPane.showMessageDialog(parent, "Can not connect to the server.\n"
+                       + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           } catch (IOException ex) {
+               JOptionPane.showMessageDialog(parent, "Can not connect to the server.\n"
+                       + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           } catch (NetException ex) {
+               JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           }
+       }
+    }
+    private class BackAction extends AbstractAction {
         MyWizard parent;
 
         public BackAction(MyWizard jframe) {
@@ -73,14 +101,17 @@ public class MainWizard extends MyWizard{
                 IConnector con = Connector.getInstance();
                 try {
                     con.leaveGame();
+                    panel.stopTimers();
                 } catch (NetException ex) {
-                    //ex.printStackTrace();
                     JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                             + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            parent.goBack();
+            if (current instanceof Panel2) {
+                Panel2 panel = (Panel2)current;
+                IConnector con = Connector.getInstance();
+            }
+            slideBack();
         }
     }
-
 }
