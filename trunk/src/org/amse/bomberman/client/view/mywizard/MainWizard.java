@@ -23,9 +23,9 @@ public class MainWizard extends MyWizard{
         this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
         this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
         this.addNextJPanel(new Panel3(this), "GAME_PANEL");
-        this.setCurrentJPanel(0);
         this.setNextAction(new NextAction(this));
         this.setBackAction(new BackAction(this));
+        this.setCurrentJPanel(0);
         this.setVisible(true);
     }
     public void slideNext() {
@@ -57,13 +57,17 @@ public class MainWizard extends MyWizard{
                    Panel1 panel1 = (Panel1) current;
                    con.сonnect(panel1.getIPAddress(), panel1.getPort());
                    slideNext();
+                   parent.setBackButtonEnable(false);
                }
                if (current instanceof Panel2) {
                    Panel2 panel2 = (Panel2) current;
                    int gameNumber = panel2.getSelectedGame();
                    if (gameNumber != -1) {
                        con.joinGame(gameNumber);
+                       int maxPl = panel2.getSelectedMaxPl();
                        slideNext();
+                       Panel3 panel3 = (Panel3) parent.getCurrentJPanel();
+                       panel3.setPlayersNum(maxPl);
                    } else {
                        JOptionPane.showMessageDialog(parent, "You did't select the game! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -102,16 +106,15 @@ public class MainWizard extends MyWizard{
                 try {
                     con.leaveGame();
                     panel.stopTimers();
+                    slideBack();
+                    parent.setBackButtonEnable(false);
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                             + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
             if (current instanceof Panel2) {
-                Panel2 panel = (Panel2)current;
-                IConnector con = Connector.getInstance();
             }
-            slideBack();
         }
     }
 }

@@ -60,6 +60,53 @@ public class Panel2 extends JPanel implements Updating{
     public MyWizard getParent() {
         return parent;
     }
+
+    public int getSelectedMaxPl() {
+        int result = -1;
+        if (table.getSelectedRow() != -1
+                && table.getValueAt(table.getSelectedRow(), 4) != null) {
+            result = Integer.parseInt(
+                    (String) table.getValueAt(table.getSelectedRow(), 4));
+            return result;
+        } else {
+            return result;
+        }
+    }
+    public int getSelectedGame() {
+        int result = -1;
+        if (table.getSelectedRow() != -1
+                && table.getValueAt(table.getSelectedRow(), 0) != null) {
+            result = Integer.parseInt(
+                    (String) table.getValueAt(table.getSelectedRow(), 0));
+            return result;
+        } else {
+            return result;
+        }
+    }
+
+    public void getServerInfo() {
+        String[] maps;
+        try {
+            // HUCK!!!--------------------------------------------------
+            refreshJButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    ((JButton) e.getComponent()).doClick();
+                }
+            });
+            // -----------------------------------------------------------
+            maps = Connector.getInstance().getMaps();
+            if (!maps[0].equals("No maps on server was founded.")) {
+                createPanel.setMaps(maps);
+            }
+            refreshTable();
+        } catch (NetException ex) {
+            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            parent.setCurrentJPanel(0);
+        }
+    }
+
     private void refreshTable() throws NetException {
         IConnector connect = Connector.getInstance();
         List<String> games = null;
@@ -117,52 +164,6 @@ public class Panel2 extends JPanel implements Updating{
         }*/ catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            parent.setCurrentJPanel(0);
-        }
-    }
-
-    private int getSelectedMaxPl() {
-        int result = -1;
-        if (table.getSelectedRow() != -1
-                && table.getValueAt(table.getSelectedRow(), 4) != null) {
-            result = Integer.parseInt(
-                    (String) table.getValueAt(table.getSelectedRow(), 4));
-            return result;
-        } else {
-            return result;
-        }
-    }
-    public int getSelectedGame() {
-        int result = -1;
-        if (table.getSelectedRow() != -1
-                && table.getValueAt(table.getSelectedRow(), 0) != null) {
-            result = Integer.parseInt(
-                    (String) table.getValueAt(table.getSelectedRow(), 0));
-            return result;
-        } else {
-            return result;
-        }
-    }
-
-    public void getServerInfo() {
-        String[] maps;
-        try {
-            // HUCK!!!--------------------------------------------------
-            refreshJButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    ((JButton) e.getComponent()).doClick();
-                }
-            });
-            // -----------------------------------------------------------
-            maps = Connector.getInstance().getMaps();
-            if (!maps[0].equals("No maps on server was founded.")) {
-                createPanel.setMaps(maps);
-            }
-            refreshTable();
-        } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             parent.setCurrentJPanel(0);
         }
     }
