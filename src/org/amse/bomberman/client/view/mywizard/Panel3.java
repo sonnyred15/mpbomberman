@@ -75,6 +75,7 @@ public class Panel3 extends JPanel implements Updating{
             if (gameInfo.get(0).equals("false")) {
                 botJButton.setEnabled(false);
                 botJButton.setVisible(false);
+                parent.setNextButtonEnable(false);
             } else {
                 botJButton.setAction(new AddBotAction());
             }

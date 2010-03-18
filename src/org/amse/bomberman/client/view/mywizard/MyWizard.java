@@ -32,7 +32,10 @@ public class MyWizard  extends JFrame{
     private JButton backJButton = new JButton();
     private JButton nextJButton = new JButton();
     private JButton cancelJButton = new JButton();
-    private final Dimension BUTTON_SIZE = new Dimension(150,30);
+    private static final String NEXT = "Next";
+    private static final String BACK = "Back";
+    private static final String FINISH = "Finish";
+    private static final String CANCEL = "Cancel";
 
     public MyWizard() {
         super();
@@ -49,6 +52,12 @@ public class MyWizard  extends JFrame{
         myPanels.add(panel);
         cardPanel.add(panel, panelName);
         //cardLayout.addLayoutComponent(panel, panelName);
+    }
+    public void setNextButtonEnable(boolean b) {
+        nextJButton.setEnabled(b);
+    }
+    public void setBackButtonEnable(boolean b) {
+        backJButton.setEnabled(b);
     }
     public JPanel getCurrentJPanel() {
         return myPanels.get(currentID);
@@ -89,6 +98,7 @@ public class MyWizard  extends JFrame{
             if (!nextJButton.isEnabled()) {
                 nextJButton.setEnabled(true);
             }
+            nextJButton.setText(NEXT);
         }
     }
     public void goNext() {
@@ -97,7 +107,9 @@ public class MyWizard  extends JFrame{
             cardLayout.next(cardPanel);
             //cardLayout.show(cardPanel, myPanelNames.get(currentID));
             if (currentID == myPanels.size() - 1) {
-                nextJButton.setText("Finish");
+                nextJButton.setText(FINISH);
+            } else {
+                nextJButton.setText(NEXT);
             }
             if (!backJButton.isEnabled()) {
                 backJButton.setEnabled(true);
@@ -126,9 +138,6 @@ public class MyWizard  extends JFrame{
         buttonBox.add(Box.createHorizontalStrut(30));
         buttonBox.add(cancelJButton);
 
-        //cancelJButton.setMinimumSize(BUTTON_SIZE);
-        //backJButton.setMinimumSize(BUTTON_SIZE);
-        //nextJButton.setMinimumSize(BUTTON_SIZE);
         cancelJButton.setAction(new CancelAction(this));
         backJButton.setAction(new BackAction(this));
         nextJButton.setAction(new NextAction(this));
@@ -149,7 +158,7 @@ public class MyWizard  extends JFrame{
 
         public CancelAction(MyWizard jframe) {
             parent = jframe;
-            putValue(NAME, "Cancel");
+            putValue(NAME, CANCEL);
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
@@ -161,7 +170,7 @@ public class MyWizard  extends JFrame{
 
         public BackAction(MyWizard jframe) {
             parent = jframe;
-            putValue(NAME, "Back");
+            putValue(NAME, BACK);
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
@@ -173,7 +182,7 @@ public class MyWizard  extends JFrame{
 
         public NextAction(MyWizard jframe) {
             parent = jframe;
-            putValue(NAME, "Next");
+            putValue(NAME, NEXT);
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
