@@ -1,10 +1,7 @@
 package org.amse.bomberman.client.view.gamejframe;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import org.amse.bomberman.client.Main;
@@ -125,13 +122,4 @@ public class MyJPanel extends JLabel {
                 return ICON_PL1;
         }
     }
-    /* HACK for transparency
-    @Override
-    public void paint(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
-        super.paint(g2);
-        g2.dispose();
-    }
-     */
 }

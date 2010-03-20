@@ -57,6 +57,12 @@ public class Model implements IModel{
                     changes.add(cell);
                 }
             }
+        } else {
+            for (int i = 0; i < map.getSize(); i++) {
+                for (int j = 0; j < map.getSize(); j++) {
+                    changes.add(buf);
+                }
+            }
         }
         this.map = map;
         updateListeners();

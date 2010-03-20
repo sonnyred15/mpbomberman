@@ -7,11 +7,9 @@ import java.net.UnknownHostException;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.Connector;
-import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 
 /**
  *
