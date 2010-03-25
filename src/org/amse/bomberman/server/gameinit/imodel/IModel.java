@@ -1,66 +1,70 @@
+
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.amse.bomberman.server.gameinit.imodel;
 
-import java.util.ArrayList;
-import java.util.List;
+//~--- non-JDK imports --------------------------------------------------------
+
 import org.amse.bomberman.server.gameinit.Bomb;
-import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.GameMap;
-import org.amse.bomberman.server.gameinit.MoveableMapObject;
+import org.amse.bomberman.server.gameinit.MoveableObject;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.util.Constants.Direction;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.List;
 
 /**
  *
  * @author chibis
  */
 public interface IModel {
+    Player addBot(String botName);
 
-    void addBomb(Bomb bomb);
+    void addExplosions(List<Pair> explosions);
 
-    void bombStartDetonating(Bomb bomb);
+    Player addPlayer(String name);
 
-    Bot addBot(String botName);
+    void bombDetonated(Bomb bomb);
 
-    void startBots();
+    void detonateBombAt(int x, int y);
 
-    void removeBot(Bot bot);
+    int getCurrentPlayersNum();
 
-    GameMap getMap();
+    List<Pair> getExplosionSquares();
 
-    String getMapName();
+    GameMap getGameMap();
 
-    void placeBomb(Player player);
+    int[][] getGameMapArray();
 
-    void detonateBomb(int x, int y);
+    String getGameMapName();
+
+    Player getPlayer(int PlayerID);
+
+    List<Player> getPlayersList();
+
+    boolean isExplosion(Pair pair);
 
     void playerBombed(Player atacker, int victimID);
 
     void playerBombed(Player atacker, Player victim);
 
-    boolean doMove(MoveableMapObject objectToMove, Direction direction);
+    void playerDied(Player player);
 
-    void removePlayer(int playerID);
-
-    int[][] getMapArray();
-
-    void addExplosions(List<Pair> explosions);
+    @Deprecated    // think is not needed
+    void printToConsole();
 
     void removeExplosion(Pair pair);
 
-    boolean isExplosion(Pair pair);
+    void removePlayer(int playerID);
 
-    List<Pair> getExplosionSquares();
+    void startup();
 
-    void printToConsole();
+    boolean tryDoMove(MoveableObject objectToMove, Direction direction);
 
-    void changeMapForCurMaxPlayers(int curMaxPlayers);
-
-    int xCoordOf(int playerID);
-
-    int yCoordOf(int playerID);
+    boolean tryPlaceBomb(Player player);
 }

@@ -19,7 +19,7 @@ public class RandomMoveBotStrategy extends BotStrategy {
     Pair target;
 
     private Pair findNewTarget(IModel model) {
-        GameMap map = model.getMap();
+        GameMap map = model.getGameMap();
         Random random = new Random();
         int x = 0;
         int y = 0;
@@ -43,7 +43,7 @@ public class RandomMoveBotStrategy extends BotStrategy {
         do {
             try {
                 Thread.sleep(75);
-                direction = findWay(bot.getPosition(), target, model.getMapArray());
+                direction = findWay(bot.getPosition(), target, model.getGameMapArray());
                 //System.out.println("Direction" + direction.toString());
             } catch (IllegalArgumentException ex) {
                 target = findNewTarget(model);

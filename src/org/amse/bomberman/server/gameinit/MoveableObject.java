@@ -9,7 +9,7 @@ package org.amse.bomberman.server.gameinit;
  *
  * @author Kirilchuk V.E
  */
-public interface MoveableMapObject {
+public interface MoveableObject {
 
     void setPosition(Pair newPosition);
 

@@ -23,6 +23,6 @@ public class MoveAction implements IAction{
     }
 
     public void executeAction(IModel model) {
-        model.doMove(this.bot, this.direction);
+        model.tryDoMove(this.bot, this.direction);
     }
 }

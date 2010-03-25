@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -15,7 +16,7 @@ import java.util.ListIterator;
 public class Chat {
 
     private final int[] lastTakedMessageIndexes;
-    private final List<String> messages = new ArrayList<String>();
+    private final List<String> messages = new CopyOnWriteArrayList<String>();
 
     public Chat(int maxPlayers) {
         this.lastTakedMessageIndexes = new int[maxPlayers];
@@ -28,11 +29,11 @@ public class Chat {
     public List<String> getNewMessages(int chatID) {
         List<String> result = new ArrayList<String>();
 
-        int from = this.lastTakedMessageIndexes[chatID];
+        int from = this.lastTakedMessageIndexes[chatID-1];
         for (ListIterator<String> it = this.messages.listIterator(from); it.hasNext();) {
             result.add(it.next());
         }
-        this.lastTakedMessageIndexes[chatID] = this.messages.size();
+        this.lastTakedMessageIndexes[chatID-1] = this.messages.size();
 
         if(result.size()==0){
             result.add("No new messages.");

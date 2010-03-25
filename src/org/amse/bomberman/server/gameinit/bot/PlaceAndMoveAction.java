@@ -23,7 +23,7 @@ public class PlaceAndMoveAction implements IAction{
     }
 
     public void executeAction(IModel model) {
-        model.placeBomb(bot);
-        model.doMove(this.bot, this.direction);
+        model.tryPlaceBomb(bot);
+        model.tryDoMove(this.bot, this.direction);
     }
 }

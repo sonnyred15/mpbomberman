@@ -60,7 +60,7 @@ public class GameTest {
                 public void run() {
 
                     for (int i = 0; i < 100; i++) {
-                        Player pl = game.join(""+i);
+                        Player pl = game.join(""+i, null); //TODO null must be session!
                         try {
                             Thread.sleep(1);
                         } catch (InterruptedException ex) {
