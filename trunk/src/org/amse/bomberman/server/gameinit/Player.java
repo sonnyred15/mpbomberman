@@ -10,7 +10,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Kirilchuk V.E
  */
-public class Player implements MoveableMapObject{
+public class Player implements MoveableObject{
 
     private DieListener playerDieListener;
 
@@ -55,6 +55,10 @@ public class Player implements MoveableMapObject{
         synchronized (BOMBS_LOCK) {
             return ((this.bombs < this.maxBombs) && isAlive());
         }
+    }
+
+    public int getBombs() {
+        return bombs;
     }
 
     public void placedBomb() {

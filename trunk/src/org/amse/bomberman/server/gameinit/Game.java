@@ -1,236 +1,224 @@
+
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.amse.bomberman.server.gameinit;
 
-import org.amse.bomberman.server.gameinit.bot.Bot;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.amse.bomberman.server.gameinit.control.Controller;
+import org.amse.bomberman.server.gameinit.control.GameEndedListener;
+import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
+import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
  * @author Kirilchuk V.E
  */
 public class Game {
+    private final Chat                      chat;
+    private final List<GameEndedListener>   gameEndedListeners;
+    private final String                    gameName;
+    private final List<GameStartedListener> gameStartedListeners;
+    private final int                       maxPlayers;
+    private final IModel                    model;
+    private Controller                      owner;
+    private final IServer                   server;
+    private boolean                         started;
 
-    private final IServer server;
-    private Player owner;
-    private final String gameName;
-    private final int maxPlayers;
-    private final IModel model;
-    private final List<Player> players;
-    private final List<ISession> sessions;
-    private boolean started;
-    private final DieListener dieListener;
-    private final Chat chat;
-    private final List<GameMapUpdateListener> gameMapUpdateListeners;
-
-    public Game(IServer server, GameMap map, String gameName, int maxPlayers) {
+    public Game(IServer server, GameMap gameMap, String gameName,
+                int maxPlayers) {
         this.server = server;
         this.gameName = gameName;
 
-        int mapMaxPlayers = map.getMaxPlayers();
-        if (maxPlayers > 0 && maxPlayers <= mapMaxPlayers) {
+        int gameMapMaxPlayers = gameMap.getMaxPlayers();
+
+        if ((maxPlayers > 0) && (maxPlayers <= gameMapMaxPlayers)) {
             this.maxPlayers = maxPlayers;
         } else {
-            this.maxPlayers = mapMaxPlayers;
+            this.maxPlayers = gameMapMaxPlayers;
         }
+
         this.chat = new Chat(this.maxPlayers);
+        this.model = new Model(gameMap, this);
 
-        this.model = new Model(map, this);
-        this.sessions = Collections.synchronizedList(new ArrayList<ISession>());
-        this.players = Collections.synchronizedList(new ArrayList<Player>());
-        this.gameMapUpdateListeners = Collections.synchronizedList(new ArrayList<GameMapUpdateListener>());
-        this.dieListener = new DieListener(this);
-
+        // this.sessions = Collections.synchronizedList(new ArrayList<ISession>());
+        this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
+        this.gameStartedListeners =
+            new CopyOnWriteArrayList<GameStartedListener>();
         this.started = false;
     }
 
-    public void setOwner(Player owner) {
-        this.owner = owner;
-    }
-
-    public String getMapName() {
-        return this.model.getMapName();
-    }
-
-    public synchronized Player join(String name, ISession session) {
-        Player player = null;
-
-        if (this.players.size() < this.maxPlayers) {
-            player = new Player(name);
-            //coordinates of players will be set when game would start!!!!
-            this.players.add(player);
-
-            player.setDieListener(dieListener);
+    public synchronized Player addBot(String name, Controller controller) {
+        if (controller != this.owner) {
+            return null;
         }
-        this.sessions.add(session);
-        this.addGameMapUpdateListener(session);
-        return player;
-    }
 
-    public synchronized Bot joinBot(String name) {
-        Bot bot = null;
-        if (this.players.size() < this.maxPlayers) {
+        Player bot = null;
+
+        if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
             bot = this.model.addBot(name);
-            if (bot != null) {
-                this.players.add(bot);
-                bot.setDieListener(dieListener);
-            }
+            this.gameStartedListeners.add((GameStartedListener)bot);
         }
+
         return bot;
     }
 
-    public Player getPlayer(int id) {//MUST BE USED ONLY AFTER GAME IS STARTED!!
-        synchronized (players) {
-            for (Player player : players) {
-                if (player.getID() == id) {
-                    return player;
-                }
-            }
-        }
-        return null;
+    public void addGameEndedListener(GameEndedListener gameEndedListener) {
+        this.gameEndedListeners.add(gameEndedListener);
     }
 
-    public void disconnectFromGame(Player player) {
-        this.players.remove(player);
-        synchronized (this.sessions) {
-            for (ISession session : sessions) {
-                if (session.correspondTo(player)) {
-                    this.sessions.remove(session);
-                    this.removeGameMapUpdateListener(session);
-                    break;
-                }
-            }
-        }
+    // method that delegates to model
+    public void addGameMapUpdateListener(GameMapUpdateListener listener) {
 
-        if (this.started) {//removing player from GameMap
-            this.model.removePlayer(player.getID());
-            this.notifyGameMapUpdateListeners();
-        }
-        if (player == this.owner) {
-            this.endGame();
-        }
+        // TODO
     }
 
-    public void placeBomb(Player player) {
-        if (this.started) {
-            this.model.placeBomb(player);
-        }
-    }
-
-    public void startGame() {
-        //Here model must change map to support currrent num of players
-        //and then give coordinates.
-        this.model.changeMapForCurMaxPlayers(this.players.size());
-        int i = 1; //giving id`s to players
-        for (Player player : players) {
-            player.setID(i);
-            Pair playerPosition = new Pair(model.xCoordOf(i), model.yCoordOf(i));
-            player.setPosition(playerPosition);
-            ++i;
-        }
-        this.started = true;
-        this.chat.clear();
-        this.model.startBots();
-    }
-
-    private void endGame() {
-        this.server.removeGame(this);
-    }
-
-    public boolean doMove(Player player, Direction direction) {
-        if (this.started) {
-            if (player.isAlive()) {
-                return model.doMove(player, direction);
-            }
-        }
-        return false;
+    public void addGameStartedListener(
+            GameStartedListener gameStartedListener) {
+        this.gameStartedListeners.add(gameStartedListener);
     }
 
     public void addMessageToChat(Player player, String message) {
-        synchronized (this.chat) {
-            int chatID = this.players.indexOf(player);
-            if (chatID != -1) {
-                this.chat.addMessage(maxPlayers, player.getNickName(), message);
-            }
-        }
+        this.chat.addMessage(player.getID(), player.getNickName(), message);
     }
 
-    public List<String> getNewMessagesFromChat(Player player) {
-        synchronized (this.chat) {
-            int chatID = this.players.indexOf(player);
-            if (chatID != -1) {
-                return this.chat.getNewMessages(chatID);
-            }
+    public boolean doMove(Controller controller, Direction direction) {
+        if (this.started) {
+            return model.tryDoMove(controller.getPlayer(), direction);
         }
-        return null;
+
+        return false;
     }
 
-    public int[][] getMapArray() {
-        return this.model.getMapArray();
+    private void endGame() {
+        for (GameEndedListener gameEndedListener : gameEndedListeners) {
+            gameEndedListener.gameEnded(this);
+        }
+
+        this.server.removeGame(this);
+    }
+
+    public List<Player> getCurrentPlayers() {
+        return Collections.unmodifiableList(this.model.getPlayersList());
+    }
+
+    public int getCurrentPlayersNum() {
+        return this.model.getCurrentPlayersNum();
     }
 
     public List<Pair> getExplosionSquares() {
         return this.model.getExplosionSquares();
     }
 
-    public boolean isStarted() {
-        return this.started;
+    public int[][] getGameMapArray() {
+        return this.model.getGameMapArray();
     }
 
-    public boolean isFull() {
-        return (this.players.size() == this.maxPlayers ? true : false);
+    public String getGameMapName() {
+        return this.model.getGameMapName();
+    }
+
+    public int getMaxPlayers() {
+        return this.maxPlayers;
     }
 
     public String getName() {
         return this.gameName;
     }
 
-    public void playerDied(Player player) {
-        model.removePlayer(player.getID());
+    public List<String> getNewMessagesFromChat(Player player) {
+        return this.chat.getNewMessages(player.getID());
     }
 
-    public int getGameMaxPlayers() {
-        return this.maxPlayers;
-    }
-
-    public List<Player> getCurrentPlayers() {
-        return Collections.unmodifiableList(players);
-    }
-
-    public int getCurrentPlayersNum() {
-        return this.players.size();
-    }
-
-    public Player getOwner() {
+    public Controller getOwner() {
         return owner;
     }
 
-    public void addGameMapUpdateListener(GameMapUpdateListener listener){
-        this.gameMapUpdateListeners.add(listener);
+    public Player getPlayer(int playerID) {
+        return this.model.getPlayer(playerID);
     }
 
-    public void removeGameMapUpdateListener(GameMapUpdateListener listener){
-        this.gameMapUpdateListeners.remove(listener);
+    public boolean isFull() {
+        return ((this.model.getCurrentPlayersNum() == this.maxPlayers) ? true
+                                                                       : false);
     }
 
-    public void notifyGameMapUpdateListeners(){
-        synchronized(gameMapUpdateListeners){
-            for (GameMapUpdateListener gameMapUpdateListener : gameMapUpdateListeners) {
-                gameMapUpdateListener.gameMapChanged();
-            }
+    public boolean isStarted() {
+        return this.started;
+    }
+
+    public synchronized Player join(String name, Controller controller) {
+        Player player = null;
+
+        if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
+
+            // this.sessions.add(session);
+            player = this.model.addPlayer(name);
+        }
+
+        return player;
+    }
+
+    public void leaveFromGame(Controller controller) {
+        this.model.removePlayer(controller.getPlayer().getID());
+
+        if (controller == this.owner) {
+            this.endGame();
         }
     }
 
-    public List<ISession> getSessions() {
-        return Collections.unmodifiableList(this.sessions);
+    public void removeGameEndedListener(GameEndedListener listener) {
+        this.gameEndedListeners.remove(listener);
+    }
+
+    // method that delegates to model
+    public void removeGameMapUpdateListener(GameMapUpdateListener listener) {
+
+        // TODO
+    }
+
+    public void setOwner(Controller owner) {
+        this.owner = owner;
+    }
+
+    public boolean tryPlaceBomb(Controller controller) {
+        if (this.started) {
+            return this.model.tryPlaceBomb(controller.getPlayer());
+        }
+
+        return false;
+    }
+
+    public boolean tryStartGame(Controller controller) {
+        if (this.owner == controller) {
+            this.started = true;
+
+            // Here model must change gameMap to support current num of players
+            // and then give coordinates to Players.
+            this.model.startup();
+            this.chat.clear();
+
+            //here we notifying all about start of game
+            for (GameStartedListener gameStartedListener : gameStartedListeners) {
+                gameStartedListener.started();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

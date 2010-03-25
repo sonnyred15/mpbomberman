@@ -1,28 +1,24 @@
+
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.amse.bomberman.server.net;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.util.List;
-import org.amse.bomberman.server.gameinit.GameMapUpdateListener;
-import org.amse.bomberman.server.gameinit.Player;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E
  */
-public interface ISession extends GameMapUpdateListener{ // Session must Extend Thread
+public interface ISession {    // Session must Extend Thread
+    void run();    // method from Thread
 
-    void run(); //method from Thread
+    void interruptSession() throws SecurityException;    // must delegate to thread.interrupt()
 
-    void interruptSession() throws SecurityException; //must delegate to thread.interrupt()
-
-    void start(); //method from Thread
-
-    Player getPlayer();
-
-    boolean correspondTo(Player player);
+    void start();    // method from Thread
 
     void sendAnswer(List<String> messages);
 

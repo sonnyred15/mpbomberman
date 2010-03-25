@@ -36,7 +36,7 @@ public class ModelTest {
                                              {3,0,0,0,0,4}};
 
     private final GameMap map = new GameMap(GAME_MAP);
-    private final Game game = new Game(new Server(), map, "testModelGame", -1);
+    private final Game game = new Game(map, "testModelGame", -1);
     private Model model = new Model(map, game);
     private Player player1 = new Player("player1");
     private Player player2 = new Player("player2");
@@ -75,9 +75,9 @@ public class ModelTest {
         System.out.println();
         System.out.println("Testing concurrent call to doMove");
         //seting position of two players for test
-        model.doMove(player2, Direction.LEFT);
-        model.doMove(player2, Direction.LEFT);
-        model.doMove(player2, Direction.LEFT); // now position in 0 row is |1 0 2 0 0 0 |
+        model.tryDoMove(player2, Direction.LEFT);
+        model.tryDoMove(player2, Direction.LEFT);
+        model.tryDoMove(player2, Direction.LEFT); // now position in 0 row is |1 0 2 0 0 0 |
 
         Thread t1 = new Thread(new Runnable() {
 
@@ -86,11 +86,11 @@ public class ModelTest {
                     if(player1.getPosition().getY()>1){
                         fail("Syncronization problem. Player moved through other player");
                     }
-                    model.doMove(player1, Direction.RIGHT);  //trying to go right
+                    model.tryDoMove(player1, Direction.RIGHT);  //trying to go right
                     if(map.isEmpty(0, 0) && map.isEmpty(0, 2)){ //if two players in one square
                         fail("Syncronization problem. Two players moved in same square.");
                     }
-                    model.doMove(player1, Direction.LEFT);
+                    model.tryDoMove(player1, Direction.LEFT);
                 }
             }
         });
@@ -102,12 +102,12 @@ public class ModelTest {
                     if(player2.getPosition().getY()<1){
                         fail("Syncronization problem. Player moved through other player");
                     }
-                    model.doMove(player2, Direction.LEFT);  //trying to go left
+                    model.tryDoMove(player2, Direction.LEFT);  //trying to go left
                     if(map.isEmpty(0, 0) && map.isEmpty(0, 2)){ //if two players in one square
                         fail("Syncronization problem. Two players moved in same square.");
                     }
                     if(map.isEmpty(0, 2)){
-                        model.doMove(player2, Direction.RIGHT);
+                        model.tryDoMove(player2, Direction.RIGHT);
                     }
                 }
             }
