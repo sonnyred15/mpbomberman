@@ -25,8 +25,7 @@ import org.amse.bomberman.client.net.NetException;
  * @author Michail Korovkin
  */
 public class ServerInfoJFrame extends JFrame {
-
-    private final int width = 500;
+    /*private final int width = 500;
     private final int height = 375;
     private JButton createJButton = new JButton();
     private JButton joinJButton = new JButton();
@@ -128,7 +127,7 @@ public class ServerInfoJFrame extends JFrame {
         }/* catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }*/ catch (NetException ex2) {
+        }*/ /*catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.dispose();
@@ -203,7 +202,7 @@ public class ServerInfoJFrame extends JFrame {
         }
     }*/
 
-    public static class JoinAction extends AbstractAction {
+    /*public static class JoinAction extends AbstractAction {
         ServerInfoJFrame parent;
 
         public JoinAction(ServerInfoJFrame jFrame) {
@@ -253,5 +252,5 @@ public class ServerInfoJFrame extends JFrame {
         public void clear() {
             data = new Object[50][5];
         }
-    }
+    }*/
 }

@@ -4,18 +4,20 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
  * @author Michael Korovkin
  */
-public class MainWizard extends MyWizard{
+public class MainWizard extends MyWizard implements RequestResultListener{
     public MainWizard() {
         super(new Dimension(700, 520), "Let's BOMBERMANNING!!!");
         this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
@@ -36,8 +38,87 @@ public class MainWizard extends MyWizard{
         updateCurrentPanel();
     }
     public void updateCurrentPanel() {
-        Updating nextPanel = (Updating) this.getCurrentJPanel();
-        nextPanel.getServerInfo();
+        Updating current = (Updating) this.getCurrentJPanel();
+        current.getServerInfo();
+    }
+    public void received(List<String> list) {
+        if (list.size() == 0) {
+            return;
+        }
+        String command = list.get(0);
+        list.remove(0);
+        JPanel current = this.getCurrentJPanel();
+        if (command.equals(ProtocolConstants.CAPTION_GAME_MAPS_LIST)) {
+            if (current instanceof Panel2) {
+                Panel2 panel2 = (Panel2) current;
+                panel2.setMaps(list);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_GAMES_LIST)) {
+            if (current instanceof Panel2) {
+                Panel2 panel2 = (Panel2) current;
+                panel2.setGames(list);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
+                panel3.setGameInfo(list);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME)) {
+            if (!list.get(0).equals("Game created.")) {
+                JOptionPane.showMessageDialog(this, "Can not create game.\n"
+                       + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_JOIN_GAME)) {
+            if (!list.get(0).equals("Joined.")) {
+                JOptionPane.showMessageDialog(this, "Can not join to the game.\n"
+                       + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
+            if (list.get(0).equals("Game started.")) {
+                if (current instanceof Panel3) {
+                    Panel3 panel3 = (Panel3) current;
+                    try {
+                        panel3.startGame();
+                    } catch (NetException ex) {
+                        JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                                + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        this.setCurrentJPanel(0);
+                    }
+                }
+            } else {
+                if (list.get(0).equals("Game is already started.")) {
+                } else {
+                    JOptionPane.showMessageDialog(this, "Can not start game.\n"
+                            + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+
+        if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
+            if (list.get(0).equals("started.")) {
+                if (current instanceof Panel3) {
+                    Panel3 panel3 = (Panel3) current;
+                    try {
+                        panel3.startGame();
+                    } catch (NetException ex) {
+                        JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                                + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        this.setCurrentJPanel(0);
+                    }
+                }
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+            if (!list.get(0).equals("Disconnected.")) {
+                JOptionPane.showMessageDialog(this, "Can not leave game.\n"
+                       + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
    private class NextAction extends AbstractAction {
@@ -48,12 +129,12 @@ public class MainWizard extends MyWizard{
            parent = jframe;
        }
        public void actionPerformed(ActionEvent e) {
-           IConnector con = Connector.getInstance();
+           IController con = Controller.getInstance();
            try {
                JPanel current = parent.getCurrentJPanel();
                if (current instanceof Panel1) {
                    Panel1 panel1 = (Panel1) current;
-                   con.сonnect(panel1.getIPAddress(), panel1.getPort());
+                   con.connect(panel1.getIPAddress(), panel1.getPort());
                    slideNext();
                    parent.setBackButtonEnable(false);
                }
@@ -61,7 +142,7 @@ public class MainWizard extends MyWizard{
                    Panel2 panel2 = (Panel2) current;
                    int gameNumber = panel2.getSelectedGame();
                    if (gameNumber != -1) {
-                       con.joinGame(gameNumber);
+                       con.requestJoinGame(gameNumber);
                        int maxPl = panel2.getSelectedMaxPl();
                        slideNext();
                        Panel3 panel3 = (Panel3) parent.getCurrentJPanel();
@@ -72,8 +153,9 @@ public class MainWizard extends MyWizard{
                    }
                }
                if (current instanceof Panel3) {
-                   Panel3 panel3 = (Panel3) current;
-                   panel3.startGame();
+                   //Panel3 panel3 = (Panel3) current;
+                   //panel3.startGame();
+                   Controller.getInstance().requestStartGame();
                }
            } catch (UnknownHostException ex) {
                JOptionPane.showMessageDialog(parent, "Can not connect to the server.\n"
@@ -100,9 +182,9 @@ public class MainWizard extends MyWizard{
 
             if (current instanceof Panel3) {
                 Panel3 panel = (Panel3)current;
-                IConnector con = Connector.getInstance();
+                IController con = Controller.getInstance();
                 try {
-                    con.leaveGame();
+                    con.requestLeaveGame();
                     panel.stopTimers();
                     slideBack();
                     parent.setBackButtonEnable(false);

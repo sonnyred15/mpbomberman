@@ -20,4 +20,5 @@ public interface IModel {
     public String getPlayerName();
     public void setPlayerBombs(int amount);
     public int getPlayerBombs();
+    public boolean isStarted();
 }

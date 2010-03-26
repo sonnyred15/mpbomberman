@@ -14,9 +14,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.impl.Controller;
 
 /**
  *
@@ -87,32 +87,28 @@ public class Panel2 extends JPanel implements Updating{
     public void getServerInfo() {
         String[] maps;
         try {
-            // HUCK!!!--------------------------------------------------
+            // HACK!!!--------------------------------------------------
             refreshJButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     ((JButton) e.getComponent()).doClick();
                 }
             });
-            // -----------------------------------------------------------
-            maps = Connector.getInstance().getMaps();
-            if (!maps[0].equals("No maps on server was founded.")) {
-                createPanel.setMaps(maps);
-            }
-            refreshTable();
+            //------------------------------------------------------------*/
+            Controller.getInstance().requestMapsList();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             parent.setCurrentJPanel(0);
         }
     }
-
-    private void refreshTable() throws NetException {
-        IConnector connect = Connector.getInstance();
-        List<String> games = null;
-        games = connect.takeGamesList();
-        // if not "No games"
-        if (games.get(0).charAt(0) != 'N') {
+    public void setMaps(List<String> maps) {
+        if (!maps.get(0).equals("No maps on server was founded.")) {
+            createPanel.setMaps(maps);
+        }
+    }
+    public void setGames(List<String> games) {
+        if (!games.get(0).equals("No unstarted games finded.")) {
             int counter = 0;
             MyTableModel tableModel = (MyTableModel) table.getModel();
             tableModel.clear();
@@ -126,7 +122,7 @@ public class Panel2 extends JPanel implements Updating{
                 counter++;
             }
         }
-        table.repaint();
+        //table.repaint();
     }
 
     private void setSizesTable() {
@@ -147,9 +143,9 @@ public class Panel2 extends JPanel implements Updating{
         columnModel.getColumn(4).setResizable(false);
     }
     private void join(int gameNumber) {
-        IConnector connect = Connector.getInstance();
+        IController control = Controller.getInstance();
         try {
-            connect.joinGame(gameNumber);
+            control.requestJoinGame(gameNumber);
             //this.dispose();
             int maxPlayers = this.getSelectedMaxPl();
             if (maxPlayers != -1) {
@@ -170,7 +166,6 @@ public class Panel2 extends JPanel implements Updating{
 
     private class RefreshAction extends AbstractAction {
         Panel2 parent;
-
         public RefreshAction(Panel2 panel) {
             parent = panel;
             putValue(NAME, "Refresh");
@@ -180,7 +175,7 @@ public class Panel2 extends JPanel implements Updating{
 
         public void actionPerformed(ActionEvent e) {
             try {
-                parent.refreshTable();
+                Controller.getInstance().requestGamesList();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

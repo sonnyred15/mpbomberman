@@ -8,9 +8,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.ServerInfoJFrame;
+import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.view.mywizard.MainWizard;
 
 /**
@@ -34,7 +33,7 @@ public class GameJMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Model.getInstance().removeListener(parent);
                 try {
-                    Connector.getInstance().leaveGame();
+                    Controller.getInstance().requestLeaveGame();
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -59,12 +58,13 @@ public class GameJMenuBar extends JMenuBar {
             parent.dispose();
             Model.getInstance().removeListener(parent);
             try {
-                Connector.getInstance().leaveGame();
+                Controller.getInstance().requestLeaveGame();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             MainWizard wizard = new MainWizard();
+            Controller.getInstance().setReceiveInfoListener(wizard);
             wizard.setCurrentJPanel(1);
             wizard.updateCurrentPanel();
             //ServerInfoJFrame serv = new ServerInfoJFrame();

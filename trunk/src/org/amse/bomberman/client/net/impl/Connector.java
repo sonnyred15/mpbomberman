@@ -29,7 +29,7 @@ import org.amse.bomberman.util.impl.Parser;
  * @author Michail Korovkin
  */
 public class Connector implements IConnector{
-    private Socket socket;
+    /*private Socket socket;
     private Timer timer;
     private static IConnector connector = null;
 
@@ -68,7 +68,7 @@ public class Connector implements IConnector{
      * @param maxPl maximum value of players that can connect to this new game.
      * @return true if game is created. Return false if something wrong :)
      */
-    public boolean createGame(String gameName, String mapName, int maxPl)
+    /*public boolean createGame(String gameName, String mapName, int maxPl)
             throws NetException{
         ArrayList<String> answer = queryAnswer(""+Command.CREATE_GAME.getValue()
                 +" "+ gameName +" "+ mapName +" "+ maxPl);
@@ -121,7 +121,7 @@ public class Connector implements IConnector{
      * @return true if game is started, false if isn't.
      * @throws java.io.IOException if you are not connected to any game.
      */
-    public boolean isStarted() throws NetException {
+    /*public boolean isStarted() throws NetException {
         ArrayList<String> status = queryAnswer(""+Command.GET_GAME_STATUS.getValue());
         if (status.get(0).equals("started.")) {
             return true;
@@ -210,5 +210,5 @@ public class Connector implements IConnector{
             }
         }
     }
-
+*/
 }

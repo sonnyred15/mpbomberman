@@ -3,6 +3,7 @@ package org.amse.bomberman.client.view.gamejframe;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -10,18 +11,17 @@ import javax.swing.SwingConstants;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
-import org.amse.bomberman.client.view.StartJFrame;
+import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.view.mywizard.MainWizard;
+import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 
 /**
  *
  * @author Michael Korovkin
  */
-public class GameJFrame extends JFrame implements IView{
-    //private BombMap map;
-    //private MyJPanel[][] cells;
+public class GameJFrame extends JFrame implements IView, RequestResultListener{
     private GamePanel gamePanel;
     private JLabel livesJLabel;
     // is really nead???
@@ -38,12 +38,21 @@ public class GameJFrame extends JFrame implements IView{
         this.setMinimumSize(new Dimension(width / 2, height / 2));
         BombMap map;
         try {
-            map = Connector.getInstance().getMap();
+            Controller.getInstance().requestGameMap();
+            // HACK!!! Delay for answer from server before get BombMap
+            Object delay = new Object();
+            synchronized (delay) {
+                try {
+                    delay.wait(1000);
+                } catch (InterruptedException ex) {
+                }
+            }
+            //--------------------------------------------------------------
+            map = Model.getInstance().getMap();
             gamePanel = new GamePanel(map);
             Container c = getContentPane();
             c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
             livesJLabel = new JLabel("Lives: 0");
-            // ???
             livesJLabel.setPreferredSize(new Dimension(width, 30));
             livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
             c.add(livesJLabel);
@@ -56,7 +65,10 @@ public class GameJFrame extends JFrame implements IView{
         } catch (NetException ex) {
              JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-             StartJFrame jframe = new StartJFrame();
+             this.dispose();
+             MainWizard wizard = new MainWizard();
+             wizard.setCurrentJPanel(0);
+             Controller.getInstance().setReceiveInfoListener(wizard);
         }
     }
 
@@ -73,6 +85,9 @@ public class GameJFrame extends JFrame implements IView{
                 dead = true;
             }
         }
+    }
+    public void received(List<String> list) {
+        // Need to do something?
     }
     private void refreshLives(int lives) {
         String buf = livesJLabel.getText();
