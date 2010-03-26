@@ -85,8 +85,8 @@ public class Controller implements IController{
         this.connector.requestPlantBomb();
     }
 
-    public void requestJoinBotIntoGame(int gameNumber) throws NetException {
-        this.connector.requestJoinBotIntoGame(gameNumber);
+    public void requestJoinBotIntoGame() throws NetException {
+        this.connector.requestJoinBotIntoGame();
     }
 
     public void requestMapsList() throws NetException {
