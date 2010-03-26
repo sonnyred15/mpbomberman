@@ -134,21 +134,23 @@ public final class Stringalize {
 
             for (int j = 0; j < field.length; j++) {
                 int n = field[i][j];
-
-                if ((n == Constants.MAP_BOMB)
-                        || (n == Constants.MAP_DETONATED_BOMB)) {
-                    for (Player player1 : players) {
-                        int x = player1.getPosition().getX();
-                        int y = player1.getPosition().getY();
-                        if(x==i && y==j){
-                            n+=100+player.getID();
+                for (Player pl : players) {
+                    int x = pl.getPosition().getX();
+                    int y = pl.getPosition().getY();
+                    if (x == i && y == j) {
+                        // player on the bomb
+                        if ((n == Constants.MAP_BOMB)) {
+                            n += 100 + player.getID();
+                        } else {
+                            // player in the center of Explosion
+                            if (n == Constants.MAP_DETONATED_BOMB) {
+                                n = player.getID();
+                            }
                         }
                     }
                 }
-                else {
-                    buff.append(n);
-                    buff.append(" ");
-                }
+                buff.append(n);
+                buff.append(" ");
             }
 
             stringalizedField.add(buff.toString());

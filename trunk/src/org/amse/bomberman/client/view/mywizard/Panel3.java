@@ -66,8 +66,10 @@ public class Panel3 extends JPanel implements Updating{
         playersNum = number;
     }
     public void stopTimers() {
-        timer.cancel();
-        timer = null;
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
     public void getServerInfo() {
         try {
