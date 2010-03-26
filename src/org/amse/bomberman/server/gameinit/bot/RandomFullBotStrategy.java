@@ -27,7 +27,7 @@ public class RandomFullBotStrategy extends BotStrategy{
         do {
             x = random.nextInt(map.getDimension() - 1);
             y = random.nextInt(map.getDimension() - 1);
-        } while (!map.isEmpty(x, y));
+        } while (!(map.isEmpty(x, y) || map.isBonus(x, y)));
 
         Pair dir = new Pair(x, y);
         //System.out.println("Choosed " + dir.toString());

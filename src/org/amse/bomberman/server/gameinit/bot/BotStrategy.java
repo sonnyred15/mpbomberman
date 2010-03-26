@@ -91,6 +91,9 @@ public abstract class BotStrategy {
             int nextX = x;
             int nextY = y + 1;
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
@@ -99,6 +102,9 @@ public abstract class BotStrategy {
             int nextX = x;
             int nextY = y - 1;
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
@@ -107,6 +113,9 @@ public abstract class BotStrategy {
             int nextX = x - 1;
             int nextY = y;
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
@@ -115,6 +124,9 @@ public abstract class BotStrategy {
             int nextX = x + 1;
             int nextY = y;
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
+                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
                 rec(new Pair(nextX, nextY), steps + 1);
             }
