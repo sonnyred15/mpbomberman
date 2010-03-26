@@ -19,12 +19,11 @@ public class Player implements MoveableObject{
     private int id = 1;
     
     private Pair position;
-
-    private final int minExplRadius = 2;
-    private int explRadius = minExplRadius; //for better testing :))
+    
+    private int explRadius = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
     private int bombs = 0;
     private final Object BOMBS_LOCK = new Object();
-    private int maxBombs = Constants.PLAYER_MAX_BOMBS;
+    private int maxBombs = Constants.PLAYER_DEFAULT_MAX_BOMBS;
 
     public Player() {
     }
@@ -47,7 +46,7 @@ public class Player implements MoveableObject{
         return ret;
     }
 
-    public synchronized boolean isAlive() {
+    public boolean isAlive() {
         return (this.lives > 0);
     }
 
@@ -124,11 +123,12 @@ public class Player implements MoveableObject{
             }
         }
     }
+    
     private void decBonuses() {
-        if (explRadius > minExplRadius) {
+        if (explRadius > Constants.PLAYER_DEFAULT_BOMB_RADIUS) {
             explRadius--;
         }
-        if (maxBombs > 1) {
+        if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
             maxBombs--;
         }
     }

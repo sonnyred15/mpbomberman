@@ -9,7 +9,7 @@ import org.amse.bomberman.util.Constants;
 public class Player implements IPlayer{
     private static Player player = null;
     private String name = "Noname";
-    private int bombAmount = Constants.PLAYER_MAX_BOMBS;
+    private int bombAmount = Constants.PLAYER_DEFAULT_MAX_BOMBS;
     // ???
     private int life = 3;
     // ???
