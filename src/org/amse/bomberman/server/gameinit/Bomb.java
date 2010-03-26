@@ -64,6 +64,9 @@ public class Bomb implements MoveableObject{
         int bombX = this.position.getX();
         int bombY = this.position.getY();
 
+        // center of Explosion
+        explosions.add(new Pair(bombX, bombY));
+        
         //uplines
         k = radius;
         for (i = bombX - 1; (i >= 0 && k > 0); --i, --k) {

@@ -274,12 +274,17 @@ public class GamePanel  extends JPanel{
         Graphics2D g = image.createGraphics();
         g.setBackground(EMPTY_COLOR);
         g.clearRect(0, 0, cellSize, cellSize);
-        Image icon = getImage(cell);
-        if (icon != null) {
-            g.drawImage(icon, 0, 0, this);
+        // if it is player on the bomb
+        if (map.getValue(cell) >= Constants.MAP_DETONATED_BOMB + 100 + 1) {
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 10 * 0.1f));
+            g.drawImage(getPlayerIcon(map.getValue(cell)), 0, 0, this);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 9 * 0.1f));
+            g.drawImage(ICON_BOMB.getImage(), 0, 0, this);
         } else {
-            g.setBackground(EMPTY_COLOR);
-            g.clearRect(0, 0, cellSize, cellSize);
+            Image icon = getImage(cell);
+            if (icon != null) {
+                g.drawImage(icon, 0, 0, this);
+            } 
         }
         return image;
     }
