@@ -110,10 +110,10 @@ public class SynchroConnector implements IConnector2 {
         Controller.getInstance().receivedRequestResult(list);
     }
 
-    public void requestJoinBotIntoGame(int gameID) throws NetException {
+    public void requestJoinBotIntoGame() throws NetException {
         // bot name???!!!
         List<String> list = queryAnswer("" +
-                Command.ADD_BOT_TO_GAME.getValue() + " " + gameID + " BOT");
+                Command.ADD_BOT_TO_GAME.getValue() + " BOT");
         System.out.println(list.get(0));
         list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);

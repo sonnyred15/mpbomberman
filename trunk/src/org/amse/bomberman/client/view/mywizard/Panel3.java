@@ -34,7 +34,6 @@ import org.amse.bomberman.util.Constants;
  * @author Michael Korovkin
  */
 public class Panel3 extends JPanel implements Updating{
-    private int serverNumber;
     private int playersNum = 1;
     private MyWizard parent;
     private JLabel[] players = new JLabel[Constants.MAX_PLAYERS];
@@ -55,12 +54,6 @@ public class Panel3 extends JPanel implements Updating{
         this.setSize(width, height);
         initComponents();
         setVisible(true);
-    }
-    public int getGameNumber() {
-        return serverNumber;
-    }
-    public void setGameNumber(int number) {
-        serverNumber  = number;
     }
     public void setPlayersNum(int number) {
         playersNum = number;
@@ -256,7 +249,7 @@ public class Panel3 extends JPanel implements Updating{
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestJoinBotIntoGame(getGameNumber());
+                Controller.getInstance().requestJoinBotIntoGame();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

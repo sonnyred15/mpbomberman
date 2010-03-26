@@ -135,18 +135,12 @@ public class CreatingGameJPanel extends JPanel {
                 // !!!!! is it safe method to know gameNumber???    !!!!!!!!!!!!
                 //List<String> games = con.requestMapsList();
                 //String[] buf = games.get(games.size()-1).split(" ");
-                //int gameNumber = Integer.parseInt(buf[0]);
                 //int players = Integer.parseInt(buf[buf.length-1]);
                 parent.goNext();
                 Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
                 nextPanel.getServerInfo();
                 //nextPanel.setPlayersNum(players);
-                //nextPanel.setGameNumber(gameNumber);
-            }/*catch (IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(myParent,"Can not create new game.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }*/ catch (NetException ex) {
+            } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 parent.setCurrentJPanel(0);

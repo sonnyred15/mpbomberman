@@ -107,8 +107,8 @@ public class AsynchroConnector implements IConnector2 {
         sendRequest("" + Command.PLACE_BOMB.getValue());
     }
 
-    public void requestJoinBotIntoGame(int gameID) throws NetException {
-        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " " + gameID + " BOT");
+    public void requestJoinBotIntoGame() throws NetException {
+        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " BOT");
     }
 
     public void requestGameMapsList() throws NetException {
