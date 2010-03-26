@@ -25,7 +25,7 @@ import javax.swing.border.LineBorder;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.net.impl.Connector;
+import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.util.Constants;
 
@@ -67,24 +67,25 @@ public class Panel3 extends JPanel implements Updating{
     }
     public void stopTimers() {
         timer.cancel();
+        timer = null;
     }
     public void getServerInfo() {
         try {
             chatTA.setText("");
-            List<String> gameInfo = Connector.getInstance().getMyGameInfo();
-            if (gameInfo.get(0).equals("false")) {
-                botJButton.setEnabled(false);
-                botJButton.setVisible(false);
-                parent.setNextButtonEnable(false);
-            } else {
-                botJButton.setAction(new AddBotAction());
-            }
-            for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
-                this.setPlayer(i, gameInfo.get(i+2));
-            }
-            for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
-                this.setPlayer(i, emptyName);
-            }
+            /*List<String> gameInfo =*/Controller.getInstance().requestGameInfo();
+            //if (gameInfo.get(0).equals("false")) {
+            //    botJButton.setEnabled(false);
+            //    botJButton.setVisible(false);
+            //    parent.setNextButtonEnable(false);
+            //} else {
+            //    botJButton.setAction(new AddBotAction());
+            //}
+            //for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
+            //    this.setPlayer(i, gameInfo.get(i+2));
+            //}
+            //for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
+            //    this.setPlayer(i, emptyName);
+            //}
             this.startUpdating();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
@@ -96,17 +97,35 @@ public class Panel3 extends JPanel implements Updating{
     public void startGame() throws NetException {
         this.stopTimers();
         parent.dispose();
-        Connector.getInstance().startGame();
+        //Controller.getInstance().requestStartGame();
         IModel model = Model.getInstance();
-        model.setMap(Connector.getInstance().getMap());
+        Controller.getInstance().requestGameMap();
+        Controller.getInstance().setReceiveInfoListener((RequestResultListener)
+                Model.getInstance());
         GameJFrame jframe = new GameJFrame();
         Model.getInstance().addListener(jframe);
-        Connector.getInstance().beginUpdating();
     }
-    private void update() {
-        try {
-            List<String> gameInfo = Connector.getInstance().getMyGameInfo();
-            if (Integer.parseInt(gameInfo.get(1)) > 0) {
+    public void setGameInfo(List<String> info) {
+        if (info.get(0).equals("false")) {
+            botJButton.setEnabled(false);
+            botJButton.setVisible(false);
+            parent.setNextButtonEnable(false);
+        } else {
+            botJButton.setAction(new AddBotAction());
+        }
+        if (Integer.parseInt(info.get(1)) > 0) {
+            for (int i = 0; i < Integer.parseInt(info.get(1)); i++) {
+                this.setPlayer(i, info.get(i + 2));
+            }
+        }
+        for (int i = Integer.parseInt(info.get(1)); i < playersNum; i++) {
+            this.setPlayer(i, emptyName);
+        }
+    }
+    //private void update() {
+        //try {
+            /*List<String> gameInfo = */
+            /*if (Integer.parseInt(gameInfo.get(1)) > 0) {
                 for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
                     this.setPlayer(i, gameInfo.get(i+2));
                 }
@@ -124,7 +143,7 @@ public class Panel3 extends JPanel implements Updating{
             this.stopTimers();
             parent.setCurrentJPanel(0);
         }
-    }
+    }*/
     private void setPlayer(int id, String name) {
         players[id].setText(name);
         LineBorder border = null;
@@ -176,9 +195,9 @@ public class Panel3 extends JPanel implements Updating{
                         try {
                             String message = getMessage();
                             if (message.length() > 0) {
-                                List<String> list = Connector.getInstance()
-                                        .sendChatMessage(message);
-                                setNewMessages(list);
+                                /*List<String> list =*/ Controller.getInstance()
+                                        .requestSendChatMessage(message);
+                                //setNewMessages(list);
                             }
                         } catch (NetException ex) {
                             // is it good?
@@ -235,16 +254,13 @@ public class Panel3 extends JPanel implements Updating{
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Connector.getInstance().joinBotIntoGame(getGameNumber());
+                Controller.getInstance().requestJoinBotIntoGame(getGameNumber());
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 stopTimers();
                 parent.setCurrentJPanel(0);
-            } /*catch (IOException ex) {
-            JOptionPane.showMessageDialog(parent, "Can not join bot to the game: \n"
-            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }*/
+            } 
         }
     }
     private class ChatAction extends AbstractAction{
@@ -256,9 +272,9 @@ public class Panel3 extends JPanel implements Updating{
             try {
                 String message = getMessage();
                 if (message.length() > 0) {
-                    List<String> list = Connector.getInstance().sendChatMessage
-                            (message);
-                    setNewMessages(list);
+                    /*List<String> list =*/ Controller.getInstance()
+                            .requestSendChatMessage(message);
+                    //setNewMessages(list);
                 }
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
@@ -271,13 +287,13 @@ public class Panel3 extends JPanel implements Updating{
     private class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
-            update();
             try {
-                boolean flag = Connector.getInstance().isStarted();
-                if (flag) {
-                    this.cancel();
-                    startGame();
-                }
+                Controller.getInstance().requestGameInfo();
+                /*boolean flag =*/ Controller.getInstance().requestIsGameStarted();
+                //if (flag) {
+                //    this.cancel();
+                //    startGame();
+                //}
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();

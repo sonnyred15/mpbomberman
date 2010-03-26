@@ -10,47 +10,52 @@ import org.amse.bomberman.util.IParser;
 
 /**
  *
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
-public class Parser implements IParser{
+public class Parser implements IParser {
+
     public BombMap parse(List<String> list) {
         BombMap map = null;
-        int n = 0;
-        n = Integer.parseInt(list.get(0));
-        map = new BombMap(n);
-        for (int i = 0; i < n; i++) {
-            String[] numbers = list.get(i+1).split(" ");
-            for (int j = 0; j < numbers.length; j++) {
-                map.setCell(new Cell(i,j), (int) Integer.parseInt(numbers[j]));
+        try {
+            int n = 0;
+            n = Integer.parseInt(list.get(0));
+            map = new BombMap(n);
+            for (int i = 0; i < n; i++) {
+                String[] numbers = list.get(i + 1).split(" ");
+                for (int j = 0; j < numbers.length; j++) {
+                    map.setCell(new Cell(i, j), (int) Integer.parseInt(numbers[j]));
+                }
             }
+            // receive list of explosive
+            int k = Integer.parseInt(list.get(n + 1));
+            ArrayList<Cell> expl = new ArrayList<Cell>(k);
+            for (int i = 0; i < k; i++) {
+                String[] xy = list.get(i + n + 2).split(" ");
+                Cell buf = new Cell((int) Integer.parseInt(xy[0])
+                        , (int) Integer.parseInt(xy[1]));
+                expl.add(buf);
+            }
+            // receive player info
+            // m == 1 always
+            int m = Integer.parseInt(list.get(n + k + 2));
+            if (m == 1) {
+                String[] info = new String[6];
+                info = list.get(n + k + 3).split(" ");
+                int x = Integer.parseInt(info[0]);
+                int y = Integer.parseInt(info[1]);
+                String nick = info[2];
+                int lives = Integer.parseInt(info[3]);
+                int bombs = Integer.parseInt(info[4]);
+                int maxBombs = Integer.parseInt(info[5]);
+                IModel model = Model.getInstance();
+                model.setPlayerLives(lives);
+                model.setPlayerCoord(new Cell(x, y));
+                model.setPlayerBombs(bombs);
+            }
+            map.setExplosions(expl);
+        } catch (NumberFormatException ex) {
+            System.out.println("Wrong format of map: " + ex);
         }
-        // receive list of explosive
-        int k = Integer.parseInt(list.get(n+1));
-        ArrayList<Cell> expl = new ArrayList<Cell>(k);
-        for (int i = 0; i < k; i++) {
-            String[] xy = list.get(i+n+2).split(" ");
-            Cell buf = new Cell((int) Integer.parseInt(xy[0])
-                    , (int) Integer.parseInt(xy[1]));
-            expl.add(buf);
-        }
-        // receive player info
-        // m == 1 always
-        int m = Integer.parseInt(list.get(n+k+2));
-        if (m == 1) {
-            String[] info = new String[6];
-            info = list.get(n + k + 3).split(" ");
-            int x = Integer.parseInt(info[0]);
-            int y = Integer.parseInt(info[1]);
-            String nick = info[2];
-            int lives = Integer.parseInt(info[3]);
-            int bombs = Integer.parseInt(info[4]);
-            int maxBombs = Integer.parseInt(info[5]);
-            IModel model = Model.getInstance();
-            model.setPlayerLives(lives);
-            model.setPlayerCoord(new Cell(x,y));
-            model.setPlayerBombs(bombs);
-        }
-        map.setExplosions(expl);
         return map;
     }
 }

@@ -13,7 +13,7 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public interface IConnector {
 
-     public void сonnect(InetAddress address, int port)
+     /*public void сonnect(InetAddress address, int port)
              throws UnknownHostException, IOException;
      public boolean leaveGame() throws NetException;
      public List<String> takeGamesList() throws NetException;
@@ -32,5 +32,5 @@ public interface IConnector {
      public List<String> getNewChatMessages() throws NetException;
      public InetAddress getInetAddress();
      public int getPort();
-     public void beginUpdating() throws NetException;
+     public void beginUpdating() throws NetException;*/
 }

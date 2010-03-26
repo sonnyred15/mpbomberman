@@ -24,7 +24,7 @@ import org.amse.bomberman.util.Constants;
  * @author Michail Korovkin
  */
 public class StartJFrame extends JFrame {
-    private final int height = 120;
+    /*private final int height = 120;
     private final int width = 240;
     private JButton connectJButton = new JButton();
     private JTextField ipTF = new JTextField();
@@ -119,5 +119,5 @@ public class StartJFrame extends JFrame {
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
+    }*/
 }

@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.control.Controller;
+import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.ProtocolConstants;
@@ -30,12 +31,12 @@ import org.amse.bomberman.util.ProtocolConstants;
 public class AsynchroConnector implements IConnector2 {
 
     private Socket socket;
-    private static Controller controller;
+    private static IController controller;
     private static IConnector2 connector = null;
 
     private AsynchroConnector() {
         if (controller == null) {
-            controller = new Controller();
+            controller = Controller.getInstance();
         }
     }
 
@@ -151,7 +152,7 @@ public class AsynchroConnector implements IConnector2 {
                         }
                         message.add(oneLine);
                     }
-                    processServerMessage(message);
+                    //----------------------------------processServerMessage(message);
                     message.clear();
                 }
             } catch (Exception ex) {
@@ -159,7 +160,7 @@ public class AsynchroConnector implements IConnector2 {
             }
         }
 
-        private void processServerMessage(List<String> message) {//TODO fix NPE
+        /*private void processServerMessage(List<String> message) {//TODO fix NPE
             String firstLine = message.get(0);
             System.out.println("GETTED SERVER MESSAGE FIRSTLINE=" + firstLine);
 
@@ -167,16 +168,16 @@ public class AsynchroConnector implements IConnector2 {
                 controller.requestGameInfo();
 
             /* Advise to update games list info*/
-            } else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAMES_LIST)) {
+            /*} else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAMES_LIST)) {
                 controller.requestGamesList();
 
             /* Advise to update game map*/
-            } else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAME_MAP)) {
+            /*} else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAME_MAP)) {
                 controller.requestGameMap();
 
             } else {//TODO ADD CHAT MESSAGE AND GET CHAT MESSAGES
                 controller.receivedRequestResult(message);
             }
-        }
+        }*/
     }
 }

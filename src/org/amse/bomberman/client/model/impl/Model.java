@@ -5,18 +5,22 @@ import java.util.List;
 import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
+import org.amse.bomberman.client.view.mywizard.RequestResultListener;
+import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.util.impl.Parser;
 
 /**
  *
  * @author Michail Korovkin
  */
-public class Model implements IModel{
+public class Model implements IModel, RequestResultListener{
     private static IModel model= null;
     private IConnector connector;
     private BombMap map;
     private IPlayer player = Player.getInstance();
     private List<IView> listener = new ArrayList<IView>();
     private List<Cell> changes = new ArrayList<Cell>();
+    private boolean isStarted = false;
 
     private Model() {
     }
@@ -67,14 +71,42 @@ public class Model implements IModel{
         this.map = map;
         updateListeners();
     }
-    // only for player from this connector
-    /*public boolean movePlayer(int number, Direction dir) {
-        if (Connector.getInstance().doMove(dir)) {
-            map = Connector.getInstance().getMap();
-            this.updateListeners();
-            return true;
-        } else return false;
-    }*/
+
+    public void received(List<String> list) {
+        String command = list.get(0);
+        list.remove(0);
+        if (command.equals(ProtocolConstants.CAPTION_GAME_MAP_INFO)) {
+            if (!list.get(0).equals("Not joined to any game.")) {
+                Parser parser = new Parser();
+                this.setMap(parser.parse(list));
+            } else {
+                System.out.println(list.get(0));
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
+            if (list.get(0).equals("false")) {
+                //System.out.println("You try to do move uncorrectly.");
+            } else {
+                if (list.get(0).equals("Not joined to any game.")) {
+                    System.out.println("Not joined to any game.");
+                }
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
+            if (list.get(0).equals("started.")) {
+                isStarted = true;
+            } else {
+                isStarted = false;
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+            if (list.get(0).equals("Disconnected.")) {
+                isStarted = false;
+            } else {
+                // TO DO
+            }
+        }
+    }
     public BombMap getMap() {
         return map;
     }
@@ -115,5 +147,8 @@ public class Model implements IModel{
     }
     public int getPlayerBombs() {
         return player.getBombAmount();
+    }
+    public boolean isStarted() {
+        return isStarted;
     }
 }

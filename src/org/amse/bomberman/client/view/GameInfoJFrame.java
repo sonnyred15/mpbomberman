@@ -35,8 +35,8 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Michail Korovkin
  */
-public class GameInfoJFrame extends JFrame implements IView{
-    private int serverNumber;
+public class GameInfoJFrame extends JFrame /*implements IView*/{
+    /*private int serverNumber;
     private int playersNum;
     private JLabel[] players = new JLabel[Constants.MAX_PLAYERS];
     private JButton startJButton = new JButton();
@@ -284,7 +284,7 @@ public class GameInfoJFrame extends JFrame implements IView{
                 JOptionPane.showMessageDialog(parent, "Can not join bot to the game: \n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }*/
-        }
+        /*}
     }
     public static class CancelAction extends AbstractAction{
         GameInfoJFrame parent;
@@ -348,5 +348,5 @@ public class GameInfoJFrame extends JFrame implements IView{
                 this.cancel();
             }
         }
-    }
+    }*/
 }

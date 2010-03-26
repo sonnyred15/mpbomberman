@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import org.amse.bomberman.client.net.IConnector;
-import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
+import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -94,7 +94,7 @@ public class CreatingGameJPanel extends JPanel {
         this.add(bottomBox);
         this.add(createJButton);
         createJButton.setAction(new CreateGameAction());
-        //  HUCK!!!! -------------------------------------------------
+        //  HACK!!!! -------------------------------------------------
         createJButton.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -106,9 +106,9 @@ public class CreatingGameJPanel extends JPanel {
 
         setVisible(true);
     }
-    public void setMaps(String[] maps) {
-        for (int i = 0; i < maps.length; i++) {
-            this.mapBox.addItem(maps[i]);
+    public void setMaps(List<String> maps) {
+        for (int i = 0; i < maps.size(); i++) {
+            this.mapBox.addItem(maps.get(i));
         }
     }
     private String getGameName() {
@@ -127,21 +127,21 @@ public class CreatingGameJPanel extends JPanel {
             putValue(SMALL_ICON, null);
         }
         public void actionPerformed(ActionEvent e) {
-            IConnector con = Connector.getInstance();
+            IController con = Controller.getInstance();
             try {
                 String mapName = getMap();
                 mapName = mapName.substring(0, mapName.indexOf('.'));
-                con.createGame(getGameName(), mapName, getMaxPlayers());
+                con.requestCreateGame(getGameName(), mapName, getMaxPlayers());
                 // !!!!! is it safe method to know gameNumber???    !!!!!!!!!!!!
-                List<String> games = Connector.getInstance().takeGamesList();
-                String[] buf = games.get(games.size()-1).split(" ");
-                int gameNumber = Integer.parseInt(buf[0]);
-                int players = Integer.parseInt(buf[buf.length-1]);
+                //List<String> games = con.requestMapsList();
+                //String[] buf = games.get(games.size()-1).split(" ");
+                //int gameNumber = Integer.parseInt(buf[0]);
+                //int players = Integer.parseInt(buf[buf.length-1]);
                 parent.goNext();
                 Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
                 nextPanel.getServerInfo();
-                nextPanel.setPlayersNum(players);
-                nextPanel.setGameNumber(gameNumber);
+                //nextPanel.setPlayersNum(players);
+                //nextPanel.setGameNumber(gameNumber);
             }/*catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(myParent,"Can not create new game.\n"

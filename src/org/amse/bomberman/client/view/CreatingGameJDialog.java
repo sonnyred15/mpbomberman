@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.impl.Connector;
 import org.amse.bomberman.client.net.NetException;
+import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.view.mywizard.MyWizard;
 import org.amse.bomberman.client.view.mywizard.Panel2;
 import org.amse.bomberman.util.Constants;
@@ -31,7 +32,7 @@ import org.amse.bomberman.util.Constants;
  * @author Michail Korovkin
  */
 public class CreatingGameJDialog extends JDialog {
-    private MyWizard parent;
+    /*private MyWizard parent;
     private int width = 280;
     private int heigth = 180;
     private JComboBox mapBox;
@@ -48,7 +49,7 @@ public class CreatingGameJDialog extends JDialog {
         setSize(width, heigth);
         setLocation(parent.getX()-width, parent.getY());
 
-        String[] maps =  Connector.getInstance().getMaps();
+        String[] maps = Controller.getInstance().requestMapsList();
         if (!maps[0].equals("No maps on server was founded.")) {
             mapBox = new JComboBox(maps);
         }
@@ -146,7 +147,7 @@ public class CreatingGameJDialog extends JDialog {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(myParent,"Can not create new game.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }*/ catch (NetException ex2) {
+            }*/ /*catch (NetException ex2) {
                 JOptionPane.showMessageDialog(myParent,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 myParent.dispose();
@@ -164,5 +165,5 @@ public class CreatingGameJDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             parent.dispose();
         }
-    }
+    }*/
 }
