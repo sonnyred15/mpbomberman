@@ -462,9 +462,9 @@ public class Session extends Thread implements ISession {
     }
 
     private boolean filtred(String message) {
-//        if (message.startsWith("Session")) {
-//            return true;
-//        }
+        if (message.startsWith("Session")) {
+            return true;
+        }
 
         return false;
     }

@@ -51,6 +51,10 @@ public class Bomb implements MoveableObject{
 
         ArrayList<Pair> explosions = new ArrayList<Pair>();
 
+
+        // center of Explosion
+        explosions.add(this.position);
+
         //if owner still staying in bomb square.
         if (this.owner.getPosition().equals(this.position)) {
             this.model.playerBombed(this.owner, this.owner);
@@ -63,9 +67,6 @@ public class Bomb implements MoveableObject{
 
         int bombX = this.position.getX();
         int bombY = this.position.getY();
-
-        // center of Explosion
-        explosions.add(new Pair(bombX, bombY));
         
         //uplines
         k = radius;
@@ -109,7 +110,7 @@ public class Bomb implements MoveableObject{
 
         this.model.addExplosions(explosions); //add explosions to model
         this.owner.detonatedBomb();
-        timer.schedule(new ClearExplosionTask(explosions, new Pair(bombX, bombY), this.owner), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
+        timer.schedule(new ClearExplosionTask(explosions, this.position, this.owner), Constants.BOMB_DETONATION_TIME, TimeUnit.MILLISECONDS);
     }
 
     //true if we must continue cycle
@@ -199,6 +200,7 @@ public class Bomb implements MoveableObject{
             }
             for (Pair pair : explSqToClear) { // clear from explosions list
                 model.removeExplosion(pair);
+                model.removeExplosion(bombToClear);
             }
         }
     }

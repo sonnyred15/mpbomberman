@@ -302,6 +302,7 @@ public class Model implements IModel {
         for (Player player : players) {
             if(player.getID()==playerID){
                 this.players.remove(player);
+                this.gameMap.removePlayer(playerID);
             }
         }
     }
