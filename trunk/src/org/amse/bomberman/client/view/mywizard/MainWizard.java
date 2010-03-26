@@ -119,6 +119,18 @@ public class MainWizard extends MyWizard implements RequestResultListener{
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+        if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
+                panel3.setNewMessages(list);
+            }
+        }
+        if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
+                panel3.setNewMessages(list);
+            }
+        }
     }
 
    private class NextAction extends AbstractAction {

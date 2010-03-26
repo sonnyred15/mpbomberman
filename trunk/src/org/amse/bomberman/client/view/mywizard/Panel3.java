@@ -124,6 +124,13 @@ public class Panel3 extends JPanel implements Updating{
             this.setPlayer(i, emptyName);
         }
     }
+    public void setNewMessages(List<String> messages) {
+        if (!messages.get(0).equals("No new messages.")) {
+            for (String message: messages) {
+                chatTA.append(message + "\n");
+            }
+        }
+    }
     //private void update() {
         //try {
             /*List<String> gameInfo = */
@@ -173,11 +180,6 @@ public class Panel3 extends JPanel implements Updating{
         messageTF.setText("");
         return message;
     }
-    private void setNewMessages(List<String> messages) {
-        for (String message: messages) {
-            chatTA.append(message + "\n");
-        }
-    }
     private void startUpdating() {
         timer = new Timer();
         timer.schedule(new UpdateTimerTask(), (long)0, checkStartDelay);
@@ -197,9 +199,7 @@ public class Panel3 extends JPanel implements Updating{
                         try {
                             String message = getMessage();
                             if (message.length() > 0) {
-                                /*List<String> list =*/ Controller.getInstance()
-                                        .requestSendChatMessage(message);
-                                //setNewMessages(list);
+                                Controller.getInstance().requestSendChatMessage(message);
                             }
                         } catch (NetException ex) {
                             // is it good?
@@ -274,9 +274,7 @@ public class Panel3 extends JPanel implements Updating{
             try {
                 String message = getMessage();
                 if (message.length() > 0) {
-                    /*List<String> list =*/ Controller.getInstance()
-                            .requestSendChatMessage(message);
-                    //setNewMessages(list);
+                    Controller.getInstance().requestSendChatMessage(message);
                 }
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
@@ -291,6 +289,7 @@ public class Panel3 extends JPanel implements Updating{
         public void run() {
             try {
                 Controller.getInstance().requestGameInfo();
+                Controller.getInstance().requestNewChatMessages();
                 /*boolean flag =*/ Controller.getInstance().requestIsGameStarted();
                 //if (flag) {
                 //    this.cancel();
