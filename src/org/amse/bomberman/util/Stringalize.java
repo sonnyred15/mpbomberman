@@ -140,11 +140,11 @@ public final class Stringalize {
                     if (x == i && y == j) {
                         // player on the bomb
                         if ((n == Constants.MAP_BOMB)) {
-                            n += 100 + player.getID();
+                            n += 100 + pl.getID();
                         } else {
                             // player in the center of Explosion
                             if (n == Constants.MAP_DETONATED_BOMB) {
-                                n = player.getID();
+                                n = pl.getID();
                             }
                         }
                     }
