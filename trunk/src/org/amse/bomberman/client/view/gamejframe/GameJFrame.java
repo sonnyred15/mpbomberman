@@ -33,7 +33,7 @@ public class GameJFrame extends JFrame implements IView, RequestResultListener{
     public GameJFrame() {
         super("BomberMan");
         this.setSize(width, height);
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 100);
         this.setMinimumSize(new Dimension(width / 2, height / 2));
         BombMap map;
@@ -43,7 +43,7 @@ public class GameJFrame extends JFrame implements IView, RequestResultListener{
             Object delay = new Object();
             synchronized (delay) {
                 try {
-                    delay.wait(1000);
+                    delay.wait(100);
                 } catch (InterruptedException ex) {
                 }
             }
