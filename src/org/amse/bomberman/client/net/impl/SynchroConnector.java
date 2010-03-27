@@ -14,11 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JFrame;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
@@ -89,12 +91,12 @@ public class SynchroConnector implements IConnector2 {
     public void requestStartGame() throws NetException {
         List<String> list = queryAnswer("" + Command.START_GAME.getValue());
         System.out.println(list);
-        list.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
-        Controller.getInstance().receivedRequestResult(list);
         // start timer for updating map of game
-        if (list.get(0).equals("Game started.")) {
+        if (list.get(0).equals("Game started.") && !Model.getInstance().isStarted()) {
             this.beginUpdating();
         }
+        list.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
+        Controller.getInstance().receivedRequestResult(list);
     }
 
     public void requestGameMap() throws NetException {
@@ -127,12 +129,12 @@ public class SynchroConnector implements IConnector2 {
 
     public void requestIsGameStarted() throws NetException {
         List<String> list = queryAnswer("" + Command.GET_GAME_STATUS.getValue());
-        list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
-        Controller.getInstance().receivedRequestResult(list);
         // does it work??? for start updating not a host.
-        if (list.get(0).equals("started.")) {
+        if (list.get(0).equals("started.") && !Model.getInstance().isStarted()) {
             this.beginUpdating();
         }
+        Controller.getInstance().receivedRequestResult(list);
+        list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
     }
 
     public void requestGameInfo() throws NetException {
@@ -195,9 +197,15 @@ public class SynchroConnector implements IConnector2 {
     }
      // must be here or somewhere else???
     public void beginUpdating(){
-        if (timer == null) {
-            timer = new Timer();
-            timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
+        Model.getInstance().setStart(true);
+        timer = new Timer();
+        timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
+    }
+    private void stopUpdating() {
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+            timer = null;
         }
     }
     private class UpdateTimerTask extends TimerTask{
@@ -208,7 +216,7 @@ public class SynchroConnector implements IConnector2 {
                 requestIsGameStarted();
                 requestGameMap();
                 if (!Model.getInstance().isStarted()) {
-                    this.cancel();
+                    stopUpdating();
                 }
             } catch (NetException ex) {
                 // is it good???

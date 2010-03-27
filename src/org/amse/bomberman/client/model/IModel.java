@@ -21,4 +21,5 @@ public interface IModel {
     public void setPlayerBombs(int amount);
     public int getPlayerBombs();
     public boolean isStarted();
+    public void setStart(boolean flag);
 }

@@ -61,6 +61,7 @@ public class Panel3 extends JPanel implements Updating{
     public void stopTimers() {
         if (timer != null) {
             timer.cancel();
+            timer.purge();
             timer = null;
         }
     }
@@ -283,11 +284,13 @@ public class Panel3 extends JPanel implements Updating{
             try {
                 Controller.getInstance().requestGameInfo();
                 Controller.getInstance().requestNewChatMessages();
-                /*boolean flag =*/ Controller.getInstance().requestIsGameStarted();
-                //if (flag) {
-                //    this.cancel();
-                //    startGame();
-                //}
+                Controller.getInstance().requestIsGameStarted();
+                if (!parent.isShowing()) {
+                    stopTimers();
+                }
+                if (Model.getInstance().isStarted()) {
+                    startGame();
+                }
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();

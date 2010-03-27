@@ -151,4 +151,7 @@ public class Model implements IModel, RequestResultListener{
     public boolean isStarted() {
         return isStarted;
     }
+    public void setStart(boolean bool) {
+        isStarted = bool;
+    }
 }
