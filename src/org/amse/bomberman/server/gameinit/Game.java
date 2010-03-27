@@ -18,7 +18,6 @@ import org.amse.bomberman.util.Constants.Direction;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Kirilchuk V.E
  */
 public class Game {
-    private final Chat                      chat;
+    private Chat                            chat;
     private final List<GameEndedListener>   gameEndedListeners;
     private final String                    gameName;
     private final List<GameStartedListener> gameStartedListeners;
@@ -53,8 +52,6 @@ public class Game {
 
         this.chat = new Chat(this.maxPlayers);
         this.model = new Model(gameMap, this);
-
-        // this.sessions = Collections.synchronizedList(new ArrayList<ISession>());
         this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
         this.gameStartedListeners =
             new CopyOnWriteArrayList<GameStartedListener>();
@@ -70,7 +67,7 @@ public class Game {
 
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
             bot = this.model.addBot(name);
-            this.gameStartedListeners.add((GameStartedListener)bot);
+            this.gameStartedListeners.add((GameStartedListener) bot);
         }
 
         return bot;
@@ -105,7 +102,7 @@ public class Game {
 
     private void endGame() {
         for (GameEndedListener gameEndedListener : gameEndedListeners) {
-            gameEndedListener.gameEnded(this);
+            gameEndedListener.gameEnded();
         }
 
         this.server.removeGame(this);
@@ -174,10 +171,16 @@ public class Game {
 
     public void leaveFromGame(Controller controller) {
         this.model.removePlayer(controller.getPlayer().getID());
+        this.chat.removePlayer(controller.getPlayer().getID());
 
         if (controller == this.owner) {
             this.endGame();
         }
+    }
+
+    public void removeBotFromGame(Player bot){
+        this.model.removePlayer(bot.getID());
+        this.chat.removePlayer(bot.getID());
     }
 
     public void removeGameEndedListener(GameEndedListener listener) {
@@ -210,8 +213,9 @@ public class Game {
             // and then give coordinates to Players.
             this.model.startup();
             this.chat.clear();
+            this.chat = new Chat(this.model.getCurrentPlayersNum());
 
-            //here we notifying all about start of game
+            // here we notifying all about start of game
             for (GameStartedListener gameStartedListener : gameStartedListeners) {
                 gameStartedListener.started();
             }

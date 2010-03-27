@@ -41,7 +41,7 @@ public class Pair {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj) {//equals by reference
             return true;
         }
         if (!(obj instanceof Pair)) {

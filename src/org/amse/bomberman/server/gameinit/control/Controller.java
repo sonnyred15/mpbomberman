@@ -19,7 +19,6 @@ import org.amse.bomberman.util.Creator;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ public class Controller implements GameEndedListener, GameStartedListener {
         this.game.addMessageToChat(player, toString);
     }
 
-    public void gameEnded(Game game) {
+    public void gameEnded() {
         this.game.removeGameEndedListener(this);
         this.game.leaveFromGame(this);
         this.game = null;

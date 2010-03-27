@@ -56,10 +56,11 @@ public class Model implements IModel {
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
         this.dieListener = new DieListener(this);
     }
-    
+
     // TODO is this is normal realization?
     public Player addBot(String botName) {
-        Bot bot = new Bot(botName, this, new RandomFullBotStrategy());
+        Bot bot = new Bot(botName, this.game, this,
+                          new RandomFullBotStrategy());
 
         this.players.add(bot);
         bot.setID(this.players.indexOf(bot) + 1);
@@ -90,9 +91,19 @@ public class Model implements IModel {
 
         Pair bombPosition = bomb.getPosition();
 
-        this.gameMap.setSquare(bombPosition.getX(), bombPosition.getY(),
-                               Constants.MAP_DETONATED_BOMB);
+        for (Player player : players) {
+            if (player.getPosition().equals(bombPosition) && player.isAlive()) {
+                this.gameMap.setSquare(bombPosition.getX(),
+                                       bombPosition.getY(), player.getID());
+            } else {
+                this.gameMap.setSquare(bombPosition.getX(),
+                                       bombPosition.getY(),
+                                       Constants.MAP_EMPTY);
+            }
+        }
 
+//      this.gameMap.setSquare(bombPosition.getX(), bombPosition.getY(),
+//                             Constants.MAP_DETONATED_BOMB);
 //      this.game.notifyGameMapUpdateListeners();
     }
 
@@ -300,7 +311,7 @@ public class Model implements IModel {
 
     public void removePlayer(int playerID) {
         for (Player player : players) {
-            if(player.getID()==playerID){
+            if (player.getID() == playerID) {
                 this.players.remove(player);
                 this.gameMap.removePlayer(playerID);
             }
