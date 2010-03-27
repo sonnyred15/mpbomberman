@@ -12,5 +12,5 @@ import org.amse.bomberman.server.gameinit.Game;
  */
 public interface GameEndedListener {
 
-    void gameEnded(Game game);
+    void gameEnded();
 }

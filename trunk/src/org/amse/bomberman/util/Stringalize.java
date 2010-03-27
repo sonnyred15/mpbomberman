@@ -1,12 +1,11 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.amse.bomberman.util;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
@@ -23,7 +22,9 @@ import java.util.List;
  * @author Kirilchuk V.E
  */
 public final class Stringalize {
-    private Stringalize() {}
+
+    private Stringalize() {
+    }
 
     public static List<String> explosions(List<Pair> expl) {    // CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
@@ -123,7 +124,7 @@ public final class Stringalize {
 
     // TODO temporary
     public static List<String> mapExplPlayerInfo2(Game game, Player player) {
-        int[][]      field = game.getGameMapArray();
+        int[][] field = game.getGameMapArray();
         List<Player> players = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 
@@ -134,18 +135,12 @@ public final class Stringalize {
 
             for (int j = 0; j < field.length; j++) {
                 int n = field[i][j];
-                for (Player pl : players) {
-                    int x = pl.getPosition().getX();
-                    int y = pl.getPosition().getY();
-                    if (x == i && y == j) {
-                        // player on the bomb
-                        if ((n == Constants.MAP_BOMB)) {
+                if (n == Constants.MAP_BOMB) {
+                    for (Player pl : players) {
+                        int x = pl.getPosition().getX();
+                        int y = pl.getPosition().getY();
+                        if (x == i && y == j && pl.isAlive()) {
                             n += 100 + pl.getID();
-                        } else {
-                            // player in the center of Explosion
-                            if (n == Constants.MAP_DETONATED_BOMB) {
-                                n = pl.getID();
-                            }
                         }
                     }
                 }
@@ -156,7 +151,8 @@ public final class Stringalize {
             stringalizedField.add(buff.toString());
         }
 
-        stringalizedField.addAll(Stringalize.explosions(game.getExplosionSquares()));
+        stringalizedField.addAll(Stringalize.explosions(
+                game.getExplosionSquares()));
 
         stringalizedField.add("" + 1);
         stringalizedField.add(Stringalize.playerInfo(player));

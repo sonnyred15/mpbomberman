@@ -13,7 +13,7 @@ import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuck V.E.
  */
 public class RandomFullBotStrategy extends BotStrategy{
 

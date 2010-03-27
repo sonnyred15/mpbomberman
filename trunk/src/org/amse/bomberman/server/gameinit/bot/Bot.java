@@ -18,17 +18,19 @@ public class Bot extends Player
     private static final long BOT_STEP_DELAY = 150L;
     private boolean           gameEnded = false;
     private final Thread      botThread;
+    private final Game        game;
     private final IModel      model;
     private BotStrategy       strategy;
 
-    public Bot(String nickName, IModel model, BotStrategy strategy) {
+    public Bot(String nickName, Game game, IModel model, BotStrategy strategy) {
         super(nickName);
-        this.model = model;
+        this.game = game; 
+        this.model = model; 
         this.strategy = strategy;
         this.botThread = new Thread(new BotRun(this));
     }
 
-    public void gameEnded(Game game) {
+    public void gameEnded() {
         this.gameEnded = true;
     }
 
@@ -60,7 +62,7 @@ public class Bot extends Player
             }
 
             System.out.println("Bot: removed from game(Game ended or he died)");
-            model.removePlayer(this.parent.getID());
+            game.removeBotFromGame(parent);
         }
     }
 }

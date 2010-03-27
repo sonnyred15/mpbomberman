@@ -15,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Chat {
 
+    private final static int KEEP_OLD_MSGS_NUM = 10;
     private final int[] lastTakedMessageIndexes;
     private final List<String> messages = new CopyOnWriteArrayList<String>();
 
@@ -35,6 +36,8 @@ public class Chat {
         }
         this.lastTakedMessageIndexes[chatID-1] = this.messages.size();
 
+        tryRemoveOldMessages();
+
         if(result.size()==0){
             result.add("No new messages.");
         }
@@ -47,5 +50,27 @@ public class Chat {
         for (int i = 0; i < this.lastTakedMessageIndexes.length; ++i) {
             this.lastTakedMessageIndexes[i] = 0;
         }
+    }
+
+    private void tryRemoveOldMessages() {
+        for (int i = 0; i < this.lastTakedMessageIndexes.length; ++i) {
+            if (this.lastTakedMessageIndexes[i] < Chat.KEEP_OLD_MSGS_NUM){
+                return;
+            }
+        }
+
+        for (int i = 0; i < Chat.KEEP_OLD_MSGS_NUM; ++i) {
+            this.messages.remove(0);//removePlayer new first
+        }
+
+        for (int i = 0; i < lastTakedMessageIndexes.length; ++i) {
+            if(this.lastTakedMessageIndexes[i]!= Integer.MAX_VALUE){
+                this.lastTakedMessageIndexes[i] -= Chat.KEEP_OLD_MSGS_NUM;
+            }
+        }
+    }
+
+    void removePlayer(int chatID) {
+        this.lastTakedMessageIndexes[chatID-1] = Integer.MAX_VALUE;
     }
 }
