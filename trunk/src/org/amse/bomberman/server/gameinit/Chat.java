@@ -21,6 +21,9 @@ public class Chat {
 
     public Chat(int maxPlayers) {
         this.lastTakedMessageIndexes = new int[maxPlayers];
+        for (int i = 0; i < lastTakedMessageIndexes.length; ++i) {
+            lastTakedMessageIndexes[i] = Integer.MAX_VALUE;
+        }
     }
 
     public void addMessage(int chatID, String playerName, String message) {
@@ -70,7 +73,11 @@ public class Chat {
         }
     }
 
-    void removePlayer(int chatID) {
+    public void removePlayer(int chatID) {
         this.lastTakedMessageIndexes[chatID-1] = Integer.MAX_VALUE;
+    }
+
+    public void addPlayer(int chatID){
+        this.lastTakedMessageIndexes[chatID-1] = 0;
     }
 }
