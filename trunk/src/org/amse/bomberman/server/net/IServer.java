@@ -29,6 +29,8 @@ public interface IServer {
 
     void notifySomeClients(List<ISession> sessions, List<String> messages);
 
+    void notifySomeClients(List<ISession> sessions, String message);
+
     int addGame(Game game);
 
     void removeGame(Game game);

@@ -55,125 +55,137 @@ public class AsynchroSession extends Thread implements ISession {
         this.controller = new Controller(server, this);
     }
 
-    @Deprecated
-    protected void addBot(String[] queryArgs) {    // TODO write for asynchro
+    protected void addBot(String[] queryArgs) {
 
-//
-//      // "11" "gameID" "botName"
-//      int    gameID = 0;
-//      String botName = "defaultBot";
-//
-//      switch (queryArgs.length) {
-//          case 3 : {    // if we getted command in full syntax
-//              try {
-//                  gameID = Integer.parseInt(queryArgs[1]);
-//              } catch (NumberFormatException ex) {
-//                  sendAnswer("Wrong command parameters. Error on client side." +
-//                             " gameID must be int.");
-////                  writeToLog("Session: addBot error. " +
-////                             " Wrong command parameters. " +
-////                             "Error on client side. gameID must be int. " +
-////                             ex.getMessage());
-//              }
-//
-//              botName = queryArgs[2];
-//
-//              break;
-//          }
-//
-//          default : {    // wrong syntax
-//              sendAnswer("Wrong query. Error on client side.");
-////              writeToLog("Session: addBot error. Wrong command parameters. Error on client side.");
-//
-//              break;
-//          }
-//      }
-//
-//      Game gameToJoin = server.getGame(gameID);
-//
-//      if (gameToJoin != null) {
-//          if (!gameToJoin.isStarted()) {
-////              Bot bot = gameToJoin.joinBot(botName);
-//
-////              if (bot == null) {    // if game is full
-//                  sendAnswer("Game is full. Try to add bot later.");
-////                  writeToLog("Session: addBot warning. Tryed to add bot, canceled. Game is full.");
-//
-//                  return;
-//              } else {
-//
-//                  // this.game = gameToJoin;
-//                  sendAnswer("Bot added.");
-//
-//                  List<ISession> sessionsToNotify = this.game.getSessions();
-//                  List<String>   messages = new ArrayList<String>(1);
-//
-//                  messages.add(0, "Update game info.");
-//                  this.server.notifySomeClients(sessionsToNotify, messages);
-//                  messages.clear();
-//                  messages.add("Update games list.");
-//                  this.server.notifyAllClients(messages);
-//                  writeToLog("Session: added bot to game." + " GameID=" +
-//                             gameID + " Player=" + botName);
-//
-//                  return;
-//              }
-//          } else {    // if game.isStarted() true
-//              sendAnswer("Game was already started.");
-//              writeToLog("Session: addbot warning. Tryed to add bot to game(gameID=" +
-//                         gameID + ") ,canceled." +
-//                         " Game is already started.");
-//
-//              return;
-//          }
-////      } else {    // if game==null true
-//          sendAnswer("No such game.");
-//          writeToLog("Session: addBot warning. Tryed to add bot to game(gameID=" +
-//                     gameID + ") ,canceled." + " No such game.");
-//
-//          return;
-//      }
+        // "11" "botName"
+        List<String> messages = new ArrayList<String>();
+
+        messages.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
+
+        String botName = "defaultBot";
+
+        if (queryArgs.length == 2) {
+            botName = queryArgs[2];
+        } else {
+            messages.add("Wrong command parameters. Error on client side.");
+            sendAnswer(messages);
+
+            return;
+        }
+
+        int joinBotResult = this.controller.tryAddBotIntoMyGame(botName);
+
+        switch (joinBotResult) {
+            case Controller.NOT_JOINED : {
+
+                // if game==null true
+                messages.add("Not joined to any game.");
+                sendAnswer(messages);
+                writeToLog("Session: addBot warning. " +
+                           "Tryed to add bot to game, canceled." +
+                           " Not joined to any game.");
+
+                return;
+            }
+
+            case Controller.NOT_OWNER_OF_GAME : {
+
+                // if not owner of game
+                messages.add("Not owner of game.");
+                sendAnswer(messages);
+                writeToLog("Session: addBot warning. " +
+                           "Tryed to add bot to game, canceled." +
+                           " Not owner of the game.");
+
+                return;
+            }
+
+            case Controller.GAME_IS_FULL : {
+                messages.add("Game is full. Try to add bot later.");
+                sendAnswer(messages);
+                writeToLog("Session: addBot warning. " +
+                           "Tryed to add bot, canceled. Game is full.");
+
+                return;
+            }
+
+            case Controller.GAME_IS_ALREADY_STARTED : {
+
+                // if game.isStarted() true
+                messages.add("Game was already started.");
+                sendAnswer(messages);
+                writeToLog("Session: addbot warning. " +
+                           "Tryed to add bot to game ,canceled." +
+                           " Game is already started.");
+
+                return;
+            }
+
+            case Controller.RESULT_SUCCESS : {
+                messages.add("Bot added.");
+                sendAnswer(messages);
+                writeToLog("Session: added bot to game." +
+                           controller.getMyGame().getName());
+                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+                this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+
+                return;
+            }
+
+            default : {
+                messages.add("Error on server.");
+                sendAnswer(messages);
+                writeToLog("Session: addbot error. Default block in switch " +
+                           "statement. Error on server side.");
+
+                return;
+            }
+        }
     }
 
-    @Deprecated    // TODO write for asynchro
     protected void addMessageToChat(String[] queryArgs) {
+        List<String> message = new ArrayList<String>(2);
 
-//      if (queryArgs.length >= 2) {
-//          if (this.game != null) {
-//              StringBuilder message = new StringBuilder();
-//
-//              for (int i = 1; i < queryArgs.length; ++i) {
-//                  message.append(queryArgs[i] + " ");
-//              }
-//
-//              this.game.addMessageToChat(this.player, message.toString());
-//
-//              List<String> toSend =
-//                  this.game.getNewMessagesFromChat(this.player);
-//
-//              sendAnswer(toSend);
-//              writeToLog("Session: client added message to game chat. message=" +
-//                         queryArgs[1]);
-//
-//              return;
-//          } else {
-//              sendAnswer("Not joined to any game.");
-//              writeToLog("Session: addMessageToChat warning. Client tryed to add message, canceled. Not joined to any game.");
-//
-//              return;
-//          }
-//      } else {
-//          sendAnswer("Wrong query. Not enough arguments");
-//          writeToLog("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
-//
-//          return;
-//      }
+        message.add(0, ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO);
+
+        if (queryArgs.length >= 2) {
+            Game game = this.controller.getMyGame();
+
+            if (game != null) {
+                StringBuilder chatMessage = new StringBuilder();
+
+                for (int i = 1; i < queryArgs.length; ++i) {
+                    chatMessage.append(queryArgs[i] + " ");
+                }
+
+                this.controller.addMessageToChat(chatMessage.toString());
+                this.notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
+                writeToLog("Session: client added message to game chat. message=" +
+                           queryArgs[1]);
+
+                return;
+            } else {
+                message.add("Not joined to any game.");
+                sendAnswer(message);
+                writeToLog("Session: addMessageToChat warning. " +
+                           "Client tryed to add message, canceled. " +
+                           "Not joined to any game.");
+
+                return;
+            }
+        } else {
+            message.add("Wrong query. Not enough arguments");
+            sendAnswer(message);
+            writeToLog("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
+
+            return;
+        }
     }
 
     protected void answerOnCommand(String query) {
         writeToLog("Session: query received. query=" + query);
 
-        if (query.length() == 0) {
+        if (query.length() == 0) {    // TODO is it really can happen???
             sendAnswer("Empty query. Error on client side.");
             writeToLog("Session: answerOnCommand warning. " +
                        "Empty query received. Error on client side.");
@@ -391,21 +403,22 @@ public class AsynchroSession extends Thread implements ISession {
 
             // notifying others
             messages.clear();
-            messages.add(ProtocolConstants.UPDATE_GAMES_LIST +
-                         " New game was created.");
+            messages.add(ProtocolConstants.UPDATE_GAMES_LIST);
             this.server.notifyAllClients(messages);
             writeToLog("Session: client created game." + " Map=" + mapName +
                        " gameName=" + gameName + " maxPlayers=" + maxPlayers);
 
             return;
         } catch (FileNotFoundException ex) {
-            sendAnswer("No such map on server.");
+            messages.add("No such map on server.");
+            sendAnswer(messages);
             writeToLog("Session: createGame warning. Client tryed to create game, canceled. " +
                        "Map wasn`t founded on server." + " Map=" + mapName);
 
             return;
         } catch (IOException ex) {
-            sendAnswer("Error on server side, while loading map.");
+            messages.add("Error on server side, while loading map.");
+            sendAnswer(messages);
             writeToLog("Session: createGame error while loadimg map. " +
                        " Map=" + mapName + " " + ex.getMessage());
 
@@ -432,14 +445,18 @@ public class AsynchroSession extends Thread implements ISession {
                 } catch (NumberFormatException ex) {
                     messages.add("Wrong move value.");
                     sendAnswer(messages);
-                    writeToLog("Session: doMove error. Unsupported direction(not int). Error on client side." +
-                               " direction=" + queryArgs[1]);
+                    writeToLog("Session: doMove error. " +
+                               "Unsupported direction(not int). " +
+                               "Error on client side." + " direction=" +
+                               queryArgs[1] + ex.getMessage());
 
                     return;
                 } catch (IllegalArgumentException ex) {
-                    sendAnswer("Wrong move value.");
-                    writeToLog("Session: doMove error. Unsupported direction. Error on client side." +
-                               " direction=" + dir);
+                    messages.add("Wrong move value.");
+                    sendAnswer(messages);
+                    writeToLog("Session: doMove error. " +
+                               "Unsupported direction. Error on client side." +
+                               " direction=" + dir + " " + ex.getMessage());
 
                     return;
                 }
@@ -457,15 +474,21 @@ public class AsynchroSession extends Thread implements ISession {
 
                 return;
             } else {    // timer.getDiff < gameStep true
-                sendAnswer("false");
-                writeToLog("Session: doMove warning. Client tryed to move, canceled. Moves allowed only every " +
+                messages.add("false");
+                sendAnswer(messages);
+                writeToLog("Session: doMove warning. " +
+                           "Client tryed to move, canceled. " +
+                           "Moves allowed only every " +
                            Constants.GAME_STEP_TIME + "ms.");
 
                 return;
             }
         } else {    // game == null true
-            sendAnswer("Not joined to any game.");
-            writeToLog("Session: doMove warning. Client tryed to move, canceled. Not joined to any game.");
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: doMove warning. " +
+                       "Client tryed to move, canceled. " +
+                       "Not joined to any game.");
 
             return;
         }
@@ -487,44 +510,39 @@ public class AsynchroSession extends Thread implements ISession {
         this.server.sessionTerminated(this);
     }
 
-    @Deprecated    // write for asynchro
-    public void gameMapChanged() {
-
-//      if (this.game != null) {
-//          List<String>   messages = new ArrayList<String>();
-//          List<ISession> sessionsToNotify = this.game.getSessions();
-//
-//          messages.add(ProtocolConstants.UPDATE_GAME_MAP);
-//          this.server.notifySomeClients(sessionsToNotify, messages);
-//      } else {
-//          writeToLog("Session: GAME MAP CHANGED CALLED. BUT GAME=NULL. FIX PLZ.");
-//      }
-    }
-
-    @Deprecated    // TODO write for asynchro
     protected void getNewMessagesFromChat() {
+        List<String> messages = new ArrayList<String>();
 
-//      if (this.game != null) {
-//          List<String> toSend = this.game.getNewMessagesFromChat(this.player);
-//
-//          sendAnswer(toSend);
-//          writeToLog("Session: client getted new messages from chat. count=" +
-//                     toSend.size());
-//
-//          return;
-//      } else {
-//          sendAnswer("Not joined to any game.");
-//          writeToLog("Session: getNewMessagesFromChat warning. Client tryed to get messages, canceled. Not joined to any game.");
-//
-//          return;
-//      }
+        messages.add(0, ProtocolConstants.CAPTION_GET_CHAT_MSGS);
+
+        if (this.controller.getMyGame() != null) {
+            List<String> toSend = this.controller.getNewMessagesFromChat();
+
+            messages.addAll(toSend);
+            sendAnswer(messages);
+            writeToLog("Session: client getted new messages from chat. count=" +
+                       toSend.size());
+
+            return;
+        } else {
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: getNewMessagesFromChat warning. Client tryed to get messages, canceled. Not joined to any game.");
+
+            return;
+        }
     }
 
     public void interruptSession() throws SecurityException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.interrupt();
+
+        try {
+            this.clientSocket.close();
+        } catch (IOException ex) {
+            writeToLog("Session: interruptSession error. " + ex.getMessage());
+        }
     }
 
-    @Deprecated    // not fully work
     protected void joinGame(String[] queryArgs) {
 
         // "2" "gameID" "playerName"
@@ -535,7 +553,9 @@ public class AsynchroSession extends Thread implements ISession {
         if (this.controller.getMyGame() != null) {
             messages.add("Leave another game first.");
             sendAnswer(messages);
-            writeToLog("Session: joinGame warning. Client tryed to join game, canceled. Already in other game.");
+            writeToLog("Session: joinGame warning. " +
+                       "Client tryed to join game, canceled. " +
+                       "Already in other game.");
 
             return;
         }
@@ -571,7 +591,7 @@ public class AsynchroSession extends Thread implements ISession {
         int joinResult = this.controller.tryJoinGame(gameID, playerName);
 
         switch (joinResult) {
-            case -2 : {
+            case Controller.NO_SUCH_UNSTARTED_GAME : {
 
                 // if no unstarted game with such gameID finded
                 messages.add("No such game.");
@@ -582,7 +602,7 @@ public class AsynchroSession extends Thread implements ISession {
                 return;
             }
 
-            case -1 : {
+            case Controller.GAME_IS_ALREADY_STARTED : {
 
                 // if game with such gameID already started
                 messages.add("Game was already started.");
@@ -594,7 +614,7 @@ public class AsynchroSession extends Thread implements ISession {
                 return;
             }
 
-            case 0 : {
+            case Controller.GAME_IS_FULL : {
                 messages.add("Game is full. Try to join later.");
                 sendAnswer(messages);
                 writeToLog("Session: joinGame warning. Client tryed to join to full game, canceled.");
@@ -602,20 +622,11 @@ public class AsynchroSession extends Thread implements ISession {
                 return;
             }
 
-            case 1 : {
+            case Controller.RESULT_SUCCESS : {
                 messages.add("Joined.");
                 sendAnswer(messages);
-
-                // TODO getSESSIONS IN CONTROLLER AND GAME!!!!!!!!!
-//              List<ISession> sessionsToNotify = this.controller.getSessions();
-//
-//              messages = new ArrayList<String>(1);
-//              messages.add(0, ProtocolConstants.UPDATE_GAME_INFO);
-//              this.server.notifySomeClients(sessionsToNotify, messages);
-                List<String> messages2 = new ArrayList<String>(1);
-
-                messages2.add(0, ProtocolConstants.UPDATE_GAMES_LIST);
-                this.server.notifyAllClients(messages2);
+                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+                this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
                 writeToLog("Session: client joined to game." + " GameID=" +
                            gameID + " Player=" + playerName);
 
@@ -624,7 +635,6 @@ public class AsynchroSession extends Thread implements ISession {
         }
     }
 
-    @Deprecated    // not fully work
     protected void leaveGame() {
         List<String> messages = new ArrayList<String>();
 
@@ -637,18 +647,13 @@ public class AsynchroSession extends Thread implements ISession {
             messages.add("Disconnected.");
             sendAnswer(messages);
 
-//          List<ISession> sessionsToNotify = temp.getSessions();
-//          if (temp.isStarted()) {
-//              ;    // do nothing
-//          } else {
-//              messages.clear();
-//              messages.add(ProtocolConstants.UPDATE_GAME_INFO);
-//              this.server.notifySomeClients(sessionsToNotify, messages);
-//          }
-            messages.clear();
-            messages.add(ProtocolConstants.UPDATE_GAMES_LIST);
-            this.server.notifyAllClients(messages);
-            writeToLog("Session: player has been disconnected from the game.");
+            List<ISession> toNotify = game.getSessions();
+
+            toNotify.remove(this);
+            this.server.notifySomeClients(toNotify,
+                                          ProtocolConstants.UPDATE_GAME_INFO);
+            writeToLog("Session: player has been disconnected from the game." +
+                       " gameName=" + game.getName());
 
             return;
         } else {
@@ -657,6 +662,16 @@ public class AsynchroSession extends Thread implements ISession {
 
             return;
         }
+    }
+
+    private void notifyAllSessions(String message) {
+        this.server.notifyAllClients(message);
+    }
+
+    private void notifyGameSessions(String message) {
+        List<ISession> sessions = this.controller.getMyGame().getSessions();
+
+        this.server.notifySomeClients(sessions, message);
     }
 
     protected void placeBomb() {
@@ -678,10 +693,14 @@ public class AsynchroSession extends Thread implements ISession {
                 return;
             } else {
                 messages.add("Game is not started. Can`t place bomb.");
+                sendAnswer(messages);
                 writeToLog("Session: placew bomb warning. Cancelled, Game is not started.");
+
+                return;
             }
         } else {
-            sendAnswer("Not joined to any game.");
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
             writeToLog("Session: place bomb warning. Canceled. Not joined to any game.");
 
             return;
@@ -751,23 +770,30 @@ public class AsynchroSession extends Thread implements ISession {
             try {
                 ret = Creator.createMapAndGetArray(mapFileName);
             } catch (FileNotFoundException ex) {
-                sendAnswer("No such map on server.");
-                writeToLog("Session: sendMap warning. Client tryed to download map, canceled. " +
+                messages.add("No such map on server.");
+                sendAnswer(messages);
+                writeToLog("Session: sendMap warning. " +
+                           "Client tryed to download map, canceled. " +
                            "Map wasn`t founded on server." + " Map=" +
                            mapFileName + " " + ex.getMessage());
 
                 return;
             } catch (IOException ex) {
-                sendAnswer("Error on server side, while loading map.");
-                writeToLog("Session: sendMap error. Client tryed to download map, canceled. " +
+                messages.add("Error on server side, while loading map.");
+                sendAnswer(messages);
+                writeToLog("Session: sendMap error. " +
+                           "Client tryed to download map, canceled. " +
                            "Error on server side while loading map." +
                            " Map=" + mapFileName + " " + ex.getMessage());
 
                 return;
             }
         } else {    // if arguments!=2
-            sendAnswer("Wrong query. Not enough arguments");
-            writeToLog("Session: sendMap error. Client tryed to download map, canceled. Wrong query.");
+            messages.add("Wrong query. Not enough arguments");
+            sendAnswer(messages);
+            writeToLog("Session: sendMap error. " +
+                       "Client tryed to download gameMap, canceled." +
+                       " Wrong query.");
 
             return;
         }
@@ -775,7 +801,8 @@ public class AsynchroSession extends Thread implements ISession {
         // if all is OK.
         messages.addAll(Stringalize.map(ret));
         sendAnswer(messages);
-        writeToLog("Session: client downloaded map." + " Map=" + mapFileName);
+        writeToLog("Session: client downloaded gameMap." + " GameMap=" +
+                   mapFileName);
     }
 
     protected void sendGameInfo() {
@@ -826,28 +853,30 @@ public class AsynchroSession extends Thread implements ISession {
         }
     }
 
-    @Deprecated    // write for asynchro
     private void sendGameMapArray2() {
+        List<String> messages = new ArrayList<String>();
 
-//      Game game = this.controller.getMyGame();
-//
-//      if (game != null) {
-//          List<String> linesToSend =
-//              Stringalize.mapExplPlayerInfo2(game,
-//                                            this.controller.getPlayer());
-//
-//          sendAnswer(linesToSend);
-//          writeToLog("Session: sended mapArray+explosions+playerInfo" +
-//                     " to client.");
-//
-//          return;
-//      } else {
-//          sendAnswer("Not joined to any game.");
-//          writeToLog("Session: sendMapArray warning. " +
-//                     "Canceled. Not joined to any game.");
-//
-//          return;
-//      }
+        messages.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
+
+        Game game = this.controller.getMyGame();
+
+        if (game != null) {
+            List<String> linesToSend =
+                Stringalize.mapExplPlayerInfo2(game,
+                                               this.controller.getPlayer());
+
+            messages.addAll(linesToSend);
+            sendAnswer(messages);
+            writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
+
+            return;
+        } else {
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: sendMapArray warning. Canceled. Not joined to any game.");
+
+            return;
+        }
     }
 
     protected void sendGameMapsList() {
@@ -886,7 +915,8 @@ public class AsynchroSession extends Thread implements ISession {
 
             return;
         } else {
-            sendAnswer("Not joined to any game.");
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
             writeToLog("Session: sendGameStatus warning. Canceled. Not joined to any game.");
 
             return;
@@ -899,57 +929,64 @@ public class AsynchroSession extends Thread implements ISession {
 
         linesToSend.add(0, ProtocolConstants.CAPTION_GAMES_LIST);
 
-        if (linesToSend.size() == 1) {    // only "Games list." phraze
+        if (linesToSend.size() == 1) {    // only ProtocolConstants.CAPTION_GAMES_LIST phraze
             linesToSend.add("No unstarted games finded.");
-            this.sendAnswer(linesToSend);
+            sendAnswer(linesToSend);
             writeToLog("Session: client tryed to get games list. No unstarted games finded.");
 
             return;
         } else {
-            this.sendAnswer(linesToSend);
+            sendAnswer(linesToSend);
             writeToLog("Session: sended games list to client.");
 
             return;
         }
     }
 
-    @Deprecated    // write for asynchro
     protected void startGame() {
+        List<String> messages = new ArrayList<String>();
 
-//      List<String> messages = new ArrayList<String>();
-//
-//      messages.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
-//
-//      Game game = this.controller.getMyGame();
-//
-//      if (game != null) {
-//          if (!game.isStarted()) {
-//              boolean success = this.controller.tryStartGame();
-//
-////                  List<ISession> sessionsToNotify = this.game.getSessions();
-//
-////                  messages.add("Game started.");
-////                  this.server.notifySomeClients(sessionsToNotify, messages);
-////                  writeToLog("Session: started game. " + "(gameName=" +
-////                             this.game.getName() + ")");
-////
-////                  return;
-//              } else {    // if player not owner of game
-//                  sendAnswer("Not owner of game.");
-//                  writeToLog("Session: startGame warning. Client tryed to start game, canceled. Not an owner.");
-//              }
-//          } else {    // if game.isStarted() true
-//              sendAnswer("Game is already started.");
-//              writeToLog("Session: startGame warning. Client tryed to start started game. Canceled.");
-//
-//              return;
-//          }
-//      } else {    // game == null true
-//          sendAnswer("Not joined to any game.");
-//          writeToLog("Session: client tryed to start game, canceled. Not joined to any game.");
-//
-//          return;
-//      }
+        messages.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
+
+        Game game = this.controller.getMyGame();
+
+        if (game != null) {
+            if (!game.isStarted()) {
+                boolean success = this.controller.tryStartGame();
+
+                if (success) {
+                    messages.add("Game started.");
+                    sendAnswer(messages);
+                    writeToLog("Session: started game. " + "(gameName=" +
+                               this.controller.getMyGame().getName() + ")");
+
+                    return;
+                } else {
+                    messages.add("Not owner of game.");
+                    sendAnswer(messages);
+                    writeToLog("Session: startGame warning. " +
+                               "Client tryed to start game, canceled. " +
+                               "Not an owner.");
+
+                    return;
+                }
+            } else {    // if game.isStarted() true
+                messages.add("Game is already started.");
+                sendAnswer(messages);
+                writeToLog("Session: startGame warning. " +
+                           "Client tryed to start started game. " +
+                           "Canceled.");
+
+                return;
+            }
+        } else {    // game == null true
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: client tryed to start game, canceled. " +
+                       "Not joined to any game.");
+
+            return;
+        }
     }
 
     protected void writeToLog(String message) {

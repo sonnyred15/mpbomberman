@@ -109,7 +109,7 @@ public class Session extends Thread implements ISession {
         int joinResult = this.controller.tryAddBotIntoMyGame(botName);
 
         switch (joinResult) {
-            case -2 : {
+            case Controller.NOT_JOINED : {
 
                 // if game==null true
                 sendAnswer("Not joined to any game.");
@@ -120,7 +120,7 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case -1 : {
+            case Controller.GAME_IS_ALREADY_STARTED : {
 
                 // if game.isStarted() true
                 sendAnswer("Game was already started.");
@@ -131,7 +131,18 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case 0 : {
+            case Controller.NOT_OWNER_OF_GAME : {
+
+                // if not owner of game
+                sendAnswer("Not owner of game.");
+                writeToLog("Session: addBot warning. " +
+                           "Tryed to add bot to game, canceled." +
+                           " Not owner of the game.");
+
+                return;
+            }
+
+            case Controller.GAME_IS_FULL : {
 
                 // if game is full
                 sendAnswer("Game is full. Try to add bot later.");
@@ -141,7 +152,7 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case 1 : {
+            case Controller.RESULT_SUCCESS : {
                 sendAnswer("Bot added.");
                 writeToLog("Session: added bot to game." + " GameID=" +
                            gameID + " Player=" + botName);
@@ -347,7 +358,7 @@ public class Session extends Thread implements ISession {
                 // "15"
                 sendGameMapArray2();
 
-                 break;
+                break;
             }
 
             default : {
@@ -462,10 +473,10 @@ public class Session extends Thread implements ISession {
     }
 
     private boolean filtred(String message) {
-        if (message.startsWith("Session")) {
-            return true;
-        }
 
+//      if (message.startsWith("Session")) {
+//          return true;
+//      }
         return false;
     }
 
@@ -517,7 +528,7 @@ public class Session extends Thread implements ISession {
         String playerName = "defaultPlayer";
 
         switch (queryArgs.length) {
-            case 2 : {    // to support command in "short" syntax when bot name is ommited
+            case 2 : {    // to support command in "short" syntax when player name is ommited
                 try {
                     gameID = Integer.parseInt(queryArgs[1]);
                 } catch (NumberFormatException ex) {
@@ -562,7 +573,7 @@ public class Session extends Thread implements ISession {
         int joinResult = this.controller.tryJoinGame(gameID, playerName);
 
         switch (joinResult) {
-            case -2 : {
+            case Controller.NO_SUCH_UNSTARTED_GAME : {
 
                 // if no unstarted game with such gameID finded
                 sendAnswer("No such game.");
@@ -572,7 +583,7 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case -1 : {
+            case Controller.GAME_IS_ALREADY_STARTED : {
 
                 // if game with such gameID already started
                 sendAnswer("Game was already started.");
@@ -583,7 +594,7 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case 0 : {
+            case Controller.GAME_IS_FULL : {
                 sendAnswer("Game is full. Try to join later.");
                 writeToLog("Session: joinGame warning. " +
                            "Client tryed to join to full game, canceled.");
@@ -591,7 +602,7 @@ public class Session extends Thread implements ISession {
                 return;
             }
 
-            case 1 : {
+            case Controller.RESULT_SUCCESS : {
                 sendAnswer("Joined.");
                 writeToLog("Session: client joined to game." + " GameID=" +
                            gameID + " Player=" + playerName);
@@ -860,7 +871,7 @@ public class Session extends Thread implements ISession {
         if (game != null) {
             List<String> linesToSend =
                 Stringalize.mapExplPlayerInfo2(game,
-                                              this.controller.getPlayer());
+                                               this.controller.getPlayer());
 
             sendAnswer(linesToSend);
             writeToLog("Session: sended mapArray+explosions+playerInfo" +
@@ -949,6 +960,8 @@ public class Session extends Thread implements ISession {
                     writeToLog("Session: startGame warning. " +
                                "Client tryed to start game, canceled. " +
                                "Not an owner.");
+
+                    return;
                 }
             } else {    // if game.isStarted() true
                 sendAnswer("Game is already started.");

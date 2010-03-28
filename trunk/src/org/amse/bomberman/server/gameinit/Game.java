@@ -14,6 +14,7 @@ import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -35,6 +36,7 @@ public class Game {
     private final IModel                    model;
     private Controller                      owner;
     private final IServer                   server;
+    private final List<ISession>            sessions;
     private boolean                         started;
 
     public Game(IServer server, GameMap gameMap, String gameName,
@@ -53,6 +55,7 @@ public class Game {
         this.chat = new Chat(this.maxPlayers);
         this.model = new Model(gameMap, this);
         this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
+        this.sessions = new CopyOnWriteArrayList<ISession>();
         this.gameStartedListeners =
             new CopyOnWriteArrayList<GameStartedListener>();
         this.started = false;
@@ -148,6 +151,10 @@ public class Game {
         return this.model.getPlayer(playerID);
     }
 
+    public List<ISession> getSessions() {
+        return sessions;
+    }
+
     public boolean isFull() {
         return ((this.model.getCurrentPlayersNum() == this.maxPlayers) ? true
                                                                        : false);
@@ -161,9 +168,8 @@ public class Game {
         Player player = null;
 
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
-
-            // this.sessions.add(session);
             player = this.model.addPlayer(name);
+            this.sessions.add(controller.getSession());
             this.chat.addPlayer(player.getID());
         }
 
@@ -171,6 +177,7 @@ public class Game {
     }
 
     public void leaveFromGame(Controller controller) {
+        this.sessions.remove(controller.getSession());
         this.model.removePlayer(controller.getPlayer().getID());
         this.chat.removePlayer(controller.getPlayer().getID());
 
@@ -179,7 +186,7 @@ public class Game {
         }
     }
 
-    public void removeBotFromGame(Player bot){
+    public void removeBotFromGame(Player bot) {
         this.model.removePlayer(bot.getID());
         this.chat.removePlayer(bot.getID());
     }

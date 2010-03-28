@@ -13,6 +13,7 @@ import java.nio.channels.IllegalBlockingModeException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.server.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
@@ -27,7 +28,7 @@ public class Server implements IServer {
 
     protected ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
     protected final int port;
-    protected final List<Game> games = Collections.synchronizedList(new LinkedList<Game>());
+    protected final List<Game> games = new CopyOnWriteArrayList<Game>();
     protected ServerSocket serverSocket;
     protected boolean shutdowned = true; //true until we start accepting clients.
     protected Thread listeningThread;
@@ -232,7 +233,9 @@ public class Server implements IServer {
         throw new UnsupportedOperationException("Not supported in this implementation.");
     }
 
-
+    public void notifySomeClients(List<ISession> sessions, String message) {
+        throw new UnsupportedOperationException("Not supported in this implementation.");
+    }
 
     private class SocketListen implements Runnable {
 

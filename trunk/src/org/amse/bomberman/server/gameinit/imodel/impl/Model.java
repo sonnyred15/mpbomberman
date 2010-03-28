@@ -37,6 +37,7 @@ public class Model implements IModel {
     private final List<Bomb>               bombs;
     private final DieListener              dieListener;
     private final List<Pair>               explosionSquares;
+    private final List<Integer>            freeIDs;
     private final Game                     game;
     private final GameMap                  gameMap;
     private final List<Player>             players;
@@ -53,6 +54,14 @@ public class Model implements IModel {
         this.timer = Executors.newSingleThreadScheduledExecutor();
         this.bombs = new CopyOnWriteArrayList<Bomb>();
         this.players = new CopyOnWriteArrayList<Player>();
+
+        Integer[] freeIDArray = new Integer[this.game.getMaxPlayers()];
+
+        for (int i = 0; i < freeIDArray.length; ++i) {
+            freeIDArray[i] = i + 1;
+        }
+
+        this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
         this.dieListener = new DieListener(this);
     }
@@ -63,7 +72,9 @@ public class Model implements IModel {
                           new RandomFullBotStrategy());
 
         this.players.add(bot);
-        bot.setID(this.players.indexOf(bot) + 1);
+
+        // bot.setID(this.players.indexOf(bot) + 1);
+        bot.setID(getFreeID());
         bot.setDieListener(this.dieListener);
 
         return bot;
@@ -79,8 +90,9 @@ public class Model implements IModel {
     public Player addPlayer(String name) {
         Player playerToAdd = new Player(name);
 
+        // playerToAdd.setID(this.players.indexOf(playerToAdd) + 1);
+        playerToAdd.setID(getFreeID());
         this.players.add(playerToAdd);
-        playerToAdd.setID(this.players.indexOf(playerToAdd) + 1);
         playerToAdd.setDieListener(this.dieListener);
 
         return playerToAdd;
@@ -136,6 +148,10 @@ public class Model implements IModel {
      */
     public List<Pair> getExplosionSquares() {
         return this.explosionSquares;
+    }
+
+    private int getFreeID() {
+        return this.freeIDs.remove(0);
     }
 
     public GameMap getGameMap() {
@@ -313,6 +329,7 @@ public class Model implements IModel {
         for (Player player : players) {
             if (player.getID() == playerID) {
                 this.players.remove(player);
+                this.freeIDs.add(playerID);
                 this.gameMap.removePlayer(playerID);
             }
         }
