@@ -164,6 +164,7 @@ public class Game {
 
             // this.sessions.add(session);
             player = this.model.addPlayer(name);
+            this.chat.addPlayer(player.getID());
         }
 
         return player;
