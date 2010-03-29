@@ -70,13 +70,15 @@ public class SynchroConnector implements IConnector2 {
     public void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException {
         List<String> answer = queryAnswer("" + Command.CREATE_GAME.getValue() +
-                " " + gameName + " " + mapName + " " + maxPl);
+                " " + gameName + " " + mapName + " " + maxPl + " "
+                + Model.getInstance().getPlayerName());
         answer.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
     public void requestJoinGame(int gameID) throws NetException {
-        List<String> list = queryAnswer("2 " + gameID);
+        List<String> list = queryAnswer("2 " + gameID + " " 
+                + Model.getInstance().getPlayerName());
         System.out.println(list.get(0));
         list.add(0, ProtocolConstants.CAPTION_JOIN_GAME);
         Controller.getInstance().receivedRequestResult(list);
