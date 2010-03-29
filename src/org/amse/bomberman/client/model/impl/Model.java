@@ -39,12 +39,16 @@ public class Model implements IModel, RequestResultListener{
         Cell buf = new Cell(0,0);
         changes.clear();
         // if it is not first call of @setMap
-        if (this.map != null) {
+        if (this.map != null && this.map.getSize() == map.getSize()) {
             for (int i = 0; i < map.getSize(); i++) {
                 for (int j = 0; j < map.getSize(); j++) {
                     buf = new Cell(i, j);
-                    if (map.getValue(buf) != this.map.getValue(buf)) {
-                        changes.add(buf);
+                    try {
+                        if (map.getValue(buf) != this.map.getValue(buf)) {
+                            changes.add(buf);
+                        }
+                    } catch (UnsupportedOperationException ex){
+                        System.out.println(i + " " + j + "\n" + ex);
                     }
                 }
             }
@@ -80,6 +84,7 @@ public class Model implements IModel, RequestResultListener{
                 Parser parser = new Parser();
                 this.setMap(parser.parse(list));
             } else {
+                Model.getInstance().setStart(false);
                 System.out.println(list.get(0));
             }
         }
@@ -88,7 +93,8 @@ public class Model implements IModel, RequestResultListener{
                 //System.out.println("You try to do move uncorrectly.");
             } else {
                 if (list.get(0).equals("Not joined to any game.")) {
-                    System.out.println("Not joined to any game.");
+                    Model.getInstance().setStart(false);
+                    System.out.println(list.get(0));
                 }
             }
         }

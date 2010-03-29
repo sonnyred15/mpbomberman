@@ -73,16 +73,27 @@ public class GameJFrame extends JFrame implements IView, RequestResultListener{
     }
 
     public void update() {
-        gamePanel.update();
         IModel model = Model.getInstance();
-        int lives = model.getPlayerLives();
-        this.refreshLives(lives);
-        if (lives <= 0) {
-            if (!dead) {
-                JOptionPane.showMessageDialog(this, "You are dead!!!", "Death"
-                        , JOptionPane.INFORMATION_MESSAGE);
-                this.removeKeyListener(listener);
-                dead = true;
+        if (!model.isStarted()) {
+            JOptionPane.showMessageDialog(this, "Host leave the game.\n"
+                        , "STOP", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+            Model.getInstance().removeListener(this);
+            MainWizard wizard = new MainWizard();
+            Controller.getInstance().setReceiveInfoListener(wizard);
+            wizard.setCurrentJPanel(1);
+            wizard.updateCurrentPanel();
+        } else {
+            gamePanel.update();
+            int lives = model.getPlayerLives();
+            this.refreshLives(lives);
+            if (lives <= 0) {
+                if (!dead) {
+                    JOptionPane.showMessageDialog(this, "You are dead!!!"
+                            , "Death", JOptionPane.INFORMATION_MESSAGE);
+                    this.removeKeyListener(listener);
+                    dead = true;
+                }
             }
         }
     }

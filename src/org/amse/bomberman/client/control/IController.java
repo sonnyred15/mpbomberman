@@ -16,6 +16,7 @@ public interface IController {
     public void setReceiveInfoListener(RequestResultListener receiveResultListener);
     public void connect(InetAddress serverIP, int serverPort)
             throws NetException, IOException;
+    public void disconnect();
     public void requestGamesList() throws NetException;
     public void requestCreateGame(String gameName, String mapName, int maxPlayers)
             throws NetException;

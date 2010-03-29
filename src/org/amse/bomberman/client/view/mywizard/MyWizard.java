@@ -80,10 +80,12 @@ public class MyWizard  extends JFrame{
             currentID = id;
             if (id == 0) {
                 backJButton.setEnabled(false);
+            }
+            if (id == myPanels.size() - 1) {
+                nextJButton.setText(FINISH);
             } else {
-                if (id == myPanels.size() - 1) {
-                    nextJButton.setEnabled(false);
-                }
+                nextJButton.setEnabled(true);
+                nextJButton.setText(NEXT);
             }
         }
     }

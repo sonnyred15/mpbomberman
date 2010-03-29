@@ -18,9 +18,12 @@ import org.amse.bomberman.util.ProtocolConstants;
  *
  * @author Michael Korovkin
  */
-public class MainWizard extends MyWizard implements RequestResultListener{
+public class MainWizard extends MyWizard implements RequestResultListener {
+    //private final int height = 530;
+    //private final int width = 680;
+
     public MainWizard() {
-        super(new Dimension(700, 520), "Let's BOMBERMANNING!!!");
+        super(new Dimension(680, 530), "Let's BOMBERMANNING!!!");
         this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
         this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
         this.addNextJPanel(new Panel3(this), "GAME_PANEL");
@@ -31,8 +34,7 @@ public class MainWizard extends MyWizard implements RequestResultListener{
     }
     public void slideNext() {
         this.goNext();
-        Updating nextPanel = (Updating) this.getCurrentJPanel();
-        nextPanel.getServerInfo();
+        updateCurrentPanel();
     }
     public void slideBack() {
         this.goBack();
@@ -120,6 +122,15 @@ public class MainWizard extends MyWizard implements RequestResultListener{
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+        if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
+            if (current instanceof Panel3) {
+                if (!list.get(0).equals("Bot added.")) {
+                    JOptionPane.showMessageDialog(this, "Can not join bot.\n"
+                            + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+        }
         if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
@@ -150,7 +161,7 @@ public class MainWizard extends MyWizard implements RequestResultListener{
                    con.connect(panel1.getIPAddress(), panel1.getPort());
                    Model.getInstance().setPlayerName(panel1.getPlayerName());
                    slideNext();
-                   parent.setBackButtonEnable(false);
+                   //parent.setBackButtonEnable(false);
                }
                if (current instanceof Panel2) {
                    Panel2 panel2 = (Panel2) current;
@@ -193,21 +204,23 @@ public class MainWizard extends MyWizard implements RequestResultListener{
         }
         public void actionPerformed(ActionEvent e) {
             JPanel current = parent.getCurrentJPanel();
+            IController con = Controller.getInstance();
 
             if (current instanceof Panel3) {
                 Panel3 panel = (Panel3)current;
-                IController con = Controller.getInstance();
                 try {
                     con.requestLeaveGame();
                     panel.stopTimers();
                     slideBack();
-                    parent.setBackButtonEnable(false);
+                    //parent.setBackButtonEnable(false);
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                             + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
             if (current instanceof Panel2) {
+                con.disconnect();
+                slideBack();
             }
         }
     }
