@@ -220,8 +220,8 @@ public class Game {
             // Here model must change gameMap to support current num of players
             // and then give coordinates to Players.
             this.model.startup();
-            this.chat.clear();
-            this.chat = new Chat(this.model.getCurrentPlayersNum());
+            //this.chat.clear();
+            //this.chat = new Chat(this.model.getCurrentPlayersNum());
 
             // here we notifying all about start of game
             for (GameStartedListener gameStartedListener : gameStartedListeners) {

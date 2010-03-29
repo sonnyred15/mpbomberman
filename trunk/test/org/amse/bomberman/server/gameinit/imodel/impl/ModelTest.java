@@ -36,7 +36,7 @@ public class ModelTest {
                                              {3,0,0,0,0,4}};
 
     private final GameMap map = new GameMap(GAME_MAP);
-    private final Game game = new Game(map, "testModelGame", -1);
+    private final Game game = new Game(null, map, "testModelGame", -1);
     private Model model = new Model(map, game);
     private Player player1 = new Player("player1");
     private Player player2 = new Player("player2");
