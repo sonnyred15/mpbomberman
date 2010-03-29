@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.ProtocolConstants;
 
 /**
@@ -147,6 +148,7 @@ public class MainWizard extends MyWizard implements RequestResultListener{
                if (current instanceof Panel1) {
                    Panel1 panel1 = (Panel1) current;
                    con.connect(panel1.getIPAddress(), panel1.getPort());
+                   Model.getInstance().setPlayerName(panel1.getPlayerName());
                    slideNext();
                    parent.setBackButtonEnable(false);
                }

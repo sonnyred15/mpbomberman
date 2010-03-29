@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.view.mywizard;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -65,6 +64,9 @@ public class Panel1 extends JPanel implements Updating {
         portTF.setText(sb.toString());
     }
 
+    public String getPlayerName() {
+        return playerNameTF.getText();
+    }
     public void getServerInfo() {
     }
 
