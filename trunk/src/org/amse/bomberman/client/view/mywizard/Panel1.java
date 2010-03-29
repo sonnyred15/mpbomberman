@@ -7,9 +7,11 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -17,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -25,9 +28,10 @@ import org.amse.bomberman.util.Constants;
  */
 public class Panel1 extends JPanel implements Updating {
 
-    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client/view/resources/cover.jpg";
+    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client/view/resources/cover.png";
     private static final URL BACKGROUND_URL = Panel1.class.getResource(BACKGROUND_PATH);
-    private static final Image BACKGROUND_IMAGE = Toolkit.getDefaultToolkit().createImage(BACKGROUND_URL);
+
+    private Image image;
 
     private final int height = 480;
     private final int width = 640;
@@ -41,6 +45,7 @@ public class Panel1 extends JPanel implements Updating {
         setSize(width, height);
         initComponents();
         this.setVisible(true);
+        this.initBackgroundImage();
     }
 
     public InetAddress getIPAddress() throws UnknownHostException {
@@ -167,10 +172,21 @@ public class Panel1 extends JPanel implements Updating {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        //BAD HACK!!! //TODO !
-        if (!g.drawImage(Panel1.BACKGROUND_IMAGE, 0, 0, this.getWidth(), this.
-                getHeight(), null)) {
-            this.repaint();
+        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+            g.drawImage(this.image, 0, 0, null);
+        }
+    }
+
+    private void initBackgroundImage() {
+        try{
+            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
+            this.image =
+                    this.image.getScaledInstance(this.getWidth(),
+                                                 this.getHeight(),
+                                                 Image.SCALE_SMOOTH);
+        }catch (IOException ex){
+            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            this.image = null;
         }
     }
 }
