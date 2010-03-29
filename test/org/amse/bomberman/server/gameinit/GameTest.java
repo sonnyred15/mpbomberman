@@ -67,7 +67,7 @@ public class GameTest {
                             System.out.println(ex.getMessage());
                         }
                         if (pl!=null){
-                            game.disconnectFromGame(pl);
+                            //game.leaveFromGame(pl);
                         }
                     }
 
