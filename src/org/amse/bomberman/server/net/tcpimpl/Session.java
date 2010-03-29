@@ -243,7 +243,7 @@ public class Session extends Thread implements ISession {
 
             case CREATE_GAME : {
 
-                // "1 gameName mapName maxPlayers" or just "1" for defaults
+                // "1 gameName mapName maxPlayers playerName" or just "1" for defaults
                 createGame(queryArgs);
 
                 break;
@@ -371,14 +371,31 @@ public class Session extends Thread implements ISession {
 
     protected void createGame(String[] queryArgs) {
 
-        // Example queryArgs = "1" "gameName" "mapName" "maxpl"
+        // Example queryArgs = "1" "gameName" "mapName" "maxpl" "playerName"
         String gameName = "defaultGameName";
         String mapName = "1";
         int    maxPlayers = -1;    // -1 for: defines by GameMap.
+        String playerName = "defaultName";
 
-        if (queryArgs.length == 4) {    // if we getted command in full syntax
+        if (queryArgs.length == 4) {
             gameName = queryArgs[1];
             mapName = queryArgs[2];
+
+            try {
+                maxPlayers = Integer.parseInt(queryArgs[3]);
+            } catch (NumberFormatException ex) {
+                sendAnswer("Wrong query parameters. Error on client side.");
+                writeToLog("Session: createGame error. " +
+                           "Client tryed to create game, canceled. " +
+                           "Wrong command parameters. Error on client side. " +
+                           ex.getMessage());
+
+                return;
+            }
+        } else if (queryArgs.length == 5) {    // if we getted command in full syntax
+            gameName = queryArgs[1];
+            mapName = queryArgs[2];
+            playerName = queryArgs[4];
 
             try {
                 maxPlayers = Integer.parseInt(queryArgs[3]);
@@ -401,7 +418,7 @@ public class Session extends Thread implements ISession {
         }
 
         try {
-            this.controller.tryCreateGame(mapName, gameName, maxPlayers);
+            this.controller.tryCreateGame(mapName, gameName, maxPlayers, playerName);
             sendAnswer("Game created.");
             writeToLog("Session: client created game." + " Map=" + mapName +
                        " gameName=" + gameName + " maxPlayers=" + maxPlayers);

@@ -396,8 +396,8 @@ public class AsynchroSession extends Thread implements ISession {
             return;
         }
 
-        try {
-            this.controller.tryCreateGame(mapName, gameName, maxPlayers);
+        try {//TODO PLAYER NAME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            this.controller.tryCreateGame(mapName, gameName, maxPlayers,"playerName");
             messages.add("Game created.");
             sendAnswer(messages);
 

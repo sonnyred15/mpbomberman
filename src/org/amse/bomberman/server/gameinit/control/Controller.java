@@ -29,8 +29,8 @@ public class Controller implements GameEndedListener, GameStartedListener {
     public static final int GAME_IS_ALREADY_STARTED = -1;
     public static final int GAME_IS_FULL = -3;
     public static final int NOT_JOINED = -2;
-    public static final int NO_SUCH_UNSTARTED_GAME = -10;
     public static final int NOT_OWNER_OF_GAME = 0;
+    public static final int NO_SUCH_UNSTARTED_GAME = -10;
     public static final int RESULT_SUCCESS = 1;
     private Game            game;
     private Player          player;
@@ -168,7 +168,8 @@ public class Controller implements GameEndedListener, GameStartedListener {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void tryCreateGame(String mapName, String gameName, int maxPlayers)
+    public void tryCreateGame(String mapName, String gameName, int maxPlayers,
+                              String playerName)
                                     throws FileNotFoundException,
                                            IOException {
         if (this.game != null) {    // if not correct client can create multiple games
@@ -180,7 +181,7 @@ public class Controller implements GameEndedListener, GameStartedListener {
         this.game = Creator.createGame(this.sessionServer, mapName, gameName,
                                        maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
-        this.player = this.game.join("playerName", this);
+        this.player = this.game.join(playerName, this);
 
         if (this.player == null) {
             throw new NullPointerException("Error while creating game. " +
@@ -218,7 +219,7 @@ public class Controller implements GameEndedListener, GameStartedListener {
                     this.game = gameToJoin;
 
                     if (this.player == null) {
-                        joinResult = Controller.GAME_IS_FULL; //TODO must never happen if synchronization is ok.
+                        joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
                     } else {
                         joinResult = Controller.RESULT_SUCCESS;
                         this.game.addGameEndedListener(this);
