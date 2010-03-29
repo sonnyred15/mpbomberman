@@ -54,6 +54,9 @@ public class AsynchroConnector implements IConnector2 {
         Thread t = new Thread(new ServerListen());
         t.start();
     }
+    public void disconnect() {
+        // TO DO
+    }
 
     private synchronized void sendRequest(String request) throws NetException {
         BufferedWriter out = null;

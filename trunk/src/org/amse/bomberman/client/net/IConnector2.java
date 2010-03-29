@@ -10,13 +10,14 @@ import java.net.UnknownHostException;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- * 
+ * @author Michael Korovkin
  * @author Kirilchuk V.E
  */
 public interface IConnector2 {
 
     void сonnect(InetAddress address, int port) throws UnknownHostException
             , IOException;
+    void disconnect();
     void requestLeaveGame() throws NetException;
     void requestGamesList() throws NetException;
     void requestCreateGame(String gameName, String mapName, int maxPl)

@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFrame;
@@ -35,6 +36,8 @@ public class SynchroConnector implements IConnector2 {
     private Timer timer;
     private Socket socket;
     private static IConnector2 connector = null;
+    private String[] botNames = {"BOT_ANDY", "BOT_SAM", "BOT_JOE", "BOT_VASYA"
+    , "BOT_PETYA", "BOT_ANYA", "BOT_LOOSER", "BOT_UNLUCKY", "BOT_FOOL", "BOT_SUICIDE"};
 
     private SynchroConnector() {
         
@@ -49,6 +52,13 @@ public class SynchroConnector implements IConnector2 {
     public void сonnect(InetAddress address, int port) throws
             UnknownHostException,IOException {
         this.socket = new Socket(address, port);
+    }
+    public void disconnect() {
+        try {
+            this.socket.close();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }
 
     public void requestLeaveGame() throws NetException {
@@ -115,9 +125,10 @@ public class SynchroConnector implements IConnector2 {
     }
 
     public void requestJoinBotIntoGame() throws NetException {
-        // bot name???!!!
+        Random r = new Random();
         List<String> list = queryAnswer("" +
-                Command.ADD_BOT_TO_GAME.getValue() + " BOT");
+                Command.ADD_BOT_TO_GAME.getValue()+" "
+                + botNames[r.nextInt(botNames.length-1)]);
         System.out.println(list.get(0));
         list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);

@@ -49,6 +49,10 @@ public class Controller implements IController{
         this.connector.сonnect(serverIP, serverPort);
     }
 
+    public void disconnect() {
+        this.connector.disconnect();
+    }
+
     public void requestGamesList() throws NetException {
         this.connector.requestGamesList();
     }
