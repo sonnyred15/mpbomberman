@@ -85,6 +85,7 @@ public class Model implements IModel, RequestResultListener{
                 this.setMap(parser.parse(list));
             } else {
                 Model.getInstance().setStart(false);
+                updateListeners();
                 System.out.println(list.get(0));
             }
         }
@@ -126,8 +127,8 @@ public class Model implements IModel, RequestResultListener{
         listener.remove(view);
     }
     private void updateListeners() {
-        for (IView elem : listener) {
-            elem.update();
+        for (int i = 0; i < listener.size(); i++) {
+            listener.get(i).update();
         }
     }
     public void setPlayerLives(int lives) {
