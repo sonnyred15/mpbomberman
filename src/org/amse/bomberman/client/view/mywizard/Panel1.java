@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -27,11 +26,11 @@ import org.amse.bomberman.util.Creator;
  * @author Kirilchuk V.E.
  */
 public class Panel1 extends JPanel implements Updating {
-
     private static final String BACKGROUND_PATH = "/org/amse/bomberman/client/view/resources/cover.png";
     private static final URL BACKGROUND_URL = Panel1.class.getResource(BACKGROUND_PATH);
 
     private Image image;
+    private Color textColor = Color.ORANGE;
 
     private final int height = 480;
     private final int width = 640;
@@ -70,30 +69,16 @@ public class Panel1 extends JPanel implements Updating {
     }
 
     private void initComponents() {
-        this.setLayout(new BorderLayout());
-        this.add(Box.createRigidArea(new Dimension(this.getWidth(), 100)),
-                BorderLayout.SOUTH);
-        this.add(Box.createRigidArea(new Dimension(0, this.getHeight())),
-                 BorderLayout.WEST);
-        this.add(Box.createRigidArea(new Dimension(this.getWidth(), 150)),
-                BorderLayout.NORTH);
-        this.add(Box.createRigidArea(new Dimension(300, this.getHeight())),
-                 BorderLayout.EAST);
-
+        this.setLayout(new FlowLayout(FlowLayout.LEFT,70,150));
         JComponent textFields = createMainPanel();
-        JPanel mainPanel = new JPanel(new FlowLayout());
-        mainPanel.setOpaque(false);
-        mainPanel.add(textFields);
-        this.add(mainPanel, BorderLayout.CENTER);
-
-
+        this.add(textFields);
     }
 
     private JComponent createMainPanel(){                
         Box bottomBox = Box.createHorizontalBox();
         JLabel ipLabel = new JLabel("IP");
         ipLabel.setPreferredSize(new Dimension(width / 8, 20));
-        ipLabel.setForeground(Color.red);
+        ipLabel.setForeground(textColor);
         ipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         bottomBox.add(ipLabel);
         ipTF.setPreferredSize(new Dimension(width / 4, 20));
@@ -106,7 +91,7 @@ public class Panel1 extends JPanel implements Updating {
 
         Box centralBox = Box.createHorizontalBox();
         JLabel portLabel = new JLabel("Port");
-        portLabel.setForeground(Color.red);
+        portLabel.setForeground(textColor);
         portLabel.setPreferredSize(new Dimension(width / 8, 20));
         portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         centralBox.add(portLabel);
@@ -116,7 +101,7 @@ public class Panel1 extends JPanel implements Updating {
 
         Box downBox = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("Player");
-        nameLabel.setForeground(Color.red);
+        nameLabel.setForeground(textColor);
         nameLabel.setPreferredSize(new Dimension(width / 8, 20));
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         downBox.add(nameLabel);
@@ -125,49 +110,14 @@ public class Panel1 extends JPanel implements Updating {
         downBox.add(playerNameTF);
 
         Box MainBox = Box.createVerticalBox();
-        //MainBox.add(Box.createVerticalGlue());
         MainBox.add(bottomBox);
         MainBox.add(Box.createVerticalStrut(20));
         MainBox.add(centralBox);
         MainBox.add(Box.createVerticalStrut(20));
         MainBox.add(downBox);
-        //MainBox.add(Box.createVerticalGlue());
 
         return MainBox;
     }
-
-//    private void initComponents2() {
-//        this.setLayout(new FlowLayout());
-//        Box bottomBox = Box.createHorizontalBox();
-//        JLabel ipLabel = new JLabel("IP");
-//        ipLabel.setPreferredSize(new Dimension(width / 8, 20));
-//        ipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-//        bottomBox.add(ipLabel);
-//        ipTF.setPreferredSize(new Dimension(width / 4, 20));
-//        try {
-//            ipTF.setText(InetAddress.getByName("localhost").getHostAddress());
-//        } catch (UnknownHostException ex) {
-//            ex.printStackTrace();
-//        }
-//        bottomBox.add(ipTF);
-//
-//        Box centralBox = Box.createHorizontalBox();
-//        JLabel portLabel = new JLabel("Port");
-//        portLabel.setPreferredSize(new Dimension(width / 8, 20));
-//        portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-//        centralBox.add(portLabel);
-//        portTF.setPreferredSize(new Dimension(width / 4, 20));
-//        portTF.setText("" + Constants.DEFAULT_PORT);
-//        centralBox.add(portTF);
-//
-//        Box MainBox = Box.createVerticalBox();
-//        MainBox.add(Box.createVerticalGlue());
-//        MainBox.add(bottomBox);
-//        MainBox.add(Box.createVerticalStrut(20));
-//        MainBox.add(centralBox);
-//        MainBox.add(Box.createVerticalGlue());
-//        this.add(MainBox);
-//    }
 
     @Override
     protected void paintComponent(Graphics g) {
