@@ -20,7 +20,7 @@ public class Model implements IModel, RequestResultListener{
     private IPlayer player = Player.getInstance();
     private List<IView> listener = new ArrayList<IView>();
     private List<Cell> changes = new ArrayList<Cell>();
-    private boolean isStarted = false;
+    private volatile boolean isStarted = false;
 
     private Model() {
     }
@@ -35,7 +35,7 @@ public class Model implements IModel, RequestResultListener{
      * BombMap it calls @update for all listeners of Model.
      * @param map new BombMap.
      */
-    public void setMap(BombMap map) {
+    public synchronized void setMap(BombMap map) {
         Cell buf = new Cell(0,0);
         changes.clear();
         // if it is not first call of @setMap
@@ -76,7 +76,7 @@ public class Model implements IModel, RequestResultListener{
         updateListeners();
     }
 
-    public void received(List<String> list) {
+    public synchronized void received(List<String> list) {
         String command = list.get(0);
         list.remove(0);
         if (command.equals(ProtocolConstants.CAPTION_GAME_MAP_INFO)) {
@@ -156,10 +156,10 @@ public class Model implements IModel, RequestResultListener{
     public int getPlayerBombs() {
         return player.getBombAmount();
     }
-    public boolean isStarted() {
+    public synchronized boolean isStarted() {
         return isStarted;
     }
-    public void setStart(boolean bool) {
+    public synchronized void setStart(boolean bool) {
         isStarted = bool;
     }
 }
