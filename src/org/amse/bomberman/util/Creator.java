@@ -35,8 +35,11 @@ public class Creator {
 
     public static Game createGame(IServer server, String mapName, String gameName, int maxPlayers)
             throws FileNotFoundException, IOException {
-
-        GameMap map = new GameMap(mapName + ".map");
+            //TODO migration version
+        if(!mapName.endsWith(".map")){
+            mapName = mapName + ".map";
+        }
+        GameMap map = new GameMap(mapName);
         return new Game(server, map, gameName, maxPlayers);
     }
 
