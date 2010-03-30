@@ -54,6 +54,7 @@ public class AsynchroConnector implements IConnector2 {
         Thread t = new Thread(new ServerListen());
         t.start();
     }
+
     public void disconnect() {
         // TO DO
     }
@@ -134,7 +135,8 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void requestDownloadGameMap(String gameMapName) throws NetException {
-        sendRequest("" + Command.DOWNLOAD_GAME_MAP.getValue() + " " + gameMapName);
+        sendRequest(
+                "" + Command.DOWNLOAD_GAME_MAP.getValue() + " " + gameMapName);
     }
 
     private class ServerListen implements Runnable {
@@ -155,7 +157,7 @@ public class AsynchroConnector implements IConnector2 {
                         }
                         message.add(oneLine);
                     }
-                    //----------------------------------processServerMessage(message);
+                    processServerMessage(message);
                     message.clear();
                 }
             } catch (Exception ex) {
@@ -163,24 +165,28 @@ public class AsynchroConnector implements IConnector2 {
             }
         }
 
-        /*private void processServerMessage(List<String> message) {//TODO fix NPE
+        private void processServerMessage(List<String> message) {
             String firstLine = message.get(0);
             System.out.println("GETTED SERVER MESSAGE FIRSTLINE=" + firstLine);
-
-            if (firstLine.startsWith(ProtocolConstants.UPDATE_GAME_INFO)) {
-                controller.requestGameInfo();
-
-            /* Advise to update games list info*/
-            /*} else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAMES_LIST)) {
-                controller.requestGamesList();
-
-            /* Advise to update game map*/
-            /*} else if (firstLine.startsWith(ProtocolConstants.UPDATE_GAME_MAP)) {
-                controller.requestGameMap();
-
-            } else {//TODO ADD CHAT MESSAGE AND GET CHAT MESSAGES
-                controller.receivedRequestResult(message);
+            try {
+                if (firstLine.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
+                    controller.requestNewChatMessages();
+                } else if (firstLine.equals(
+                        ProtocolConstants.UPDATE_GAMES_LIST)) {
+                    controller.requestGamesList();
+                } else if (firstLine.equals(
+                        ProtocolConstants.UPDATE_GAME_INFO)) {
+                    controller.requestGameInfo();
+                } else if (firstLine.equals(
+                        ProtocolConstants.UPDATE_GAME_MAP)) {
+                    controller.requestGameMap();
+                } else {
+                    controller.receivedRequestResult(message);
+                }
+            } catch (NetException ex) {
+                ;//TODO
+                ex.printStackTrace();
             }
-        }*/
+        }
     }
 }

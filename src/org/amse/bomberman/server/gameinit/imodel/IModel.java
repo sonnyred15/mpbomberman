@@ -12,6 +12,7 @@ import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.MoveableObject;
 import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
 import org.amse.bomberman.util.Constants.Direction;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -26,6 +27,8 @@ public interface IModel {
     Player addBot(String botName);
 
     void addExplosions(List<Pair> explosions);
+
+    void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener);
 
     Player addPlayer(String name);
 
@@ -59,6 +62,9 @@ public interface IModel {
     void printToConsole();
 
     void removeExplosion(Pair pair);
+
+    void removeGameMapUpdateListener(
+            GameMapUpdateListener gameMapUpdateListener);
 
     void removePlayer(int playerID);
 

@@ -355,7 +355,7 @@ public class AsynchroSession extends Thread implements ISession {
 
     protected void createGame(String[] queryArgs) {
 
-        // Example queryArgs = "1" "gameName" "mapName" "maxpl"
+        // Example queryArgs = "1" "gameName" "mapName" "maxpl" "playerName"
         List<String> messages = new ArrayList<String>();
 
         messages.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
@@ -371,10 +371,12 @@ public class AsynchroSession extends Thread implements ISession {
         String gameName = null;
         String mapName = null;
         int    maxPlayers = -1;    // -1 for: defines by GameMap.
+        String playerName = "defaultPlayer";
 
-        if (queryArgs.length == 4) {    // if we getted command in full syntax
+        if (queryArgs.length == 5) {    // if we getted command in full syntax
             gameName = queryArgs[1];
             mapName = queryArgs[2];
+            playerName = queryArgs[4];
 
             try {
                 maxPlayers = Integer.parseInt(queryArgs[3]);
@@ -396,8 +398,9 @@ public class AsynchroSession extends Thread implements ISession {
             return;
         }
 
-        try {//TODO PLAYER NAME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            this.controller.tryCreateGame(mapName, gameName, maxPlayers,"playerName");
+        try {
+            this.controller.tryCreateGame(mapName, gameName, maxPlayers,
+                                          playerName);
             messages.add("Game created.");
             sendAnswer(messages);
 
@@ -657,7 +660,8 @@ public class AsynchroSession extends Thread implements ISession {
 
             return;
         } else {
-            sendAnswer("Not joined to any game.");
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
             writeToLog("Session: leaveGame warning. Disconnect from game canceled. Not joined to any game.");
 
             return;
@@ -666,6 +670,27 @@ public class AsynchroSession extends Thread implements ISession {
 
     private void notifyAllSessions(String message) {
         this.server.notifyAllClients(message);
+    }
+
+    public void notifyClientAboutGameMapChange() {
+        this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+    }
+
+    public void notifyClientAboutGameDisconnect() {
+        List<String> message = new ArrayList<String>(2);
+        message.add(ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
+        message.add("Disconnected.");
+
+        this.sendAnswer(message);
+    }
+
+    public void notifyClientAboutGameStart() {
+        List<String> message = new ArrayList<String>(2);
+        message.add(ProtocolConstants.CAPTION_START_GAME_INFO);
+        message.add("Game started.");
+
+        List<ISession> sessions = this.controller.getMyGame().getSessions();
+        this.server.notifySomeClients(sessions, message);
     }
 
     private void notifyGameSessions(String message) {

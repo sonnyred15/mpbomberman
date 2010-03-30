@@ -25,7 +25,9 @@ import java.util.List;
  *
  * @author Kirilchuk V.E.
  */
-public class Controller implements GameEndedListener, GameStartedListener {
+public class Controller
+        implements GameEndedListener, GameStartedListener,
+                   GameMapUpdateListener {
     public static final int GAME_IS_ALREADY_STARTED = -1;
     public static final int GAME_IS_FULL = -3;
     public static final int NOT_JOINED = -2;
@@ -51,6 +53,10 @@ public class Controller implements GameEndedListener, GameStartedListener {
         this.game.leaveFromGame(this);
         this.game = null;
         this.player = null;
+    }
+
+    public void gameMapChanged() {
+        this.session.notifyClientAboutGameMapChange();
     }
 
     /**
@@ -98,18 +104,17 @@ public class Controller implements GameEndedListener, GameStartedListener {
      * If client was not joined to any game, this method do nothing.
      */
     public void leaveGame() {
-        if (this.game != null) {
+        if (this.game != null) { 
+            this.game.removeGameStartedListener(this);
             this.game.removeGameEndedListener(this);
+            this.game.removeGameMapUpdateListener(this);
             this.game.leaveFromGame(this);
             this.game = null;
         }
     }
 
     public void started() {
-
-        // must notify client that game started in asynchroRealization
-        // and do nothing in synchro..
-        ;    // synchro and asynchro collision
+        this.session.notifyClientAboutGameStart();
     }
 
     /**

@@ -16,6 +16,7 @@ import org.amse.bomberman.server.gameinit.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.bot.RandomFullBotStrategy;
+import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
@@ -34,14 +35,15 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author Kirilchuk V.E.
  */
 public class Model implements IModel {
-    private final List<Bomb>               bombs;
-    private final DieListener              dieListener;
-    private final List<Pair>               explosionSquares;
-    private final List<Integer>            freeIDs;
-    private final Game                     game;
-    private final GameMap                  gameMap;
-    private final List<Player>             players;
-    private final ScheduledExecutorService timer;
+    private final List<Bomb>                  bombs;
+    private final DieListener                 dieListener;
+    private final List<Pair>                  explosionSquares;
+    private final List<Integer>               freeIDs;
+    private final Game                        game;
+    private final GameMap                     gameMap;
+    private final List<GameMapUpdateListener> gameMapUpdateListeners;
+    private final List<Player>                players;
+    private final ScheduledExecutorService    timer;
 
     /**
      * Constructor of Model.
@@ -61,6 +63,8 @@ public class Model implements IModel {
             freeIDArray[i] = i + 1;
         }
 
+        this.gameMapUpdateListeners =
+            new CopyOnWriteArrayList<GameMapUpdateListener>();
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
         this.dieListener = new DieListener(this);
@@ -84,6 +88,11 @@ public class Model implements IModel {
         this.explosionSquares.addAll(explSq);
 
 //      this.game.notifyGameMapUpdateListeners();
+    }
+
+    public void addGameMapUpdateListener(
+            GameMapUpdateListener gameMapUpdateListener) {
+        this.gameMapUpdateListeners.add(gameMapUpdateListener);
     }
 
     // TODO is this is normal realization?
@@ -323,6 +332,11 @@ public class Model implements IModel {
         this.explosionSquares.remove(explosion);
 
 //      this.game.notifyGameMapUpdateListeners();
+    }
+
+    public void removeGameMapUpdateListener(
+            GameMapUpdateListener gameMapUpdateListener) {
+        this.gameMapUpdateListeners.remove(gameMapUpdateListener);
     }
 
     public void removePlayer(int playerID) {
