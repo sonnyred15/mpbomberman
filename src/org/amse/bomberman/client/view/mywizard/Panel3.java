@@ -68,20 +68,7 @@ public class Panel3 extends JPanel implements Updating{
     public void getServerInfo() {
         try {
             chatTA.setText("");
-            /*List<String> gameInfo =*/Controller.getInstance().requestGameInfo();
-            //if (gameInfo.get(0).equals("false")) {
-            //    botJButton.setEnabled(false);
-            //    botJButton.setVisible(false);
-            //    parent.setNextButtonEnable(false);
-            //} else {
-            //    botJButton.setAction(new AddBotAction());
-            //}
-            //for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
-            //    this.setPlayer(i, gameInfo.get(i+2));
-            //}
-            //for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
-            //    this.setPlayer(i, emptyName);
-            //}
+            Controller.getInstance().requestGameInfo();
             this.startUpdating();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
@@ -109,12 +96,13 @@ public class Panel3 extends JPanel implements Updating{
         } else {
             botJButton.setAction(new AddBotAction());
         }
-        if (Integer.parseInt(info.get(1)) > 0) {
-            for (int i = 0; i < Integer.parseInt(info.get(1)); i++) {
-                this.setPlayer(i, info.get(i + 2));
+        playersNum = Integer.parseInt(info.get(1));
+        if (Integer.parseInt(info.get(2)) > 0) {
+            for (int i = 0; i < Integer.parseInt(info.get(2)); i++) {
+                this.setPlayer(i, info.get(i + 3));
             }
         }
-        for (int i = Integer.parseInt(info.get(1)); i < playersNum; i++) {
+        for (int i = Integer.parseInt(info.get(2)); i < playersNum; i++) {
             this.setPlayer(i, emptyName);
         }
     }

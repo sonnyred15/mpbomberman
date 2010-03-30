@@ -85,7 +85,6 @@ public class Panel2 extends JPanel implements Updating{
     }
 
     public void getServerInfo() {
-        String[] maps;
         try {
             // HACK!!!--------------------------------------------------
             refreshJButton.addMouseListener(new MouseAdapter() {
@@ -95,6 +94,7 @@ public class Panel2 extends JPanel implements Updating{
                 }
             });
             //------------------------------------------------------------*/
+            Controller.getInstance().requestGamesList();
             Controller.getInstance().requestMapsList();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"

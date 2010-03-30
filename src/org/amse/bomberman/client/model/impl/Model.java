@@ -95,6 +95,7 @@ public class Model implements IModel, RequestResultListener{
             } else {
                 if (list.get(0).equals("Not joined to any game.")) {
                     Model.getInstance().setStart(false);
+                    updateListeners();
                     System.out.println(list.get(0));
                 }
             }
