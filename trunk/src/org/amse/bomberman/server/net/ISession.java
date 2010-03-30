@@ -23,4 +23,10 @@ public interface ISession {    // Session must Extend Thread
     void sendAnswer(List<String> messages);
 
     void sendAnswer(String message);
+
+    void notifyClientAboutGameMapChange();
+
+    void notifyClientAboutGameStart();
+
+    void notifyClientAboutGameDisconnect();
 }

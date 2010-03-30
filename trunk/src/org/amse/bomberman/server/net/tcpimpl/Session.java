@@ -418,7 +418,8 @@ public class Session extends Thread implements ISession {
         }
 
         try {
-            this.controller.tryCreateGame(mapName, gameName, maxPlayers, playerName);
+            this.controller.tryCreateGame(mapName, gameName, maxPlayers,
+                                          playerName);
             sendAnswer("Game created.");
             writeToLog("Session: client created game." + " Map=" + mapName +
                        " gameName=" + gameName + " maxPlayers=" + maxPlayers);
@@ -646,6 +647,18 @@ public class Session extends Thread implements ISession {
 
             return;
         }
+    }
+
+    public void notifyClientAboutGameDisconnect() {
+        ;    // do nothing in current realization
+    }
+
+    public void notifyClientAboutGameMapChange() {
+        ;    // do nothing in current realization
+    }
+
+    public void notifyClientAboutGameStart() {
+        ;    // do nothing in current realization
     }
 
     protected void placeBomb() {

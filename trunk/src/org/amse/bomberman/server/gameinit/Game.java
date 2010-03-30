@@ -80,10 +80,12 @@ public class Game {
         this.gameEndedListeners.add(gameEndedListener);
     }
 
-    // method that delegates to model
-    public void addGameMapUpdateListener(GameMapUpdateListener listener) {
+    public void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener){
+        this.model.addGameMapUpdateListener(gameMapUpdateListener);
+    }
 
-        // TODO
+    public void removeGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener){
+        this.model.removeGameMapUpdateListener(gameMapUpdateListener);
     }
 
     public void addGameStartedListener(
@@ -191,16 +193,14 @@ public class Game {
         this.chat.removePlayer(bot.getID());
     }
 
+    public void removeGameStartedListener(GameStartedListener listener){
+        this.gameStartedListeners.remove(listener);
+    }
+
     public void removeGameEndedListener(GameEndedListener listener) {
         this.gameEndedListeners.remove(listener);
     }
-
-    // method that delegates to model
-    public void removeGameMapUpdateListener(GameMapUpdateListener listener) {
-
-        // TODO
-    }
-
+    
     public void setOwner(Controller owner) {
         this.owner = owner;
     }
