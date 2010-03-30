@@ -103,7 +103,6 @@ public class CreatingGameJPanel extends JPanel {
             }
         });
         // -----------------------------------------------------------
-
         setVisible(true);
     }
     public void setMaps(List<String> maps) {
@@ -130,16 +129,11 @@ public class CreatingGameJPanel extends JPanel {
             IController con = Controller.getInstance();
             try {
                 String mapName = getMap();
-                mapName = mapName.substring(0, mapName.indexOf('.'));
+                //mapName = mapName.substring(0, mapName.indexOf('.'));
                 con.requestCreateGame(getGameName(), mapName, getMaxPlayers());
-                // !!!!! is it safe method to know gameNumber???    !!!!!!!!!!!!
-                //List<String> games = con.requestMapsList();
-                //String[] buf = games.get(games.size()-1).split(" ");
-                //int players = Integer.parseInt(buf[buf.length-1]);
                 parent.goNext();
                 Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
                 nextPanel.getServerInfo();
-                //nextPanel.setPlayersNum(players);
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
