@@ -62,6 +62,8 @@ public final class Stringalize {
             lst.add("false");
         }
 
+        lst.add("" + game.getMaxPlayers());
+
         List<Player> players = game.getCurrentPlayers();
 
         lst.add("" + players.size());
