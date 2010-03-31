@@ -34,7 +34,7 @@ public interface IModel {
 
     void bombDetonated(Bomb bomb);
 
-    void detonateBombAt(int x, int y);
+    void detonateBombAt(Pair position);
 
     int getCurrentPlayersNum();
 
@@ -42,8 +42,10 @@ public interface IModel {
 
     GameMap getGameMap();
 
+    @Deprecated // use getGameMap.getField() instead
     int[][] getGameMapArray();
 
+    @Deprecated // use getGameMap.getName() instead
     String getGameMapName();
 
     Player getPlayer(int PlayerID);
@@ -52,16 +54,19 @@ public interface IModel {
 
     boolean isExplosion(Pair pair);
 
+    void notifyGameMapUpdateListeners();
+
     void playerBombed(Player atacker, int victimID);
 
     void playerBombed(Player atacker, Player victim);
 
+    @Deprecated // or model must implement DieListener or this mehod is not a model interface
     void playerDied(Player player);
 
     @Deprecated    // think is not needed
     void printToConsole();
 
-    void removeExplosion(Pair pair);
+    void removeExplosions(List<Pair> explosions);
 
     void removeGameMapUpdateListener(
             GameMapUpdateListener gameMapUpdateListener);
@@ -69,7 +74,7 @@ public interface IModel {
     void removePlayer(int playerID);
 
     void startup();
-
+    
     boolean tryDoMove(MoveableObject objectToMove, Direction direction);
 
     boolean tryPlaceBomb(Player player);

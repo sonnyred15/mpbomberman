@@ -28,13 +28,13 @@ public final class GameMap {
     private int           maxPlayers = Constants.MAX_PLAYERS;
     private final int     dimension;
     private final int[][] field;
-    private final String  mapName;
+    private final String  gameMapName;
 
-    public GameMap(int[][] mapArray) {    // CHECK < THIS// What if we get non square matrix???
-        this.dimension = mapArray.length;
-        this.field = mapArray;
+    public GameMap(int[][] gameMapArray) {    // CHECK < THIS// What if we get non square matrix???
+        this.dimension = gameMapArray.length;
+        this.field = gameMapArray;
         this.maxPlayers = countMaxPlayers(this.field);
-        this.mapName = "intArrayMap";
+        this.gameMapName = "intArrayMap";
     }
 
     /**
@@ -82,7 +82,7 @@ public final class GameMap {
 
             this.field = arr;
             this.maxPlayers = countMaxPlayers(this.field);
-            this.mapName = fileName;
+            this.gameMapName = fileName;
         } catch (NumberFormatException ex) {
             throw new IOException("Incorrect map.");
         } finally {
@@ -92,61 +92,8 @@ public final class GameMap {
         }
     }
 
-    public int[][] getField() {
-        return this.field;
-    }
-
-    public int getDimension() {
-        return this.dimension;
-    }
-
-    public int getMaxPlayers() {
-        return this.maxPlayers;
-    }
-
-    public String getName() {
-        return this.mapName;
-    }
-
-    public int getSquare(int x, int y) {
-        return this.field[x][y];
-    }
-
-    public void setSquare(int x, int y, int value) {
-        this.field[x][y] = value;
-    }
-
-    /**
-     * players 1..15
-     * @param x
-     * @param y
-     * @return PayerId if there is player.
-     * Returns -1 if there is NO player.
-     */
-    public int playerIdAt(int x, int y) {
-        int square = this.field[x][y];
-
-        if ((square < 1) || (square > Constants.MAX_PLAYERS)) {
-            return -1;
-        }
-
-        return square;
-    }
-
-    /**
-     *
-     * @param x
-     * @param y
-     * @return True if map[x][y]=-16
-     */
-    public boolean isBomb(int x, int y) {
-        return (this.field[x][y] == Constants.MAP_BOMB);
-    }
-
-    public boolean isBonus(int x, int y) {
-        return ((this.field[x][y] == Constants.MAP_BONUS_LIFE)
-                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_RADIUS)
-                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_COUNT));
+    public int blockAt(Pair position) {
+        return this.blockAt(position.getX(), position.getY());
     }
 
     /**
@@ -167,6 +114,10 @@ public final class GameMap {
         return square + 9;
     }
 
+    public int bonusAt(Pair position) {
+        return this.bonusAt(position.getX(), position.getY());
+    }
+
     /**
      * return value of bonus at specific cell with coords x and y.
      * @param x coord in line.
@@ -183,24 +134,6 @@ public final class GameMap {
         }
     }
 
-    public boolean isEmpty(int x, int y) {
-        return this.field[x][y] == Constants.MAP_EMPTY;
-    }
-
-    public void removePlayer(int playerID) {
-        int dim = this.dimension;
-
-        for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
-                if (this.field[i][j] == playerID) {
-                    this.field[i][j] = Constants.MAP_EMPTY;
-
-                    return;    // a little bit optimize
-                }
-            }
-        }
-    }
-
     /**
      * Change GameMap for defined in argument number of players by
      * removing unused players from GameMap.
@@ -210,6 +143,29 @@ public final class GameMap {
         for (int i = curMaxPlayers + 1; i <= this.maxPlayers; ++i) {
             removePlayer(i);
         }
+    }
+
+    // count maxPlayers for this mapArray.
+    private int countMaxPlayers(int[][] mapArray) {
+        int counter = 0;
+        int dim = this.dimension;
+
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                int sq = mapArray[i][j];
+
+                if ((sq > 0) && (sq < Constants.MAX_PLAYERS)) {
+                    ++counter;
+                    mapArray[i][j] = counter;
+                }
+            }
+        }
+
+        return counter;
+    }
+
+    public void destroyBlock(Pair position) {
+        this.destroyBlock(position.getX(), position.getY());
     }
 
     public void destroyBlock(int x, int y) {
@@ -235,24 +191,105 @@ public final class GameMap {
         }
     }
 
-    // count maxPlayers for this mapArray.
-    private int countMaxPlayers(int[][] mapArray) {
-        int counter = 0;
+    public int getDimension() {
+        return this.dimension;
+    }
+
+    public int[][] getField() {
+        return this.field;
+    }
+
+    public int getMaxPlayers() {
+        return this.maxPlayers;
+    }
+
+    public String getName() {
+        return this.gameMapName;
+    }
+
+    public int getSquare(Pair position) {
+        return this.getSquare(position.getX(), position.getY());
+    }
+
+    public int getSquare(int x, int y) {
+        return this.field[x][y];
+    }
+
+    public boolean isBomb(Pair position) {
+        return this.isBomb(position.getX(), position.getY());
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return True if map[x][y]=-16
+     */
+    public boolean isBomb(int x, int y) {
+        return (this.field[x][y] == Constants.MAP_BOMB);
+    }
+
+    public boolean isBonus(Pair position) {
+        return this.isBonus(position.getX(), position.getY());
+    }
+
+    public boolean isBonus(int x, int y) {
+        return ((this.field[x][y] == Constants.MAP_BONUS_LIFE)
+                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_RADIUS)
+                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_COUNT));
+    }
+
+    public boolean isEmpty(Pair position) {
+        return this.isEmpty(position.getX(), position.getY());
+    }
+
+    public boolean isEmpty(int x, int y) {
+        return this.field[x][y] == Constants.MAP_EMPTY;
+    }
+
+    public int playerIDAt(Pair position) {
+        return this.playerIDAt(position.getX(), position.getY());
+    }
+
+    /**
+     * players 1..15
+     * @param x
+     * @param y
+     * @return PayerId if there is player.
+     * Returns -1 if there is NO player.
+     */
+    public int playerIDAt(int x, int y) {
+        int square = this.field[x][y];
+
+        if ((square < 1) || (square > Constants.MAX_PLAYERS)) {
+            return -1;
+        }
+
+        return square;
+    }
+    /**
+     * Remove concrete player from gameMap.
+     * @param playerID
+     */
+    public void removePlayer(int playerID) {
         int dim = this.dimension;
 
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
-                int sq = mapArray[i][j];
+                if (this.field[i][j] == playerID) {
+                    this.field[i][j] = Constants.MAP_EMPTY;
 
-                if ((sq > 0) && (sq < Constants.MAX_PLAYERS)) {
-                    ++counter;
-                    mapArray[i][j] = counter;
+                    return;    // a little bit optimize
                 }
             }
         }
-
-        return counter;
     }
 
-    // remove concrete player from map.
+    public void setSquare(Pair position, int value) {
+        this.setSquare(position.getX(), position.getY(), value);
+    }
+
+    public void setSquare(int x, int y, int value) {
+        this.field[x][y] = value;
+    }
 }
