@@ -26,8 +26,6 @@ import org.amse.bomberman.util.Constants.Direction;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Model that is responsable for game rules and responsable for connection
@@ -43,7 +41,6 @@ public class Model implements IModel {
     private final GameMap                     gameMap;
     private final List<GameMapUpdateListener> gameMapUpdateListeners;
     private final List<Player>                players;
-    private final ScheduledExecutorService    timer;
 
     /**
      * Constructor of Model.
@@ -53,7 +50,6 @@ public class Model implements IModel {
     public Model(GameMap gameMap, Game game) {
         this.gameMap = gameMap;
         this.game = game;
-        this.timer = Executors.newSingleThreadScheduledExecutor();
         this.bombs = new CopyOnWriteArrayList<Bomb>();
         this.players = new CopyOnWriteArrayList<Player>();
 
@@ -75,19 +71,16 @@ public class Model implements IModel {
         Bot bot = new Bot(botName, this.game, this,
                           new RandomFullBotStrategy());
 
-        this.players.add(bot);
-
-        // bot.setID(this.players.indexOf(bot) + 1);
         bot.setID(getFreeID());
         bot.setDieListener(this.dieListener);
+        this.players.add(bot);
 
         return bot;
     }
 
     public void addExplosions(List<Pair> explSq) {
         this.explosionSquares.addAll(explSq);
-
-//      this.game.notifyGameMapUpdateListeners();
+        this.notifyGameMapUpdateListeners();
     }
 
     public void addGameMapUpdateListener(
@@ -99,10 +92,9 @@ public class Model implements IModel {
     public Player addPlayer(String name) {
         Player playerToAdd = new Player(name);
 
-        // playerToAdd.setID(this.players.indexOf(playerToAdd) + 1);
         playerToAdd.setID(getFreeID());
-        this.players.add(playerToAdd);
         playerToAdd.setDieListener(this.dieListener);
+        this.players.add(playerToAdd);
 
         return playerToAdd;
     }
@@ -110,30 +102,22 @@ public class Model implements IModel {
     public void bombDetonated(Bomb bomb) {
         this.bombs.remove(bomb);
 
-        Pair bombPosition = bomb.getPosition();
+        Player owner = bomb.getOwner();
 
-        for (Player player : players) {
-            if (player.getPosition().equals(bombPosition) && player.isAlive()) {
-                this.gameMap.setSquare(bombPosition.getX(),
-                                       bombPosition.getY(), player.getID());
-            } else {
-                this.gameMap.setSquare(bombPosition.getX(),
-                                       bombPosition.getY(),
-                                       Constants.MAP_EMPTY);
-            }
+        if (owner.getPosition().equals(bomb.getPosition())) {
+            this.gameMap.setSquare(owner.getPosition(), owner.getID());
+        } else {
+            this.gameMap.setSquare(bomb.getPosition(), Constants.MAP_EMPTY);
         }
 
-//      this.gameMap.setSquare(bombPosition.getX(), bombPosition.getY(),
-//                             Constants.MAP_DETONATED_BOMB);
-//      this.game.notifyGameMapUpdateListeners();
+        // TODO is this.notifyGameMapUpdateListeners(); need????
     }
 
-    public void detonateBombAt(int x, int y) {
+    public void detonateBombAt(Pair position) {
         Bomb bombToDetonate = null;
-        Pair square = new Pair(x, y);
 
         for (Bomb bomb : bombs) {
-            if (bomb.getPosition().equals(square)) {
+            if (bomb.getPosition().equals(position)) {
                 bombToDetonate = bomb;
 
                 break;
@@ -141,10 +125,6 @@ public class Model implements IModel {
         }
 
         bombToDetonate.detonate();
-    }
-
-    public boolean doMove(Player player, Direction direction) {
-        return this.tryDoMove(player, direction);
     }
 
     public int getCurrentPlayersNum() {
@@ -202,8 +182,10 @@ public class Model implements IModel {
     }
 
     private boolean isMoveToReserved(int x, int y) {    // note that on explosions isEmpty = true!!!
-        return (this.gameMap.isEmpty(x, y)) ? false
-                                            : true;
+        boolean isFree = this.gameMap.isEmpty(x, y)
+                         || this.gameMap.isBonus(x, y);
+
+        return !isFree;
     }
 
     private boolean isOutMove(int x, int y) {
@@ -230,6 +212,12 @@ public class Model implements IModel {
             } else {
                 this.gameMap.setSquare(x, y, Constants.MAP_EMPTY);
             }
+
+            if (this.gameMap.isBonus(newX, newY)) {
+                int bonus = this.gameMap.bonusAt(newX, newY);
+
+                ((Player) objectToMove).takeBonus(bonus);
+            }
         } else if (objectToMove instanceof Bomb) {
             Bomb bomb = (Bomb) objectToMove;
 
@@ -250,6 +238,8 @@ public class Model implements IModel {
         if (isExplosion(newPosition)) {
             objectToMove.bombed();
         }
+
+        this.notifyGameMapUpdateListeners();
     }
 
     private int[] newCoords(Pair currentPosition, Direction direction) {    // whats about catch illegalArgumentException???
@@ -293,6 +283,13 @@ public class Model implements IModel {
         return arr;
     }
 
+    public void notifyGameMapUpdateListeners() {
+        for (GameMapUpdateListener gameMapUpdateListener :
+                gameMapUpdateListeners) {
+            gameMapUpdateListener.gameMapChanged();
+        }
+    }
+
     public void playerBombed(Player atacker, int victimID) {
         Player victim = this.getPlayer(victimID);
 
@@ -328,10 +325,14 @@ public class Model implements IModel {
         System.out.println();
     }
 
-    public void removeExplosion(Pair explosion) {
-        this.explosionSquares.remove(explosion);
+    public void removeExplosions(List<Pair> explosions) {
 
-//      this.game.notifyGameMapUpdateListeners();
+        // this.explosionSquares.removeAll(explosions);
+        for (Pair pair : explosions) {
+            this.explosionSquares.remove(pair);
+        }
+
+        this.notifyGameMapUpdateListeners();
     }
 
     public void removeGameMapUpdateListener(
@@ -365,21 +366,6 @@ public class Model implements IModel {
         }
     }
 
-    private void takeBonus(Player player, int x, int y) {
-        int bonus = this.gameMap.bonusAt(x, y);
-
-        if (bonus == -1) {
-            return;
-        } else {
-            this.gameMap.setSquare(player.getPosition().getX(),
-                                   player.getPosition().getY(),
-                                   Constants.MAP_EMPTY);
-            player.setPosition(new Pair(x, y));
-            player.takeBonus(bonus);
-            this.gameMap.setSquare(x, y, player.getID());
-        }
-    }
-
     /**
      * Trying to move the player in defined direction.
      * @param player Player to move
@@ -407,9 +393,6 @@ public class Model implements IModel {
                                 break;
                             }
                         }
-                    } else if (this.gameMap.isBonus(newX, newY)
-                               && (objToMove instanceof Player)) {
-                        takeBonus((Player) objToMove, newX, newY);
                     }
 
                     if (!isMoveToReserved(newX, newY)) {
@@ -440,8 +423,7 @@ public class Model implements IModel {
                         return false;    // if player staying under the bomb
                     }
 
-                    Bomb bomb = new Bomb(this, player, gameMap, new Pair(x, y),
-                                         timer);
+                    Bomb bomb = new Bomb(this, player, new Pair(x, y));
 
                     this.bombs.add(bomb);
 
