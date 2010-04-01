@@ -43,6 +43,7 @@ public class Panel1 extends JPanel implements Updating {
         setSize(width, height);
         initComponents();
         this.setVisible(true);
+        //this.add(Panel11.create());
         this.initBackgroundImage();
     }
 
