@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;

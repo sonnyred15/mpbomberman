@@ -97,12 +97,12 @@ public class ServerFrame extends JFrame {
             int port = Integer.parseInt(portField.getText()); //throws NumberFormatException
 
             if (server == null) { //if it is first initialization
-                server = new Server(port);
+                server = new AsynchroServer(port);
                 info.setServer(server);
                 server.setChangeListener(info);
             } else if (server.getPort() != port) { //if we want to raise server on new port
                 server.writeToLog("Raising server on new port");
-                server = new Server(port);
+                server = new AsynchroServer(port);
                 info.setServer(server);
                 info.clearLog();
                 server.setChangeListener(info);

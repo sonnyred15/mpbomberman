@@ -21,7 +21,7 @@ import org.amse.bomberman.server.net.IServer;
 public class Creator {
 
     public static List<String> createGameMapsList() {
-        return Collections.unmodifiableList(Constants.maps);
+        return Constants.maps;
     }
 
     public static int[][] createMapAndGetArray(String fileName) throws
