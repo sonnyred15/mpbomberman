@@ -15,13 +15,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JFrame;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
@@ -64,6 +61,10 @@ public class SynchroConnector implements IConnector2 {
     public void requestLeaveGame() throws NetException {
         List<String> answer = queryAnswer("" + Command.LEAVE_GAME.getValue());
         System.out.println(answer.get(0));
+        // not essential, can be deleted. Use for stop timers faster.
+        if (answer.get(0).equals("Disconnected.")) {
+            stopUpdating();
+        }
         answer.add(0, ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
         Controller.getInstance().receivedRequestResult(answer);
     }
@@ -119,7 +120,6 @@ public class SynchroConnector implements IConnector2 {
 
     public void requestPlantBomb() throws NetException {
         List<String> list = queryAnswer("" + Command.PLACE_BOMB.getValue());
-        System.out.println(list.get(0));
         list.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
@@ -129,7 +129,6 @@ public class SynchroConnector implements IConnector2 {
         List<String> list = queryAnswer("" +
                 Command.ADD_BOT_TO_GAME.getValue()+" "
                 + botNames[r.nextInt(botNames.length-1)]);
-        System.out.println(list.get(0));
         list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
@@ -224,13 +223,12 @@ public class SynchroConnector implements IConnector2 {
     private class UpdateTimerTask extends TimerTask{
         @Override
         public void run() {
-            IModel model = Model.getInstance();
             try {
-                requestIsGameStarted();
-                requestGameMap();
                 if (!Model.getInstance().isStarted()) {
                     stopUpdating();
                 }
+                requestIsGameStarted();
+                requestGameMap();
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();

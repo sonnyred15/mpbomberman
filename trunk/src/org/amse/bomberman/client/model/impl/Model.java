@@ -94,7 +94,7 @@ public class Model implements IModel, RequestResultListener{
                 //System.out.println("You try to do move uncorrectly.");
             } else {
                 if (list.get(0).equals("Not joined to any game.")) {
-                    Model.getInstance().setStart(false);
+                    isStarted = false;
                     updateListeners();
                     System.out.println(list.get(0));
                 }
@@ -110,6 +110,7 @@ public class Model implements IModel, RequestResultListener{
         if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
             if (list.get(0).equals("Disconnected.")) {
                 isStarted = false;
+                updateListeners();
             } else {
                 // TO DO
             }

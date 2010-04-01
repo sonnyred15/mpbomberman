@@ -55,19 +55,12 @@ public class GameJMenuBar extends JMenuBar {
         }
 
         public void actionPerformed(ActionEvent e) {
-            parent.dispose();
-            Model.getInstance().removeListener(parent);
             try {
                 Controller.getInstance().requestLeaveGame();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-            MainWizard wizard = new MainWizard();
-            Controller.getInstance().setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(1);
-            wizard.updateCurrentPanel();
-            //ServerInfoJFrame serv = new ServerInfoJFrame();
         }
     }
 }
