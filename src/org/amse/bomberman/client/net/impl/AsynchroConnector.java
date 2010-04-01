@@ -31,13 +31,9 @@ import org.amse.bomberman.util.ProtocolConstants;
 public class AsynchroConnector implements IConnector2 {
 
     private Socket socket;
-    private static IController controller;
     private static IConnector2 connector = null;
 
     private AsynchroConnector() {
-        if (controller == null) {
-            controller = Controller.getInstance();
-        }
     }
 
     public static IConnector2 getInstance() {
@@ -104,7 +100,7 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void requestGameMap() throws NetException {
-        sendRequest("" + Command.GET_GAME_MAP_INFO.getValue());
+        sendRequest("" + Command.GET_GAME_MAP_INFO2.getValue());
     }
 
     public void requestPlantBomb() throws NetException {
@@ -116,6 +112,7 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void requestGameMapsList() throws NetException {
+        sendRequest("" + Command.GET_GAME_MAPS_LIST.getValue());
     }
 
     public void requestIsGameStarted() throws NetException {
@@ -170,21 +167,21 @@ public class AsynchroConnector implements IConnector2 {
             System.out.println("GETTED SERVER MESSAGE FIRSTLINE=" + firstLine);
             try {
                 if (firstLine.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    controller.requestNewChatMessages();
+                    Controller.getInstance().requestNewChatMessages();
                 } else if (firstLine.equals(
                         ProtocolConstants.UPDATE_GAMES_LIST)) {
-                    controller.requestGamesList();
+                    Controller.getInstance().requestGamesList();
                 } else if (firstLine.equals(
                         ProtocolConstants.UPDATE_GAME_INFO)) {
-                    controller.requestGameInfo();
+                    Controller.getInstance().requestGameInfo();
                 } else if (firstLine.equals(
                         ProtocolConstants.UPDATE_GAME_MAP)) {
-                    controller.requestGameMap();
+                    Controller.getInstance().requestGameMap();
                 } else {
-                    controller.receivedRequestResult(message);
+                    Controller.getInstance().receivedRequestResult(message);
                 }
             } catch (NetException ex) {
-                ;//TODO
+                //TODO
                 ex.printStackTrace();
             }
         }

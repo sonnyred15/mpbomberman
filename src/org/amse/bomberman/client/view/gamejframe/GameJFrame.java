@@ -15,13 +15,12 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.view.mywizard.MainWizard;
-import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 
 /**
  *
  * @author Michael Korovkin
  */
-public class GameJFrame extends JFrame implements IView, RequestResultListener{
+public class GameJFrame extends JFrame implements IView{
     private GamePanel gamePanel;
     private JLabel livesJLabel;
     // is really nead???
@@ -96,9 +95,6 @@ public class GameJFrame extends JFrame implements IView, RequestResultListener{
                 }
             }
         }
-    }
-    public void received(List<String> list) {
-        // Need to do something?
     }
     private void refreshLives(int lives) {
         String buf = livesJLabel.getText();

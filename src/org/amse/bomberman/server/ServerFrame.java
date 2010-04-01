@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.amse.bomberman.server.net.IServer;
-//import org.amse.bomberman.server.net.tcpimpl.AsynchroServer;
+import org.amse.bomberman.server.net.tcpimpl.AsynchroServer;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants;
 
