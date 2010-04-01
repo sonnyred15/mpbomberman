@@ -25,7 +25,7 @@ public class Controller implements IController{
 
     private Controller() {
         if (connector == null) {
-            connector = SynchroConnector.getInstance();
+            connector = AsynchroConnector.getInstance();
         }
     }
     public static IController getInstance() {
