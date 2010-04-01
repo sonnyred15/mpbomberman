@@ -7,6 +7,7 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.BufferedReader;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
@@ -25,10 +26,14 @@ import org.amse.bomberman.util.Stringalize;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -672,24 +677,26 @@ public class AsynchroSession extends Thread implements ISession {
         this.server.notifyAllClients(message);
     }
 
+    public void notifyClientAboutGameDisconnect() {
+        List<String> message = new ArrayList<String>(2);
+
+        message.add(ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
+        message.add("Disconnected.");
+        this.sendAnswer(message);
+    }
+
     public void notifyClientAboutGameMapChange() {
         this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
-    public void notifyClientAboutGameDisconnect() {
-        List<String> message = new ArrayList<String>(2);
-        message.add(ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
-        message.add("Disconnected.");
-
-        this.sendAnswer(message);
-    }
-
     public void notifyClientAboutGameStart() {
         List<String> message = new ArrayList<String>(2);
+
         message.add(ProtocolConstants.CAPTION_START_GAME_INFO);
         message.add("Game started.");
 
         List<ISession> sessions = this.controller.getMyGame().getSessions();
+
         this.server.notifySomeClients(sessions, message);
     }
 
@@ -729,6 +736,76 @@ public class AsynchroSession extends Thread implements ISession {
             writeToLog("Session: place bomb warning. Canceled. Not joined to any game.");
 
             return;
+        }
+    }
+
+    @Override
+    public void run() {
+        BufferedReader in = null;
+
+        try {
+            this.clientSocket.setSoTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);    // throws SocketException
+        } catch (SocketException ex) {
+            writeToLog("Session: exception in run method. " + ex.getMessage());    // Error in the underlaying TCP protocol.
+        }
+
+        writeToLog("Session: waiting query from client...");
+
+        try {
+            InputStream       is = this.clientSocket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+
+            in = new BufferedReader(isr);
+
+            String clientQueryLine;
+
+            while (!Thread.interrupted()) {
+                try {
+                    clientQueryLine = in.readLine();    // throws IOException
+
+                    if (clientQueryLine == null) {
+                        break;
+                    }
+
+                    answerOnCommand(clientQueryLine);
+                } catch (SocketTimeoutException ex) {    // if client not responsable
+                    writeToLog("Session: terminated by socket timeout. " +
+                               ex.getMessage());
+
+                    break;
+                }
+            }
+        } catch (IOException ex) {    // IOException in in.readLine()
+            writeToLog("Session: run error. " + ex.getMessage());
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();    // throws IOException
+                }
+            } catch (IOException ex) {
+                writeToLog("Session: run error. " + ex.getMessage());
+            }
+
+            try {
+                writeToLog("Session: freeing resources.");
+                freeResources();
+                writeToLog("Session: ended.");
+            } catch (IOException ex) {
+                writeToLog("Session: run error. While closing client socket. " +
+                           ex.getMessage());
+            }
+
+            try {
+                if (this.log != null) {
+                    this.log.close();    // throws IOException
+                    this.log = null;
+                }
+            } catch (IOException ex) {
+
+                // can`t close log stream. Log wont be saved
+                System.out.println("Session: run error. Can`t close log stream. " +
+                                   "Log won`t be saved. " + ex.getMessage());
+            }
         }
     }
 
