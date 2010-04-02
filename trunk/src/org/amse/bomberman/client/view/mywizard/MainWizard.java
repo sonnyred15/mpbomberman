@@ -86,7 +86,10 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 if (current instanceof Panel3) {
                     Panel3 panel3 = (Panel3) current;
                     try {
-                        panel3.startGame();
+                        if (!Model.getInstance().isStarted()) {
+                            Model.getInstance().setStart(true);
+                            panel3.startGame();
+                        }
                     } catch (NetException ex) {
                         JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                                 + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -107,7 +110,10 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 if (current instanceof Panel3) {
                     Panel3 panel3 = (Panel3) current;
                     try {
-                        panel3.startGame();
+                        if (!Model.getInstance().isStarted()) {
+                            Model.getInstance().setStart(true);
+                            panel3.startGame();
+                        }
                     } catch (NetException ex) {
                         JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                                 + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

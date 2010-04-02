@@ -277,9 +277,6 @@ public class Panel3 extends JPanel implements Updating{
                 if (!parent.isShowing()) {
                     stopTimers();
                 }
-                if (Model.getInstance().isStarted()) {
-                    startGame();
-                }
             } catch (NetException ex) {
                 // is it good???
                 ex.printStackTrace();

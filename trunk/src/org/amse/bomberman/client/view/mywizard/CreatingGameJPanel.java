@@ -109,6 +109,7 @@ public class CreatingGameJPanel extends JPanel {
         for (int i = 0; i < maps.size(); i++) {
             this.mapBox.addItem(maps.get(i));
         }
+        this.mapBox.setSize(this.mapBox.getPreferredSize());
     }
     private String getGameName() {
         return gameNameTF.getText();
