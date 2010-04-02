@@ -33,7 +33,7 @@ public class SynchroConnector implements IConnector2 {
     private Timer timer;
     private Socket socket;
     private static IConnector2 connector = null;
-    private String[] botNames = {"BOT_ANDY", "BOT_SAM", "BOT_JOE", "BOT_VASYA"
+    public static final String[] botNames = {"BOT_ANDY", "BOT_SAM", "BOT_JOE", "BOT_VASYA"
     , "BOT_PETYA", "BOT_ANYA", "BOT_LOOSER", "BOT_UNLUCKY", "BOT_FOOL", "BOT_SUICIDE"};
 
     private SynchroConnector() {
@@ -145,8 +145,8 @@ public class SynchroConnector implements IConnector2 {
         if (list.get(0).equals("started.") && !Model.getInstance().isStarted()) {
             this.beginUpdating();
         }
-        Controller.getInstance().receivedRequestResult(list);
         list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
+        Controller.getInstance().receivedRequestResult(list);
     }
 
     public void requestGameInfo() throws NetException {
@@ -209,7 +209,6 @@ public class SynchroConnector implements IConnector2 {
     }
      // must be here or somewhere else???
     public void beginUpdating(){
-        Model.getInstance().setStart(true);
         timer = new Timer();
         timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }

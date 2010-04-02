@@ -16,6 +16,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
@@ -89,7 +90,7 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void requestJoinGame(int gameID) throws NetException {
-        sendRequest("2 " + gameID + " " + "playerName");
+        sendRequest("2 " + gameID + " " + Model.getInstance().getPlayerName());
     }
 
     public void requestDoMove(Direction dir) throws NetException {
@@ -109,7 +110,9 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void requestJoinBotIntoGame() throws NetException {
-        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " BOT");
+        Random r = new Random();
+        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " "
+                +SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length-1)]);
     }
 
     public void requestGameMapsList() throws NetException {

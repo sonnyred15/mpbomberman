@@ -84,7 +84,7 @@ public class Model implements IModel, RequestResultListener{
                 Parser parser = new Parser();
                 this.setMap(parser.parse(list));
             } else {
-                Model.getInstance().setStart(false);
+                //Model.getInstance().setStart(false);
                 updateListeners();
                 System.out.println(list.get(0));
             }
