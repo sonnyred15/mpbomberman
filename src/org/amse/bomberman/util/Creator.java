@@ -7,6 +7,7 @@ package org.amse.bomberman.util;
 import java.awt.Component;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -21,7 +22,7 @@ import org.amse.bomberman.server.net.IServer;
 public class Creator {
 
     public static List<String> createGameMapsList() {
-        return Constants.maps;
+        return new ArrayList<String>(Constants.maps);
     }
 
     public static int[][] createMapAndGetArray(String fileName) throws

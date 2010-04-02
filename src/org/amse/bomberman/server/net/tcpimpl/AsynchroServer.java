@@ -131,6 +131,13 @@ public class AsynchroServer extends Server {
     }
 
     @Override
+    public void notifySomeClients(List<ISession> sessions, String message) {
+        for (ISession session : sessions) {
+            session.sendAnswer(message);
+        }
+    }
+
+    @Override
     public void notifyAllClientsExceptOne(List<String> messages, ISession sessionToIgnore) {
         for (ISession session : sessions) {
             if (session != sessionToIgnore) {

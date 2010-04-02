@@ -19,6 +19,7 @@ import java.util.List;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.ProtocolConstants;
@@ -83,7 +84,8 @@ public class AsynchroConnector implements IConnector2 {
         sendRequest("" + Command.CREATE_GAME.getValue() +
                 " " + gameName +
                 " " + mapName +
-                " " + maxPl);
+                " " + maxPl +
+                " " + Model.getInstance().getPlayerName());
     }
 
     public void requestJoinGame(int gameID) throws NetException {
@@ -163,7 +165,12 @@ public class AsynchroConnector implements IConnector2 {
 
         private void processServerMessage(List<String> message) {
             String firstLine = message.get(0);
-            System.out.println("GETTED SERVER MESSAGE FIRSTLINE=" + firstLine);
+            /* for debugging */
+            System.out.println("GETTED SERVER MESSAGE:");
+            for (String string : message) {
+                System.out.println(string);
+            }
+            /*--------------*/
             try {
                 if (firstLine.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
                     Controller.getInstance().requestNewChatMessages();
