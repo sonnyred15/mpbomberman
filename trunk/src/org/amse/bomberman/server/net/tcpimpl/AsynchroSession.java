@@ -70,7 +70,7 @@ public class AsynchroSession extends Thread implements ISession {
         String botName = "defaultBot";
 
         if (queryArgs.length == 2) {
-            botName = queryArgs[2];
+            botName = queryArgs[1];
         } else {
             messages.add("Wrong command parameters. Error on client side.");
             sendAnswer(messages);
