@@ -187,6 +187,7 @@ public class Controller
                                        maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
         this.player = this.game.join(playerName, this);
+        this.game.addGameMapUpdateListener(this);
 
         if (this.player == null) {
             throw new NullPointerException("Error while creating game. " +
@@ -227,6 +228,7 @@ public class Controller
                         joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
                     } else {
                         joinResult = Controller.RESULT_SUCCESS;
+                        this.game.addGameMapUpdateListener(this);
                         this.game.addGameEndedListener(this);
                     }
                 }

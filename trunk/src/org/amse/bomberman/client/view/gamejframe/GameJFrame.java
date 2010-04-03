@@ -39,13 +39,15 @@ public class GameJFrame extends JFrame implements IView{
         try {
             Controller.getInstance().requestGameMap();
             // HACK!!! Delay for answer from server before get BombMap
-            Object delay = new Object();
-            synchronized (delay) {
-                try {
-                    delay.wait(100);
-                } catch (InterruptedException ex) {
-                }
-            }
+//            Object delay = new Object();
+//            System.out.println("DELAY STARTED");
+//            synchronized (delay) {
+//                try {
+//                    delay.wait(1000);
+//                } catch (InterruptedException ex) {
+//                }
+//            }
+//            System.out.println("DELAY ENDED");
             //--------------------------------------------------------------
             map = Model.getInstance().getMap();
             gamePanel = new GamePanel(map);
