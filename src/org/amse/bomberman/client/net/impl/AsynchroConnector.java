@@ -111,8 +111,8 @@ public class AsynchroConnector implements IConnector2 {
 
     public void requestJoinBotIntoGame() throws NetException {
         Random r = new Random();
-        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " "
-                +SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length-1)]);
+        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " " +
+                SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length - 1)]);
     }
 
     public void requestGameMapsList() throws NetException {
@@ -158,8 +158,10 @@ public class AsynchroConnector implements IConnector2 {
                         }
                         message.add(oneLine);
                     }
-                    processServerMessage(message);
-                    message.clear();
+                    Thread t = new Thread(new MyRunnable(message));
+                    t.start();
+                    //processServerMessage(message);
+                    message = new ArrayList<String>();
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -186,12 +188,25 @@ public class AsynchroConnector implements IConnector2 {
                 } else if (firstLine.equals(
                         ProtocolConstants.UPDATE_GAME_MAP)) {
                     Controller.getInstance().requestGameMap();
-                } else {
+                } else {                    
                     Controller.getInstance().receivedRequestResult(message);
                 }
             } catch (NetException ex) {
                 //TODO
                 ex.printStackTrace();
+            }
+        }
+
+        private class MyRunnable implements Runnable {
+
+            List<String> message;
+
+            public MyRunnable(List<String> message) {
+                this.message = message;
+            }
+
+            public void run() {
+                processServerMessage(message);
             }
         }
     }

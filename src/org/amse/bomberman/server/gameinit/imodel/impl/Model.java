@@ -398,7 +398,7 @@ public class Model implements IModel {
                     if (!isMoveToReserved(newX, newY)) {
                         makeMove(objToMove, newX, newY);
 
-//                      this.game.notifyGameMapUpdateListeners();
+                        this.notifyGameMapUpdateListeners();
                         return true;
                     }
                 }
@@ -433,7 +433,7 @@ public class Model implements IModel {
                                            bombPosition.getY(),
                                            Constants.MAP_BOMB);
 
-//                  this.game.notifyGameMapUpdateListeners();
+                    this.notifyGameMapUpdateListeners();
                     return true;
                 }
             }
