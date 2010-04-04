@@ -277,9 +277,7 @@ public class GamePanel  extends JPanel{
         // if it is player on the bomb
         if (map.getValue(cell) >= Constants.MAP_BOMB + 100 + 1) {
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 10 * 0.1f));
-            //System.out.println(map.getValue(cell));
             int playerNum = map.getValue(cell)-100 - Constants.MAP_BOMB;
-            //System.out.println(playerNum);
             g.drawImage(getPlayerIcon(playerNum), 0, 0, this);
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 9 * 0.1f));
             g.drawImage(ICON_BOMB.getImage(), 0, 0, this);

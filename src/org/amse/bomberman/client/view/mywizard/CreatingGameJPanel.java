@@ -3,8 +3,6 @@ package org.amse.bomberman.client.view.mywizard;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -94,22 +92,13 @@ public class CreatingGameJPanel extends JPanel {
         this.add(bottomBox);
         this.add(createJButton);
         createJButton.setAction(new CreateGameAction());
-        //  HACK!!!! -------------------------------------------------
-        createJButton.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                ((JButton) e.getComponent()).doClick();
-            }
-        });
-        // -----------------------------------------------------------
         setVisible(true);
     }
     public void setMaps(List<String> maps) {
+        this.mapBox.removeAllItems();
         for (int i = 0; i < maps.size(); i++) {
             this.mapBox.addItem(maps.get(i));
         }
-        this.mapBox.setSize(this.mapBox.getPreferredSize());
     }
     private String getGameName() {
         return gameNameTF.getText();
@@ -130,7 +119,6 @@ public class CreatingGameJPanel extends JPanel {
             IController con = Controller.getInstance();
             try {
                 String mapName = getMap();
-                //mapName = mapName.substring(0, mapName.indexOf('.'));
                 con.requestCreateGame(getGameName(), mapName, getMaxPlayers());
                 parent.goNext();
                 Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
