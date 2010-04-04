@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -114,28 +113,6 @@ public class Panel3 extends JPanel implements Updating{
             }
         }
     }
-    //private void update() {
-        //try {
-            /*List<String> gameInfo = */
-            /*if (Integer.parseInt(gameInfo.get(1)) > 0) {
-                for (int i = 0; i < Integer.parseInt(gameInfo.get(1)); i++) {
-                    this.setPlayer(i, gameInfo.get(i+2));
-                }
-            }
-            for (int i = Integer.parseInt(gameInfo.get(1)); i < playersNum; i++) {
-                this.setPlayer(i, emptyName);
-            }
-            List<String> messages = Connector.getInstance().getNewChatMessages();
-            if (!messages.get(0).equals("No new messages.")) {
-                this.setNewMessages(messages);
-            }
-        } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.stopTimers();
-            parent.setCurrentJPanel(0);
-        }
-    }*/
     private void setPlayer(int id, String name) {
         players[id].setText(name);
         LineBorder border = null;

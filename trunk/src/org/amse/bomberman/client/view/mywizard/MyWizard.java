@@ -145,7 +145,7 @@ public class MyWizard  extends JFrame{
         nextJButton.setAction(new NextAction(this));
 
         cardPanel = new JPanel();
-        cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+        //cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
         cardLayout = new CardLayout();
         cardPanel.setLayout(cardLayout);
 

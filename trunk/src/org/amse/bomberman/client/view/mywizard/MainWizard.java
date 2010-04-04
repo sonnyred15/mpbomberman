@@ -23,7 +23,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
     //private final int width = 680;
 
     public MainWizard() {
-        super(new Dimension(680, 530), "Let's BOMBERMANNING!!!");
+        super(new Dimension(660, 530), "Let's BOMBERMANNING!!!");
         this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
         this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
         this.addNextJPanel(new Panel3(this), "GAME_PANEL");

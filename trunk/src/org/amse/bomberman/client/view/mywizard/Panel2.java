@@ -3,8 +3,6 @@ package org.amse.bomberman.client.view.mywizard;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -56,8 +54,7 @@ public class Panel2 extends JPanel implements Updating{
         this.setVisible(true);
     }
     // !!!!!!!!!!!!!!!!!!!!  is it really need???
-    @Override
-    public MyWizard getParent() {
+    public MyWizard getWizard() {
         return parent;
     }
 
@@ -86,14 +83,6 @@ public class Panel2 extends JPanel implements Updating{
 
     public void getServerInfo() {
         try {
-            // HACK!!!--------------------------------------------------
-            refreshJButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    ((JButton) e.getComponent()).doClick();
-                }
-            });
-            //------------------------------------------------------------*/
             Controller.getInstance().requestGamesList();
             Controller.getInstance().requestMapsList();
         } catch (NetException ex) {
@@ -146,18 +135,13 @@ public class Panel2 extends JPanel implements Updating{
         IController control = Controller.getInstance();
         try {
             control.requestJoinGame(gameNumber);
-            //this.dispose();
             int maxPlayers = this.getSelectedMaxPl();
             if (maxPlayers != -1) {
-                //GameInfoJFrame jframe = new GameInfoJFrame(gameNumber, maxPlayers);
             } else {
                 JOptionPane.showMessageDialog(this, "You did't select the game! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }/* catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Can not join to the game: \n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }*/ catch (NetException ex2) {
+        } catch (NetException ex2) {
             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             parent.setCurrentJPanel(0);
@@ -179,7 +163,7 @@ public class Panel2 extends JPanel implements Updating{
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                getParent().setCurrentJPanel(0);
+                getWizard().setCurrentJPanel(0);
             }
         }
     }
