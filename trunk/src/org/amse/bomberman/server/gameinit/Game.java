@@ -29,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Game {
     private Chat                            chat;
+    private final List<Controller>          controllers;
     private final List<GameEndedListener>   gameEndedListeners;
     private final String                    gameName;
     private final List<GameStartedListener> gameStartedListeners;
@@ -36,7 +37,6 @@ public class Game {
     private final IModel                    model;
     private Controller                      owner;
     private final IServer                   server;
-    private final List<ISession>            sessions;
     private boolean                         started;
 
     public Game(IServer server, GameMap gameMap, String gameName,
@@ -55,7 +55,7 @@ public class Game {
         this.chat = new Chat(this.maxPlayers);
         this.model = new Model(gameMap, this);
         this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
-        this.sessions = new CopyOnWriteArrayList<ISession>();
+        this.controllers = new CopyOnWriteArrayList<Controller>();
         this.gameStartedListeners =
             new CopyOnWriteArrayList<GameStartedListener>();
         this.started = false;
@@ -80,12 +80,9 @@ public class Game {
         this.gameEndedListeners.add(gameEndedListener);
     }
 
-    public void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener){
+    public void addGameMapUpdateListener(
+            GameMapUpdateListener gameMapUpdateListener) {
         this.model.addGameMapUpdateListener(gameMapUpdateListener);
-    }
-
-    public void removeGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener){
-        this.model.removeGameMapUpdateListener(gameMapUpdateListener);
     }
 
     public void addGameStartedListener(
@@ -93,13 +90,14 @@ public class Game {
         this.gameStartedListeners.add(gameStartedListener);
     }
 
-    public void addMessageToChat(Player player, String message) {
-        this.chat.addMessage(player.getID(), player.getNickName(), message);
+    public void addMessageToChat(int playerID, String message) {
+        this.chat.addMessage(playerID, this.model.getPlayer(playerID).getNickName(),
+                             message);
     }
 
-    public boolean doMove(Controller controller, Direction direction) {
+    public boolean doMove(int playerID, Direction direction) {
         if (this.started) {
-            return model.tryDoMove(controller.getPlayer(), direction);
+            return model.tryDoMove(this.model.getPlayer(playerID), direction);
         }
 
         return false;
@@ -113,10 +111,15 @@ public class Game {
         this.server.removeGame(this);
     }
 
+    public List<Controller> getControllers() {
+        return controllers;
+    }
+
     public List<Player> getCurrentPlayers() {
         return Collections.unmodifiableList(this.model.getPlayersList());
     }
 
+    // maybe use instead of this getCurrentPlayers.size()?
     public int getCurrentPlayersNum() {
         return this.model.getCurrentPlayersNum();
     }
@@ -126,11 +129,11 @@ public class Game {
     }
 
     public int[][] getGameMapArray() {
-        return this.model.getGameMapArray();
+        return this.model.getGameMap().getField();
     }
 
     public String getGameMapName() {
-        return this.model.getGameMapName();
+        return this.model.getGameMap().getName();
     }
 
     public int getMaxPlayers() {
@@ -141,8 +144,8 @@ public class Game {
         return this.gameName;
     }
 
-    public List<String> getNewMessagesFromChat(Player player) {
-        return this.chat.getNewMessages(player.getID());
+    public List<String> getNewMessagesFromChat(int playerID) {
+        return this.chat.getNewMessages(playerID);
     }
 
     public Controller getOwner() {
@@ -151,10 +154,6 @@ public class Game {
 
     public Player getPlayer(int playerID) {
         return this.model.getPlayer(playerID);
-    }
-
-    public List<ISession> getSessions() {
-        return sessions;
     }
 
     public boolean isFull() {
@@ -166,22 +165,22 @@ public class Game {
         return this.started;
     }
 
-    public synchronized Player join(String name, Controller controller) {
-        Player player = null;
+    public synchronized int join(String name, Controller controller) {
+        int playerID = -1;
 
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
-            player = this.model.addPlayer(name);
-            this.sessions.add(controller.getSession());
-            this.chat.addPlayer(player.getID());
+            playerID = this.model.addPlayer(name);
+            this.controllers.add(controller);
+            this.chat.addPlayer(playerID);
         }
 
-        return player;
+        return playerID;
     }
 
     public void leaveFromGame(Controller controller) {
-        this.sessions.remove(controller.getSession());
-        this.model.removePlayer(controller.getPlayer().getID());
-        this.chat.removePlayer(controller.getPlayer().getID());
+        this.controllers.remove(controller);
+        this.model.removePlayer(controller.getID());
+        this.chat.removePlayer(controller.getID());
 
         if (controller == this.owner) {
             this.endGame();
@@ -193,14 +192,19 @@ public class Game {
         this.chat.removePlayer(bot.getID());
     }
 
-    public void removeGameStartedListener(GameStartedListener listener){
-        this.gameStartedListeners.remove(listener);
-    }
-
     public void removeGameEndedListener(GameEndedListener listener) {
         this.gameEndedListeners.remove(listener);
     }
-    
+
+    public void removeGameMapUpdateListener(
+            GameMapUpdateListener gameMapUpdateListener) {
+        this.model.removeGameMapUpdateListener(gameMapUpdateListener);
+    }
+
+    public void removeGameStartedListener(GameStartedListener listener) {
+        this.gameStartedListeners.remove(listener);
+    }
+
     public void setOwner(Controller owner) {
         this.owner = owner;
     }
@@ -220,9 +224,9 @@ public class Game {
             // Here model must change gameMap to support current num of players
             // and then give coordinates to Players.
             this.model.startup();
-            //this.chat.clear();
-            //this.chat = new Chat(this.model.getCurrentPlayersNum());
 
+            // this.chat.clear();
+            // this.chat = new Chat(this.model.getCurrentPlayersNum());
             // here we notifying all about start of game
             for (GameStartedListener gameStartedListener : gameStartedListeners) {
                 gameStartedListener.started();

@@ -30,7 +30,7 @@ public interface IModel {
 
     void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener);
 
-    Player addPlayer(String name);
+    int addPlayer(String name);
 
     void bombDetonated(Bomb bomb);
 
@@ -74,7 +74,7 @@ public interface IModel {
     void removePlayer(int playerID);
 
     void startup();
-    
+
     boolean tryDoMove(MoveableObject objectToMove, Direction direction);
 
     boolean tryPlaceBomb(Player player);

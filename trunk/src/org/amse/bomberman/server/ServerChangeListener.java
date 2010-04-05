@@ -5,6 +5,8 @@
 
 package org.amse.bomberman.server;
 
+import org.amse.bomberman.server.net.IServer;
+
 /**
  *
  * @author Kirilchuk V.E
@@ -13,6 +15,5 @@ public interface ServerChangeListener {
 
     void addedToLog(String line);
 
-    void switchedState(boolean started);
-    
+    void changed(IServer server);
 }
