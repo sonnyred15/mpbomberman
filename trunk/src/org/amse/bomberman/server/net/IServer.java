@@ -21,21 +21,6 @@ public interface IServer {
 
     void shutdown() throws IOException, IllegalStateException;
 
-    @Deprecated
-    void notifyAllClients(String message);
-
-    @Deprecated
-    void notifyAllClients(List<String> messages);
-
-    @Deprecated
-    void notifyAllClientsExceptOne(List<String> messages, ISession sessionToIgnore);
-
-    @Deprecated
-    void notifySomeClients(List<ISession> sessions, List<String> messages);
-
-    @Deprecated
-    void notifySomeClients(List<ISession> sessions, String message);
-
     int addGame(Game game);
 
     void removeGame(Game game);

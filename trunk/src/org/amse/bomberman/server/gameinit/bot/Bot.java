@@ -41,30 +41,31 @@ public class Bot extends Player
     }
 
     private class BotRun implements Runnable {
-        Bot parent;
+        Bot bot;
 
         public BotRun(Bot parent) {
-            this.parent = parent;
+            this.bot = parent;
         }
 
         public void run() {
             while (isAlive() && !gameEnded) {
                 try {
-                    IAction action = strategy.thinkAction(this.parent, model);
+                    IAction action = strategy.thinkAction(this.bot, model);
 
-                    action.executeAction(model);
+                    action.executeAction(game);
                     Thread.sleep(Bot.BOT_STEP_DELAY+random.nextInt(100));
                 } catch (InterruptedException ex) {
                     System.out.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
                 } catch (UnsupportedOperationException ex) {
-
-                    // System.out.println("Bot can not find the way to the target Pair.");
-                    // System.out.println("Bot dreamed new target.");
+                    ex.printStackTrace();
                 }
             }
 
             System.out.println("Bot: removed from game(Game ended or he died)");
-            game.removeBotFromGame(parent);
+            
+            game.removeGameStartedListener(this.bot);
+            game.removeGameEndedListener(this.bot);
+            game.removeBotFromGame(this.bot);
         }
     }
 }

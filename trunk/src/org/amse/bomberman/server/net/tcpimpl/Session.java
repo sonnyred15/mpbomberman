@@ -9,10 +9,8 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.control.Controller;
-import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ILog;
@@ -20,18 +18,10 @@ import org.amse.bomberman.util.Stringalize;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 import java.util.List;
 
@@ -39,22 +29,29 @@ import java.util.List;
  *
  * @author Kirilchuk V.E
  */
-public class Session extends Thread implements ISession {
-    protected ILog log = null;    // it can be null. So use writeToLog() instead of log.println()
-    protected final MyTimer    timer = new MyTimer(System.currentTimeMillis());
-    protected final Socket     clientSocket;
+public class Session extends AbstractSession implements ISession {
+    private final MyTimer      timer = new MyTimer(System.currentTimeMillis());
     protected final Controller controller;
-    protected final IServer    server;
-    protected final int        sessionID;
 
     public Session(Server server, Socket clientSocket, int sessionID,
                    ILog log) {
-        this.setDaemon(true);
-        this.server = server;
-        this.clientSocket = clientSocket;
-        this.sessionID = sessionID;
-        this.log = log;
+        super(server, clientSocket, sessionID, log);
         this.controller = new Controller(server, this);
+    }
+
+    public void interruptSession() throws SecurityException {
+        this.interrupt();
+
+        try {
+            this.clientSocket.close();
+        } catch (IOException ex) {
+            writeToLog("Session: interruptSession error. " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void notifyClient(String message) {
+        ;    // do nothing in this realization
     }
 
     protected void addBot(String[] queryArgs) {    // migrating version need remove case 3
@@ -198,177 +195,6 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void answerOnCommand(String query) {
-        writeToLog("Session: query received. query=" + query);
-
-        if (query.length() == 0) {
-            sendAnswer("Empty query. Error on client side.");
-            writeToLog("Session: answerOnCommand warning. " +
-                       "Empty query received. Error on client side.");
-
-            return;
-        }
-
-        Command  cmd = null;
-        String[] queryArgs = query.split(" ");
-
-        try {
-            int command = Integer.parseInt(queryArgs[0]);
-
-            cmd = Command.fromInt(command);    // throws IllegalArgumentException
-        } catch (NumberFormatException ex) {
-            sendAnswer("Wrong query.");
-            writeToLog("Session: answerOnCommand error. " +
-                       "Wrong first part of query. " +
-                       "Wrong query from client. " + ex.getMessage());
-
-            return;
-        } catch (IllegalArgumentException ex) {
-            sendAnswer("Wrong query. Not supported command.");
-            writeToLog("Session: answerOnCommand error. " +
-                       "Non supported command int from client. " +
-                       ex.getMessage());
-
-            return;
-        }
-
-        switch (cmd) {
-            case GET_GAMES : {
-
-                // "0"
-                sendGames();
-
-                break;
-            }
-
-            case CREATE_GAME : {
-
-                // "1 gameName mapName maxPlayers playerName" or just "1" for defaults
-                createGame(queryArgs);
-
-                break;
-            }
-
-            case JOIN_GAME : {
-
-                // "2 gameID botName"
-                joinGame(queryArgs);
-
-                break;
-            }
-
-            case DO_MOVE : {
-
-                // "3 direction"
-                doMove(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_MAP_INFO : {
-
-                // "4"
-                sendGameMapArray();
-
-                break;
-            }
-
-            case START_GAME : {
-
-                // "5"
-                startGame();
-
-                break;
-            }
-
-            case LEAVE_GAME : {
-
-                // "6"
-                leaveGame();
-
-                break;
-            }
-
-            case PLACE_BOMB : {
-
-                // "7"
-                placeBomb();
-
-                break;
-            }
-
-            case DOWNLOAD_GAME_MAP : {
-
-                // "8 mapName"
-                sendDownloadingGameMap(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_STATUS : {
-
-                // "9"
-                sendGameStatus();
-
-                break;
-            }
-
-            case GET_GAME_MAPS_LIST : {
-
-                // "10"
-                sendGameMapsList();
-
-                break;
-            }
-
-            case ADD_BOT_TO_GAME : {
-
-                // "11 gameID botName"
-                addBot(queryArgs);
-
-                break;
-            }
-
-            case GET_MY_GAME_INFO : {
-
-                // "12"
-                sendGameInfo();
-
-                break;    // TODO
-            }
-
-            case CHAT_ADD_MSG : {
-
-                // "13 message"
-                addMessageToChat(queryArgs);
-
-                break;    // TODO
-            }
-
-            case CHAT_GET_NEW_MSGS : {
-
-                // "14"
-                getNewMessagesFromChat();
-
-                break;    // TODO
-            }
-
-            case GET_GAME_MAP_INFO2 : {
-
-                // "15"
-                sendGameMapArray2();
-
-                break;
-            }
-
-            default : {
-                sendAnswer("Unrecognized command!");
-                writeToLog("Session: answerOnCommand error." +
-                           " Getted unrecognized command.");
-            }
-        }
-    }
-
     protected void createGame(String[] queryArgs) {
 
         // Example queryArgs = "1" "gameName" "mapName" "maxpl" "playerName"
@@ -490,24 +316,12 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    private boolean filtred(String message) {
-
-//      if (message.startsWith("Session")) {
-//          return true;
-//      }
-        return false;
-    }
-
-    protected void freeResources() throws IOException {
+    protected void freeResources() {
         if (this.controller != null) {
-            this.controller.leaveGame();
+            this.controller.tryLeaveGame();
         }
 
         this.server.sessionTerminated(this);
-    }
-
-    public void gameMapChanged() {
-        ;    // do nothing in current implementation
     }
 
     protected void getNewMessagesFromChat() {
@@ -526,16 +340,6 @@ public class Session extends Thread implements ISession {
                        "Not joined to any game.");
 
             return;
-        }
-    }
-
-    public void interruptSession() throws SecurityException {
-        this.interrupt();
-
-        try {
-            this.clientSocket.close();
-        } catch (IOException ex) {
-            writeToLog("Session: interruptSession error. " + ex.getMessage());
         }
     }
 
@@ -634,7 +438,7 @@ public class Session extends Thread implements ISession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            this.controller.leaveGame();
+            this.controller.tryLeaveGame();
             sendAnswer("Disconnected.");
             writeToLog("Session: player has been disconnected from the game.");
 
@@ -647,18 +451,6 @@ public class Session extends Thread implements ISession {
 
             return;
         }
-    }
-
-    public void notifyClientAboutGameDisconnect() {
-        ;    // do nothing in current realization
-    }
-
-    public void notifyClientAboutGameMapChange() {
-        ;    // do nothing in current realization
-    }
-
-    public void notifyClientAboutGameStart() {
-        ;    // do nothing in current realization
     }
 
     protected void placeBomb() {
@@ -686,131 +478,6 @@ public class Session extends Thread implements ISession {
                        "Canceled. Not joined to any game.");
 
             return;
-        }
-    }
-
-    @Override
-    public void run() {
-        BufferedReader in = null;
-
-        try {
-            this.clientSocket.setSoTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);    // throws SocketException
-        } catch (SocketException ex) {
-            writeToLog("Session: exception in run method. " + ex.getMessage());    // Error in the underlaying TCP protocol.
-        }
-
-        writeToLog("Session: waiting query from client...");
-
-        try {
-            InputStream       is = this.clientSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-
-            in = new BufferedReader(isr);
-
-            String clientQueryLine;
-
-            while (!Thread.interrupted()) {
-                try {
-                    clientQueryLine = in.readLine();    // throws IOException
-
-                    if (clientQueryLine == null) {
-                        break;
-                    }
-
-                    answerOnCommand(clientQueryLine);
-                } catch (SocketTimeoutException ex) {    // if client not responsable
-                    writeToLog("Session: terminated by socket timeout. " +
-                               ex.getMessage());
-
-                    break;
-                }
-            }
-        } catch (IOException ex) {    // IOException in in.readLine()
-            writeToLog("Session: run error. " + ex.getMessage());
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();    // throws IOException
-                }
-            } catch (IOException ex) {
-                writeToLog("Session: run error. " + ex.getMessage());
-            }
-
-            try {
-                writeToLog("Session: freeing resources.");
-                freeResources();
-                writeToLog("Session: ended.");
-            } catch (IOException ex) {
-                writeToLog("Session: run error. While closing client socket. " +
-                           ex.getMessage());
-            }
-
-            try {
-                if (this.log != null) {
-                    this.log.close();    // throws IOException
-                    this.log = null;
-                }
-            } catch (IOException ex) {
-
-                // can`t close log stream. Log wont be saved
-                System.out.println("Session: run error. Can`t close log stream. " +
-                                   "Log won`t be saved. " + ex.getMessage());
-            }
-        }
-    }
-
-    public void sendAnswer(String shortAnswer) {
-        BufferedWriter out = null;
-
-        try {
-            OutputStream       os = this.clientSocket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-
-            out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
-            out.write(shortAnswer);
-            out.newLine();
-            out.write("");
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Send strings from linesToSend to client.
-     * @param linesToSend lines to send.
-     */
-    public void sendAnswer(List<String> linesToSend)
-                                    throws IllegalArgumentException {
-        BufferedWriter out = null;
-
-        try {
-            OutputStream os = this.clientSocket.getOutputStream();    // throws IOException
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-
-            out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
-
-            if ((linesToSend == null) || (linesToSend.size() == 0)) {
-                writeToLog("Session: sendAnswer error. Realization error." +
-                           " Tryed to send 0 strings to client.");
-
-                throw new IllegalArgumentException("Session sendAnswer method must send" +
-                                                   " at least one string to client.");
-            } else {
-                for (String string : linesToSend) {
-                    out.write(string);
-                    out.newLine();
-                }
-            }
-
-            out.write("");
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
         }
     }
 
@@ -880,28 +547,6 @@ public class Session extends Thread implements ISession {
             List<String> linesToSend =
                 Stringalize.mapExplPlayerInfo(game,
                                               this.controller.getPlayer());
-
-            sendAnswer(linesToSend);
-            writeToLog("Session: sended mapArray+explosions+playerInfo" +
-                       " to client.");
-
-            return;
-        } else {
-            sendAnswer("Not joined to any game.");
-            writeToLog("Session: sendMapArray warning. " +
-                       "Canceled. Not joined to any game.");
-
-            return;
-        }
-    }
-
-    private void sendGameMapArray2() {
-        Game game = this.controller.getMyGame();
-
-        if (game != null) {
-            List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo2(game,
-                                               this.controller.getPlayer());
 
             sendAnswer(linesToSend);
             writeToLog("Session: sended mapArray+explosions+playerInfo" +
@@ -1010,13 +655,29 @@ public class Session extends Thread implements ISession {
         }
     }
 
-    protected void writeToLog(String message) {
-        if ((this.log != null) &&!filtred(message)) {
-            this.log.println(message + "(sessionID=" + sessionID + ")");
+    protected void sendGameMapArray2() {
+        Game game = this.controller.getMyGame();
+
+        if (game != null) {
+            List<String> linesToSend =
+                Stringalize.mapExplPlayerInfo2(game,
+                                               this.controller.getPlayer());
+
+            sendAnswer(linesToSend);
+            writeToLog("Session: sended mapArray+explosions+playerInfo" +
+                       " to client.");
+
+            return;
+        } else {
+            sendAnswer("Not joined to any game.");
+            writeToLog("Session: sendMapArray warning. " +
+                       "Canceled. Not joined to any game.");
+
+            return;
         }
     }
 
-    protected class MyTimer {
+    private class MyTimer {
         private long startTime;
 
         public MyTimer(long startTime) {

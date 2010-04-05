@@ -5,6 +5,8 @@
 
 package org.amse.bomberman.server.gameinit;
 
+import org.amse.bomberman.util.Pair;
+
 /**
  *
  * @author Kirilchuk V.E

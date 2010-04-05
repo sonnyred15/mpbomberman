@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
@@ -16,6 +17,8 @@ import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Pair;
+import org.amse.bomberman.util.ProtocolConstants;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -41,6 +44,8 @@ public class Game {
 
     public Game(IServer server, GameMap gameMap, String gameName,
                 int maxPlayers) {
+
+        // initialization
         this.server = server;
         this.gameName = gameName;
 
@@ -59,6 +64,10 @@ public class Game {
         this.gameStartedListeners =
             new CopyOnWriteArrayList<GameStartedListener>();
         this.started = false;
+
+        // additional stuff
+        this.server.addGame(this);
+        this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     public synchronized Player addBot(String name, Controller controller) {
@@ -71,6 +80,9 @@ public class Game {
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
             bot = this.model.addBot(name);
             this.gameStartedListeners.add((GameStartedListener) bot);
+            this.gameEndedListeners.add((GameEndedListener) bot);
+            this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
         }
 
         return bot;
@@ -80,35 +92,30 @@ public class Game {
         this.gameEndedListeners.add(gameEndedListener);
     }
 
-    public void addGameMapUpdateListener(
-            GameMapUpdateListener gameMapUpdateListener) {
-        this.model.addGameMapUpdateListener(gameMapUpdateListener);
-    }
-
     public void addGameStartedListener(
             GameStartedListener gameStartedListener) {
         this.gameStartedListeners.add(gameStartedListener);
     }
 
     public void addMessageToChat(int playerID, String message) {
-        this.chat.addMessage(playerID, this.model.getPlayer(playerID).getNickName(),
+        this.chat.addMessage(playerID,
+                             this.model.getPlayer(playerID).getNickName(),
                              message);
+        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
     }
 
     public boolean doMove(int playerID, Direction direction) {
+        boolean moved = false;
+
         if (this.started) {
-            return model.tryDoMove(this.model.getPlayer(playerID), direction);
+            moved = model.tryDoMove(this.model.getPlayer(playerID), direction);
+
+            if (moved) {
+                notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+            }
         }
 
-        return false;
-    }
-
-    private void endGame() {
-        for (GameEndedListener gameEndedListener : gameEndedListeners) {
-            gameEndedListener.gameEnded();
-        }
-
-        this.server.removeGame(this);
+        return moved;
     }
 
     public List<Controller> getControllers() {
@@ -172,6 +179,10 @@ public class Game {
             playerID = this.model.addPlayer(name);
             this.controllers.add(controller);
             this.chat.addPlayer(playerID);
+
+            // notifying clients
+            this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
         }
 
         return playerID;
@@ -179,15 +190,29 @@ public class Game {
 
     public void leaveFromGame(Controller controller) {
         this.controllers.remove(controller);
-        this.model.removePlayer(controller.getID());
+        this.model.removePlayer(controller.getID());    // this will call notify about gameMap change
         this.chat.removePlayer(controller.getID());
 
+        if (!this.started) {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+        } else {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+        }
+
         if (controller == this.owner) {
-            this.endGame();
+            this.terminateGame();    // will call notify if need
         }
     }
 
-    public void removeBotFromGame(Player bot) {
+    public void removeBotFromGame(Bot bot) {
+        if (!this.started) {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+        } else {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+        }
+
         this.model.removePlayer(bot.getID());
         this.chat.removePlayer(bot.getID());
     }
@@ -196,11 +221,10 @@ public class Game {
         this.gameEndedListeners.remove(listener);
     }
 
-    public void removeGameMapUpdateListener(
-            GameMapUpdateListener gameMapUpdateListener) {
-        this.model.removeGameMapUpdateListener(gameMapUpdateListener);
-    }
-
+//  public void removeGameMapUpdateListener(
+//          GameMapUpdateListener gameMapUpdateListener) {
+//      this.model.removeGameMapUpdateListener(gameMapUpdateListener);
+//  }
     public void removeGameStartedListener(GameStartedListener listener) {
         this.gameStartedListeners.remove(listener);
     }
@@ -209,12 +233,18 @@ public class Game {
         this.owner = owner;
     }
 
-    public boolean tryPlaceBomb(Controller controller) {
+    public boolean tryPlaceBomb(int playerID) {
+        boolean placed = false;
+
         if (this.started) {
-            return this.model.tryPlaceBomb(controller.getPlayer());
+            placed = this.model.tryPlaceBomb(this.model.getPlayer(playerID));
+
+            if (placed) {
+                notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+            }
         }
 
-        return false;
+        return placed;
     }
 
     public boolean tryStartGame(Controller controller) {
@@ -227,7 +257,7 @@ public class Game {
 
             // this.chat.clear();
             // this.chat = new Chat(this.model.getCurrentPlayersNum());
-            // here we notifying all about start of game
+            notifyGameSessions(ProtocolConstants.MESSAGE_GAME_START);
             for (GameStartedListener gameStartedListener : gameStartedListeners) {
                 gameStartedListener.started();
             }
@@ -236,5 +266,33 @@ public class Game {
         }
 
         return false;
+    }
+
+    public void notifyAllSessions(String message) {
+        List<ISession> sessions = this.server.getSessions();
+
+        for (ISession iSession : sessions) {
+            iSession.notifyClient(message);
+        }
+    }
+
+    public void notifyGameSessions(String message) {
+        for (Controller controller : controllers) {
+            controller.getSession().notifyClient(message);
+        }
+    }
+
+    private void terminateGame() {
+        for (GameEndedListener gameEndedListener : gameEndedListeners) {
+            gameEndedListener.gameEnded();
+        }
+
+        this.server.removeGame(this);
+
+        if (!this.started) {
+            notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        }
+
+        notifyGameSessions(ProtocolConstants.MESSAGE_GAME_KICK);
     }
 }
