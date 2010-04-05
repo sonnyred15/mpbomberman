@@ -8,12 +8,9 @@ package org.amse.bomberman.server.net.tcpimpl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
-import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ILog;
@@ -22,18 +19,10 @@ import org.amse.bomberman.util.Stringalize;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,22 +31,29 @@ import java.util.List;
  *
  * @author Kirilchuk V.E.
  */
-public class AsynchroSession extends Thread implements ISession {
-    protected ILog log = null;    // it can be null. So use writeToLog() instead of log.println()
-    protected final MyTimer    timer = new MyTimer(System.currentTimeMillis());
-    protected final Socket     clientSocket;
+public class AsynchroSession extends AbstractSession {
+    private final MyTimer      timer = new MyTimer(System.currentTimeMillis());
     protected final Controller controller;
-    protected final IServer    server;
-    protected final int        sessionID;
 
     public AsynchroSession(Server server, Socket clientSocket, int sessionID,
                            ILog log) {
-        this.setDaemon(true);
-        this.server = server;
-        this.clientSocket = clientSocket;
-        this.sessionID = sessionID;
-        this.log = log;
+        super(server, clientSocket, sessionID, log);
         this.controller = new Controller(server, this);
+    }
+
+    public void interruptSession() throws SecurityException {
+        this.interrupt();
+
+        try {
+            this.clientSocket.close();
+        } catch (IOException ex) {
+            writeToLog("Session: interruptSession error. " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void notifyClient(String message) {
+        this.sendAnswer(message);
     }
 
     protected void addBot(String[] queryArgs) {
@@ -131,8 +127,6 @@ public class AsynchroSession extends Thread implements ISession {
                 sendAnswer(messages);
                 writeToLog("Session: added bot to game." +
                            controller.getMyGame().getName());
-                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
-                this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
 
                 return;
             }
@@ -164,7 +158,6 @@ public class AsynchroSession extends Thread implements ISession {
                 }
 
                 this.controller.addMessageToChat(chatMessage.toString());
-                this.notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
                 writeToLog("Session: client added message to game chat. message=" +
                            queryArgs[1]);
 
@@ -184,177 +177,6 @@ public class AsynchroSession extends Thread implements ISession {
             writeToLog("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
 
             return;
-        }
-    }
-
-    protected void answerOnCommand(String query) {
-        writeToLog("Session: query received. query=" + query);
-
-        if (query.length() == 0) {    // TODO is it really can happen???
-            sendAnswer("Empty query. Error on client side.");
-            writeToLog("Session: answerOnCommand warning. " +
-                       "Empty query received. Error on client side.");
-
-            return;
-        }
-
-        Command  cmd = null;
-        String[] queryArgs = query.split(" ");
-
-        try {
-            int command = Integer.parseInt(queryArgs[0]);
-
-            cmd = Command.fromInt(command);    // throws IllegalArgumentException
-        } catch (NumberFormatException ex) {
-            sendAnswer("Wrong query.");
-            writeToLog("Session: answerOnCommand error. " +
-                       "Wrong first part of query. " +
-                       "Wrong query from client. " + ex.getMessage());
-
-            return;
-        } catch (IllegalArgumentException ex) {
-            sendAnswer("Wrong query. Not supported command.");
-            writeToLog("Session: answerOnCommand error. " +
-                       "Non supported command int from client. " +
-                       ex.getMessage());
-
-            return;
-        }
-
-        switch (cmd) {
-            case GET_GAMES : {
-
-                // "0"
-                sendGames();
-
-                break;
-            }
-
-            case CREATE_GAME : {
-
-                // "1 gameName mapName maxPlayers" or just "1" for defaults
-                createGame(queryArgs);
-
-                break;
-            }
-
-            case JOIN_GAME : {
-
-                // "2 gameID botName"
-                joinGame(queryArgs);
-
-                break;
-            }
-
-            case DO_MOVE : {
-
-                // "3 direction"
-                doMove(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_MAP_INFO : {
-
-                // "4"
-                sendGameMapArray();
-
-                break;
-            }
-
-            case START_GAME : {
-
-                // "5"
-                startGame();
-
-                break;
-            }
-
-            case LEAVE_GAME : {
-
-                // "6"
-                leaveGame();
-
-                break;
-            }
-
-            case PLACE_BOMB : {
-
-                // "7"
-                placeBomb();
-
-                break;
-            }
-
-            case DOWNLOAD_GAME_MAP : {
-
-                // "8 mapName"
-                sendDownloadingGameMap(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_STATUS : {
-
-                // "9"
-                sendGameStatus();
-
-                break;
-            }
-
-            case GET_GAME_MAPS_LIST : {
-
-                // "10"
-                sendGameMapsList();
-
-                break;
-            }
-
-            case ADD_BOT_TO_GAME : {
-
-                // "11 gameID botName"
-                addBot(queryArgs);
-
-                break;
-            }
-
-            case GET_MY_GAME_INFO : {
-
-                // "12"
-                sendGameInfo();
-
-                break;    // TODO
-            }
-
-            case CHAT_ADD_MSG : {
-
-                // "13 message"
-                addMessageToChat(queryArgs);
-
-                break;    // TODO
-            }
-
-            case CHAT_GET_NEW_MSGS : {
-
-                // "14"
-                getNewMessagesFromChat();
-
-                break;    // TODO
-            }
-
-            case GET_GAME_MAP_INFO2 : {
-
-                // "15"
-                sendGameMapArray2();
-
-                break;
-            }
-
-            default : {
-                sendAnswer("Unrecognized command!");
-                writeToLog("Session: answerOnCommand error." +
-                           " Getted unrecognized command.");
-            }
         }
     }
 
@@ -408,13 +230,6 @@ public class AsynchroSession extends Thread implements ISession {
                                           playerName);
             messages.add("Game created.");
             sendAnswer(messages);
-
-            // notifying others
-            messages.clear();
-            messages.add(ProtocolConstants.UPDATE_GAMES_LIST);
-            this.server.notifyAllClients(messages);
-            writeToLog("Session: client created game." + " Map=" + mapName +
-                       " gameName=" + gameName + " maxPlayers=" + maxPlayers);
 
             return;
         } catch (FileNotFoundException ex) {
@@ -502,17 +317,9 @@ public class AsynchroSession extends Thread implements ISession {
         }
     }
 
-    private boolean filtred(String message) {
-
-//      if (message.startsWith("Session")) {
-//          return true;
-//      }
-        return false;
-    }
-
-    protected void freeResources() throws IOException {
+    protected void freeResources() {
         if (this.controller != null) {
-            this.controller.leaveGame();
+            this.controller.tryLeaveGame();
         }
 
         this.server.sessionTerminated(this);
@@ -538,16 +345,6 @@ public class AsynchroSession extends Thread implements ISession {
             writeToLog("Session: getNewMessagesFromChat warning. Client tryed to get messages, canceled. Not joined to any game.");
 
             return;
-        }
-    }
-
-    public void interruptSession() throws SecurityException {
-        this.interrupt();
-
-        try {
-            this.clientSocket.close();
-        } catch (IOException ex) {
-            writeToLog("Session: interruptSession error. " + ex.getMessage());
         }
     }
 
@@ -633,8 +430,6 @@ public class AsynchroSession extends Thread implements ISession {
             case Controller.RESULT_SUCCESS : {
                 messages.add("Joined.");
                 sendAnswer(messages);
-                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
-                this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
                 writeToLog("Session: client joined to game." + " GameID=" +
                            gameID + " Player=" + playerName);
 
@@ -651,20 +446,9 @@ public class AsynchroSession extends Thread implements ISession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            this.controller.leaveGame();
+            this.controller.tryLeaveGame();
             messages.add("Disconnected.");
             sendAnswer(messages);
-
-            List<Controller> controllers = game.getControllers();
-            List<ISession>   toNotify = new ArrayList();
-
-            for (Controller controller : controllers) {
-                toNotify.add(controller.getSession());
-            }
-
-            toNotify.remove(this);
-            this.server.notifySomeClients(toNotify,
-                                          ProtocolConstants.UPDATE_GAME_INFO);
             writeToLog("Session: player has been disconnected from the game." +
                        " gameName=" + game.getName());
 
@@ -676,49 +460,6 @@ public class AsynchroSession extends Thread implements ISession {
 
             return;
         }
-    }
-
-    private void notifyAllSessions(String message) {
-        this.server.notifyAllClients(message);
-    }
-
-    public void notifyClientAboutGameDisconnect() {
-        List<String> message = new ArrayList<String>(2);
-
-        message.add(ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
-        message.add("Disconnected.");
-        this.sendAnswer(message);
-    }
-
-    public void notifyClientAboutGameMapChange() {
-        this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
-    }
-
-    public void notifyClientAboutGameStart() {
-        List<String> message = new ArrayList<String>(2);
-
-        message.add(ProtocolConstants.CAPTION_START_GAME_INFO);
-        message.add("Game started.");
-
-        List<Controller> cntrls = this.controller.getMyGame().getControllers();
-        List<ISession>   sessions = new ArrayList<ISession>();
-
-        for (Controller control : cntrls) {
-            sessions.add(control.getSession());
-        }
-
-        this.server.notifySomeClients(sessions, message);
-    }
-
-    private void notifyGameSessions(String message) {
-        List<Controller> cntrls = this.controller.getMyGame().getControllers();
-        List<ISession>   sessions = new ArrayList<ISession>();
-
-        for (Controller control : cntrls) {
-            sessions.add(control.getSession());
-        }
-
-        this.server.notifySomeClients(sessions, message);
     }
 
     protected void placeBomb() {
@@ -751,127 +492,6 @@ public class AsynchroSession extends Thread implements ISession {
             writeToLog("Session: place bomb warning. Canceled. Not joined to any game.");
 
             return;
-        }
-    }
-
-    @Override
-    public void run() {
-        BufferedReader in = null;
-
-        try {
-            this.clientSocket.setSoTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);    // throws SocketException
-        } catch (SocketException ex) {
-            writeToLog("Session: exception in run method. " + ex.getMessage());    // Error in the underlaying TCP protocol.
-        }
-
-        writeToLog("Session: waiting query from client...");
-
-        try {
-            InputStream       is = this.clientSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-
-            in = new BufferedReader(isr);
-
-            String clientQueryLine;
-
-            while (!Thread.interrupted()) {
-                try {
-                    clientQueryLine = in.readLine();    // throws IOException
-
-                    if (clientQueryLine == null) {
-                        break;
-                    }
-
-                    answerOnCommand(clientQueryLine);
-                } catch (SocketTimeoutException ex) {    // if client not responsable
-                    writeToLog("Session: terminated by socket timeout. " +
-                               ex.getMessage());
-
-                    break;
-                }
-            }
-        } catch (IOException ex) {    // IOException in in.readLine()
-            writeToLog("Session: run error. " + ex.getMessage());
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();    // throws IOException
-                }
-            } catch (IOException ex) {
-                writeToLog("Session: run error. " + ex.getMessage());
-            }
-
-            try {
-                writeToLog("Session: freeing resources.");
-                freeResources();
-                writeToLog("Session: ended.");
-            } catch (IOException ex) {
-                writeToLog("Session: run error. While closing client socket. " +
-                           ex.getMessage());
-            }
-
-            try {
-                if (this.log != null) {
-                    this.log.close();    // throws IOException
-                    this.log = null;
-                }
-            } catch (IOException ex) {
-
-                // can`t close log stream. Log wont be saved
-                System.out.println("Session: run error. Can`t close log stream. " +
-                                   "Log won`t be saved. " + ex.getMessage());
-            }
-        }
-    }
-
-    public void sendAnswer(List<String> linesToSend)
-                                    throws IllegalArgumentException {
-        BufferedWriter out = null;
-
-        try {
-            OutputStream os = this.clientSocket.getOutputStream();    // throws IOException
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-
-            out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
-
-            if ((linesToSend == null) || (linesToSend.size() == 0)) {
-                writeToLog("Session: sendAnswer error. Realization error." +
-                           " Tryed to send 0 strings to client.");
-
-                throw new IllegalArgumentException("Session sendAnswer method must send" +
-                                                   " at least one string to client.");
-            } else {
-                for (String string : linesToSend) {
-                    out.write(string);
-                    out.newLine();
-                }
-            }
-
-            out.write("");
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
-        }
-    }
-
-    public void sendAnswer(String shortAnswer) {
-        BufferedWriter out = null;
-
-        try {
-            OutputStream       os = this.clientSocket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-
-            out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
-            out.write(shortAnswer);
-            out.newLine();
-            out.write("");
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
         }
     }
 
@@ -970,32 +590,6 @@ public class AsynchroSession extends Thread implements ISession {
         }
     }
 
-    private void sendGameMapArray2() {
-        List<String> messages = new ArrayList<String>();
-
-        messages.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
-
-        Game game = this.controller.getMyGame();
-
-        if (game != null) {
-            List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo2(game,
-                                               this.controller.getPlayer());
-
-            messages.addAll(linesToSend);
-            sendAnswer(messages);
-            writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
-
-            return;
-        } else {
-            messages.add("Not joined to any game.");
-            sendAnswer(messages);
-            writeToLog("Session: sendMapArray warning. Canceled. Not joined to any game.");
-
-            return;
-        }
-    }
-
     protected void sendGameMapsList() {
         List<String> messages = Stringalize.gameMapsList();
 
@@ -1072,11 +666,11 @@ public class AsynchroSession extends Thread implements ISession {
                 boolean success = this.controller.tryStartGame();
 
                 if (success) {
-                    messages.add("Game started.");
-                    sendAnswer(messages);
-                    writeToLog("Session: started game. " + "(gameName=" +
-                               this.controller.getMyGame().getName() + ")");
 
+//                  messages.add("Game started.");
+//                  sendAnswer(messages);
+//                  writeToLog("Session: started game. " + "(gameName=" +
+//                             this.controller.getMyGame().getName() + ")");
                     return;
                 } else {
                     messages.add("Not owner of game.");
@@ -1106,13 +700,33 @@ public class AsynchroSession extends Thread implements ISession {
         }
     }
 
-    protected void writeToLog(String message) {
-        if ((this.log != null) &&!filtred(message)) {
-            this.log.println(message + "(sessionID=" + sessionID + ")");
+    protected void sendGameMapArray2() {
+        List<String> messages = new ArrayList<String>();
+
+        messages.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
+
+        Game game = this.controller.getMyGame();
+
+        if (game != null) {
+            List<String> linesToSend =
+                Stringalize.mapExplPlayerInfo2(game,
+                                               this.controller.getPlayer());
+
+            messages.addAll(linesToSend);
+            sendAnswer(messages);
+            writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
+
+            return;
+        } else {
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: sendMapArray warning. Canceled. Not joined to any game.");
+
+            return;
         }
     }
 
-    protected class MyTimer {
+    private class MyTimer {
         private long startTime;
 
         public MyTimer(long startTime) {

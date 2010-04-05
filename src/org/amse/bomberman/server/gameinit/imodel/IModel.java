@@ -10,7 +10,7 @@ package org.amse.bomberman.server.gameinit.imodel;
 import org.amse.bomberman.server.gameinit.Bomb;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.MoveableObject;
-import org.amse.bomberman.server.gameinit.Pair;
+import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
 import org.amse.bomberman.util.Constants.Direction;
@@ -28,7 +28,7 @@ public interface IModel {
 
     void addExplosions(List<Pair> explosions);
 
-    void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener);
+    //void addGameMapUpdateListener(GameMapUpdateListener gameMapUpdateListener);
 
     int addPlayer(String name);
 
@@ -54,7 +54,7 @@ public interface IModel {
 
     boolean isExplosion(Pair pair);
 
-    void notifyGameMapUpdateListeners();
+    //void notifyGameMapUpdateListeners();
 
     void playerBombed(Player atacker, int victimID);
 
@@ -68,8 +68,8 @@ public interface IModel {
 
     void removeExplosions(List<Pair> explosions);
 
-    void removeGameMapUpdateListener(
-            GameMapUpdateListener gameMapUpdateListener);
+//    void removeGameMapUpdateListener(
+//            GameMapUpdateListener gameMapUpdateListener);
 
     void removePlayer(int playerID);
 

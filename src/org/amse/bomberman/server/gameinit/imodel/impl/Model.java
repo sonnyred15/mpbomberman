@@ -12,7 +12,7 @@ import org.amse.bomberman.server.gameinit.DieListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.MoveableObject;
-import org.amse.bomberman.server.gameinit.Pair;
+import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameinit.Player;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.bot.RandomFullBotStrategy;
@@ -26,6 +26,7 @@ import org.amse.bomberman.util.Constants.Direction;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  * Model that is responsable for game rules and responsable for connection
@@ -39,7 +40,7 @@ public class Model implements IModel {
     private final List<Integer>               freeIDs;
     private final Game                        game;
     private final GameMap                     gameMap;
-    private final List<GameMapUpdateListener> gameMapUpdateListeners;
+//    private final List<GameMapUpdateListener> gameMapUpdateListeners;
     private final List<Player>                players;
 
     /**
@@ -59,8 +60,8 @@ public class Model implements IModel {
             freeIDArray[i] = i + 1;
         }
 
-        this.gameMapUpdateListeners =
-            new CopyOnWriteArrayList<GameMapUpdateListener>();
+//        this.gameMapUpdateListeners =
+//            new CopyOnWriteArrayList<GameMapUpdateListener>();
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
         this.dieListener = new DieListener(this);
@@ -80,13 +81,14 @@ public class Model implements IModel {
 
     public void addExplosions(List<Pair> explSq) {
         this.explosionSquares.addAll(explSq);
-        this.notifyGameMapUpdateListeners();
+//        this.notifyGameMapUpdateListeners();
+        this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
-    public void addGameMapUpdateListener(
-            GameMapUpdateListener gameMapUpdateListener) {
-        this.gameMapUpdateListeners.add(gameMapUpdateListener);
-    }
+//    public void addGameMapUpdateListener(
+//            GameMapUpdateListener gameMapUpdateListener) {
+//        this.gameMapUpdateListeners.add(gameMapUpdateListener);
+//    }
 
     // TODO is this is normal realization?
     public int addPlayer(String name) {
@@ -110,7 +112,7 @@ public class Model implements IModel {
             this.gameMap.setSquare(bomb.getPosition(), Constants.MAP_EMPTY);
         }
 
-        // TODO is this.notifyGameMapUpdateListeners(); need????
+        this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
     public void detonateBombAt(Pair position) {
@@ -164,13 +166,14 @@ public class Model implements IModel {
     }
 
     public Player getPlayer(int playerID) {
-        for (Player player : players) {
-            if (player.getID() == playerID) {
-                return player;
+        Player player = null;
+        for (Player pl : players) {
+            if (pl.getID() == playerID) {
+                player = pl;
             }
         }
 
-        return null;
+        return player;
     }
 
     public List<Player> getPlayersList() {
@@ -238,8 +241,6 @@ public class Model implements IModel {
         if (isExplosion(newPosition)) {
             objectToMove.bombed();
         }
-
-        this.notifyGameMapUpdateListeners();
     }
 
     private int[] newCoords(Pair currentPosition, Direction direction) {    // whats about catch illegalArgumentException???
@@ -283,12 +284,12 @@ public class Model implements IModel {
         return arr;
     }
 
-    public void notifyGameMapUpdateListeners() {
-        for (GameMapUpdateListener gameMapUpdateListener :
-                gameMapUpdateListeners) {
-            gameMapUpdateListener.gameMapChanged();
-        }
-    }
+//    public void notifyGameMapUpdateListeners() {
+//        for (GameMapUpdateListener gameMapUpdateListener :
+//                gameMapUpdateListeners) {
+//            gameMapUpdateListener.gameMapChanged();
+//        }
+//    }
 
     public void playerBombed(Player atacker, int victimID) {
         Player victim = this.getPlayer(victimID);
@@ -306,6 +307,7 @@ public class Model implements IModel {
 
     public void playerDied(Player player) {
         this.gameMap.removePlayer(player.getID());
+        this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
     /**
@@ -332,13 +334,14 @@ public class Model implements IModel {
             this.explosionSquares.remove(pair);
         }
 
-        this.notifyGameMapUpdateListeners();
+        //this.notifyGameMapUpdateListeners();
+        this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
-    public void removeGameMapUpdateListener(
-            GameMapUpdateListener gameMapUpdateListener) {
-        this.gameMapUpdateListeners.remove(gameMapUpdateListener);
-    }
+//    public void removeGameMapUpdateListener(
+//            GameMapUpdateListener gameMapUpdateListener) {
+//        this.gameMapUpdateListeners.remove(gameMapUpdateListener);
+//    }
 
     public void removePlayer(int playerID) {
         for (Player player : players) {
@@ -396,8 +399,7 @@ public class Model implements IModel {
                     }
 
                     if (!isMoveToReserved(newX, newY)) {
-                        makeMove(objToMove, newX, newY);
-                        this.notifyGameMapUpdateListeners();
+                        makeMove(objToMove, newX, newY);                        
 
                         return true;
                     }
@@ -431,8 +433,7 @@ public class Model implements IModel {
 
                     this.gameMap.setSquare(bombPosition.getX(),
                                            bombPosition.getY(),
-                                           Constants.MAP_BOMB);
-                    this.notifyGameMapUpdateListeners();
+                                           Constants.MAP_BOMB);                    
 
                     return true;
                 }

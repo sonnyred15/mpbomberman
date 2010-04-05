@@ -26,22 +26,28 @@ import org.amse.bomberman.util.impl.ConsoleLog;
  */
 public class Server implements IServer {
 
-    protected ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
-    protected final int port;
-    protected final List<Game> games = new CopyOnWriteArrayList<Game>();
-    protected ServerSocket serverSocket;
-    protected boolean shutdowned = true; //true until we start accepting clients.
-    protected Thread listeningThread;
-    protected final List<ISession> sessions = new CopyOnWriteArrayList<ISession>();
-    protected int sessionCounter = 0; //need to generate name of log files.
-    protected long startTime;
-    protected ServerChangeListener changeListener;
+    private ILog log = new ConsoleLog(); // could be never initialized. Use writeToLog(...) instead of log.println(...)
+    private final int port;
+    private final List<Game> games = new CopyOnWriteArrayList<Game>();
+    private ServerSocket serverSocket;
+    private boolean shutdowned = true; //true until we start accepting clients.
+    private Thread listeningThread;
+    private final List<ISession> sessions = new CopyOnWriteArrayList<ISession>();
+    private int sessionCounter = 0; //need to generate name of log files.
+    private long startTime;
+    private ServerChangeListener changeListener;
+    private boolean isAsynchro = false;
 
     /**
      * Constructor with default port.
      */
     public Server() {
         this(Constants.DEFAULT_PORT);
+    }
+
+    public Server(int port, boolean isAsynchro) {
+        this(port);
+        this.isAsynchro = isAsynchro;
     }
 
     /**
@@ -68,8 +74,8 @@ public class Server implements IServer {
                 this.listeningThread.start();
             } else {
                 throw new IllegalStateException("Server: start error. " +
-                                                "Already accepting. " +
-                                                "Can`t raise.");
+                        "Already accepting. " +
+                        "Can`t raise.");
             }
 
         } catch (IOException ex) {
@@ -120,14 +126,14 @@ public class Server implements IServer {
                         this.log.close();
                     } catch (IOException ex) {
                         System.out.println("Server: stop warning. " +
-                                           "Can`t save log." +
-                                           ex.getMessage());
+                                "Can`t save log." +
+                                ex.getMessage());
                     }
                 }
             } else {
                 throw new IllegalStateException("Server: stop error. " +
-                                                "Is not raised. " +
-                                                "Can`t shutdown.");
+                        "Is not raised. " +
+                        "Can`t shutdown.");
             }
 
         } catch (IOException ex) {
@@ -152,7 +158,7 @@ public class Server implements IServer {
             writeToLog("Server: game added.");
         } else {
             writeToLog("Server: addGame warning. " +
-                       "Tryed to add game to shutdowned server.");
+                    "Tryed to add game to shutdowned server.");
         }
         if (this.changeListener != null) {
             this.changeListener.changed(this);
@@ -169,11 +175,11 @@ public class Server implements IServer {
                 writeToLog("Server: game removed.");
             } else {
                 writeToLog("Server: removeGame warning. " +
-                           "No specified game found.");
+                        "No specified game found.");
             }
         } else {
             writeToLog("Server: removeGame warning. " +
-                       "Tryed to remove game from shutdowned server.");
+                    "Tryed to remove game from shutdowned server.");
         }
     }
 
@@ -189,11 +195,11 @@ public class Server implements IServer {
                 game = this.games.get(n);
             } catch (IndexOutOfBoundsException ex) {
                 writeToLog("Server: getGame warning. " +
-                           "Tryed to get game with illegal ID.");
+                        "Tryed to get game with illegal ID.");
             }
         } else {
             writeToLog("Server: getGame warning. " +
-                       "Tryed to get game from shutdowned server.");
+                    "Tryed to get game from shutdowned server.");
         }
         return game;
     }
@@ -201,7 +207,7 @@ public class Server implements IServer {
     public List<Game> getGamesList() {
         if (this.shutdowned) { // is it redundant?
             writeToLog("Server: getGamesList warning. " +
-                       "Tryed to get games list from shutdowned server.");
+                    "Tryed to get games list from shutdowned server.");
         }
 
         return this.games;
@@ -236,31 +242,6 @@ public class Server implements IServer {
         this.changeListener = logListener;
     }
 
-    public void notifyAllClients(String message) {
-        throw new UnsupportedOperationException(
-                "Not supported in this implementation.");
-    }
-
-    public void notifyAllClients(List<String> messages) {
-        throw new UnsupportedOperationException(
-                "Not supported in this implementation.");
-    }
-
-    public void notifySomeClients(List<ISession> sessions, List<String> messages) {
-        throw new UnsupportedOperationException(
-                "Not supported in this implementation.");
-    }
-
-    public void notifyAllClientsExceptOne(List<String> messages, ISession sessionToIgnore) {
-        throw new UnsupportedOperationException(
-                "Not supported in this implementation.");
-    }
-
-    public void notifySomeClients(List<ISession> sessions, String message) {
-        throw new UnsupportedOperationException(
-                "Not supported in this implementation.");
-    }
-
     private class SocketListen implements Runnable {
 
         private Server server;
@@ -280,11 +261,20 @@ public class Server implements IServer {
                     //exceptions
                     Socket clientSocket = serverSocket.accept();
                     writeToLog("Server: client connected. " +
-                               "Starting new session thread...");
+                            "Starting new session thread...");
                     sessionCounter++;
-                    //CHECK V THIS// Is it throwing any exceptions?
-                    ISession newSession = new Session(this.server, clientSocket,
-                            sessionCounter, this.server.log);
+
+                    ISession newSession = null;
+                    //
+                    if (isAsynchro) {
+                        newSession = new AsynchroSession(this.server,
+                                clientSocket,
+                                sessionCounter, this.server.log);
+                    } else {
+                        newSession = new Session(this.server, clientSocket,
+                                sessionCounter, this.server.log);
+                    }
+                    //
                     sessions.add(newSession);
                     newSession.start();
                     if (changeListener != null) {
@@ -307,7 +297,7 @@ public class Server implements IServer {
             }
 
             /*must free resources and stop our thread.*/
-            int i = 1;            
+            int i = 1;
             for (ISession session : sessions) {
                 writeToLog("Server: interrupting session " + i + "...");
                 session.interruptSession();

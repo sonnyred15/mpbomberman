@@ -5,12 +5,13 @@
 
 package org.amse.bomberman.server.gameinit.bot;
 
-import org.amse.bomberman.server.gameinit.imodel.IModel;
+
+import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E.
  */
 public class PlaceAndMoveAction implements IAction{
 
@@ -22,8 +23,8 @@ public class PlaceAndMoveAction implements IAction{
         this.bot = bot;
     }
 
-    public void executeAction(IModel model) {
-        model.tryPlaceBomb(bot);
-        model.tryDoMove(this.bot, this.direction);
+    public void executeAction(Game game) {
+        game.tryPlaceBomb(this.bot.getID());
+        game.doMove(this.bot.getID(), this.direction);
     }
 }

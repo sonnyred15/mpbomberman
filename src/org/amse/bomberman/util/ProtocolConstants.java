@@ -27,10 +27,15 @@ public class ProtocolConstants {
     public static final String CAPTION_SEND_CHAT_MSG_INFO = "Send chat messages.";
     public static final String CAPTION_GET_CHAT_MSGS = "Get chat messages.";
 
+    public static final String MESSAGE_GAME_KICK = "You were kicked from the game.";
+    public static final String MESSAGE_GAME_START = "Game started.";
+
     public static final String UPDATE_GAME_MAP = "Update game map.";
     public static final String UPDATE_GAMES_LIST = "Update games list.";
     public static final String UPDATE_GAME_INFO = "Update game info.";
     public static final String UPDATE_CHAT_MSGS = "Update chat messages.";
+
+    public static final String SPLIT_SYMBOL = " ";
 
 
     private  ProtocolConstants() {

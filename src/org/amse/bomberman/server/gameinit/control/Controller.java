@@ -25,9 +25,7 @@ import java.util.List;
  *
  * @author Kirilchuk V.E.
  */
-public class Controller
-        implements GameEndedListener, GameStartedListener,
-                   GameMapUpdateListener {
+public class Controller implements GameEndedListener{
     public static final int GAME_IS_ALREADY_STARTED = -1;
     public static final int GAME_IS_FULL = -3;
     public static final int NOT_JOINED = -2;
@@ -36,7 +34,7 @@ public class Controller
     public static final int RESULT_SUCCESS = 1;
     private Game            game;
     private int             playerID;
-    private final ISession  session;    // do not delete need to notify session about updates
+    private final ISession  session;
     private final IServer sessionServer;
 
     public Controller(IServer sessionServer, ISession session) {
@@ -49,16 +47,10 @@ public class Controller
     }
 
     public void gameEnded() {
-        this.game.removeGameStartedListener(this);
         this.game.removeGameEndedListener(this);
-        this.game.removeGameMapUpdateListener(this);
-        this.game.leaveFromGame(this);
+//        this.game.leaveFromGame(this); //TODO is it really need?
         this.game = null;
         this.playerID = -1;
-    }
-
-    public void gameMapChanged() {
-        this.session.notifyClientAboutGameMapChange();
     }
 
     public int getID() {
@@ -105,22 +97,16 @@ public class Controller
 
     /**
      * Removes all listeners correspond to this Controller.
-     * Then removes Player(Client) from game.
+     * Then removes client from game.
      * <p>
      * If client was not joined to any game, this method do nothing.
      */
-    public void leaveGame() {
+    public void tryLeaveGame() {
         if (this.game != null) {
-            this.game.removeGameStartedListener(this);
             this.game.removeGameEndedListener(this);
-            this.game.removeGameMapUpdateListener(this);
             this.game.leaveFromGame(this);
             this.game = null;
         }
-    }
-
-    public void started() {
-        this.session.notifyClientAboutGameStart();
     }
 
     /**
@@ -192,8 +178,7 @@ public class Controller
         this.game = Creator.createGame(this.sessionServer, mapName, gameName,
                                        maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
-        this.playerID = this.game.join(playerName, this);
-        this.game.addGameMapUpdateListener(this);
+        this.playerID = this.game.join(playerName, this);        
 
         if (this.playerID == -1) {
             throw new NullPointerException("Error while creating game. " +
@@ -201,9 +186,7 @@ public class Controller
         }
 
         this.game.addGameEndedListener(this);
-
-        // TODO addGameStartedListener
-        this.sessionServer.addGame(this.game);
+        
     }
 
     public boolean tryDoMove(Direction dir) {
@@ -234,7 +217,6 @@ public class Controller
                         joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
                     } else {
                         joinResult = Controller.RESULT_SUCCESS;
-                        this.game.addGameMapUpdateListener(this);
                         this.game.addGameEndedListener(this);
                     }
                 }
@@ -245,7 +227,7 @@ public class Controller
     }
 
     public void tryPlaceBomb() {
-        this.game.tryPlaceBomb(this);
+        this.game.tryPlaceBomb(this.playerID);
     }
 
     public boolean tryStartGame() {    // ONLY HOST(CREATER) CAN START GAME!!!

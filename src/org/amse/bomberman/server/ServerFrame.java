@@ -14,11 +14,9 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.tcpimpl.AsynchroServer;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
@@ -98,7 +96,7 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText()); //throws NumberFormatException
 
-            server = new AsynchroServer(port);
+            server = new Server(port, true);
             server.setChangeListener(info);
             info.clearLog();
 

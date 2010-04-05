@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.Constants;
 

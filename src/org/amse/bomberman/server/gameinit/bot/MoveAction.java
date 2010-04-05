@@ -5,7 +5,7 @@
 
 package org.amse.bomberman.server.gameinit.bot;
 
-import org.amse.bomberman.server.gameinit.imodel.IModel;
+import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -22,7 +22,7 @@ public class MoveAction implements IAction{
         this.bot = bot;
     }
 
-    public void executeAction(IModel model) {
-        model.tryDoMove(this.bot, this.direction);
+    public void executeAction(Game game) {
+        game.doMove(this.bot.getID(), this.direction);
     }
 }

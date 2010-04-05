@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.gameinit;
 
+import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.util.Constants;
 
 /**

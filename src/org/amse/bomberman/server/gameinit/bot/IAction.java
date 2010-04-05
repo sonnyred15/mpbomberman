@@ -5,7 +5,7 @@
 
 package org.amse.bomberman.server.gameinit.bot;
 
-import org.amse.bomberman.server.gameinit.imodel.IModel;
+import org.amse.bomberman.server.gameinit.Game;
 
 /**
  *
@@ -13,6 +13,6 @@ import org.amse.bomberman.server.gameinit.imodel.IModel;
  */
 public interface IAction {
 
-    void executeAction(IModel model);
+    void executeAction(Game game);
 
 }
