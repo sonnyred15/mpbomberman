@@ -21,6 +21,7 @@ import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.tcpimpl.AsynchroServer;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
 
 /**
  * Server startup window.
@@ -34,7 +35,8 @@ public class ServerFrame extends JFrame {
     private IServer server;
     private final ServerInfo info = new ServerInfo();
     private final JLabel portLabel = new JLabel("Server Port");
-    private final JTextField portField = new JTextField("" + Constants.DEFAULT_PORT);
+    private final JTextField portField = new JTextField(
+            "" + Constants.DEFAULT_PORT);
     private final AbstractButton btnControl = new JButton(BTN_TEXT_RAISE);
     private final AbstractButton btnStatus = new JButton("Status");
 
@@ -96,17 +98,10 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText()); //throws NumberFormatException
 
-            if (server == null) { //if it is first initialization
-                server = new AsynchroServer(port);
-                info.setServer(server);
-                server.setChangeListener(info);
-            } else if (server.getPort() != port) { //if we want to raise server on new port
-                server.writeToLog("Raising server on new port");
-                server = new AsynchroServer(port);
-                info.setServer(server);
-                info.clearLog();
-                server.setChangeListener(info);
-            }
+            server = new AsynchroServer(port);
+            server.setChangeListener(info);
+            info.clearLog();
+
             server.start();
         } catch (NumberFormatException ex) { //parse errors
             showErrorMessage(ex.getMessage());
@@ -114,8 +109,7 @@ public class ServerFrame extends JFrame {
         } catch (IllegalArgumentException ex) { // wrong port(not in 0..65535)
             showErrorMessage(ex.getMessage());
             return;
-        }
-        catch (IOException ex) { //sockets errors. Server logging them.
+        } catch (IOException ex) { //sockets errors. Server logging them.
             showErrorMessage(ex.getMessage());
             return;
         } catch (IllegalStateException ex) {//must never happen
@@ -148,6 +142,6 @@ public class ServerFrame extends JFrame {
     }
 
     private void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+        Creator.createErrorDialog(this, message, "Error");
     }
 }

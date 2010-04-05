@@ -7,10 +7,6 @@ package org.amse.bomberman.server;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,20 +26,17 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
     private final String STARTED_GAMES_LABEL_TEXT = "Started games: ";
     private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
     private final String CLIENTS_LABEL_TEXT = "Clients: ";
-    private final String TIME_LABEL_TEXT = "Working time(sec.): ";
+    //private final String TIME_LABEL_TEXT = "Working time(sec.): ";
     private final String PORT_LABEL_TEXT = "Port: ";
-    //
-    private IServer server = null;
+    //    
     private final JTextArea log = new JTextArea();
-    private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private ScheduledFuture<?> timerTaskControl;
     //
     private final JLabel labelShutdowned = new JLabel(SHUTDOWNED_LABEL_TEXT);
     private final JLabel labelPort = new JLabel(PORT_LABEL_TEXT);
     private final JLabel labelStartedGames = new JLabel(STARTED_GAMES_LABEL_TEXT);
     private final JLabel labelUnstartedGames = new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
     private final JLabel labelClients = new JLabel(CLIENTS_LABEL_TEXT);
-    private final JLabel labelTime = new JLabel(TIME_LABEL_TEXT);
+   // private final JLabel labelTime = new JLabel(TIME_LABEL_TEXT);
 
     public ServerInfo() {
 
@@ -64,7 +57,7 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
         infoPanel.add(labelClients);
         infoPanel.add(labelUnstartedGames);
         infoPanel.add(labelStartedGames);
-        infoPanel.add(labelTime);
+        //infoPanel.add(labelTime);
         this.add(infoPanel);
 
         /*settings of log text area*/
@@ -78,19 +71,15 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
         //pack();
     }
 
-    public void setServer(IServer server) {        
-        this.server = server;        
-    }
+    public void changed(IServer server) {
+        if (server != null) {
+            this.labelPort.setText(PORT_LABEL_TEXT + server.getPort());
+            this.labelClients.setText(CLIENTS_LABEL_TEXT + server.getSessions());
+            this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + server.isShutdowned());
 
-    public void stateChanged() {
-        if (this.server != null) {
-            this.labelPort.setText(PORT_LABEL_TEXT + this.server.getPort());
-            this.labelClients.setText(CLIENTS_LABEL_TEXT + this.server.getClientsNum());
-            this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + this.server.isShutdowned());
+            if (!server.isShutdowned()) {
 
-            if (!this.server.isShutdowned()) {
-
-                List<Game> games = this.server.getGamesList();
+                List<Game> games = server.getGamesList();
                 int startedGamesCount = 0;
                 int unstartedGamesCount = 0;
                 for (Game game : games) {
@@ -103,29 +92,12 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
 
                 this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT + startedGamesCount);
                 this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT + unstartedGamesCount);
-                this.labelTime.setText(TIME_LABEL_TEXT + this.server.getWorkTime());
+                //this.labelTime.setText(TIME_LABEL_TEXT + server.getWorkTime());
             } else {
                 this.labelStartedGames.setText(this.labelStartedGames.getText() + "(was)");
                 this.labelUnstartedGames.setText(this.labelUnstartedGames.getText() + "(was)");
             }
         }
-    }
-
-    public void switchedState(boolean started) {
-        if (!started) {
-            if (this.timerTaskControl != null) { //canceling previous task
-                this.timerTaskControl.cancel(false);
-            }
-        } else {
-            this.timerTaskControl = timer.scheduleAtFixedRate(new Runnable() {
-
-                public void run() {
-                    stateChanged();
-                }
-            }, 1000, 1000, TimeUnit.MILLISECONDS);
-        }
-
-        stateChanged();
     }
 
     public synchronized void addedToLog(String line) {

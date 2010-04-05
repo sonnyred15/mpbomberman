@@ -89,14 +89,14 @@ public class Model implements IModel {
     }
 
     // TODO is this is normal realization?
-    public Player addPlayer(String name) {
+    public int addPlayer(String name) {
         Player playerToAdd = new Player(name);
 
         playerToAdd.setID(getFreeID());
         playerToAdd.setDieListener(this.dieListener);
         this.players.add(playerToAdd);
 
-        return playerToAdd;
+        return playerToAdd.getID();
     }
 
     public void bombDetonated(Bomb bomb) {
@@ -294,13 +294,13 @@ public class Model implements IModel {
         Player victim = this.getPlayer(victimID);
 
         victim.bombed();
-        this.game.addMessageToChat(victim,
+        this.game.addMessageToChat(victimID,
                                    "was bombed by " + atacker.getNickName());
     }
 
     public void playerBombed(Player atacker, Player victim) {
         victim.bombed();
-        this.game.addMessageToChat(victim,
+        this.game.addMessageToChat(victim.getID(),
                                    "was bombed by " + atacker.getNickName());
     }
 
@@ -397,8 +397,8 @@ public class Model implements IModel {
 
                     if (!isMoveToReserved(newX, newY)) {
                         makeMove(objToMove, newX, newY);
-
                         this.notifyGameMapUpdateListeners();
+
                         return true;
                     }
                 }
@@ -432,8 +432,8 @@ public class Model implements IModel {
                     this.gameMap.setSquare(bombPosition.getX(),
                                            bombPosition.getY(),
                                            Constants.MAP_BOMB);
-
                     this.notifyGameMapUpdateListeners();
+
                     return true;
                 }
             }

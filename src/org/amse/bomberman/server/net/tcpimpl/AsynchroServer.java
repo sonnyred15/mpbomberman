@@ -49,7 +49,7 @@ public class AsynchroServer extends Server {
 
         this.startTime = System.currentTimeMillis();
         if (this.changeListener != null) {
-            this.changeListener.switchedState(true);
+            this.changeListener.changed(this);
         }
         writeToLog("Server: started.");
     }

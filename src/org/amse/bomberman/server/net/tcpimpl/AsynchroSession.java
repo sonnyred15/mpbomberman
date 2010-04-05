@@ -7,7 +7,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.BufferedReader;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
@@ -23,6 +22,7 @@ import org.amse.bomberman.util.Stringalize;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -655,7 +655,12 @@ public class AsynchroSession extends Thread implements ISession {
             messages.add("Disconnected.");
             sendAnswer(messages);
 
-            List<ISession> toNotify = game.getSessions();
+            List<Controller> controllers = game.getControllers();
+            List<ISession>   toNotify = new ArrayList();
+
+            for (Controller controller : controllers) {
+                toNotify.add(controller.getSession());
+            }
 
             toNotify.remove(this);
             this.server.notifySomeClients(toNotify,
@@ -695,13 +700,23 @@ public class AsynchroSession extends Thread implements ISession {
         message.add(ProtocolConstants.CAPTION_START_GAME_INFO);
         message.add("Game started.");
 
-        List<ISession> sessions = this.controller.getMyGame().getSessions();
+        List<Controller> cntrls = this.controller.getMyGame().getControllers();
+        List<ISession>   sessions = new ArrayList<ISession>();
+
+        for (Controller control : cntrls) {
+            sessions.add(control.getSession());
+        }
 
         this.server.notifySomeClients(sessions, message);
     }
 
     private void notifyGameSessions(String message) {
-        List<ISession> sessions = this.controller.getMyGame().getSessions();
+        List<Controller> cntrls = this.controller.getMyGame().getControllers();
+        List<ISession>   sessions = new ArrayList<ISession>();
+
+        for (Controller control : cntrls) {
+            sessions.add(control.getSession());
+        }
 
         this.server.notifySomeClients(sessions, message);
     }

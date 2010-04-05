@@ -35,7 +35,7 @@ public class Controller
     public static final int NO_SUCH_UNSTARTED_GAME = -10;
     public static final int RESULT_SUCCESS = 1;
     private Game            game;
-    private Player          player;
+    private int             playerID;
     private final ISession  session;    // do not delete need to notify session about updates
     private final IServer sessionServer;
 
@@ -45,18 +45,24 @@ public class Controller
     }
 
     public void addMessageToChat(String toString) {
-        this.game.addMessageToChat(player, toString);
+        this.game.addMessageToChat(this.playerID, toString);
     }
 
     public void gameEnded() {
+        this.game.removeGameStartedListener(this);
         this.game.removeGameEndedListener(this);
+        this.game.removeGameMapUpdateListener(this);
         this.game.leaveFromGame(this);
         this.game = null;
-        this.player = null;
+        this.playerID = -1;
     }
 
     public void gameMapChanged() {
         this.session.notifyClientAboutGameMapChange();
+    }
+
+    public int getID() {
+        return this.playerID;
     }
 
     /**
@@ -76,7 +82,7 @@ public class Controller
      * List of only String - "No new messages." if there is no new messages available.
      */
     public List<String> getNewMessagesFromChat() {
-        return this.game.getNewMessagesFromChat(this.player);
+        return this.game.getNewMessagesFromChat(this.playerID);
     }
 
     /**
@@ -86,7 +92,7 @@ public class Controller
      * or null if you are not joined to any game.
      */
     public Player getPlayer() {
-        return this.player;
+        return this.game.getPlayer(this.playerID);
     }
 
     /**
@@ -104,7 +110,7 @@ public class Controller
      * If client was not joined to any game, this method do nothing.
      */
     public void leaveGame() {
-        if (this.game != null) { 
+        if (this.game != null) {
             this.game.removeGameStartedListener(this);
             this.game.removeGameEndedListener(this);
             this.game.removeGameMapUpdateListener(this);
@@ -186,10 +192,10 @@ public class Controller
         this.game = Creator.createGame(this.sessionServer, mapName, gameName,
                                        maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
-        this.player = this.game.join(playerName, this);
+        this.playerID = this.game.join(playerName, this);
         this.game.addGameMapUpdateListener(this);
 
-        if (this.player == null) {
+        if (this.playerID == -1) {
             throw new NullPointerException("Error while creating game. " +
                     "Owner tryed to create and join but join returned null.");
         }
@@ -201,7 +207,7 @@ public class Controller
     }
 
     public boolean tryDoMove(Direction dir) {
-        return this.game.doMove(this, dir);
+        return this.game.doMove(this.playerID, dir);
     }
 
     public int tryJoinGame(int gameID, String playerName) {
@@ -221,10 +227,10 @@ public class Controller
                 joinResult = Controller.GAME_IS_ALREADY_STARTED;
 
                 if (!gameToJoin.isStarted()) {
-                    this.player = gameToJoin.join(playerName, this);
+                    this.playerID = gameToJoin.join(playerName, this);
                     this.game = gameToJoin;
 
-                    if (this.player == null) {
+                    if (this.playerID == -1) {
                         joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
                     } else {
                         joinResult = Controller.RESULT_SUCCESS;
