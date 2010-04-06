@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.client.net.impl;
 
 import java.io.BufferedReader;
@@ -17,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
@@ -27,6 +24,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
+ * @author Michael Korovkin
  * @author Kirilchuk V.E.
  */
 public class AsynchroConnector implements IConnector2 {
@@ -53,7 +51,11 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void disconnect() {
-        // TO DO
+        try {
+            this.socket.close();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }
 
     private synchronized void sendRequest(String request) throws NetException {
@@ -158,13 +160,14 @@ public class AsynchroConnector implements IConnector2 {
                         }
                         message.add(oneLine);
                     }
-                    Thread t = new Thread(new MyRunnable(message));
-                    t.start();
-                    //processServerMessage(message);
+                    SwingUtilities.invokeLater(new InvokationServerCommand(message));
+                    //Thread t = new Thread(new InvokationServerCommand(message));
+                    //t.start();
                     message = new ArrayList<String>();
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                System.out.println(ex);
+                //ex.printStackTrace();
             }
         }
 
@@ -197,11 +200,10 @@ public class AsynchroConnector implements IConnector2 {
             }
         }
 
-        private class MyRunnable implements Runnable {
-
+        private class InvokationServerCommand implements Runnable {
             List<String> message;
 
-            public MyRunnable(List<String> message) {
+            public InvokationServerCommand(List<String> message) {
                 this.message = message;
             }
 

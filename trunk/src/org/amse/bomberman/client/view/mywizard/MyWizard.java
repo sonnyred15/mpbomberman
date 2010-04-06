@@ -74,6 +74,12 @@ public class MyWizard  extends JFrame{
     public void setBackAction(Action a) {
         backJButton.setAction(a);
     }
+    /*
+     * DANGER!!! Using this method you override standart Action to this button!
+     */
+    public void setCancelAction(Action a) {
+        cancelJButton.setAction(a);
+    }
     public void setCurrentJPanel(int id) {
         if (id >= 0 && id < myPanels.size()) {
             cardLayout.show(cardPanel, myPanelNames.get(id));

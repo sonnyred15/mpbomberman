@@ -76,9 +76,9 @@ public class Controller implements IController{
 
     public void requestStartGame() throws NetException {
         this.connector.requestStartGame();
-        //if (connector instanceof SynchroConnector) {
-        //    ((SynchroConnector)connector).beginUpdating();
-        //}
+        if (connector instanceof SynchroConnector) {
+            ((SynchroConnector)connector).beginUpdating();
+        }
     }
 
     public void requestGameMap() throws NetException {

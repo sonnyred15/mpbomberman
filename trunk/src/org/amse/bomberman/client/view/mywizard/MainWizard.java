@@ -29,6 +29,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
         this.addNextJPanel(new Panel3(this), "GAME_PANEL");
         this.setNextAction(new NextAction(this));
         this.setBackAction(new BackAction(this));
+        this.setCancelAction(new CancelAction(this));
         this.setCurrentJPanel(0);
         this.setVisible(true);
     }
@@ -228,6 +229,19 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 con.disconnect();
                 slideBack();
             }
+        }
+    }
+    public static class CancelAction extends AbstractAction {
+        MyWizard parent;
+
+        public CancelAction(MyWizard jframe) {
+            parent = jframe;
+            putValue(NAME, "Cancel");
+            putValue(SMALL_ICON, null);
+        }
+        public void actionPerformed(ActionEvent e) {
+            parent.dispose();
+            Controller.getInstance().disconnect();
         }
     }
 }

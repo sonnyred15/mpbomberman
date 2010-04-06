@@ -80,12 +80,11 @@ public class Panel3 extends JPanel implements Updating{
         if (Model.getInstance().isStarted()) {
             this.stopTimers();
             parent.dispose();
-            //Controller.getInstance().requestStartGame();
             IModel model = Model.getInstance();            
             Controller.getInstance().setReceiveInfoListener((RequestResultListener) Model.getInstance());
-            Controller.getInstance().requestGameMap();
             GameJFrame jframe = new GameJFrame();
             Model.getInstance().addListener(jframe);
+            Controller.getInstance().requestGameMap();
         }
     }
     public void setGameInfo(List<String> info) {

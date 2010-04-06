@@ -75,33 +75,49 @@ public class GamePanel  extends JPanel{
     private static ImageIcon ICON_BURN = new ImageIcon(Main.class
             .getClassLoader().getResource(BURN_ICON_PATH));
 
-    public GamePanel(BombMap map) {
-        this.map = map;
-        changes = new ArrayList<Cell>();
-        size = map.getSize();
-        if (size < defaultRange) {
-            range = size;
+    public GamePanel() {
+        BombMap gameMap = Model.getInstance().getMap();
+        if (gameMap != null) {
+            this.update();
+            /*for (int i = LUCell.getX(); i < RDCell.getX(); i++) {
+            for (int j = LUCell.getY(); j < RDCell.getY(); j++) {
+            Graphics2D g = buffer.createGraphics();
+            g.drawImage(ICON_PL1.getImage(), 0, 0, this);
+            Graphics gr = this.getGraphics();
+            gr.drawImage(buffer, cellSize * i + 30, cellSize * j + 30, this);
+            }
+            }*/
         } else {
             range = defaultRange;
+            width = range*cellSize;
+            height = range*cellSize;
+            this.setPreferredSize(new Dimension(width, height));
         }
-        width = range*cellSize;
-        height = range*cellSize;
-        this.setPreferredSize(new Dimension(width, height));
-        myCoord = Model.getInstance().getPlayerCoord();
-        this.findEyeShot();
-        //this.update();
-        /*for (int i = LUCell.getX(); i < RDCell.getX(); i++) {
-            for (int j = LUCell.getY(); j < RDCell.getY(); j++) {
-                Graphics2D g = buffer.createGraphics();
-                g.drawImage(ICON_PL1.getImage(), 0, 0, this);
-                Graphics gr = this.getGraphics();
-                gr.drawImage(buffer, cellSize * i + 30, cellSize * j + 30, this);
-            }
-        }*/
     }
     public void update() {
         IModel model = Model.getInstance();
-        map = model.getMap();
+        BombMap newMap = model.getMap();
+        // if map was not received yet.
+        if (newMap == null) {
+            return;
+        }
+        // if this is first invocation after receiving of map
+        if (map == null) {
+            map = newMap;
+            changes = new ArrayList<Cell>();
+            size = map.getSize();
+            if (size < defaultRange) {
+                range = size;
+            } else {
+                range = defaultRange;
+            }
+            width = range * cellSize;
+            height = range * cellSize;
+            this.setPreferredSize(new Dimension(width, height));
+            myCoord = Model.getInstance().getPlayerCoord();
+            this.findEyeShot();
+        }
+        map = newMap;
         myCoord = model.getPlayerCoord();
         int x = myCoord.getX();
         int y = myCoord.getY();
@@ -118,6 +134,9 @@ public class GamePanel  extends JPanel{
     @Override
     public void paint(Graphics graphics) {
         if (isFirst) {
+            if (map == null) {
+                return;
+            }
             List<Cell> expl = map.getExplosions();
             for (int i = LUCell.getX(); i <= RDCell.getX(); i++) {
                 for (int j = LUCell.getY(); j <= RDCell.getY(); j++) {

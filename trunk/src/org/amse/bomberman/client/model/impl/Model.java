@@ -80,8 +80,7 @@ public class Model implements IModel, RequestResultListener{
                 Parser parser = new Parser();
                 this.setMap(parser.parse(list));
             } else {
-                //Model.getInstance().setStart(false);
-                updateListeners();
+                escapeGame();
             }
         }
         if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
@@ -89,8 +88,7 @@ public class Model implements IModel, RequestResultListener{
                 //System.out.println("You try to do move uncorrectly.");
             } else {
                 if (list.get(0).equals("Not joined to any game.")) {
-                    isStarted = false;
-                    updateListeners();
+                    escapeGame();
                 }
             }
         }
@@ -98,13 +96,12 @@ public class Model implements IModel, RequestResultListener{
             if (list.get(0).equals("started.")) {
                 isStarted = true;
             } else {
-                isStarted = false;
+                escapeGame();
             }
         }
         if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
             if (list.get(0).equals("Disconnected.")) {
-                isStarted = false;
-                updateListeners();
+                escapeGame();
             } else {
                 // TO DO
             }
@@ -156,5 +153,12 @@ public class Model implements IModel, RequestResultListener{
     }
     public synchronized void setStart(boolean bool) {
         isStarted = bool;
+    }
+    private synchronized void escapeGame() {
+        isStarted = false;
+        map = null;
+        changes.clear();
+        updateListeners();
+        listener.clear();
     }
 }
