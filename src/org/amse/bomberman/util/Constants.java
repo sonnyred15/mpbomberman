@@ -33,7 +33,7 @@ public final class Constants {
 
     public static final int DEFAULT_PORT = 10500;
     public static final int DEFAULT_ACCEPT_TIMEOUT = 60000;
-    public static final int DEFAULT_CLIENT_TIMEOUT = 60000;
+    public static final int DEFAULT_CLIENT_TIMEOUT = 300000;
     
     public static final String DEFAULT_FILE_LOG_NAME = "server.log";
 

@@ -35,42 +35,27 @@ public class GameJFrame extends JFrame implements IView{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 100);
         this.setMinimumSize(new Dimension(width / 2, height / 2));
-        BombMap map;
-        try {
-            Controller.getInstance().requestGameMap();
-            // HACK!!! Delay for answer from server before get BombMap
-            Object delay = new Object();
-            System.out.println("DELAY STARTED");
-            synchronized (delay) {
-                try {
-                    delay.wait(1000);
-                } catch (InterruptedException ex) {
-                }
-            }
-            System.out.println("DELAY ENDED");
-            //--------------------------------------------------------------
-            map = Model.getInstance().getMap();
-            gamePanel = new GamePanel(map);
-            Container c = getContentPane();
-            c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            livesJLabel = new JLabel("Lives: 0");
-            livesJLabel.setPreferredSize(new Dimension(width, 30));
-            livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            c.add(livesJLabel);
-            c.add(gamePanel);
-            this.addKeyListener(listener);
-            this.setJMenuBar(new GameJMenuBar(this));
+        gamePanel = new GamePanel();
+        Container c = getContentPane();
+        c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        livesJLabel = new JLabel("Lives: 0");
+        livesJLabel.setPreferredSize(new Dimension(width, 30));
+        livesJLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        c.add(livesJLabel);
+        c.add(gamePanel);
+        this.addKeyListener(listener);
+        this.setJMenuBar(new GameJMenuBar(this));
 
-            setResizable(true);
-            setVisible(true);
-        } catch (NetException ex) {
-             JOptionPane.showMessageDialog(this,"Connection was lost.\n"
+        setResizable(true);
+        setVisible(true);
+             /*JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
              this.dispose();
              MainWizard wizard = new MainWizard();
              wizard.setCurrentJPanel(0);
              Controller.getInstance().setReceiveInfoListener(wizard);
-        }
+              *
+              */
     }
 
     public void update() {
