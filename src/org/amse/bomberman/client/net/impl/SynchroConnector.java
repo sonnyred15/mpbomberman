@@ -15,10 +15,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JPanel;
+import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.net.IConnector2;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.view.mywizard.MyWizard;
+import org.amse.bomberman.client.view.mywizard.Panel3;
+import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
@@ -83,6 +88,9 @@ public class SynchroConnector implements IConnector2 {
         List<String> answer = queryAnswer("" + Command.CREATE_GAME.getValue() +
                 " " + gameName + " " + mapName + " " + maxPl + " "
                 + Model.getInstance().getPlayerName());
+        if (answer.get(0).equals("Game created.")) {
+            beginPanel3Updating();
+        }
         answer.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
         Controller.getInstance().receivedRequestResult(answer);
     }
@@ -91,6 +99,9 @@ public class SynchroConnector implements IConnector2 {
         List<String> list = queryAnswer("2 " + gameID + " " 
                 + Model.getInstance().getPlayerName());
         System.out.println(list.get(0));
+        if (list.get(0).equals("Joined.")) {
+            beginPanel3Updating();
+        }
         list.add(0, ProtocolConstants.CAPTION_JOIN_GAME);
         Controller.getInstance().receivedRequestResult(list);
     }
@@ -106,7 +117,7 @@ public class SynchroConnector implements IConnector2 {
         System.out.println(list);
         // start timer for updating map of game
         if (list.get(0).equals("Game started.") && !Model.getInstance().isStarted()) {
-            this.beginUpdating();
+            this.beginGameUpdating();
         }
         list.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
         Controller.getInstance().receivedRequestResult(list);
@@ -143,7 +154,7 @@ public class SynchroConnector implements IConnector2 {
         List<String> list = queryAnswer("" + Command.GET_GAME_STATUS.getValue());
         // does it work??? for start updating not a host.
         if (list.get(0).equals("started.") && !Model.getInstance().isStarted()) {
-            this.beginUpdating();
+            this.beginGameUpdating();
         }
         list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
         Controller.getInstance().receivedRequestResult(list);
@@ -208,9 +219,14 @@ public class SynchroConnector implements IConnector2 {
         return answer;
     }
      // must be here or somewhere else???
-    public void beginUpdating(){
+    public void beginGameUpdating(){
         timer = new Timer();
-        timer.schedule(new UpdateTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
+        timer.schedule(new GameTimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
+    }
+     // must be here or somewhere else???
+    private void beginPanel3Updating(){
+        timer = new Timer();
+        timer.schedule(new Panel3TimerTask(), (long)0,(long) Constants.GAME_STEP_TIME);
     }
     private void stopUpdating() {
         if (timer != null) {
@@ -219,7 +235,7 @@ public class SynchroConnector implements IConnector2 {
             timer = null;
         }
     }
-    private class UpdateTimerTask extends TimerTask{
+    private class GameTimerTask extends TimerTask{
         @Override
         public void run() {
             try {
@@ -232,6 +248,36 @@ public class SynchroConnector implements IConnector2 {
                 // is it good???
                 ex.printStackTrace();
                 this.cancel();
+            }
+        }
+    }
+    private class Panel3TimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                IController c = Controller.getInstance();
+                c.requestGameInfo();
+                c.requestNewChatMessages();
+                c.requestIsGameStarted();
+                // how do it better??? ----------------------------------------
+                RequestResultListener listener = c.getReceiveInfoListener();
+                if (listener instanceof MyWizard) {
+                    JPanel panel = ((MyWizard) listener).getCurrentJPanel();
+                    if (panel instanceof Panel3) {
+                        Panel3 panel3 = (Panel3) panel;
+                        if (!((MyWizard) listener).isShowing()) {
+                            panel3.stopTimers();
+                        }
+                    }
+                }
+
+            } catch (NetException ex) {
+                // is it good???
+                ex.printStackTrace();
+                stopUpdating();
+                this.cancel();
+                //parent.setCurrentJPanel(0);
             }
         }
     }

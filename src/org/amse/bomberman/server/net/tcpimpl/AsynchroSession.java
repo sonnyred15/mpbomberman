@@ -667,10 +667,10 @@ public class AsynchroSession extends AbstractSession {
 
                 if (success) {
 
-//                  messages.add("Game started.");
-//                  sendAnswer(messages);
-//                  writeToLog("Session: started game. " + "(gameName=" +
-//                             this.controller.getMyGame().getName() + ")");
+                  messages.add("Game started.");
+                  sendAnswer(messages);
+                  writeToLog("Session: started game. " + "(gameName=" +
+                             this.controller.getMyGame().getName() + ")");
                     return;
                 } else {
                     messages.add("Not owner of game.");

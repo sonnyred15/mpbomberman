@@ -14,6 +14,7 @@ import org.amse.bomberman.util.Constants.Direction;
 public interface IController {
 
     public void setReceiveInfoListener(RequestResultListener receiveResultListener);
+    public RequestResultListener getReceiveInfoListener();
     public void connect(InetAddress serverIP, int serverPort)
             throws NetException, IOException;
     public void disconnect();
