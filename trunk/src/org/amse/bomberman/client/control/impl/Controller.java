@@ -39,6 +39,9 @@ public class Controller implements IController{
         this.receiveResultListener = receiveResultListener;
     }
 
+    public RequestResultListener getReceiveInfoListener() {
+        return receiveResultListener;
+    }
     @Deprecated
     public void showError(String message) {
         Creator.createErrorDialog(null, "Error", message);
@@ -77,7 +80,7 @@ public class Controller implements IController{
     public void requestStartGame() throws NetException {
         this.connector.requestStartGame();
         if (connector instanceof SynchroConnector) {
-            ((SynchroConnector)connector).beginUpdating();
+            ((SynchroConnector)connector).beginGameUpdating();
         }
     }
 

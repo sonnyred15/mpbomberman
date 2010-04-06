@@ -44,7 +44,6 @@ public class Panel3 extends JPanel implements Updating{
     private final int width = 640;
     private final int height = 480;
     private final Dimension defaultButton = new Dimension(100,20);
-    private final long checkStartDelay = 150;
     private final String emptyName = "EMPTY";
     private final String closedName = "Closed";
 
@@ -68,7 +67,6 @@ public class Panel3 extends JPanel implements Updating{
         try {
             chatTA.setText("");
             Controller.getInstance().requestGameInfo();
-            this.startUpdating();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -138,10 +136,6 @@ public class Panel3 extends JPanel implements Updating{
         String message = messageTF.getText();
         messageTF.setText("");
         return message;
-    }
-    private void startUpdating() {
-        timer = new Timer();
-        timer.schedule(new UpdateTimerTask(), (long)0, checkStartDelay);
     }
     private void initComponents() {
         for (int i = 0; i < Constants.MAX_PLAYERS; i++) {
@@ -243,23 +237,5 @@ public class Panel3 extends JPanel implements Updating{
             }
         }
     }
-    private class UpdateTimerTask extends TimerTask {
-        @Override
-        public void run() {
-            try {
-                Controller.getInstance().requestGameInfo();
-                Controller.getInstance().requestNewChatMessages();
-                Controller.getInstance().requestIsGameStarted();
-                if (!parent.isShowing()) {
-                    stopTimers();
-                }
-            } catch (NetException ex) {
-                // is it good???
-                ex.printStackTrace();
-                stopTimers();
-                this.cancel();
-                parent.setCurrentJPanel(0);
-            }
-        }
-    }
+    
 }
