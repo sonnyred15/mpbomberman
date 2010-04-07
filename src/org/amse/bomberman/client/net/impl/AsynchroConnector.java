@@ -191,7 +191,10 @@ public class AsynchroConnector implements IConnector2 {
                 } else if (firstLine.equals(
                         ProtocolConstants.UPDATE_GAME_MAP)) {
                     Controller.getInstance().requestGameMap();
-                } else {                    
+                } else if (firstLine.equals(
+                        ProtocolConstants.UPDATE_CHAT_MSGS)) {
+                    Controller.getInstance().requestNewChatMessages();
+                } else {
                     Controller.getInstance().receivedRequestResult(message);
                 }
             } catch (NetException ex) {

@@ -58,36 +58,31 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 panel2.setMaps(list);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_GAMES_LIST)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_GAMES_LIST)) {
             if (current instanceof Panel2) {
                 Panel2 panel2 = (Panel2) current;
                 panel2.setGames(list);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setGameInfo(list);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME)) {
             if (!list.get(0).equals("Game created.")) {
                 JOptionPane.showMessageDialog(this, "Can not create game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_JOIN_GAME)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_GAME)) {
             if (!list.get(0).equals("Joined.")) {
                 JOptionPane.showMessageDialog(this, "Can not join to the game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
             if (list.get(0).equals("Game started.")) {
                 if (current instanceof Panel3) {
                     Panel3 panel3 = (Panel3) current;
@@ -110,8 +105,22 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 }
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
+        } else if (command.equals(ProtocolConstants.MESSAGE_GAME_START)) {
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
+                try {
+                    if (!Model.getInstance().isStarted()) {
+                        Model.getInstance().setStart(true);
+                        panel3.startGame();
+                    }
+                } catch (NetException ex) {
+                    JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    this.setCurrentJPanel(0);
+                }
+            }
+            return;
+        }else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
             if (list.get(0).equals("started.")) {
                 if (current instanceof Panel3) {
                     Panel3 panel3 = (Panel3) current;
@@ -128,15 +137,13 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 }
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
             if (!list.get(0).equals("Disconnected.")) {
                 JOptionPane.showMessageDialog(this, "Can not leave game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
             if (current instanceof Panel3) {
                 if (!list.get(0).equals("Bot added.")) {
                     JOptionPane.showMessageDialog(this, "Can not join bot.\n"
@@ -145,15 +152,13 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 }
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
             }
             return;
-        }
-        if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
