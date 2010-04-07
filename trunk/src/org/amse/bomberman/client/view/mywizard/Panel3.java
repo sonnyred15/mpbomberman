@@ -75,15 +75,13 @@ public class Panel3 extends JPanel implements Updating{
         }
     }
     public void startGame() throws NetException {
-        if (Model.getInstance().isStarted()) {
-            this.stopTimers();
-            parent.dispose();
-            IModel model = Model.getInstance();            
-            Controller.getInstance().setReceiveInfoListener((RequestResultListener) Model.getInstance());
-            GameJFrame jframe = new GameJFrame();
-            Model.getInstance().addListener(jframe);
-            Controller.getInstance().requestGameMap();
-        }
+        this.stopTimers();
+        parent.dispose();
+        IModel model = Model.getInstance();
+        Controller.getInstance().setReceiveInfoListener((RequestResultListener) Model.getInstance());
+        GameJFrame jframe = new GameJFrame();
+        Model.getInstance().addListener(jframe);
+        Controller.getInstance().requestGameMap();
     }
     public void setGameInfo(List<String> info) {
         if (info.get(0).equals("false")) {
