@@ -47,6 +47,7 @@ public class AsynchroConnector implements IConnector2 {
 
         this.socket = new Socket(address, port);
         Thread t = new Thread(new ServerListen());
+        t.setDaemon(true);
         t.start();
     }
 
@@ -69,7 +70,8 @@ public class AsynchroConnector implements IConnector2 {
             out.newLine();
             out.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
+            throw new NetException();
         }
     }
 
@@ -153,22 +155,20 @@ public class AsynchroConnector implements IConnector2 {
 
                 String oneLine;
                 List<String> message = new ArrayList<String>();
-                while (!Thread.interrupted()) {
-                    while ((oneLine = in.readLine()) != null) {
-                        if (oneLine.length() == 0) {
-                            break;
-                        }
-                        message.add(oneLine);
+                while (!Thread.interrupted() && (oneLine = in.readLine()) != null) {
+                    if (oneLine.length() == 0) {
+                        SwingUtilities.invokeLater(new InvokationServerCommand(message));
+                        message = new ArrayList<String>();
+                        continue;
                     }
-                    SwingUtilities.invokeLater(new InvokationServerCommand(message));
-                    //Thread t = new Thread(new InvokationServerCommand(message));
-                    //t.start();
-                    message = new ArrayList<String>();
+                    message.add(oneLine);
                 }
-            } catch (Exception ex) {
-                System.out.println(ex);
-                //ex.printStackTrace();
+
+            } catch (IOException ex) {
+                System.out.println("ServerListen: run error. " + ex.getMessage());
             }
+
+            System.out.println("ServerListen: run ended.");
         }
 
         private void processServerMessage(List<String> message) {

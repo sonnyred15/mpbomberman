@@ -89,21 +89,16 @@ public abstract class AbstractSession extends Thread implements ISession {
         } finally {
             try {
                 if (in != null) {
-                    in.close();    // throws IOException
+                    this.clientSocket.close();
                 }
             } catch (IOException ex) {
                 writeToLog("Session: run error. " + ex.getMessage());
             }
 
-//          try {
             writeToLog("Session: freeing resources.");
             freeResources();
             writeToLog("Session: ended.");
 
-//          } catch (IOException ex) {
-//              writeToLog("Session: run error. While closing client socket. " +
-//                         ex.getMessage());
-//          }
             try {
                 if (this.log != null) {
                     this.log.close();    // throws IOException
