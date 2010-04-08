@@ -74,7 +74,7 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
     public void changed(IServer server) {
         if (server != null) {
             this.labelPort.setText(PORT_LABEL_TEXT + server.getPort());
-            this.labelClients.setText(CLIENTS_LABEL_TEXT + server.getSessions());
+            this.labelClients.setText(CLIENTS_LABEL_TEXT + server.getSessions().size());
             this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + server.isShutdowned());
 
             if (!server.isShutdowned()) {
