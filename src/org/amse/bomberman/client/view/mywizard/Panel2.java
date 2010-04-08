@@ -97,10 +97,10 @@ public class Panel2 extends JPanel implements Updating{
         }
     }
     public void setGames(List<String> games) {
+        MyTableModel tableModel = (MyTableModel) table.getModel();
+        tableModel.clear();
         if (!games.get(0).equals("No unstarted games finded.")) {
             int counter = 0;
-            MyTableModel tableModel = (MyTableModel) table.getModel();
-            tableModel.clear();
             for (String game : games) {
                 String[] buf = game.split(" ");
                 table.setValueAt(buf[0], counter, 0);
@@ -111,7 +111,7 @@ public class Panel2 extends JPanel implements Updating{
                 counter++;
             }
         }
-        //table.repaint();
+        table.repaint();
     }
 
     private void setSizesTable() {

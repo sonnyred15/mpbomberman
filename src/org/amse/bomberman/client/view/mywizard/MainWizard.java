@@ -66,8 +66,14 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
             if (current instanceof Panel3) {
-                Panel3 panel3 = (Panel3) current;
-                panel3.setGameInfo(list);
+                if (!list.get(0).equals("Not joined to any game.")) {
+                    Panel3 panel3 = (Panel3) current;
+                    panel3.setGameInfo(list);
+                } else {
+                    this.slideBack();
+                    JOptionPane.showMessageDialog(this, "Created game was closed.\n"
+                       , "Game Closed.", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME)) {
@@ -183,7 +189,6 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                    con.connect(panel1.getIPAddress(), panel1.getPort());
                    Model.getInstance().setPlayerName(panel1.getPlayerName());
                    slideNext();
-                   //parent.setBackButtonEnable(false);
                }
                if (current instanceof Panel2) {
                    Panel2 panel2 = (Panel2) current;
@@ -200,8 +205,6 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                    }
                }
                if (current instanceof Panel3) {
-                   //Panel3 panel3 = (Panel3) current;
-                   //panel3.startGame();
                    Controller.getInstance().requestStartGame();
                }
            } catch (UnknownHostException ex) {
@@ -232,9 +235,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                 Panel3 panel = (Panel3)current;
                 try {
                     con.requestLeaveGame();
-                    panel.stopTimers();
                     slideBack();
-                    //parent.setBackButtonEnable(false);
                 } catch (NetException ex) {
                     JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                             + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

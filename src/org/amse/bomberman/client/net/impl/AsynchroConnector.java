@@ -52,10 +52,12 @@ public class AsynchroConnector implements IConnector2 {
     }
 
     public void disconnect() {
-        try {
-            this.socket.close();
-        } catch (IOException ex) {
-            System.out.println(ex);
+        if (socket != null) {
+            try {
+                this.socket.close();
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
     }
 
