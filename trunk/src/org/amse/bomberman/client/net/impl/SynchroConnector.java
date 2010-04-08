@@ -56,10 +56,12 @@ public class SynchroConnector implements IConnector2 {
         this.socket = new Socket(address, port);
     }
     public void disconnect() {
-        try {
-            this.socket.close();
-        } catch (IOException ex) {
-            System.out.println(ex);
+        if (socket != null) {
+            try {
+                this.socket.close();
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
     }
 
@@ -210,7 +212,7 @@ public class SynchroConnector implements IConnector2 {
                 answer.add(oneLine);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e);
             throw new NetException();
         }
         if (answer.size() == 0) {
@@ -267,7 +269,7 @@ public class SynchroConnector implements IConnector2 {
                     if (panel instanceof Panel3) {
                         Panel3 panel3 = (Panel3) panel;
                         if (!((MyWizard) listener).isShowing()) {
-                            panel3.stopTimers();
+                            stopUpdating();
                         }
                     }
                 }

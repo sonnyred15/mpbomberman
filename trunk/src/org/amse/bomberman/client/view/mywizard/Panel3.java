@@ -40,7 +40,6 @@ public class Panel3 extends JPanel implements Updating{
     private JButton chatJButton = new JButton();
     private JTextArea chatTA = new JTextArea();
     private JTextField messageTF = new JTextField();
-    private Timer timer;
     private final int width = 640;
     private final int height = 480;
     private final Dimension defaultButton = new Dimension(100,20);
@@ -56,13 +55,6 @@ public class Panel3 extends JPanel implements Updating{
     public void setPlayersNum(int number) {
         playersNum = number;
     }
-    public void stopTimers() {
-        if (timer != null) {
-            timer.cancel();
-            timer.purge();
-            timer = null;
-        }
-    }
     public void getServerInfo() {
         try {
             chatTA.setText("");
@@ -70,12 +62,10 @@ public class Panel3 extends JPanel implements Updating{
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            stopTimers();
             parent.setCurrentJPanel(0);
         }
     }
     public void startGame() throws NetException {
-        this.stopTimers();
         parent.dispose();
         IModel model = Model.getInstance();
         Controller.getInstance().setReceiveInfoListener((RequestResultListener) Model.getInstance());
@@ -155,7 +145,6 @@ public class Panel3 extends JPanel implements Updating{
                         } catch (NetException ex) {
                             // is it good?
                             ex.printStackTrace();
-                            stopTimers();
                             parent.setCurrentJPanel(0);
                         }
                     }
@@ -211,7 +200,6 @@ public class Panel3 extends JPanel implements Updating{
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                stopTimers();
                 parent.setCurrentJPanel(0);
             } 
         }
@@ -230,7 +218,6 @@ public class Panel3 extends JPanel implements Updating{
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
                         + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                stopTimers();
                 parent.setCurrentJPanel(0);
             }
         }
