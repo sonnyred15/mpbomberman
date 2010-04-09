@@ -45,7 +45,7 @@ public class GamePanel  extends JPanel{
     private static final Color EMPTY_COLOR = Color.LIGHT_GRAY;
     private static final Color PL_EXPL_COLOR = Color.RED;
     private static final String BOMB_ICON_PATH = "org/amse/bomberman/client/icons/bomb-48.png";
-    private static final String WALL_ICON_PATH = "org/amse/bomberman/client/icons/wall-48.png";
+    private static final String WALL_ICON_PATH = "org/amse/bomberman/client/icons/wall-wood-48.png";
     private static final String PL1_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-1.png";
     private static final String PL2_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-2.png";
     private static final String PL3_ICON_PATH = "org/amse/bomberman/client/icons/superman-48-3.png";
