@@ -58,7 +58,7 @@ public class GameJFrame extends JFrame implements IView{
               */
     }
 
-    public void update() {
+    public synchronized void update() {
         IModel model = Model.getInstance();
         if (!model.isStarted()) {
             //JOptionPane.showMessageDialog(this, "You leaved the game.\n"
@@ -75,10 +75,10 @@ public class GameJFrame extends JFrame implements IView{
             this.refreshLives(lives);
             if (lives <= 0) {
                 if (!dead) {
+                    dead = true;
                     JOptionPane.showMessageDialog(this, "You are dead!!!"
                             , "Death", JOptionPane.INFORMATION_MESSAGE);
                     this.removeKeyListener(listener);
-                    dead = true;
                 }
             }
         }

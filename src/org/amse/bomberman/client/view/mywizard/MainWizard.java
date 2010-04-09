@@ -43,7 +43,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
     }
     public void updateCurrentPanel() {
         Updating current = (Updating) this.getCurrentJPanel();
-        current.getServerInfo();
+        current.doBeforeShow();
     }
     public void received(List<String> list) {
         if (list.size() == 0) {

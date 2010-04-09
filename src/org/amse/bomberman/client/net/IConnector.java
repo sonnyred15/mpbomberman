@@ -1,36 +1,37 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.amse.bomberman.client.net;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
-import org.amse.bomberman.client.model.BombMap;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- *
- * @author Michail Korovkin
+ * @author Michael Korovkin
+ * @author Kirilchuk V.E
  */
 public interface IConnector {
 
-     /*public void сonnect(InetAddress address, int port)
-             throws UnknownHostException, IOException;
-     public boolean leaveGame() throws NetException;
-     public List<String> takeGamesList() throws NetException;
-     public boolean createGame(String gameName, String mapName, int maxPl) 
-             throws NetException;
-     public boolean joinGame(int gameID) throws NetException;
-     public boolean doMove(Direction dir) throws NetException;
-     public boolean startGame() throws NetException;
-     public BombMap getMap() throws NetException;
-     public boolean plantBomb() throws NetException;
-     public boolean joinBotIntoGame(int gameNumber) throws NetException;
-     public String[] getMaps() throws NetException;
-     public boolean isStarted() throws NetException;
-     public List<String> getMyGameInfo() throws NetException;
-     public List<String> sendChatMessage(String message) throws NetException;
-     public List<String> getNewChatMessages() throws NetException;
-     public InetAddress getInetAddress();
-     public int getPort();
-     public void beginUpdating() throws NetException;*/
+    void сonnect(InetAddress address, int port) throws UnknownHostException
+            , IOException;
+    void disconnect();
+    void requestLeaveGame() throws NetException;
+    void requestGamesList() throws NetException;
+    void requestCreateGame(String gameName, String mapName, int maxPl)
+            throws NetException;
+    void requestJoinGame(int gameID) throws NetException;
+    void requestDoMove(Direction dir) throws NetException;
+    void requestStartGame() throws NetException;
+    void requestGameMap() throws NetException;
+    void requestDownloadGameMap(String gameMapName) throws NetException;
+    void requestPlantBomb() throws NetException;
+    void requestJoinBotIntoGame() throws NetException;
+    void requestGameMapsList() throws NetException;
+    void requestIsGameStarted() throws NetException;
+    void requestGameInfo() throws NetException;
+    void sendChatMessage(String message) throws NetException;
+    void requestNewChatMessages() throws NetException;
 }

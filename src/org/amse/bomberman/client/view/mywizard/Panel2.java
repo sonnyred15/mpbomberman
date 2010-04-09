@@ -81,7 +81,7 @@ public class Panel2 extends JPanel implements Updating{
         }
     }
 
-    public void getServerInfo() {
+    public void doBeforeShow() {
         try {
             Controller.getInstance().requestGamesList();
             Controller.getInstance().requestMapsList();

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.net.IConnector2;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
@@ -27,15 +27,15 @@ import org.amse.bomberman.util.ProtocolConstants;
  * @author Michael Korovkin
  * @author Kirilchuk V.E.
  */
-public class AsynchroConnector implements IConnector2 {
+public class AsynchroConnector implements IConnector {
 
     private Socket socket;
-    private static IConnector2 connector = null;
+    private static IConnector connector = null;
 
     private AsynchroConnector() {
     }
 
-    public static IConnector2 getInstance() {
+    public static IConnector getInstance() {
         if (connector == null) {
             connector = new AsynchroConnector();
         }

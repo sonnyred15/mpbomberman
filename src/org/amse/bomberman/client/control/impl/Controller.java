@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-import org.amse.bomberman.client.net.IConnector2;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
 import org.amse.bomberman.client.net.impl.SynchroConnector;
@@ -19,7 +19,7 @@ import org.amse.bomberman.util.Creator;
  */
 public class Controller implements IController{
 
-    private IConnector2 connector = null;
+    private IConnector connector = null;
     private static IController controller = null;
     private RequestResultListener receiveResultListener;
 

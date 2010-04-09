@@ -55,7 +55,7 @@ public class Panel3 extends JPanel implements Updating{
     public void setPlayersNum(int number) {
         playersNum = number;
     }
-    public void getServerInfo() {
+    public void doBeforeShow() {
         try {
             chatTA.setText("");
             Controller.getInstance().requestGameInfo();

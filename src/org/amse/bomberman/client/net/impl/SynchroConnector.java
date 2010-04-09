@@ -17,7 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JPanel;
 import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.net.IConnector2;
+import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
@@ -33,18 +33,18 @@ import org.amse.bomberman.util.ProtocolConstants;
  *
  * @author Kirilchuk V.E. and Michael Korovkin
  */
-public class SynchroConnector implements IConnector2 {
+public class SynchroConnector implements IConnector {
 
     private Timer timer;
     private Socket socket;
-    private static IConnector2 connector = null;
+    private static IConnector connector = null;
     public static final String[] botNames = {"BOT_ANDY", "BOT_SAM", "BOT_JOE", "BOT_VASYA"
     , "BOT_PETYA", "BOT_ANYA", "BOT_LOOSER", "BOT_UNLUCKY", "BOT_FOOL", "BOT_SUICIDE"};
 
     private SynchroConnector() {
         
     }
-    public static IConnector2 getInstance() {
+    public static IConnector getInstance() {
         if (connector == null) {
             connector = new SynchroConnector();
         }
