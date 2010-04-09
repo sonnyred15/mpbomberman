@@ -21,16 +21,22 @@ public class Controller implements IController{
 
     private IConnector connector = null;
     private static IController controller = null;
+    private boolean isAsynchro;
     private RequestResultListener receiveResultListener;
 
-    private Controller() {
+    private Controller(boolean isAsynchro) {
+        this.isAsynchro = isAsynchro;
         if (connector == null) {
-            connector = AsynchroConnector.getInstance();
+            if (isAsynchro) {
+                connector = AsynchroConnector.getInstance();
+            } else {
+                connector = SynchroConnector.getInstance();
+            }
         }
     }
     public static IController getInstance() {
         if (controller == null) {
-            controller = (IController)new Controller();
+            controller = (IController)new Controller(true);
         }
         return controller;
     }
@@ -79,9 +85,9 @@ public class Controller implements IController{
 
     public void requestStartGame() throws NetException {
         this.connector.requestStartGame();
-        if (connector instanceof SynchroConnector) {
+        /*if (!isAsynchro) {
             ((SynchroConnector)connector).beginGameUpdating();
-        }
+        }*/
     }
 
     public void requestGameMap() throws NetException {

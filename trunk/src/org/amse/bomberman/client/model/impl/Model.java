@@ -2,6 +2,7 @@ package org.amse.bomberman.client.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
@@ -82,8 +83,7 @@ public class Model implements IModel, RequestResultListener{
             } else {
                 escapeGame();
             }
-        }
-        if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
             if (list.get(0).equals("false")) {
                 //System.out.println("You try to do move uncorrectly.");
             } else {
@@ -91,20 +91,20 @@ public class Model implements IModel, RequestResultListener{
                     escapeGame();
                 }
             }
-        }
-        if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
             if (list.get(0).equals("started.")) {
                 isStarted = true;
             } else {
                 escapeGame();
             }
-        }
-        if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
             if (list.get(0).equals("Disconnected.")) {
                 escapeGame();
             } else {
                 // TO DO
             }
+        } else if (command.equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
+            escapeGame();
         }
     }
     public BombMap getMap() {
