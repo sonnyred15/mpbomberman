@@ -248,7 +248,8 @@ public class SynchroConnector implements IConnector {
                 requestGameMap();
             } catch (NetException ex) {
                 // is it good???
-                ex.printStackTrace();
+                //ex.printStackTrace();
+                System.out.println(ex);
                 this.cancel();
             }
         }
@@ -276,10 +277,10 @@ public class SynchroConnector implements IConnector {
 
             } catch (NetException ex) {
                 // is it good???
-                ex.printStackTrace();
+                //ex.printStackTrace();
+                System.out.println(ex);
                 stopUpdating();
                 this.cancel();
-                //parent.setCurrentJPanel(0);
             }
         }
     }
