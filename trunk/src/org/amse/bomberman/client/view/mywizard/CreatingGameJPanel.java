@@ -122,7 +122,7 @@ public class CreatingGameJPanel extends JPanel {
                 con.requestCreateGame(getGameName(), mapName, getMaxPlayers());
                 parent.goNext();
                 Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
-                nextPanel.getServerInfo();
+                nextPanel.doBeforeShow();
             } catch (NetException ex) {
                 JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

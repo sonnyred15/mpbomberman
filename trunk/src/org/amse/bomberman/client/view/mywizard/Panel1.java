@@ -68,7 +68,7 @@ public class Panel1 extends JPanel implements Updating {
     public String getPlayerName() {
         return playerNameTF.getText();
     }
-    public void getServerInfo() {
+    public void doBeforeShow() {
     }
 
     private void initComponents() {
