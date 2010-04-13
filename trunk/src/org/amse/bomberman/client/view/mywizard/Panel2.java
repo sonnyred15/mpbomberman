@@ -1,13 +1,20 @@
 package org.amse.bomberman.client.view.mywizard;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -25,32 +32,17 @@ public class Panel2 extends JPanel implements Updating{
     private final int height = 480;
     private MyWizard parent;
     private JButton refreshJButton = new JButton();
-    private JTable table = new JTable(new MyTableModel());
-    private final Dimension buttonSize = new Dimension(200, 40);
-    private CreatingGameJPanel createPanel;
+    private JTable table;
+    private CreatingGameJPanel creatingPanel;
+    private JPanel mainPanel = new JPanel();
+    private CardLayout cardLayout = new CardLayout();
+    private final String CREATE_NAME = "New game";
+    private final String JOIN_NAME = "Join game";
 
     public Panel2(MyWizard jframe){
         this.setSize(width, height);
         parent = jframe;
-        createPanel = new CreatingGameJPanel(parent);
-
-        JPanel leftBox = new JPanel();
-        // how calculate sizes???
-        leftBox.setPreferredSize(new Dimension(200, 240));
-        leftBox.setLayout(new FlowLayout());
-        leftBox.add(createPanel);
-        leftBox.add(refreshJButton);
-        this.setSizesTable();
-
-        this.setLayout(new FlowLayout());
-        this.add(leftBox);
-        JScrollPane jsp = new JScrollPane(table, JScrollPane
-                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        // how calculate sizes???
-        jsp.setPreferredSize(new Dimension(width - 200, height - 50));
-        this.add(jsp);
-
-        refreshJButton.setAction(new RefreshAction(this));
+        initComponents();
         this.setVisible(true);
     }
     // !!!!!!!!!!!!!!!!!!!!  is it really need???
@@ -93,7 +85,7 @@ public class Panel2 extends JPanel implements Updating{
     }
     public void setMaps(List<String> maps) {
         if (!maps.get(0).equals("No maps on server was founded.")) {
-            createPanel.setMaps(maps);
+            creatingPanel.setMaps(maps);
         }
     }
     public void setGames(List<String> games) {
@@ -148,6 +140,61 @@ public class Panel2 extends JPanel implements Updating{
         }
     }
 
+    private void initComponents() {
+        // initialization of MyTable with list of games
+        table = new JTable(new MyTableModel());
+        this.setSizesTable();
+
+        // create JRadioButtons and set Actions to it
+        JRadioButton createButton = new JRadioButton("New game");
+        createButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, CREATE_NAME);
+            }
+        });
+        JRadioButton joinButton = new JRadioButton("Join game");
+        joinButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, JOIN_NAME);
+            }
+        });
+
+        // Button group to select type - create new game or join to the created game
+        ButtonGroup selectGroup = new ButtonGroup();
+        selectGroup.add(createButton);
+        selectGroup.add(joinButton);
+        createButton.setSelected(true);
+        Box radioBox = Box.createVerticalBox();
+        radioBox.setPreferredSize(new Dimension(120, 50));
+        radioBox.add(createButton);
+        radioBox.add(joinButton);
+
+        // createPanel
+        creatingPanel = new CreatingGameJPanel(parent);
+        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 150));
+        createPanel.add(creatingPanel);
+
+        // JoinPanel
+        JPanel joinPanel = new JPanel();
+        JScrollPane jsp = new JScrollPane(table, JScrollPane
+                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        joinPanel.add(jsp);
+        joinPanel.add(refreshJButton);
+        jsp.setPreferredSize(new Dimension(width - 150, height - 100));
+        joinPanel.setPreferredSize(new Dimension(width - 150, height - 50));
+        refreshJButton.setAction(new RefreshAction(this));
+
+        // mainPanel - cardLayout with createPanel and joinPanel
+        mainPanel.setLayout(cardLayout);
+        mainPanel.add(createPanel, CREATE_NAME);
+        mainPanel.add(joinPanel, JOIN_NAME);
+
+        // add radioPanel and mainPanel
+        this.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 0));
+        this.add(radioBox);
+        this.add(mainPanel);
+    }
+
     private class RefreshAction extends AbstractAction {
         Panel2 parent;
         public RefreshAction(Panel2 panel) {
@@ -167,28 +214,6 @@ public class Panel2 extends JPanel implements Updating{
             }
         }
     }
-
-    /*
-    public static class JoinAction extends AbstractAction {
-        ServerInfoJFrame myParent;
-
-        public JoinAction(ServerInfoJFrame jFrame) {
-            myParent = jFrame;
-            putValue(NAME, "Join");
-            putValue(SHORT_DESCRIPTION, "Join to the selected Game");
-            putValue(SMALL_ICON, null);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            int gameNumber = myParent.getSelectedGame();
-            if (gameNumber != -1) {
-                myParent.join(gameNumber);
-            } else {
-                JOptionPane.showMessageDialog(myParent, "You did't select the game! "
-                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }*/
 
     private class MyTableModel extends AbstractTableModel {
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};

@@ -51,7 +51,6 @@ public class MyWizard  extends JFrame{
         myPanelNames.add(panelName);
         myPanels.add(panel);
         cardPanel.add(panel, panelName);
-        //cardLayout.addLayoutComponent(panel, panelName);
     }
     public void setNextButtonEnable(boolean b) {
         nextJButton.setEnabled(b);
