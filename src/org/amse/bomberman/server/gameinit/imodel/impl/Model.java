@@ -421,8 +421,9 @@ public class Model implements IModel {
                     int x = player.getPosition().getX();
                     int y = player.getPosition().getY();
 
-                    if (this.gameMap.isBomb(x, y)) {
-                        return false;    // if player staying under the bomb
+                    if (this.gameMap.isBomb(x, y)
+                            || this.isExplosion(new Pair(x, y))) {
+                        return false;    // if player staying under the bomb or explosion
                     }
 
                     Bomb bomb = new Bomb(this, player, new Pair(x, y));
