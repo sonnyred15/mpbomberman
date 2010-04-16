@@ -204,6 +204,9 @@ public class AsynchroSession extends AbstractSession {
             gameName = queryArgs[1];
             mapName = queryArgs[2];
             playerName = queryArgs[4];
+            if(playerName.length()>10){
+                playerName = playerName.substring(0, 10);
+            }
 
             try {
                 maxPlayers = Integer.parseInt(queryArgs[3]);
@@ -384,6 +387,9 @@ public class AsynchroSession extends AbstractSession {
             }
 
             playerName = queryArgs[2];
+            if(playerName.length() > 10){
+                playerName = playerName.substring(0, 10);
+            }
         } else {    // wrong syntax
             messages.add("Wrong query. Error on client side.");
             sendAnswer(messages);

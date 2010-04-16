@@ -170,13 +170,6 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
-//
-//  public abstract void notifyClientAboutGameMapChange();
-//
-//  public abstract void notifyClientAboutGameStart();
-//
-//  public abstract void notifyClientAboutGameDisconnect();
-
     public abstract void notifyClient(String message);
 
     protected abstract void freeResources();

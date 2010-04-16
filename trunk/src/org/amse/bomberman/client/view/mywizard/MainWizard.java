@@ -26,7 +26,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
         super(new Dimension(660, 530), "Let's BOMBERMANNING!!!");
         this.addNextJPanel(new Panel1(this), "CONNECT_PANEL");
         this.addNextJPanel(new Panel2(this), "CREATE_PANEL");
-        this.addNextJPanel(new Panel3(this), "GAME_PANEL");
+        this.addNextJPanel(new Panel33(this), "GAME_PANEL");
         this.setNextAction(new NextAction(this));
         this.setBackAction(new BackAction(this));
         this.setCancelAction(new CancelAction(this));
@@ -65,9 +65,9 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
-            if (current instanceof Panel3) {
+            if (current instanceof Panel33) {
                 if (!list.get(0).equals("Not joined to any game.")) {
-                    Panel3 panel3 = (Panel3) current;
+                    Panel33 panel3 = (Panel33) current;
                     panel3.setGameInfo(list);
                 } else {
                     this.slideBack();
@@ -90,8 +90,8 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
             if (list.get(0).equals("Game started.")) {
-                if (current instanceof Panel3) {
-                    Panel3 panel3 = (Panel3) current;
+                if (current instanceof Panel33) {
+                    Panel33 panel3 = (Panel33) current;
                     try {
                         if (!Model.getInstance().isStarted()) {
                             Model.getInstance().setStart(true);
@@ -112,8 +112,8 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             }
             return;
         } else if (command.equals(ProtocolConstants.MESSAGE_GAME_START)) {
-            if (current instanceof Panel3) {
-                Panel3 panel3 = (Panel3) current;
+            if (current instanceof Panel33) {
+                Panel33 panel3 = (Panel33) current;
                 try {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
@@ -128,8 +128,8 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
             if (list.get(0).equals("started.")) {
-                if (current instanceof Panel3) {
-                    Panel3 panel3 = (Panel3) current;
+                if (current instanceof Panel33) {
+                    Panel33 panel3 = (Panel33) current;
                     try {
                         if (!Model.getInstance().isStarted()) {
                             Model.getInstance().setStart(true);
@@ -150,7 +150,7 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
-            if (current instanceof Panel3) {
+            if (current instanceof Panel33) {
                 if (!list.get(0).equals("Bot added.")) {
                     JOptionPane.showMessageDialog(this, "Can not join bot.\n"
                             + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
@@ -159,14 +159,14 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
-            if (current instanceof Panel3) {
-                Panel3 panel3 = (Panel3) current;
+            if (current instanceof Panel33) {
+                Panel33 panel3 = (Panel33) current;
                 panel3.setNewMessages(list);
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
-            if (current instanceof Panel3) {
-                Panel3 panel3 = (Panel3) current;
+            if (current instanceof Panel33) {
+                Panel33 panel3 = (Panel33) current;
                 panel3.setNewMessages(list);
             }
             return;
@@ -197,14 +197,14 @@ public class MainWizard extends MyWizard implements RequestResultListener {
                        con.requestJoinGame(gameNumber);
                        int maxPl = panel2.getSelectedMaxPl();
                        slideNext();
-                       Panel3 panel3 = (Panel3) parent.getCurrentJPanel();
+                       Panel33 panel3 = (Panel33) parent.getCurrentJPanel();
                        panel3.setPlayersNum(maxPl);
                    } else {
                        JOptionPane.showMessageDialog(parent, "You did't select the game! "
                         + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
                    }
                }
-               if (current instanceof Panel3) {
+               if (current instanceof Panel33) {
                    Controller.getInstance().requestStartGame();
                }
            } catch (UnknownHostException ex) {
@@ -231,8 +231,8 @@ public class MainWizard extends MyWizard implements RequestResultListener {
             JPanel current = parent.getCurrentJPanel();
             IController con = Controller.getInstance();
 
-            if (current instanceof Panel3) {
-                Panel3 panel = (Panel3)current;
+            if (current instanceof Panel33) {
+                Panel33 panel = (Panel33)current;
                 try {
                     con.requestLeaveGame();
                     slideBack();
