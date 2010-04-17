@@ -23,6 +23,6 @@ public class MoveAction implements IAction{
     }
 
     public void executeAction(Game game) {
-        game.doMove(this.bot.getID(), this.direction);
+        game.tryDoMove(this.bot.getID(), this.direction);
     }
 }

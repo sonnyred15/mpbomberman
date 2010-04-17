@@ -6,7 +6,7 @@ package org.amse.bomberman.server.net;
 
 import java.io.IOException;
 import java.util.List;
-import org.amse.bomberman.server.ServerChangeListener;
+import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 
 /**

@@ -106,7 +106,7 @@ public final class Stringalize {
     }
 
     public static List<String> mapAndExplosionsInfo(Game game) {
-        List<String> result = Stringalize.map(game.getGameMapArray());
+        List<String> result = Stringalize.map(game.getGameField());
 
         result.addAll(Stringalize.explosions(game.getExplosionSquares()));
 
@@ -124,7 +124,7 @@ public final class Stringalize {
 
     // TODO temporary
     public static List<String> mapExplPlayerInfo2(Game game, Player player) {
-        int[][]      field = game.getGameMapArray();
+        int[][]      field = game.getGameField();
         List<Player> players = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 

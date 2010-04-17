@@ -110,7 +110,7 @@ public class Controller implements GameEndedListener{
     }
 
     /**
-     * Tryes to join bot into your game with specified nick name.
+     * Tryes to tryJoin bot into your game with specified nick name.
      * @param botName nick name of bot.
      * @return integer value that have next meanings
      * <p>
@@ -118,7 +118,7 @@ public class Controller implements GameEndedListener{
      * and trying to add bot.
      * <p>
      * Controller.GAME_IS_ALREADY_STARTED - if game was already started
-     * and you can not join bot.
+     * and you can not tryJoin bot.
      * <p>
      * Controller.NOT_OWNER_OF_GAME - if you are not owner of the game
      * or game is full
@@ -133,7 +133,7 @@ public class Controller implements GameEndedListener{
                 joinResult = Controller.GAME_IS_ALREADY_STARTED;
 
                 if (!this.game.isStarted()) {
-                    Player bot = this.game.addBot(botName, this);
+                    Player bot = this.game.tryAddBot(botName, this);
 
                     if (bot == null) {
                         joinResult = Controller.NOT_OWNER_OF_GAME;
@@ -149,7 +149,7 @@ public class Controller implements GameEndedListener{
 
     /**
      * Creates game. Add it to server. Setting session as owner of the game
-     * and join owner into game.
+     * and tryJoin owner into game.
      * <p>
      * If owner was in other game and tryes to create game
      * then this method will disconnect him from previous game, cause only one
@@ -178,7 +178,7 @@ public class Controller implements GameEndedListener{
         this.game = Creator.createGame(this.sessionServer, mapName, gameName,
                                        maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
-        this.playerID = this.game.join(playerName, this);        
+        this.playerID = this.game.tryJoin(playerName, this);
 
         if (this.playerID == -1) {
             throw new NullPointerException("Error while creating game. " +
@@ -190,7 +190,7 @@ public class Controller implements GameEndedListener{
     }
 
     public boolean tryDoMove(Direction dir) {
-        return this.game.doMove(this.playerID, dir);
+        return this.game.tryDoMove(this.playerID, dir);
     }
 
     public int tryJoinGame(int gameID, String playerName) {
@@ -210,7 +210,7 @@ public class Controller implements GameEndedListener{
                 joinResult = Controller.GAME_IS_ALREADY_STARTED;
 
                 if (!gameToJoin.isStarted()) {
-                    this.playerID = gameToJoin.join(playerName, this);
+                    this.playerID = gameToJoin.tryJoin(playerName, this);
                     this.game = gameToJoin;
 
                     if (this.playerID == -1) {

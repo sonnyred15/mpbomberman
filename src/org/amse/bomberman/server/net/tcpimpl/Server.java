@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.amse.bomberman.server.ServerChangeListener;
+import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
