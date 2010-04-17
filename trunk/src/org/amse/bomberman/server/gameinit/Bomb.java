@@ -20,12 +20,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * Class that represents Bomb - object of bomberman game.
  * @author Kirilchuk V.E.
  */
 public class Bomb implements MoveableObject {
+    //TODO need to be tested. One timer on all Bombs can cause some problems
+    //when number of bombes in game would be too much.
+    //It is only guess, so need to be checked.
     private static final ScheduledExecutorService timer =
-        Executors.newSingleThreadScheduledExecutor();
+                                   Executors.newSingleThreadScheduledExecutor();
     private boolean       wasDetonated = false;
     private final GameMap gameMap;
     private final IModel  model;
@@ -33,23 +36,41 @@ public class Bomb implements MoveableObject {
     private final Pair    position;
     private final int     radius;
 
+    /**
+     * Constructor of Bomb. Should be called in model when someone places bomb.
+     * @param model IModel that owns this Bomb.
+     * @param player Player that setted the bomb.
+     * @param bombPosition coordinates on gameMap where Bomb was placed.
+     */
     public Bomb(IModel model, Player player, Pair bombPosition) {
-        //init object fields
-        this.model = model;
-        this.owner = player;
-        this.gameMap = this.model.getGameMap();
+
+        /*init object fields*/
+        this.model    = model;
+        this.owner    = player;
+        this.gameMap  = this.model.getGameMap();
         this.position = bombPosition;
-        this.radius = this.owner.getRadius();
-        //additional stuff
-        this.owner.placedBomb();
+        this.radius   = this.owner.getRadius();
+
+        /*additional stuff*/
+        this.owner.placedBomb(); //takes bomb from player
         Bomb.timer.schedule(new DetonateTask(), Constants.BOMB_TIMER_VALUE,
                             TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Method of MoveableObject interface.
+     * When bomb is moving to explosion it must detonate.
+     * @see MoveableObject
+     */
     public void bombed() {
-        this.model.detonateBombAt(this.position);
+        this.detonate();
     }
 
+    /**
+     * Method to detonate Bomb. It is called either from Model, when other bomb
+     * explode and detonate this bomb, or from DetonateTask,
+     * when time to explode has come.
+     */
     public void detonate() {
         if (this.wasDetonated) {
             return;
@@ -123,14 +144,14 @@ public class Bomb implements MoveableObject {
         // center of Explosion
         explosions.add(this.position);
 
-        // if owner still staying in bomb square and not under explosion.
+        // if owner still staying in bomb square and not under other explosion.
         if (this.owner.getPosition().equals(this.position)
                 &&!this.model.isExplosion(this.position)) {
             this.model.playerBombed(this.owner, this.owner);
         }
 
         this.model.addExplosions(explosions);    // add explosions to model
-        this.owner.detonatedBomb();
+        this.owner.detonatedBomb(); //must return bomb to player
         Bomb.timer.schedule(new ClearExplosionTask(explosions),
                             Constants.BOMB_DETONATION_TIME,
                             TimeUnit.MILLISECONDS);
@@ -154,7 +175,7 @@ public class Bomb implements MoveableObject {
                 // going to return false;
             } else {    // destroyable block
                 if (gameMap.blockAt(x, y) == 8) {    // destroyed block
-                    gameMap.destroyBlock(x, y);
+                    gameMap.damageBlock(x, y);
                 } else {
                     gameMap.setSquare(x, y, gameMap.blockAt(x, y) + 1 - 9);
                 }
@@ -186,14 +207,27 @@ public class Bomb implements MoveableObject {
         return Constants.MAP_BOMB;
     }
 
+    /**
+     * Returns the owner of this bomb.
+     * Owner - it is player that setted this bomb.
+     * @return owner of this bomb.
+     */
     public Player getOwner() {
         return owner;
     }
 
+    /**
+     * Returns the position of this bomb on gameMap.
+     * @return position of this bomb on gameMap
+     */
     public Pair getPosition() {
         return this.position;
     }
 
+    /**
+     * Sets the new position of this bomb.
+     * @param newPosition new position on gameMap.
+     */
     public void setPosition(Pair newPosition) {
         this.position.setX(newPosition.getX());
         this.position.setY(newPosition.getY());
@@ -214,6 +248,7 @@ public class Bomb implements MoveableObject {
 
 
     private class DetonateTask implements Runnable {
+
         @Override
         public void run() {
             detonate();

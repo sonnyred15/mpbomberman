@@ -25,6 +25,6 @@ public class PlaceAndMoveAction implements IAction{
 
     public void executeAction(Game game) {
         game.tryPlaceBomb(this.bot.getID());
-        game.doMove(this.bot.getID(), this.direction);
+        game.tryDoMove(this.bot.getID(), this.direction);
     }
 }

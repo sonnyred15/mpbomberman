@@ -60,9 +60,6 @@ public interface IModel {
 
     void playerBombed(Player atacker, Player victim);
 
-    @Deprecated // or model must implement DieListener or this mehod is not a model interface
-    void playerDied(Player player);
-
     @Deprecated    // think is not needed
     void printToConsole();
 

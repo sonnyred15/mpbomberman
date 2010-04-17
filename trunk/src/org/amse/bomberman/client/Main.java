@@ -2,7 +2,7 @@ package org.amse.bomberman.client;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.client.control.impl.Controller;
+import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.view.mywizard.MainWizard;
 
 /**
@@ -15,8 +15,11 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        MainWizard wizard = new MainWizard();
+        SwingUtilities.invokeLater(new Runnable() {
 
-        Controller.getInstance().setReceiveInfoListener(wizard);
+            public void run() {
+                new MainWizard();
+            }
+        });
     }
 }

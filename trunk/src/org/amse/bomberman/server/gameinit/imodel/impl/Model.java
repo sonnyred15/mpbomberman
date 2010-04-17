@@ -33,9 +33,8 @@ import org.amse.bomberman.util.ProtocolConstants;
  * between GameMap and Game.
  * @author Kirilchuk V.E.
  */
-public class Model implements IModel {
+public class Model implements IModel, DieListener {
     private final List<Bomb>                  bombs;
-    private final DieListener                 dieListener;
     private final List<Pair>                  explosionSquares;
     private final List<Integer>               freeIDs;
     private final Game                        game;
@@ -64,7 +63,6 @@ public class Model implements IModel {
 //            new CopyOnWriteArrayList<GameMapUpdateListener>();
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
-        this.dieListener = new DieListener(this);
     }
 
     // TODO is this is normal realization?
@@ -73,7 +71,7 @@ public class Model implements IModel {
                           new RandomFullBotStrategy());
 
         bot.setID(getFreeID());
-        bot.setDieListener(this.dieListener);
+        bot.setDieListener(this);
         this.players.add(bot);
 
         return bot;
@@ -95,7 +93,7 @@ public class Model implements IModel {
         Player playerToAdd = new Player(name);
 
         playerToAdd.setID(getFreeID());
-        playerToAdd.setDieListener(this.dieListener);
+        playerToAdd.setDieListener(this);
         this.players.add(playerToAdd);
 
         return playerToAdd.getID();

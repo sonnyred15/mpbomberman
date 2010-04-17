@@ -7,9 +7,9 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.Main;
 import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import java.util.Random;
 
 /**
- *
+ * Class that represents game field and stuff to work with this field.
  * @author Kirilchuk V.E.
  */
 public final class GameMap {
@@ -31,17 +31,21 @@ public final class GameMap {
     private final int[][] field;
     private final String  gameMapName;
 
-    public GameMap(int[][] gameMapArray) {    // CHECK < THIS// What if we get non square matrix???
-        this.dimension = gameMapArray.length;
-        this.field = gameMapArray;
+    /**
+     * Constructor of GameMap from square matrix.
+     * @param field square matrix of ints.
+     */
+    public GameMap(int[][] field) {    // CHECK < THIS// What if we get non square matrix???
+        this.dimension = field.length;
+        this.field = field;
         this.maxPlayers = countMaxPlayers(this.field);
         this.gameMapName = "intArrayMap";
     }
 
     /**
-     * Creates map from file.
-     * @param fileName file with map.
-     * @throws java.io.FileNotFoundException if no file with such name found
+     * Creates GameMap from file.
+     * @param fileName file with field.
+     * @throws java.io.FileNotFoundException if no file with such name found.
      * @throws java.io.IOException if an error occurs while reading from file.
      */
     public GameMap(String fileName) throws FileNotFoundException,
@@ -59,8 +63,6 @@ public final class GameMap {
         BufferedReader    reader = null;
 
         try {
-
-            // reader = new BufferedReader(new FileReader(fileName));
             reader = new BufferedReader(isr);
 
             int buf = Integer.parseInt(reader.readLine());
@@ -93,17 +95,28 @@ public final class GameMap {
         }
     }
 
+    /**
+     * Returnes int that represents the block on the field
+     * at the defined position.
+     * <p> returnes -1 if there is no block at such position.
+     * <p> returnes 1 for undestroyable block.
+     * @param position position to check.
+     * @return int that represents the block on the field
+     * at the defined position.
+     */
     public int blockAt(Pair position) {
         return this.blockAt(position.getX(), position.getY());
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @return 1 if block undestroyable.
-     * n in [2..8] if destroyable by n mines.
-     * -1 if it is not block.
+     * Returnes int that represents the block on the field
+     * at the defined position.
+     * <p> returnes -1 if there is no block at such position.
+     * <p> returnes 1 for undestroyable block.
+     * @param x position by x to check.
+     * @param y position by y to check.
+     * @return int that represents the block on the field
+     * at the defined position.
      */
     public int blockAt(int x, int y) {
         int square = this.field[x][y];
@@ -112,15 +125,20 @@ public final class GameMap {
             return -1;
         }
 
-        return square + 9;
+        return square + 9;    // TODO MAGIC NUMBERS ARE BAD AND MAYBE USE ABSOLUTE INSTEAD!?!?!?
     }
 
+    /**
+     * Return value of bonus at the defined position.
+     * @param position position to check.
+     * @return integer value of bonus and -1 if it is not a bonus.
+     */
     public int bonusAt(Pair position) {
         return this.bonusAt(position.getX(), position.getY());
     }
 
     /**
-     * return value of bonus at specific cell with coords x and y.
+     * Return value of bonus at specific cell with coords x and y.
      * @param x coord in line.
      * @param y coord in column.
      * @return integer value of bonus and -1 if it is not a bonus.
@@ -138,7 +156,7 @@ public final class GameMap {
     /**
      * Change GameMap for defined in argument number of players by
      * removing unused players from GameMap.
-     * @param maxPlayers number of players to use
+     * @param maxPlayers number of players to use.
      */
     public void changeMapForCurMaxPlayers(int curMaxPlayers) {
         for (int i = curMaxPlayers + 1; i <= this.maxPlayers; ++i) {
@@ -146,30 +164,22 @@ public final class GameMap {
         }
     }
 
-    // count maxPlayers for this mapArray.
-    private int countMaxPlayers(int[][] mapArray) {
-        int counter = 0;
-        int dim = this.dimension;
-
-        for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
-                int sq = mapArray[i][j];
-
-                if ((sq > 0) && (sq < Constants.MAX_PLAYERS)) {
-                    ++counter;
-                    mapArray[i][j] = counter;
-                }
-            }
-        }
-
-        return counter;
+    /**
+     * Damage block at the defined or do nothing if
+     * there is no block or block is undestroyable.
+     * @param position position of block to damage.
+     */
+    public void damageBlock(Pair position) {
+        this.damageBlock(position.getX(), position.getY());
     }
 
-    public void destroyBlock(Pair position) {
-        this.destroyBlock(position.getX(), position.getY());
-    }
-
-    public void destroyBlock(int x, int y) {
+    /**
+     * Damage block at the defined position or do nothing if
+     * there is no block or block is undestroyable.
+     * @param x position by x.
+     * @param y position by y.
+     */
+    public void damageBlock(int x, int y) {
         if (this.field[x][y] != -1) {
             return;
         }
@@ -192,72 +202,135 @@ public final class GameMap {
         }
     }
 
+    /**
+     * Returns the dimension of field.
+     * @return the dimension of field.
+     */
     public int getDimension() {
         return this.dimension;
     }
 
+    /**
+     * Returnes field matrix.
+     * @return field matrix.
+     */
     public int[][] getField() {
         return this.field;
     }
 
+    /**
+     * Returnes max players num supported by this GameMap.
+     * @returnmax players num supported by this GameMap.
+     */
     public int getMaxPlayers() {
         return this.maxPlayers;
     }
 
+    /**
+     * Returnes name of this GameMap.
+     * @return
+     */
     public String getName() {
         return this.gameMapName;
     }
 
+    /**
+     * Returns int that represents some object at the specified position.
+     * @param position position to check.
+     * @return int that represents some object at the specified position.
+     */
     public int getSquare(Pair position) {
         return this.getSquare(position.getX(), position.getY());
     }
 
+    /**
+     * Returns int that represents some object at the specified position.
+     * @param x position by x.
+     * @param y position by y.
+     * @return int that represents some object at the specified position.
+     */
     public int getSquare(int x, int y) {
         return this.field[x][y];
     }
 
+    /**
+     * Checks if there is bomb at the defined position.
+     * @param position position to check.
+     * @return true if there is bomb, false otherwise.
+     */
     public boolean isBomb(Pair position) {
         return this.isBomb(position.getX(), position.getY());
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @return True if map[x][y]=-16
+     * Checks if there is bomb at the defined position.
+     * @param x position by x.
+     * @param y position by y.
+     * @return true if there is bomb, false otherwise.
      */
     public boolean isBomb(int x, int y) {
         return (this.field[x][y] == Constants.MAP_BOMB);
     }
 
+    /**
+     * Checks if there is bonus at the defined position.
+     * @param position position to check.
+     * @return true if there is bonus, false otherwise.
+     */
     public boolean isBonus(Pair position) {
         return this.isBonus(position.getX(), position.getY());
     }
 
+    /**
+     * Checks if there is bonus at the defined position.
+     * @param x position by x.
+     * @param y position by y.
+     * @return true if there is bomb, false otherwise.
+     */
     public boolean isBonus(int x, int y) {
         return ((this.field[x][y] == Constants.MAP_BONUS_LIFE)
                 || (this.field[x][y] == Constants.MAP_BONUS_BOMB_RADIUS)
                 || (this.field[x][y] == Constants.MAP_BONUS_BOMB_COUNT));
     }
 
+    /**
+     * Checks if field at the sdefined position is empty.
+     * @param position position to check.
+     * @return true if there is empty cell, false otherwise.
+     */
     public boolean isEmpty(Pair position) {
         return this.isEmpty(position.getX(), position.getY());
     }
 
+    /**
+     * Checks if field at the sdefined position is empty.
+     * @param x position by x.
+     * @param y position by y.
+     * @return true if there is empty cell, false otherwise.
+     */
     public boolean isEmpty(int x, int y) {
         return this.field[x][y] == Constants.MAP_EMPTY;
     }
 
+    /**
+     * Returns int which is ID that represents player staying at the defined
+     * position.
+     * <p> -1 if there is no player.
+     * @param position position to check.
+     * @return int which is ID that represents player or -1 if
+     * there is no player.
+     */
     public int playerIDAt(Pair position) {
         return this.playerIDAt(position.getX(), position.getY());
     }
 
     /**
-     * players 1..15
-     * @param x
-     * @param y
-     * @return PayerId if there is player.
-     * Returns -1 if there is NO player.
+     * Returns int which is ID that represents player staying at the defined
+     * position.
+     * @param x position by x.
+     * @param y position by y.
+     * @return int which is ID that represents player or -1 if
+     * there is no player.
      */
     public int playerIDAt(int x, int y) {
         int square = this.field[x][y];
@@ -268,9 +341,10 @@ public final class GameMap {
 
         return square;
     }
+
     /**
      * Remove concrete player from gameMap.
-     * @param playerID
+     * @param playerID player to remove.
      */
     public void removePlayer(int playerID) {
         int dim = this.dimension;
@@ -286,11 +360,45 @@ public final class GameMap {
         }
     }
 
+    /**
+     * Setting value to square of field at the defined position.
+     * @param position position to set at.
+     * @param value value to set.
+     */
     public void setSquare(Pair position, int value) {
         this.setSquare(position.getX(), position.getY(), value);
     }
 
+    /**
+     * Setting value to square of field at the defined position.
+     * @param x position by x.
+     * @param y position by y.
+     * @param value value to set.
+     */
     public void setSquare(int x, int y, int value) {
         this.field[x][y] = value;
+    }
+
+    /**
+     * Returns max players num of this GameMap.
+     * @param field square matrix of GameMap.
+     * @return max players num of this GameMap.
+     */
+    private int countMaxPlayers(int[][] field) {
+        int counter = 0;
+        int dim = this.dimension;
+
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                int sq = field[i][j];
+
+                if ((sq > 0) && (sq < Constants.MAX_PLAYERS)) {
+                    ++counter;
+                    field[i][j] = counter;
+                }
+            }
+        }
+
+        return counter;
     }
 }

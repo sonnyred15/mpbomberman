@@ -32,6 +32,8 @@ public class MainWizard extends MyWizard implements RequestResultListener {
         this.setCancelAction(new CancelAction(this));
         this.setCurrentJPanel(0);
         this.setVisible(true);
+
+        Controller.getInstance().setReceiveInfoListener(this);
     }
     public void slideNext() {
         this.goNext();
