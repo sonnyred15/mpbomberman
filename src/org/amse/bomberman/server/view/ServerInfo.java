@@ -140,6 +140,9 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
         log.setCaretPosition(log.getText().length() - 1 - line.length());
     }
 
+    /**
+     * Clears text of log.
+     */
     public void clearLog() {
         log.setText("");
     }

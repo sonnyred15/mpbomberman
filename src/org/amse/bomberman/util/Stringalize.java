@@ -8,8 +8,8 @@ package org.amse.bomberman.util;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.gameinit.control.Controller;
+import org.amse.bomberman.server.gameinit.imodel.Player;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -18,12 +18,22 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ * Utility class.
+ * Main appointment to make String r List of Strings from something.
  * @author Kirilchuk V.E
  */
 public final class Stringalize {
     private Stringalize() {}
 
+    /**
+     * Creates list of explosions.
+     * Each string of list is coordinate of explosion in next format:
+     * <p>
+     * "x=... y=..."
+     *
+     * @param expl explosions to stringazize.
+     * @return list of explosions as list of strings.
+     */
     public static List<String> explosions(List<Pair> expl) {    // CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
 
@@ -36,10 +46,18 @@ public final class Stringalize {
         return lst;
     }
 
-    public static String game(Game game, int gameIndex) {
+    /**
+     * Creates string of game parameters in next format:
+     * <p>
+     * "gameID gameName gameMapName curPlayersNum maxPlayers"
+     * @param game game to get parameters from.
+     * @param gameID ID of game.
+     * @return string of game parameters.
+     */
+    public static String gameParams(Game game, int gameID) {
         StringBuilder result = new StringBuilder();
 
-        result.append(gameIndex);
+        result.append(gameID);
         result.append(' ');
         result.append(game.getName());
         result.append(' ');
@@ -52,8 +70,21 @@ public final class Stringalize {
         return result.toString();
     }
 
-    public static List<String> gameInfo(Game game, Controller controller) {
+    /**
+     * Creates string of some game parameters for client(controller)
+     * in next format:
+     * <p>
+     * "true/false maxPlayers curGamePlayersNum player1info player2info ..."
+     * <p>
+     * true if this client is owner of this game, false otherwise.
+     * <p>
+     * To playerInfo watch playerInfo method.
+     * @param controller represent client to get info for.
+     * @return string of some game parameters for client.
+     */
+    public static List<String> gameInfoForClient(Controller controller) {
         List<String> lst = new ArrayList<String>();
+        Game         game = controller.getMyGame();
 
         if (controller == game.getOwner()) {
             lst.add("true");
@@ -74,11 +105,20 @@ public final class Stringalize {
         return lst;
     }
 
+    /**
+     * Returns list of string - names of availible gameMaps.
+     * @return list of string - names of availible gameMaps.
+     */
     public static List<String> gameMapsList() {
         return Creator.createGameMapsList();
     }
 
-    public static String gameStatus(Game game) {
+    /**
+     * Returns game start status - started game or not.
+     * @param game game to get status from.
+     * @return "started" if game started, "not started" otherwise.
+     */
+    public static String gameStartStatus(Game game) {    // TODO started not started bad decision make true false.
         if (game.isStarted()) {
             return "started.";
         } else {
@@ -86,16 +126,29 @@ public final class Stringalize {
         }
     }
 
-    public static List<String> map(int[][] map) {    // CHECK < THIS!!!// WHATS ABOUT map SYNCHRONIZATION?
+    /**
+     * Returnes list of strings in next format:
+     * <p>
+     * dimension
+     * <p>
+     * int int int .. int
+     * <p>
+     * ..................
+     * <p>
+     * int int int .. int
+     * @param gameMapField field to make list of strings from.
+     * @return gameMapField as list of strings.
+     */
+    public static List<String> field(int[][] gameMapField) {    // CHECK < THIS!!!// WHATS ABOUT field SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
 
-        lst.add("" + map.length);
+        lst.add("" + gameMapField.length);
 
-        for (int i = 0; i < map.length; ++i) {
+        for (int i = 0; i < gameMapField.length; ++i) {
             StringBuilder buff = new StringBuilder();
 
-            for (int j = 0; j < map.length; j++) {
-                buff.append(map[i][j]);
+            for (int j = 0; j < gameMapField.length; j++) {
+                buff.append(gameMapField[i][j]);
                 buff.append(" ");
             }
 
@@ -105,16 +158,56 @@ public final class Stringalize {
         return lst;
     }
 
-    public static List<String> mapAndExplosionsInfo(Game game) {
-        List<String> result = Stringalize.map(game.getGameField());
+    /**
+     * Returns list of strings in next format:
+     * <p>
+     * dimension
+     * <p>
+     * int int int .. int
+     * <p>
+     * ..................
+     * <p>
+     * int int int .. int
+     * <p>
+     * x=... y=...
+     * <p>
+     * x=... y=... this is explosions.
+     * <br>
+     * @param game game to get field and exloions from.
+     * @return list of strings of gameMapField and explosions
+     */
+    public static List<String> fieldAndExplosionsInfo(Game game) {
+        List<String> result = Stringalize.field(game.getGameField());
 
         result.addAll(Stringalize.explosions(game.getExplosionSquares()));
 
         return result;
     }
 
-    public static List<String> mapExplPlayerInfo(Game game, Player player) {
-        List<String> result = Stringalize.mapAndExplosionsInfo(game);
+    /**
+     * Returns list of strings in next format:
+     * <p>
+     * dimension
+     * <p>
+     * int int int .. int
+     * <p>
+     * ..................
+     * <p>
+     * int int int .. int
+     * <p>
+     * x=... y=...
+     * <p>
+     * x=... y=... (this is explosions.)
+     * <p>
+     * 1 (separator - always just one.)
+     * <p>
+     * playerInfo (watch playerInfo method)
+     * @param game game to get field and exloions from.
+     * @param player player to get info from.
+     * @return list of strings of gameMapField and explosions
+     */
+    public static List<String> fieldExplPlayerInfo(Game game, Player player) {
+        List<String> result = Stringalize.fieldAndExplosionsInfo(game);
 
         result.add("" + 1);
         result.add(Stringalize.playerInfo(player));
@@ -122,8 +215,7 @@ public final class Stringalize {
         return result;
     }
 
-    // TODO temporary
-    public static List<String> mapExplPlayerInfo2(Game game, Player player) {
+    public static List<String> fieldExplPlayerInfo2(Game game, Player player) {    // TODO temporary
         int[][]      field = game.getGameField();
         List<Player> players = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
@@ -161,10 +253,24 @@ public final class Stringalize {
         return stringalizedField;
     }
 
+    /**
+     * Returns string in next format:
+     * <p>
+     * positionX positionY nickName lives bombs maxBombs
+     * @param player player to get info from.
+     * @return players info.
+     */
     public static String playerInfo(Player player) {    // CHECK < THIS!!!//
         return player.getInfo();
     }
 
+    /**
+     * List of strings - unstarted games strings in next format:
+     *  <p>
+     *  "gameID gameName gameMapName curPlayersNum maxPlayers"
+     *  @param allGames started and unstarted games.
+     *  @return list of strings - unstarted games strings.
+     */
     public static List<String> unstartedGames(List<Game> allGames) {
         List<String> unstartedGames = new ArrayList<String>();
 
@@ -176,7 +282,7 @@ public final class Stringalize {
 
                 // send only games that are not started!!!
                 if (!game.isStarted()) {
-                    unstartedGames.add(Stringalize.game(game, i));
+                    unstartedGames.add(Stringalize.gameParams(game, i));
                 }
             }
         }

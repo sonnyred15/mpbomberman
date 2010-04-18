@@ -108,7 +108,7 @@ public class Session extends AbstractSession implements ISession {
         switch (joinResult) {
             case Controller.NOT_JOINED : {
 
-                // if game==null true
+                // if gameParams==null true
                 sendAnswer("Not joined to any game.");
                 writeToLog("Session: addBot warning. " +
                            "Tryed to add bot to game(gameID=" + gameID + ")" +
@@ -119,7 +119,7 @@ public class Session extends AbstractSession implements ISession {
 
             case Controller.GAME_IS_ALREADY_STARTED : {
 
-                // if game.isStarted() true
+                // if gameParams.isStarted() true
                 sendAnswer("Game was already started.");
                 writeToLog("Session: addbot warning. " +
                            "Tryed to add bot to game(gameID=" + gameID + ")" +
@@ -130,7 +130,7 @@ public class Session extends AbstractSession implements ISession {
 
             case Controller.NOT_OWNER_OF_GAME : {
 
-                // if not owner of game
+                // if not owner of gameParams
                 sendAnswer("Not owner of game.");
                 writeToLog("Session: addBot warning. " +
                            "Tryed to add bot to game, canceled." +
@@ -141,7 +141,7 @@ public class Session extends AbstractSession implements ISession {
 
             case Controller.GAME_IS_FULL : {
 
-                // if game is full
+                // if gameParams is full
                 sendAnswer("Game is full. Try to add bot later.");
                 writeToLog("Session: addBot warning. " +
                            "Tryed to add bot, canceled. Game is full.");
@@ -306,7 +306,7 @@ public class Session extends AbstractSession implements ISession {
 
                 return;
             }
-        } else {    // game == null true
+        } else {    // gameParams == null true
             sendAnswer("Not joined to any game.");
             writeToLog("Session: doMove warning. " +
                        "Client tryed to move, canceled. " +
@@ -397,7 +397,7 @@ public class Session extends AbstractSession implements ISession {
         switch (joinResult) {
             case Controller.NO_SUCH_UNSTARTED_GAME : {
 
-                // if no unstarted game with such gameID finded
+                // if no unstarted gameParams with such gameID finded
                 sendAnswer("No such game.");
                 writeToLog("Session: client tryed to join " + "gameID=" +
                            gameID + " ,canceled." + " No such game on server.");
@@ -407,7 +407,7 @@ public class Session extends AbstractSession implements ISession {
 
             case Controller.GAME_IS_ALREADY_STARTED : {
 
-                // if game with such gameID already started
+                // if gameParams with such gameID already started
                 sendAnswer("Game was already started.");
                 writeToLog("Session: joinGame warning. " +
                            "Client tryed to join gameID=" + gameID +
@@ -487,7 +487,7 @@ public class Session extends AbstractSession implements ISession {
 
         if (queryArgs.length == 2) {
             try {
-                ret = Creator.createMapAndGetArray(mapFileName);
+                ret = Creator.createMapAndGetField(mapFileName);
             } catch (FileNotFoundException ex) {
                 sendAnswer("No such map on server.");
                 writeToLog("Session: sendMap warning. " +
@@ -514,7 +514,7 @@ public class Session extends AbstractSession implements ISession {
         }
 
         // if all is OK.
-        List<String> lst = Stringalize.map(ret);
+        List<String> lst = Stringalize.field(ret);
 
         sendAnswer(lst);
         writeToLog("Session: client downloaded map." + " Map=" + mapFileName);
@@ -524,7 +524,7 @@ public class Session extends AbstractSession implements ISession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            List<String> info = Stringalize.gameInfo(game, this.controller);
+            List<String> info = Stringalize.gameInfoForClient(this.controller);
 
             sendAnswer(info);
             writeToLog("Session: sended gameInfo to client.");
@@ -545,7 +545,7 @@ public class Session extends AbstractSession implements ISession {
 
         if (game != null) {
             List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo(game,
+                Stringalize.fieldExplPlayerInfo(game,
                                               this.controller.getPlayer());
 
             sendAnswer(linesToSend);
@@ -584,7 +584,7 @@ public class Session extends AbstractSession implements ISession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            String ret = Stringalize.gameStatus(game);
+            String ret = Stringalize.gameStartStatus(game);
 
             sendAnswer(ret);
             writeToLog("Session: sended game status to client.");
@@ -638,7 +638,7 @@ public class Session extends AbstractSession implements ISession {
 
                     return;
                 }
-            } else {    // if game.isStarted() true
+            } else {    // if gameParams.isStarted() true
                 sendAnswer("Game is already started.");
                 writeToLog("Session: startGame warning. " +
                            "Client tryed to start started game. " +
@@ -646,7 +646,7 @@ public class Session extends AbstractSession implements ISession {
 
                 return;
             }
-        } else {    // game == null true
+        } else {    // gameParams == null true
             sendAnswer("Not joined to any game.");
             writeToLog("Session: client tryed to start game, canceled. " +
                        "Not joined to any game.");
@@ -660,7 +660,7 @@ public class Session extends AbstractSession implements ISession {
 
         if (game != null) {
             List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo2(game,
+                Stringalize.fieldExplPlayerInfo2(game,
                                                this.controller.getPlayer());
 
             sendAnswer(linesToSend);
