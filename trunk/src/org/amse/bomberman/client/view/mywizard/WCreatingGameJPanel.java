@@ -20,24 +20,21 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.util.Constants;
-
 /**
  *
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
-public class CreatingGameJPanel extends JPanel {
-    private MyWizard parent;
+public class WCreatingGameJPanel extends JPanel{
     private int width = 200;
     private int heigth = 200;
     private JComboBox mapBox = new JComboBox();;
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
-    private JButton createJButton = new JButton();
+    //private JButton createJButton = new JButton();
     private final int LINE_H = 20;
     private final int LABEL_SIZE = width/3+10;
 
-    public CreatingGameJPanel(MyWizard wizard){
-        parent = wizard;
+    public WCreatingGameJPanel(){
         this.setPreferredSize(new Dimension(width, heigth));
 
         // creating top line for gameName Field
@@ -82,8 +79,8 @@ public class CreatingGameJPanel extends JPanel {
         this.add(topBox);
         this.add(centralBox);
         this.add(bottomBox);
-        this.add(createJButton);
-        createJButton.setAction(new CreateGameAction());
+        //this.add(createJButton);
+        //createJButton.setAction(new CreateGameAction());
         setVisible(true);
     }
     public void setMaps(List<String> maps) {
@@ -101,7 +98,7 @@ public class CreatingGameJPanel extends JPanel {
     private String getMap() {
         return (String)mapBox.getSelectedItem();
     }
-    private class CreateGameAction extends AbstractAction {
+    /*private class CreateGameAction extends AbstractAction {
         public CreateGameAction() {
             putValue(NAME, "Create");
             putValue(SHORT_DESCRIPTION, "Create game with selected arguments.");
@@ -121,6 +118,5 @@ public class CreatingGameJPanel extends JPanel {
                 parent.setCurrentJPanel(0);
             }
         }
-    }
+    }*/
 }
-

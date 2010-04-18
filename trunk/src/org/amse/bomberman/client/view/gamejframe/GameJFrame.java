@@ -12,7 +12,7 @@ import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.view.mywizard.MainWizard;
+import org.amse.bomberman.client.view.mywizard.BomberWizard;
 
 /**
  *
@@ -49,7 +49,7 @@ public class GameJFrame extends JFrame implements IView{
              /*JOptionPane.showMessageDialog(this,"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
              this.dispose();
-             MainWizard wizard = new MainWizard();
+             BomberWizard wizard = new BomberWizard();
              wizard.setCurrentJPanel(0);
              Controller.getInstance().setReceiveInfoListener(wizard);
               *
@@ -63,7 +63,7 @@ public class GameJFrame extends JFrame implements IView{
             //            , "STOP", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             Model.getInstance().removeListener(this);
-            MainWizard wizard = new MainWizard();
+            BomberWizard wizard = new BomberWizard();
             Controller.getInstance().setReceiveInfoListener(wizard);
             wizard.setCurrentJPanel(1);
             wizard.updateCurrentPanel();

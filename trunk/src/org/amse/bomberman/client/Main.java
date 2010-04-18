@@ -3,7 +3,8 @@ package org.amse.bomberman.client;
 //~--- non-JDK imports --------------------------------------------------------
 
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.view.mywizard.MainWizard;
+import org.amse.bomberman.client.view.mywizard.BombWizard;
+import org.amse.bomberman.client.view.mywizard.BomberWizard;
 
 /**
  *
@@ -18,7 +19,8 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                new MainWizard();
+                new BomberWizard();
+                //new BombWizard();
             }
         });
     }
