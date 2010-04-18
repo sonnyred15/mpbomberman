@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit.imodel;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Pair;
@@ -17,6 +18,10 @@ import java.util.List;
 
 /**
  * Interface that provides methods of Model of BomberMan Game.
+ * Model is responsable for game rules and responsable for connection
+ * between GameMap and Game.
+ * @see Game
+ * @see GameMap
  * @author Kirilchuk V.E.
  */
 public interface IModel {

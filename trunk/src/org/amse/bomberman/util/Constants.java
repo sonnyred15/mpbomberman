@@ -146,7 +146,7 @@ public final class Constants {
                     return GET_GAME_MAP_INFO2;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
-                            "must be between 0 and 14 inclusive");
+                            "must be between 0 and 15 inclusive");
             }
         }
     }

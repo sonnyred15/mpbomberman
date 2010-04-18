@@ -79,7 +79,7 @@ public class AsynchroSession extends AbstractSession {
         switch (joinBotResult) {
             case Controller.NOT_JOINED : {
 
-                // if game==null true
+                // if gameParams==null true
                 messages.add("Not joined to any game.");
                 sendAnswer(messages);
                 writeToLog("Session: addBot warning. " +
@@ -91,7 +91,7 @@ public class AsynchroSession extends AbstractSession {
 
             case Controller.NOT_OWNER_OF_GAME : {
 
-                // if not owner of game
+                // if not owner of gameParams
                 messages.add("Not owner of game.");
                 sendAnswer(messages);
                 writeToLog("Session: addBot warning. " +
@@ -112,7 +112,7 @@ public class AsynchroSession extends AbstractSession {
 
             case Controller.GAME_IS_ALREADY_STARTED : {
 
-                // if game.isStarted() true
+                // if gameParams.isStarted() true
                 messages.add("Game was already started.");
                 sendAnswer(messages);
                 writeToLog("Session: addbot warning. " +
@@ -309,7 +309,7 @@ public class AsynchroSession extends AbstractSession {
 
                 return;
             }
-        } else {    // game == null true
+        } else {    // gameParams == null true
             messages.add("Not joined to any game.");
             sendAnswer(messages);
             writeToLog("Session: doMove warning. " +
@@ -404,7 +404,7 @@ public class AsynchroSession extends AbstractSession {
         switch (joinResult) {
             case Controller.NO_SUCH_UNSTARTED_GAME : {
 
-                // if no unstarted game with such gameID finded
+                // if no unstarted gameParams with such gameID finded
                 messages.add("No such game.");
                 sendAnswer(messages);
                 writeToLog("Session: client tryed to join gameID=" + gameID +
@@ -415,7 +415,7 @@ public class AsynchroSession extends AbstractSession {
 
             case Controller.GAME_IS_ALREADY_STARTED : {
 
-                // if game with such gameID already started
+                // if gameParams with such gameID already started
                 messages.add("Game was already started.");
                 sendAnswer(messages);
                 writeToLog("Session: joinGame warning. Client tryed to join gameID=" +
@@ -475,7 +475,7 @@ public class AsynchroSession extends AbstractSession {
 
         Game game = this.controller.getMyGame();
 
-        if (game != null) {    // Always if game!=null player is not null too!
+        if (game != null) {    // Always if gameParams!=null player is not null too!
             if (game.isStarted()) {
                 this.controller.tryPlaceBomb();
                 messages.add("Ok.");
@@ -511,7 +511,7 @@ public class AsynchroSession extends AbstractSession {
 
         if (queryArgs.length == 2) {
             try {
-                ret = Creator.createMapAndGetArray(mapFileName);
+                ret = Creator.createMapAndGetField(mapFileName);
             } catch (FileNotFoundException ex) {
                 messages.add("No such map on server.");
                 sendAnswer(messages);
@@ -542,7 +542,7 @@ public class AsynchroSession extends AbstractSession {
         }
 
         // if all is OK.
-        messages.addAll(Stringalize.map(ret));
+        messages.addAll(Stringalize.field(ret));
         sendAnswer(messages);
         writeToLog("Session: client downloaded gameMap." + " GameMap=" +
                    mapFileName);
@@ -556,7 +556,7 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            info.addAll(Stringalize.gameInfo(game, this.controller));
+            info.addAll(Stringalize.gameInfoForClient(this.controller));
             sendAnswer(info);
             writeToLog("Session: sended gameInfo to client.");
 
@@ -579,7 +579,7 @@ public class AsynchroSession extends AbstractSession {
 
         if (game != null) {
             List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo(game,
+                Stringalize.fieldExplPlayerInfo(game,
                                               this.controller.getPlayer());
 
             messages.addAll(linesToSend);
@@ -624,7 +624,7 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            String ret = Stringalize.gameStatus(game);
+            String ret = Stringalize.gameStartStatus(game);
 
             messages.add(ret);
             sendAnswer(messages);
@@ -687,7 +687,7 @@ public class AsynchroSession extends AbstractSession {
 
                     return;
                 }
-            } else {    // if game.isStarted() true
+            } else {    // if gameParams.isStarted() true
                 messages.add("Game is already started.");
                 sendAnswer(messages);
                 writeToLog("Session: startGame warning. " +
@@ -696,7 +696,7 @@ public class AsynchroSession extends AbstractSession {
 
                 return;
             }
-        } else {    // game == null true
+        } else {    // gameParams == null true
             messages.add("Not joined to any game.");
             sendAnswer(messages);
             writeToLog("Session: client tryed to start game, canceled. " +
@@ -715,7 +715,7 @@ public class AsynchroSession extends AbstractSession {
 
         if (game != null) {
             List<String> linesToSend =
-                Stringalize.mapExplPlayerInfo2(game,
+                Stringalize.fieldExplPlayerInfo2(game,
                                                this.controller.getPlayer());
 
             messages.addAll(linesToSend);
