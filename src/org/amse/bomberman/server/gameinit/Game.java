@@ -30,13 +30,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Class that represents Game.
  * It correspond to:
  * <p>
- * 1) Before game starts players tryJoin to game. Owner of game can add bots.
+ * 1) Before game starts players try join to game. Owner of game can add bots.
  * Players can chatting and so on.
  * <p>
- * 2) After start game became something like a dealer between players
- * controllers and model.
- *
- * @author Kirilchuk V.E
+ * 2) After start, game became something like a dealer between
+ * players controllers and model.
+ * @author Kirilchuk V.E.
  */
 public class Game {
     private Chat                            chat;

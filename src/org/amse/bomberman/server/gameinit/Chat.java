@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Chat {
 
     // TODO this version of chat is compromise for syncronous and asynchronous
-    // Session. Better way in asynchronous server is to ass send new messages to
+    // Session. Better way in asynchronous server is to send new messages to
     // clients and not to store them. BUt syncronous session can`t send in such way.
     // TODO make separate realization of ingame events log.
     private final static int   KEEP_OLD_MSGS_NUM = 10;
@@ -41,7 +41,8 @@ public class Chat {
 
     /**
      * Adding message to chat in next notation:
-     * <p>playerName: message.
+     * <p>
+     * playerName: message.
      * @param playerName nickName of player that added message.
      * @param message message to add to chat.
      */
