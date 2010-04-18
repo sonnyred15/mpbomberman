@@ -8,7 +8,8 @@ package org.amse.bomberman.server.gameinit.control;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.GameMap;
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
@@ -22,37 +23,99 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
+ * Class that represents net controller of ingame player.
  * @author Kirilchuk V.E.
  */
-public class Controller implements GameEndedListener{
+public class Controller implements GameEndedListener {
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryJoinGame
+     * <p> 2)tryAddBotIntoMyGame
+     * <p> Tells that game was already started
+     * and your operation is not success.
+     */
     public static final int GAME_IS_ALREADY_STARTED = -1;
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryJoinGame
+     * <p> 2)tryAddBotIntoMyGame
+     * <p> Tells that game is full
+     * and your operation is not success.
+     */
     public static final int GAME_IS_FULL = -3;
-    public static final int NOT_JOINED = -2;
-    public static final int NOT_OWNER_OF_GAME = 0;
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryAddBotIntoMyGame
+     * <p> Tells that you are not joined to any game so
+     * you can not do this operation.
+     */
+    public static final int NOT_JOINED = -2;    // TODO there must be more methods that return this.
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryAddBotIntoMyGame
+     * <p> Tells that you are not owner of game so
+     * you can not do this operation.
+     */
+    public static final int NOT_OWNER_OF_GAME = 0;    // TODO there must be more methods that return this.
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryJoinGame
+     * <p> Tells that you operation failed cause no such unstarted game.
+     */
     public static final int NO_SUCH_UNSTARTED_GAME = -10;
+
+    /**
+     * Possible return value of next methods:
+     * <p> 1)tryJoinGame
+     * <p> 2)tryAddBotIntoMyGame
+     * <p> Tells that you operation was sucessful.
+     */
     public static final int RESULT_SUCCESS = 1;
     private Game            game;
     private int             playerID;
     private final ISession  session;
-    private final IServer sessionServer;
+    private final IServer   sessionServer;
 
+    /**
+     * Constructor of controller.
+     * @param sessionServer server of session that owns this controller.
+     * @param session owner of this controller.
+     */
     public Controller(IServer sessionServer, ISession session) {
         this.sessionServer = sessionServer;
         this.session = session;
     }
 
-    public void addMessageToChat(String toString) {
+    /**
+     * Method to add message to game chat.
+     * @param toString
+     */
+    public void addMessageToChat(String toString) {    // TODO must check if no game.
         this.game.addMessageToChat(this.playerID, toString);
     }
 
+    /**
+     * Method from GameEndedListener interface. In current realization
+     * just setting game of controller to null and ID of player to -1.
+     * @see GameEndedListener
+     */
     public void gameEnded() {
         this.game.removeGameEndedListener(this);
-//        this.game.leaveFromGame(this); //TODO is it really need?
+
+//      this.game.leaveFromGame(this); //TODO is it really need?
         this.game = null;
         this.playerID = -1;
     }
 
+    /**
+     * Returns ingame ID of controller`s player.
+     * @return ingame ID of controller`s player.
+     */
     public int getID() {
         return this.playerID;
     }
@@ -122,6 +185,11 @@ public class Controller implements GameEndedListener{
      * <p>
      * Controller.NOT_OWNER_OF_GAME - if you are not owner of the game
      * or game is full
+     * <p>
+     * Controller.GAME_IS_FULL - if game is full
+     * and you can not join bot.
+     * <p>
+     * Controller.RESULT_SUCCESS - if bot was joined.
      */
     public int tryAddBotIntoMyGame(String botName) {
         int joinResult = Controller.NOT_JOINED;
@@ -156,17 +224,17 @@ public class Controller implements GameEndedListener{
      * game for client is supported.
      * <p>
      * Additionally setting this controller as GameEndedListener.
-     * @see org.amse.bomberman.server.gameinit.control.GameEndedListener
-     * <p>
-     * @param mapName
-     * @param gameName
-     * @param maxPlayers
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @see GameEndedListener
+     * @see Game
+     * @see GameMap
+     * @param gameMapName name of gameMap to create.
+     * @param gameName name of game to create.
+     * @param maxPlayers maxPlayers parameter of game.
+     * @throws FileNotFoundException if no gameMap with such name was finded.
+     * @throws IOException if IO errors occurs while creating gameMap.
      */
-    public void tryCreateGame(String mapName, String gameName, int maxPlayers,
-                              String playerName)
+    public void tryCreateGame(String gameMapName, String gameName,
+                              int maxPlayers, String playerName)
                                     throws FileNotFoundException,
                                            IOException {
         if (this.game != null) {    // if not correct client can create multiple games
@@ -175,8 +243,8 @@ public class Controller implements GameEndedListener{
             game.leaveFromGame(this);
         }
 
-        this.game = Creator.createGame(this.sessionServer, mapName, gameName,
-                                       maxPlayers);
+        this.game = Creator.createGame(this.sessionServer, gameMapName,
+                                       gameName, maxPlayers);
         this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
         this.playerID = this.game.tryJoin(playerName, this);
 
@@ -186,13 +254,35 @@ public class Controller implements GameEndedListener{
         }
 
         this.game.addGameEndedListener(this);
-        
     }
 
-    public boolean tryDoMove(Direction dir) {
+    /**
+     * Tryes to move controller`s player in defined direction
+     * in controller`s game.
+     * @param dir move direction
+     * @return true if player was moved, false otherwise.
+     */
+    public boolean tryDoMove(Direction dir) {    // TODO what if game==null
         return this.game.tryDoMove(this.playerID, dir);
     }
 
+    /**
+     * Tryes to join controller into game with specified nick name.
+     * @param gameID ID of game to join in.
+     * @param playerName nick name of player.
+     * @return integer value that have next meanings
+     * <p>
+     * Controller.NO_SUCH_UNSTARTED_GAME - if there is no unstarted game
+     * with such ID.
+     * <p>
+     * Controller.GAME_IS_ALREADY_STARTED - if game was already started
+     * and you can not join.
+     * <p>
+     * Controller.GAME_IS_FULL - if game is full
+     * and you can not join.
+     * <p>
+     * Controller.RESULT_SUCCESS - if you was joined.
+     */
     public int tryJoinGame(int gameID, String playerName) {
         if (this.game != null) {    // if not correct client can create multiple games
 
@@ -226,11 +316,19 @@ public class Controller implements GameEndedListener{
         return joinResult;
     }
 
-    public void tryPlaceBomb() {
+    /**
+     * Tryes to place bomb by controller`s player in controller`s game.
+     */
+    public void tryPlaceBomb() {    // TODO what if game == null
         this.game.tryPlaceBomb(this.playerID);
     }
 
-    public boolean tryStartGame() {    // ONLY HOST(CREATER) CAN START GAME!!!
+    /**
+     * Tryes to start game by this controller. Start of game possible
+     * only if this controller is the owner of game.
+     * @return true if game was started, false otherwise.
+     */
+    public boolean tryStartGame() {    // TODO what if game ==null // ONLY HOST(CREATER) CAN START GAME!!!
         return this.game.tryStartGame(this);
     }
 }

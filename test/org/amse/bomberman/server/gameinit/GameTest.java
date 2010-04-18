@@ -5,6 +5,7 @@
 
 package org.amse.bomberman.server.gameinit;
 
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Creator;
 import org.junit.After;

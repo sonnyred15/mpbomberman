@@ -8,7 +8,7 @@ package org.amse.bomberman.server.gameinit.imodel.impl;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.util.Pair;
-import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.net.tcpimpl.Server;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;

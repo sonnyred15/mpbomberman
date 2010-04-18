@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
