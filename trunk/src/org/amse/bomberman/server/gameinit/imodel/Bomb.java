@@ -3,10 +3,11 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.server.gameinit;
+package org.amse.bomberman.server.gameinit.imodel;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.amse.bomberman.server.gameinit.*;
 import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.Constants;

@@ -7,16 +7,15 @@ package org.amse.bomberman.server.gameinit.imodel.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Bomb;
-import org.amse.bomberman.server.gameinit.DieListener;
+import org.amse.bomberman.server.gameinit.imodel.Bomb;
+import org.amse.bomberman.server.gameinit.imodel.DieListener;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
-import org.amse.bomberman.server.gameinit.MoveableObject;
+import org.amse.bomberman.server.gameinit.imodel.MoveableObject;
 import org.amse.bomberman.util.Pair;
-import org.amse.bomberman.server.gameinit.Player;
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.bot.RandomFullBotStrategy;
-import org.amse.bomberman.server.gameinit.control.GameMapUpdateListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
@@ -39,7 +38,6 @@ public class Model implements IModel, DieListener {
     private final List<Integer>               freeIDs;
     private final Game                        game;
     private final GameMap                     gameMap;
-//    private final List<GameMapUpdateListener> gameMapUpdateListeners;
     private final List<Player>                players;
 
     /**
@@ -59,8 +57,6 @@ public class Model implements IModel, DieListener {
             freeIDArray[i] = i + 1;
         }
 
-//        this.gameMapUpdateListeners =
-//            new CopyOnWriteArrayList<GameMapUpdateListener>();
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
     }
@@ -79,14 +75,8 @@ public class Model implements IModel, DieListener {
 
     public void addExplosions(List<Pair> explSq) {
         this.explosionSquares.addAll(explSq);
-//        this.notifyGameMapUpdateListeners();
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
-
-//    public void addGameMapUpdateListener(
-//            GameMapUpdateListener gameMapUpdateListener) {
-//        this.gameMapUpdateListeners.add(gameMapUpdateListener);
-//    }
 
     // TODO is this is normal realization?
     public int addPlayer(String name) {
@@ -145,22 +135,6 @@ public class Model implements IModel, DieListener {
 
     public GameMap getGameMap() {
         return gameMap;
-    }
-
-    /**
-     * Return matrix of GameMap.
-     * @return matrix of GameMap
-     */
-    public int[][] getGameMapArray() {
-        return this.gameMap.getField();
-    }
-
-    /**
-     * Return name of GameMap of this Model.
-     * @return Name of GameMap in String
-     */
-    public String getGameMapName() {
-        return this.gameMap.getName();
     }
 
     public Player getPlayer(int playerID) {
@@ -235,7 +209,7 @@ public class Model implements IModel, DieListener {
 
         objectToMove.setPosition(newPosition);
 
-        // if player is making move to explosion zone.
+        // if object is making move to explosion zone.
         if (isExplosion(newPosition)) {
             objectToMove.bombed();
         }
@@ -282,13 +256,6 @@ public class Model implements IModel, DieListener {
         return arr;
     }
 
-//    public void notifyGameMapUpdateListeners() {
-//        for (GameMapUpdateListener gameMapUpdateListener :
-//                gameMapUpdateListeners) {
-//            gameMapUpdateListener.gameMapChanged();
-//        }
-//    }
-
     public void playerBombed(Player atacker, int victimID) {
         Player victim = this.getPlayer(victimID);
 
@@ -327,19 +294,12 @@ public class Model implements IModel, DieListener {
 
     public void removeExplosions(List<Pair> explosions) {
 
-        // this.explosionSquares.removeAll(explosions);
         for (Pair pair : explosions) {
             this.explosionSquares.remove(pair);
         }
 
-        //this.notifyGameMapUpdateListeners();
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
-
-//    public void removeGameMapUpdateListener(
-//            GameMapUpdateListener gameMapUpdateListener) {
-//        this.gameMapUpdateListeners.remove(gameMapUpdateListener);
-//    }
 
     public void removePlayer(int playerID) {
         for (Player player : players) {

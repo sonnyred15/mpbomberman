@@ -10,18 +10,31 @@ import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- *
+ * Class that represents bot strategy. Strategy is something like methods
+ * about how to findBest way to target and how to make desicion what to do...
  * @author Kirilchuk V.E.
  */
 public abstract class BotStrategy {
 
+    /**
+     * Clone of game field. Bot can do with it whatever he wants.
+     */
     protected int[][] temp;
-    private int cons = 1000; // on temp map bot put 1000 + num of steps to destination
+    private int       cons = 1000; // on temp map bot put 1000 + num of steps to destination
 
-    public Direction findWay(Pair begin, Pair end, final int[][] mapArray) throws
+    /**
+     * Method to find way to target. Not the best algorithm but can be overrided
+     * by inherited class.
+     * @param begin start position to fin way from.
+     * @param end end position to find way to.
+     * @param mapArray game field to find way on.
+     * @return direction to move to became closer on one step to target.
+     * @throws IllegalArgumentException if bot can`t find way to current target.
+     */
+    public Direction findWay(Pair begin, Pair end, final int[][] field) throws
             IllegalArgumentException {
 
-        this.temp = cloneField(mapArray);
+        this.temp = cloneField(field);
 
         rec(begin, cons);
         int steps = temp[end.getX()][end.getY()] - cons;
@@ -71,6 +84,12 @@ public abstract class BotStrategy {
         }
     }
 
+    /**
+     * Abstract method that must make decision about what to do.
+     * @param bot bot that thinking about action.
+     * @param model model that owns this bot.
+     * @return action for bot to do.
+     */
     public abstract IAction thinkAction(Bot bot, IModel model);
 
     private int[][] cloneField(final int[][] mapArray) {

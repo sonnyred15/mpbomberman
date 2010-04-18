@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.server.gameinit;
+package org.amse.bomberman.server.gameinit.imodel;
 
 /**
  * Interface for listener of players die.
