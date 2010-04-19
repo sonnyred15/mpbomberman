@@ -92,7 +92,7 @@ public class Game {
 
     /**
      * Adding bot into game if it is possible.
-     * <p> Note that only owner of game can tryJoin bots.
+     * <p> Note that only owner of game can add bots.
      * @param name nickName of bot.
      * @param controller controller of player that tryes to add bot.
      * @return object of Bot class wrapped by Player.
