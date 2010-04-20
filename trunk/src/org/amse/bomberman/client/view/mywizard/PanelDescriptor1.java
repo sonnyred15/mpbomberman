@@ -12,9 +12,8 @@ import org.amse.bomberman.client.net.NetException;
  * @author Michael Korovkin
  */
 public class PanelDescriptor1 extends WizardDescriptor{
-    private static final String IDENTIFIER = "Server_Panel";
-    public PanelDescriptor1() {
-        super(IDENTIFIER, new WPanel1());
+    public PanelDescriptor1(Wizard wizard, String identifier) {
+        super(wizard, identifier, new WPanel1());
     }
 
     @Override

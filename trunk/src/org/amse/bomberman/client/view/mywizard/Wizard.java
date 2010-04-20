@@ -57,10 +57,10 @@ public class Wizard extends JFrame{
     }
     public void setBackButtonEnable(boolean b) {
         backJButton.setEnabled(b);
-    }
-    public JPanel getCurrentJPanel() {
-        return myDescriptors.get(currentID);
     }*/
+    public JPanel getCurrentJPanel() {
+        return myDescriptors.get(currentID).getPanel();
+    }
     
     public void setCurrentJPanel(String id) {
         int newID = -1;
@@ -77,6 +77,8 @@ public class Wizard extends JFrame{
             currentID = newID;
             if (newID == 0) {
                 backJButton.setEnabled(false);
+            } else {
+                backJButton.setEnabled(true);
             }
             if (newID == myDescriptors.size() - 1) {
                 nextJButton.setText(FINISH);
@@ -96,7 +98,17 @@ public class Wizard extends JFrame{
         if (nextJButton.isEnabled() && currentID < myDescriptors.size() - 1) {
             myDescriptors.get(currentID).goNext();
             this.setCurrentJPanel(myDescriptors.get(currentID + 1).getIdentifier());
+        } else {
+            if (currentID == myDescriptors.size() - 1) {
+                this.finish();
+            }
         }
+    }
+    /*
+     * Override this method to do something after closing of Wizard.
+     */
+    public void finish() {
+
     }
 
     private void initComponents() {

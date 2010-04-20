@@ -9,9 +9,8 @@ import org.amse.bomberman.client.net.NetException;
  * @author Michael Korovkin
  */
 public class PanelDescriptor3 extends WizardDescriptor {
-    private static final String IDENTIFIER = "GameInfo_Panel";
-    public PanelDescriptor3() {
-        super(IDENTIFIER, new WPanel3());
+    public PanelDescriptor3(Wizard wizard, String identifier) {
+        super(wizard, identifier, new WPanel3());
     }
 
     @Override

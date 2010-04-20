@@ -2,23 +2,16 @@ package org.amse.bomberman.client.view.mywizard;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 import java.util.List;
-import javax.swing.AbstractAction;
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.util.Constants;
 /**
  *
@@ -30,7 +23,6 @@ public class WCreatingGameJPanel extends JPanel{
     private JComboBox mapBox = new JComboBox();;
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
-    //private JButton createJButton = new JButton();
     private final int LINE_H = 20;
     private final int LABEL_SIZE = width/3+10;
 
@@ -79,8 +71,6 @@ public class WCreatingGameJPanel extends JPanel{
         this.add(topBox);
         this.add(centralBox);
         this.add(bottomBox);
-        //this.add(createJButton);
-        //createJButton.setAction(new CreateGameAction());
         setVisible(true);
     }
     public void setMaps(List<String> maps) {
@@ -89,34 +79,13 @@ public class WCreatingGameJPanel extends JPanel{
             this.mapBox.addItem(maps.get(i));
         }
     }
-    private String getGameName() {
+    public String getGameName() {
         return gameNameTF.getText();
     }
-    private int getMaxPlayers() {
+    public int getMaxPlayers() {
         return (int)((Integer)playersSpinner.getValue());
     }
-    private String getMap() {
+    public String getMap() {
         return (String)mapBox.getSelectedItem();
     }
-    /*private class CreateGameAction extends AbstractAction {
-        public CreateGameAction() {
-            putValue(NAME, "Create");
-            putValue(SHORT_DESCRIPTION, "Create game with selected arguments.");
-            putValue(SMALL_ICON, null);
-        }
-        public void actionPerformed(ActionEvent e) {
-            IController con = Controller.getInstance();
-            try {
-                String mapName = getMap();
-                con.requestCreateGame(getGameName(), mapName, getMaxPlayers());
-                parent.goNext();
-                Panel3 nextPanel = (Panel3) parent.getCurrentJPanel();
-                nextPanel.doBeforeShow();
-            } catch (NetException ex) {
-                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                parent.setCurrentJPanel(0);
-            }
-        }
-    }*/
 }

@@ -155,7 +155,7 @@ public class AsynchroConnector implements IConnector {
                 InputStreamReader isr = new InputStreamReader(is, "UTF-8");
                 in = new BufferedReader(isr);
 
-                String oneLine;
+                String oneLine = null;
                 List<String> message = new ArrayList<String>();
                 while (!Thread.interrupted() && (oneLine = in.readLine()) != null) {
                     if (oneLine.length() == 0) {
@@ -165,6 +165,7 @@ public class AsynchroConnector implements IConnector {
                     }
                     message.add(oneLine);
                 }
+                //System.out.println(oneLine);
 
             } catch (IOException ex) {
                 System.out.println("ServerListen: run error. " + ex.getMessage());
