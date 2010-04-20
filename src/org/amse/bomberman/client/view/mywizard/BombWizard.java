@@ -78,7 +78,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
                 if (current instanceof WPanel3) {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
-                        this.finish();
+                        this.startGame();
                     }
                 }
             } else {
@@ -93,7 +93,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             if (current instanceof WPanel3) {
                 if (!Model.getInstance().isStarted()) {
                     Model.getInstance().setStart(true);
-                    this.finish();
+                    this.startGame();
                 }
             }
             return;
@@ -102,7 +102,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
                 if (current instanceof WPanel3) {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
-                        this.finish();
+                        this.startGame();
                     }
                 }
             }
@@ -138,6 +138,16 @@ public class BombWizard extends Wizard implements RequestResultListener {
     }
     @Override
     public void finish() {
+        try {
+            Controller.getInstance().requestStartGame();
+        } catch (NetException ex) {
+            System.out.println(ex);
+            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            this.setCurrentJPanel(IDENTIFIER1);
+        }
+    }
+    private void startGame() {
         this.dispose();
         Controller.getInstance().setReceiveInfoListener((RequestResultListener)
                 Model.getInstance());
@@ -148,7 +158,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
         } catch (NetException ex) {
             System.out.println(ex);
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-                + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.setCurrentJPanel(IDENTIFIER1);
             Controller.getInstance().setReceiveInfoListener(this);
         }
