@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,7 +20,7 @@ import javax.swing.border.EmptyBorder;
  * @author Michael Korovkin
  */
 public class Wizard extends JFrame{
-    private List<WizardDescriptor> myDescriptors;
+    private List<PanelDescriptor> myDescriptors;
     private Dimension size = new Dimension(0,0);
     private int currentID = 0;
 
@@ -48,7 +47,7 @@ public class Wizard extends JFrame{
         this.initComponents();
     }
 
-    public void addWizardDescriptor(WizardDescriptor descriptor) {
+    public void addWizardDescriptor(PanelDescriptor descriptor) {
         myDescriptors.add(descriptor);
         cardPanel.add(descriptor.getPanel(), descriptor.getIdentifier());
     }
@@ -96,8 +95,9 @@ public class Wizard extends JFrame{
     }
     public void goNext() {
         if (nextJButton.isEnabled() && currentID < myDescriptors.size() - 1) {
-            myDescriptors.get(currentID).goNext();
-            this.setCurrentJPanel(myDescriptors.get(currentID + 1).getIdentifier());
+            if (myDescriptors.get(currentID).goNext()) {
+                this.setCurrentJPanel(myDescriptors.get(currentID + 1).getIdentifier());
+            }
         } else {
             if (currentID == myDescriptors.size() - 1) {
                 this.finish();
@@ -117,7 +117,7 @@ public class Wizard extends JFrame{
         this.setLocation(400, 150);
         this.setResizable(false);
 
-        myDescriptors = new ArrayList<WizardDescriptor>();
+        myDescriptors = new ArrayList<PanelDescriptor>();
         buttonPanel = new JPanel();
         JSeparator separator = new JSeparator();
         buttonPanel.setLayout(new BorderLayout());

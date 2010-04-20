@@ -6,12 +6,12 @@ import javax.swing.JPanel;
  *
  * @author Michael Korovkin
  */
-public abstract class WizardDescriptor {
+public abstract class PanelDescriptor {
     private Wizard parent;
     private JPanel targetPanel;
     private String panelIdentifier;
 
-    public WizardDescriptor(Wizard wizard, String id, JPanel panel) {
+    public PanelDescriptor(Wizard wizard, String id, JPanel panel) {
         panelIdentifier = id;
         targetPanel = panel;
         parent = wizard;
@@ -54,8 +54,8 @@ public abstract class WizardDescriptor {
 
     }
 
-    public void goNext() {
-
+    public boolean goNext() {
+        return true;
     }
 
     public void goBack() {

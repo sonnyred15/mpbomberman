@@ -11,17 +11,18 @@ import org.amse.bomberman.client.net.NetException;
  *
  * @author Michael Korovkin
  */
-public class PanelDescriptor1 extends WizardDescriptor{
+public class PanelDescriptor1 extends PanelDescriptor{
     public PanelDescriptor1(Wizard wizard, String identifier) {
         super(wizard, identifier, new WPanel1());
     }
 
     @Override
-    public void goNext() {
+    public boolean goNext() {
         WPanel1 panel = (WPanel1)this.getPanel();
         try {
             Controller.getInstance().connect(panel.getIPAddress(), panel.getPort());
             Model.getInstance().setPlayerName(panel.getPlayerName());
+            return true;
         } catch (UnknownHostException ex) {
             JOptionPane.showMessageDialog(this.getWizard(), "Can not connect to the server.\n"
                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -32,5 +33,6 @@ public class PanelDescriptor1 extends WizardDescriptor{
             JOptionPane.showMessageDialog(this.getWizard(),"Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
 }

@@ -12,6 +12,7 @@ import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.view.mywizard.BombWizard;
 import org.amse.bomberman.client.view.mywizard.BomberWizard;
 
 /**
@@ -63,10 +64,9 @@ public class GameJFrame extends JFrame implements IView{
             //            , "STOP", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             Model.getInstance().removeListener(this);
-            BomberWizard wizard = new BomberWizard();
+            BombWizard wizard = new BombWizard();
             Controller.getInstance().setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(1);
-            wizard.updateCurrentPanel();
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);
         } else {
             gamePanel.update();
             int lives = model.getPlayerLives();

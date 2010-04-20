@@ -1,6 +1,8 @@
 package org.amse.bomberman.client.view.mywizard;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -11,7 +13,9 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
+import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 /**
@@ -21,7 +25,6 @@ import javax.swing.table.TableColumnModel;
 public class WPanel2 extends JPanel{
     private final int width = 640;
     private final int height = 480;
-    //private JButton refreshJButton = new JButton();
     private JTable table;
     private WCreatingGameJPanel creatingPanel;
     private JPanel mainPanel = new JPanel();
@@ -114,16 +117,6 @@ public class WPanel2 extends JPanel{
         columnModel.getColumn(3).setResizable(false);
         columnModel.getColumn(4).setResizable(false);
     }
-    /*private void join(int gameNumber) throws NetException {
-        IController control = Controller.getInstance();
-        control.requestJoinGame(gameNumber);
-        int maxPlayers = this.getSelectedMaxPl();
-        if (maxPlayers != -1) {
-        } else {
-            JOptionPane.showMessageDialog(this, "You did't select the game! "
-                + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }*/
 
     private void initComponents() {
         // initialization of MyTable with list of games
@@ -150,13 +143,16 @@ public class WPanel2 extends JPanel{
         selectGroup.add(joinButton);
         createButton.setSelected(true);
         Box radioBox = Box.createVerticalBox();
-        radioBox.setPreferredSize(new Dimension(120, 50));
+        radioBox.add(Box.createVerticalStrut(10));
         radioBox.add(createButton);
+        radioBox.add(Box.createVerticalStrut(10));
         radioBox.add(joinButton);
+        radioBox.setPreferredSize(new Dimension(width-50, 80));
+        radioBox.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         // createPanel
         creatingPanel = new WCreatingGameJPanel();
-        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 150));
+        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 50));
         createPanel.add(creatingPanel);
 
         // JoinPanel
@@ -165,40 +161,29 @@ public class WPanel2 extends JPanel{
                 .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         joinPanel.add(jsp);
         //joinPanel.add(refreshJButton);
-        jsp.setPreferredSize(new Dimension(width - 150, height - 100));
-        joinPanel.setPreferredSize(new Dimension(width - 150, height - 50));
-        //refreshJButton.setAction(new RefreshAction(this));
+        jsp.setPreferredSize(new Dimension(width - 150, height - 200));
+        joinPanel.setPreferredSize(new Dimension(width - 150, height - 150));
 
         // mainPanel - cardLayout with createPanel and joinPanel
         mainPanel.setLayout(cardLayout);
         mainPanel.add(createPanel, CREATE_NAME);
         mainPanel.add(joinPanel, JOIN_NAME);
 
+        // leftPanel
+        JPanel leftPanel = new JPanel();
+        leftPanel.setPreferredSize(new Dimension(30,100));
+        leftPanel.add(new JSeparator());
+
         // add radioPanel and mainPanel
-        this.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        this.add(radioBox);
-        this.add(mainPanel);
+        Box mainBox = Box.createVerticalBox();
+        mainBox.add(radioBox);
+        mainBox.add(mainPanel);
+        //this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        this.add(leftPanel, BorderLayout.WEST);
+        this.add(radioBox, BorderLayout.NORTH);
+        this.add(mainPanel, BorderLayout.CENTER);
+        //this.add(mainBox);
     }
-
-    /*private class RefreshAction extends AbstractAction {
-        WPanel2 parent;
-        public RefreshAction(WPanel2 panel) {
-            parent = panel;
-            putValue(NAME, "Refresh");
-            putValue(SHORT_DESCRIPTION, "Refresh information from server");
-            putValue(SMALL_ICON, null);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Controller.getInstance().requestGamesList();
-            } catch (NetException ex) {
-                /*JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                getWizard().setCurrentJPanel(0);
-            }
-        }
-    }*/
 
     private class MyTableModel extends AbstractTableModel {
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
