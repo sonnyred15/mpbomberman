@@ -8,7 +8,7 @@ import org.amse.bomberman.client.net.NetException;
  *
  * @author Michael Korovkin
  */
-public class PanelDescriptor3 extends WizardDescriptor {
+public class PanelDescriptor3 extends PanelDescriptor {
     public PanelDescriptor3(Wizard wizard, String identifier) {
         super(wizard, identifier, new WPanel3());
     }

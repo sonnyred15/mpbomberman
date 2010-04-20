@@ -20,7 +20,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
     public static final String IDENTIFIER2 = "Create/Join_Panel";
     public static final String IDENTIFIER3 = "GameInfo_Panel";
     public BombWizard() {
-        super(new Dimension(660, 530),"Let's BOMBERMANNING!!!");
+        super(new Dimension(640, 480),"Let's BOMBERMANNING!!!");
         this.addWizardDescriptor(new PanelDescriptor1(this, IDENTIFIER1));
         this.addWizardDescriptor(new PanelDescriptor2(this, IDENTIFIER2));
         this.addWizardDescriptor(new PanelDescriptor3(this, IDENTIFIER3));
