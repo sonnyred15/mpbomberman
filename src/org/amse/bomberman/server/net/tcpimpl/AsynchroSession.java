@@ -714,6 +714,7 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
+            if(game.isStarted()){
             List<String> linesToSend =
                 Stringalize.fieldExplPlayerInfo2(game,
                                                this.controller.getPlayer());
@@ -723,6 +724,13 @@ public class AsynchroSession extends AbstractSession {
             writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
 
             return;
+            } else { //game not started
+                messages.add("Game is not started. You can`t get full game field info.");
+                sendAnswer(messages);
+                writeToLog("Session: sendMapArray warning. Canceled. Game is not started.");
+
+                return;
+            }
         } else {
             messages.add("Not joined to any game.");
             sendAnswer(messages);
