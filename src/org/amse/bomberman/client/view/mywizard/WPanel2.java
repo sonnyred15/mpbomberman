@@ -1,27 +1,19 @@
 package org.amse.bomberman.client.view.mywizard;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.control.impl.Controller;
 /**
  *
  * @author Michael Korovkin
@@ -34,8 +26,10 @@ public class WPanel2 extends JPanel{
     private WCreatingGameJPanel creatingPanel;
     private JPanel mainPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
-    private final String CREATE_NAME = "New game";
-    private final String JOIN_NAME = "Join game";
+    JRadioButton createButton;
+    JRadioButton joinButton;
+    public static final String CREATE_NAME = "New game";
+    public static final String JOIN_NAME = "Join game";
 
     public WPanel2(){
         this.setSize(width, height);
@@ -43,6 +37,11 @@ public class WPanel2 extends JPanel{
         this.setVisible(true);
     }
 
+    public String getState() {
+        if (createButton.isSelected()) {
+            return CREATE_NAME;
+        } else return JOIN_NAME;
+    }
     public int getSelectedMaxPl() {
         int result = -1;
         if (table.getSelectedRow() != -1
@@ -88,6 +87,15 @@ public class WPanel2 extends JPanel{
         }
         table.repaint();
     }
+    public String getMap() {
+        return this.creatingPanel.getMap();
+    }
+    public String getGameName() {
+        return this.creatingPanel.getGameName();
+    }
+    public int getMaxPlayers() {
+        return this.creatingPanel.getMaxPlayers();
+    }
 
     private void setSizesTable() {
         table.getTableHeader().setReorderingAllowed(false);
@@ -123,13 +131,13 @@ public class WPanel2 extends JPanel{
         this.setSizesTable();
 
         // create JRadioButtons and set Actions to it
-        JRadioButton createButton = new JRadioButton("New game");
+        createButton = new JRadioButton("New game");
         createButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, CREATE_NAME);
             }
         });
-        JRadioButton joinButton = new JRadioButton("Join game");
+        joinButton = new JRadioButton("Join game");
         joinButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, JOIN_NAME);

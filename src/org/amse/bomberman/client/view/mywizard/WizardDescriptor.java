@@ -7,13 +7,14 @@ import javax.swing.JPanel;
  * @author Michael Korovkin
  */
 public abstract class WizardDescriptor {
-    private Wizard wizard;
+    private Wizard parent;
     private JPanel targetPanel;
     private String panelIdentifier;
 
-    public WizardDescriptor(String id, JPanel panel) {
+    public WizardDescriptor(Wizard wizard, String id, JPanel panel) {
         panelIdentifier = id;
         targetPanel = panel;
+        parent = wizard;
     }
 
     public JPanel getPanel() {
@@ -31,10 +32,10 @@ public abstract class WizardDescriptor {
     }
 
     public void setWizard(Wizard w) {
-        wizard = w;
+        parent = w;
     }
     public Wizard getWizard() {
-        return wizard;
+        return parent;
     }
 
     /**
