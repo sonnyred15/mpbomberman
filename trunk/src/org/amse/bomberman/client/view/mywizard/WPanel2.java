@@ -5,9 +5,14 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -18,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
+import org.amse.bomberman.util.Creator;
 /**
  *
  * @author Michael Korovkin
@@ -25,12 +31,20 @@ import javax.swing.table.TableColumnModel;
 public class WPanel2 extends JPanel{
     private final int width = 640;
     private final int height = 480;
+    private Color foreground = Color.ORANGE;
+
+    private Image image;
+    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
+            "/view/resources/cover2.png";
+    private static final URL BACKGROUND_URL = Panel1.class.getResource(BACKGROUND_PATH);
+
     private JTable table;
     private WCreatingGameJPanel creatingPanel;
     private JPanel mainPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
-    JRadioButton createButton;
-    JRadioButton joinButton;
+
+    private JRadioButton createButton;
+    private JRadioButton joinButton;
     public static final String CREATE_NAME = "New game";
     public static final String JOIN_NAME = "Join game";
 
@@ -38,6 +52,7 @@ public class WPanel2 extends JPanel{
         this.setSize(width, height);
         initComponents();
         this.setVisible(true);
+        this.initBackgroundImage();
     }
 
     public String getState() {
@@ -118,11 +133,15 @@ public class WPanel2 extends JPanel{
         columnModel.getColumn(4).setResizable(false);
     }
 
-    private void initComponents() {
-        // initialization of MyTable with list of games
-        table = new JTable(new MyTableModel());
-        this.setSizesTable();
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+            g.drawImage(this.image, 0, 0, null);
+        }
+    }
 
+    private void initComponents() {
         // create JRadioButtons and set Actions to it
         createButton = new JRadioButton("New game");
         createButton.addActionListener(new ActionListener(){
@@ -130,12 +149,16 @@ public class WPanel2 extends JPanel{
                 cardLayout.show(mainPanel, CREATE_NAME);
             }
         });
+        createButton.setOpaque(false);
+        createButton.setForeground(foreground);
         joinButton = new JRadioButton("Join game");
         joinButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, JOIN_NAME);
             }
         });
+        joinButton.setOpaque(false);
+        joinButton.setForeground(foreground);
 
         // Button group to select type - create new game or join to the created game
         ButtonGroup selectGroup = new ButtonGroup();
@@ -148,26 +171,37 @@ public class WPanel2 extends JPanel{
         radioBox.add(Box.createVerticalStrut(10));
         radioBox.add(joinButton);
         radioBox.setPreferredSize(new Dimension(width-50, 80));
-        radioBox.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        Box topBox = Box.createHorizontalBox();
+        topBox.add(Box.createHorizontalStrut(300));
+        topBox.add(radioBox);
+        topBox.add(Box.createHorizontalGlue());
 
         // createPanel
         creatingPanel = new WCreatingGameJPanel();
-        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 50));
+        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 50));
         createPanel.add(creatingPanel);
+        createPanel.setOpaque(false);
 
+        // initialization of MyTable with list of games
+        table = new JTable(new MyTableModel());
+        this.setSizesTable();
         // JoinPanel
         JPanel joinPanel = new JPanel();
         JScrollPane jsp = new JScrollPane(table, JScrollPane
                 .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setPreferredSize(new Dimension(width - 150, height - 150));
         joinPanel.add(jsp);
-        //joinPanel.add(refreshJButton);
-        jsp.setPreferredSize(new Dimension(width - 150, height - 200));
-        joinPanel.setPreferredSize(new Dimension(width - 150, height - 150));
+        joinPanel.setOpaque(false);
+        joinPanel.setPreferredSize(new Dimension(400, 400));
 
         // mainPanel - cardLayout with createPanel and joinPanel
         mainPanel.setLayout(cardLayout);
         mainPanel.add(createPanel, CREATE_NAME);
         mainPanel.add(joinPanel, JOIN_NAME);
+        mainPanel.setOpaque(false);
+        mainPanel.setPreferredSize(new Dimension(200, height-100));
+        mainPanel.setMaximumSize(new Dimension(width - 120,height-100));
+        mainPanel.setBorder(new LineBorder(Color.ORANGE, 1));
 
         // leftPanel
         JPanel leftPanel = new JPanel();
@@ -176,13 +210,21 @@ public class WPanel2 extends JPanel{
 
         // add radioPanel and mainPanel
         Box mainBox = Box.createVerticalBox();
-        mainBox.add(radioBox);
+        mainBox.add(topBox);
         mainBox.add(mainPanel);
-        //this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        this.add(leftPanel, BorderLayout.WEST);
-        this.add(radioBox, BorderLayout.NORTH);
-        this.add(mainPanel, BorderLayout.CENTER);
-        //this.add(mainBox);
+        this.add(mainBox);
+    }
+    private void initBackgroundImage() {
+        try{
+            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
+            this.image =
+                    this.image.getScaledInstance(this.getWidth(),
+                                                 this.getHeight(),
+                                                 Image.SCALE_SMOOTH);
+        }catch (IOException ex){
+            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            this.image = null;
+        }
     }
 
     private class MyTableModel extends AbstractTableModel {

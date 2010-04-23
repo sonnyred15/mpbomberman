@@ -112,7 +112,7 @@ public class Wizard extends JFrame{
     }
 
     private void initComponents() {
-        this.setSize(size.width, size.height);
+        this.setSize(size.width, size.height + 60);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 150);
         this.setResizable(false);
@@ -136,7 +136,6 @@ public class Wizard extends JFrame{
         nextJButton.setAction(new NextAction());
 
         cardPanel = new JPanel();
-        //cardPanel.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
         cardLayout = new CardLayout();
         cardPanel.setLayout(cardLayout);
 
