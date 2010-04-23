@@ -22,7 +22,7 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.view.mywizard.MyWizard;
-import org.amse.bomberman.client.view.mywizard.Panel3old;
+import org.amse.bomberman.client.view.mywizard.Panel3;
 import org.amse.bomberman.client.view.mywizard.RequestResultListener;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
@@ -267,8 +267,8 @@ public class SynchroConnector implements IConnector {
                 RequestResultListener listener = c.getReceiveInfoListener();
                 if (listener instanceof MyWizard) {
                     JPanel panel = ((MyWizard) listener).getCurrentJPanel();
-                    if (panel instanceof Panel3old) {
-                        Panel3old panel3 = (Panel3old) panel;
+                    if (panel instanceof Panel3) {
+                        Panel3 panel3 = (Panel3) panel;
                         if (!((MyWizard) listener).isShowing()) {
                             stopUpdating();
                         }

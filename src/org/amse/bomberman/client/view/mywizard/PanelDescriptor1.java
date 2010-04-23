@@ -13,12 +13,12 @@ import org.amse.bomberman.client.net.NetException;
  */
 public class PanelDescriptor1 extends PanelDescriptor{
     public PanelDescriptor1(Wizard wizard, String identifier) {
-        super(wizard, identifier, new WPanel1());
+        super(wizard, identifier, new Panel1());
     }
 
     @Override
     public boolean goNext() {
-        WPanel1 panel = (WPanel1)this.getPanel();
+        Panel1 panel = (Panel1)this.getPanel();
         try {
             Controller.getInstance().connect(panel.getIPAddress(), panel.getPort());
             Model.getInstance().setPlayerName(panel.getPlayerName());

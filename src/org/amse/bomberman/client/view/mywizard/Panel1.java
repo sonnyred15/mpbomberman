@@ -18,14 +18,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
-
 /**
  *
  * @author Michael Korovkin
- * @author Kirilchuk V.E.
  */
-public class Panel1 extends JPanel implements Updating {
-    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client/view/resources/cover.png";
+public class Panel1 extends JPanel{
+    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
+            "/view/resources/cover.png";
     private static final URL BACKGROUND_URL = Panel1.class.getResource(BACKGROUND_PATH);
 
     private Image image;
@@ -33,17 +32,14 @@ public class Panel1 extends JPanel implements Updating {
 
     private final int height = 480;
     private final int width = 640;
-    private MyWizard parent;
     private JTextField ipTF = new JTextField();
     private JTextField portTF = new JTextField();
     private JTextField playerNameTF = new JTextField();
 
-    public Panel1(MyWizard jframe) {
-        parent = jframe;
+    public Panel1() {
         setSize(width, height);
         initComponents();
         this.setVisible(true);
-        //this.add(Panel11.create());
         this.initBackgroundImage();
     }
 
@@ -68,8 +64,6 @@ public class Panel1 extends JPanel implements Updating {
     public String getPlayerName() {
         return playerNameTF.getText();
     }
-    public void doBeforeShow() {
-    }
 
     private void initComponents() {
         this.setLayout(new FlowLayout(FlowLayout.LEFT,70,150));
@@ -77,7 +71,7 @@ public class Panel1 extends JPanel implements Updating {
         this.add(textFields);
     }
 
-    private JComponent createMainPanel(){                
+    private JComponent createMainPanel(){
         Box bottomBox = Box.createHorizontalBox();
         JLabel ipLabel = new JLabel("IP");
         ipLabel.setPreferredSize(new Dimension(width / 8, 20));

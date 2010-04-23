@@ -4,7 +4,6 @@ package org.amse.bomberman.client;
 
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.view.mywizard.BombWizard;
-import org.amse.bomberman.client.view.mywizard.BomberWizard;
 
 /**
  *

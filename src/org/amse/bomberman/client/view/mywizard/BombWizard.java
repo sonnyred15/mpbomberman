@@ -38,21 +38,21 @@ public class BombWizard extends Wizard implements RequestResultListener {
         list.remove(0);
         JPanel current = this.getCurrentJPanel();
         if (command.equals(ProtocolConstants.CAPTION_GAME_MAPS_LIST)) {
-            if (current instanceof WPanel2) {
-                WPanel2 panel2 = (WPanel2) current;
+            if (current instanceof Panel2) {
+                Panel2 panel2 = (Panel2) current;
                 panel2.setMaps(list);
             }
             return;
         } else if (command.equals(ProtocolConstants.CAPTION_GAMES_LIST)) {
-            if (current instanceof WPanel2) {
-                WPanel2 panel2 = (WPanel2) current;
+            if (current instanceof Panel2) {
+                Panel2 panel2 = (Panel2) current;
                 panel2.setGames(list);
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GAME_INFO)) {
-            if (current instanceof WPanel3) {
+            if (current instanceof Panel3) {
                 if (!list.get(0).equals("Not joined to any game.")) {
-                    WPanel3 panel3 = (WPanel3) current;
+                    Panel3 panel3 = (Panel3) current;
                     panel3.setGameInfo(list);
                 } else {
                     this.goBack();
@@ -75,7 +75,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
             if (list.get(0).equals("Game started.")) {
-                if (current instanceof WPanel3) {
+                if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
                         this.startGame();
@@ -90,7 +90,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             }
             return;
         } else if (command.equals(ProtocolConstants.MESSAGE_GAME_START)) {
-            if (current instanceof WPanel3) {
+            if (current instanceof Panel3) {
                 if (!Model.getInstance().isStarted()) {
                     Model.getInstance().setStart(true);
                     this.startGame();
@@ -99,7 +99,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
             if (list.get(0).equals("started.")) {
-                if (current instanceof WPanel3) {
+                if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
                         this.startGame();
@@ -114,7 +114,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
-            if (current instanceof WPanel3) {
+            if (current instanceof Panel3) {
                 if (!list.get(0).equals("Bot added.")) {
                     JOptionPane.showMessageDialog(this, "Can not join bot.\n"
                             + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
@@ -123,14 +123,14 @@ public class BombWizard extends Wizard implements RequestResultListener {
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
-            if (current instanceof WPanel3) {
-                WPanel3 panel3 = (WPanel3) current;
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
             }
             return;
         }else if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
-            if (current instanceof WPanel3) {
-                WPanel3 panel3 = (WPanel3) current;
+            if (current instanceof Panel3) {
+                Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
             }
             return;
