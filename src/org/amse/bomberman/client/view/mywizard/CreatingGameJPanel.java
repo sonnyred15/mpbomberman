@@ -19,7 +19,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Michael Korovkin
  */
-public class WCreatingGameJPanel extends JPanel{
+public class CreatingGameJPanel extends JPanel{
     private int width = 200;
     private int heigth = 100;
     private Color foreground = Color.ORANGE;
@@ -29,7 +29,7 @@ public class WCreatingGameJPanel extends JPanel{
     private final int LINE_H = 20;
     private final int LABEL_SIZE = width/3+10;
 
-    public WCreatingGameJPanel(){
+    public CreatingGameJPanel(){
         this.setPreferredSize(new Dimension(width, heigth));
         this.setBorder(new LineBorder(Color.ORANGE, 1));
 

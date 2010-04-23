@@ -19,10 +19,11 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Michael Korovkin
  */
-public class Wizard extends JFrame{
+public class Wizard extends JFrame implements WizardListener{
     private List<PanelDescriptor> myDescriptors;
     private Dimension size = new Dimension(0,0);
     private int currentID = 0;
+    private WizardController controller;
 
     private JPanel cardPanel;
     private CardLayout cardLayout;
@@ -31,6 +32,7 @@ public class Wizard extends JFrame{
     private JButton backJButton = new JButton();
     private JButton nextJButton = new JButton();
     private JButton cancelJButton = new JButton();
+    private Dimension buttonSize = new Dimension(30, 30);
 
     private static final String NEXT = "Next";
     private static final String BACK = "Back";
@@ -47,9 +49,16 @@ public class Wizard extends JFrame{
         this.initComponents();
     }
 
-    public void addWizardDescriptor(PanelDescriptor descriptor) {
+    public void addPanelDescriptor(PanelDescriptor descriptor) {
         myDescriptors.add(descriptor);
         cardPanel.add(descriptor.getPanel(), descriptor.getIdentifier());
+    }
+
+    public void setNextText(String text) {
+        this.nextJButton.setText(text);
+    }
+    public void setBackText(String text) {
+        this.backJButton.setText(text);
     }
     /*public void setNextButtonEnable(boolean b) {
         nextJButton.setEnabled(b);
@@ -105,10 +114,15 @@ public class Wizard extends JFrame{
         }
     }
     /*
-     * Override this method to do something after closing of Wizard.
+     * Override this method to do something after pressing "finish" on the last
+     * panel of wizard.
      */
     public void finish() {
 
+    }
+
+    public void wizardActionPerformed(WizardAction a) {
+        // override this
     }
 
     private void initComponents() {
@@ -119,6 +133,9 @@ public class Wizard extends JFrame{
 
         myDescriptors = new ArrayList<PanelDescriptor>();
         buttonPanel = new JPanel();
+        controller = new WizardController();
+        controller.addWizardListener(this);
+
         JSeparator separator = new JSeparator();
         buttonPanel.setLayout(new BorderLayout());
         buttonPanel.add(separator, BorderLayout.NORTH);
@@ -134,6 +151,11 @@ public class Wizard extends JFrame{
         cancelJButton.setAction(new CancelAction());
         backJButton.setAction(new BackAction());
         nextJButton.setAction(new NextAction());
+        // why it is not work?
+        //cancelJButton.setMinimumSize(buttonSize);
+        //backJButton.setMinimumSize(buttonSize);
+        //nextJButton.setMinimumSize(buttonSize);
+        //nextJButton.setMaximumSize(buttonSize);
 
         cardPanel = new JPanel();
         cardLayout = new CardLayout();

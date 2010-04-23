@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -39,7 +41,7 @@ public class Panel2 extends JPanel{
     private static final URL BACKGROUND_URL = Panel2.class.getResource(BACKGROUND_PATH);
 
     private JTable table;
-    private WCreatingGameJPanel creatingPanel;
+    private CreatingGameJPanel creatingPanel;
     private JPanel mainPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
 
@@ -147,6 +149,9 @@ public class Panel2 extends JPanel{
         createButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, CREATE_NAME);
+                //----------------------------------------------------------
+                WizardController.throwWizardAction(new WizardAction
+                                (BombWizard.ACTION_NEXT_TEXT, "Create"));
             }
         });
         createButton.setOpaque(false);
@@ -155,6 +160,9 @@ public class Panel2 extends JPanel{
         joinButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, JOIN_NAME);
+                //--------------------------------------------------------
+                WizardController.throwWizardAction(new WizardAction
+                                (BombWizard.ACTION_NEXT_TEXT, "Join"));
             }
         });
         joinButton.setOpaque(false);
@@ -177,7 +185,7 @@ public class Panel2 extends JPanel{
         topBox.add(Box.createHorizontalGlue());
 
         // createPanel
-        creatingPanel = new WCreatingGameJPanel();
+        creatingPanel = new CreatingGameJPanel();
         JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 50));
         createPanel.add(creatingPanel);
         createPanel.setOpaque(false);
@@ -185,6 +193,19 @@ public class Panel2 extends JPanel{
         // initialization of MyTable with list of games
         table = new JTable(new MyTableModel());
         this.setSizesTable();
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int clicks = e.getClickCount();
+                if (clicks > 1) {
+                    if (table.getValueAt(table.getSelectedRow(), 0) != null) {
+                        //-----------------------------------------------------
+                        WizardController.throwWizardAction(new WizardAction
+                                (BombWizard.ACTION_JOIN));
+                    }
+                }
+            }
+        });
         // JoinPanel
         JPanel joinPanel = new JPanel();
         JScrollPane jsp = new JScrollPane(table, JScrollPane

@@ -19,11 +19,15 @@ public class BombWizard extends Wizard implements RequestResultListener {
     public static final String IDENTIFIER1 = "Server_Panel";
     public static final String IDENTIFIER2 = "Create/Join_Panel";
     public static final String IDENTIFIER3 = "GameInfo_Panel";
+    public static final String ACTION_DISCONNECT = "Connection lost";
+    public static final String ACTION_JOIN = "Join selected game";
+    public static final String ACTION_NEXT_TEXT = "Back text";
+    public static final String ACTION_BACK_TEXT = "Next text";
     public BombWizard() {
         super(new Dimension(640, 480),"Let's BOMBERMANNING!!!");
-        this.addWizardDescriptor(new PanelDescriptor1(this, IDENTIFIER1));
-        this.addWizardDescriptor(new PanelDescriptor2(this, IDENTIFIER2));
-        this.addWizardDescriptor(new PanelDescriptor3(this, IDENTIFIER3));
+        this.addPanelDescriptor(new PanelDescriptor1(this, IDENTIFIER1));
+        this.addPanelDescriptor(new PanelDescriptor2(this, IDENTIFIER2));
+        this.addPanelDescriptor(new PanelDescriptor3(this, IDENTIFIER3));
         this.setCurrentJPanel(IDENTIFIER1);
 
         Controller.getInstance().setReceiveInfoListener(this);
@@ -136,6 +140,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
             return;
         }
     }
+
     @Override
     public void finish() {
         try {
@@ -145,6 +150,24 @@ public class BombWizard extends Wizard implements RequestResultListener {
             JOptionPane.showMessageDialog(this, "Connection was lost.\n"
                 + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.setCurrentJPanel(IDENTIFIER1);
+        }
+    }
+
+    @Override
+    public void wizardActionPerformed(WizardAction a) {
+        String action = a.getMessage();
+        if (action.equals(ACTION_BACK_TEXT)) {
+            this.setBackText(a.getValue());
+        } else if (action.equals(ACTION_NEXT_TEXT)) {
+            this.setNextText(a.getValue());
+        } else if (action.equals(ACTION_JOIN)) {
+            this.goNext();
+        } else if (action.equals(ACTION_DISCONNECT)) {
+            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
+                + a.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            this.setCurrentJPanel(IDENTIFIER1);
+        } else {
+            System.out.println(action);
         }
     }
     private void startGame() {

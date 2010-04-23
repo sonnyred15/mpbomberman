@@ -123,6 +123,10 @@ public class Panel3 extends JPanel {
         }
     }
 
+    public void clean() {
+        this.chatTA.setText("");
+    }
+
     private void initComponents() {
         this.setLayout(new BorderLayout(10, 0));
 
