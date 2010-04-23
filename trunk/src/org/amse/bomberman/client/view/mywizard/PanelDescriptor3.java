@@ -16,13 +16,13 @@ public class PanelDescriptor3 extends PanelDescriptor {
     @Override
     public void doBeforeDisplay() {
         try {
-            // TO DO
-            //chatTA.setText("");
+            Panel3 panel3 = (Panel3) this.getPanel();
+            panel3.clean();
             Controller.getInstance().requestGameInfo();
         } catch (NetException ex) {
             JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            //go first panel
+            this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
         }
     }
 
@@ -33,7 +33,7 @@ public class PanelDescriptor3 extends PanelDescriptor {
         } catch (NetException ex) {
              JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-             // go first panel
+             this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
         }
     }
 }
