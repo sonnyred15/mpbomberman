@@ -2,54 +2,64 @@ package org.amse.bomberman.client.view.mywizard;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
-import javax.swing.AbstractAction;
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTable;
+import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
-import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.control.impl.Controller;
-
+import org.amse.bomberman.util.Creator;
 /**
  *
  * @author Michael Korovkin
  */
-public class Panel2 extends JPanel implements Updating{
+public class Panel2 extends JPanel{
     private final int width = 640;
     private final int height = 480;
-    private MyWizard parent;
-    private JButton refreshJButton = new JButton();
+    private Color foreground = Color.ORANGE;
+
+    private Image image;
+    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
+            "/view/resources/cover2.png";
+    private static final URL BACKGROUND_URL = Panel2.class.getResource(BACKGROUND_PATH);
+
     private JTable table;
-    private CreatingGameJPanel creatingPanel;
+    private WCreatingGameJPanel creatingPanel;
     private JPanel mainPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
-    private final String CREATE_NAME = "New game";
-    private final String JOIN_NAME = "Join game";
 
-    public Panel2(MyWizard jframe){
+    private JRadioButton createButton;
+    private JRadioButton joinButton;
+    public static final String CREATE_NAME = "New game";
+    public static final String JOIN_NAME = "Join game";
+
+    public Panel2(){
         this.setSize(width, height);
-        parent = jframe;
         initComponents();
         this.setVisible(true);
-    }
-    // !!!!!!!!!!!!!!!!!!!!  is it really need???
-    public MyWizard getWizard() {
-        return parent;
+        this.initBackgroundImage();
     }
 
+    public String getState() {
+        if (createButton.isSelected()) {
+            return CREATE_NAME;
+        } else return JOIN_NAME;
+    }
     public int getSelectedMaxPl() {
         int result = -1;
         if (table.getSelectedRow() != -1
@@ -73,16 +83,6 @@ public class Panel2 extends JPanel implements Updating{
         }
     }
 
-    public void doBeforeShow() {
-        try {
-            Controller.getInstance().requestGamesList();
-            Controller.getInstance().requestMapsList();
-        } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            parent.setCurrentJPanel(0);
-        }
-    }
     public void setMaps(List<String> maps) {
         if (!maps.get(0).equals("No maps on server was founded.")) {
             creatingPanel.setMaps(maps);
@@ -105,6 +105,15 @@ public class Panel2 extends JPanel implements Updating{
         }
         table.repaint();
     }
+    public String getMap() {
+        return this.creatingPanel.getMap();
+    }
+    public String getGameName() {
+        return this.creatingPanel.getGameName();
+    }
+    public int getMaxPlayers() {
+        return this.creatingPanel.getMaxPlayers();
+    }
 
     private void setSizesTable() {
         table.getTableHeader().setReorderingAllowed(false);
@@ -123,41 +132,33 @@ public class Panel2 extends JPanel implements Updating{
         columnModel.getColumn(3).setResizable(false);
         columnModel.getColumn(4).setResizable(false);
     }
-    private void join(int gameNumber) {
-        IController control = Controller.getInstance();
-        try {
-            control.requestJoinGame(gameNumber);
-            int maxPlayers = this.getSelectedMaxPl();
-            if (maxPlayers != -1) {
-            } else {
-                JOptionPane.showMessageDialog(this, "You did't select the game! "
-                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (NetException ex2) {
-            JOptionPane.showMessageDialog(this,"Connection was lost.\n"
-                    + ex2.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            parent.setCurrentJPanel(0);
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+            g.drawImage(this.image, 0, 0, null);
         }
     }
 
     private void initComponents() {
-        // initialization of MyTable with list of games
-        table = new JTable(new MyTableModel());
-        this.setSizesTable();
-
         // create JRadioButtons and set Actions to it
-        JRadioButton createButton = new JRadioButton("New game");
+        createButton = new JRadioButton("New game");
         createButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, CREATE_NAME);
             }
         });
-        JRadioButton joinButton = new JRadioButton("Join game");
+        createButton.setOpaque(false);
+        createButton.setForeground(foreground);
+        joinButton = new JRadioButton("Join game");
         joinButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, JOIN_NAME);
             }
         });
+        joinButton.setOpaque(false);
+        joinButton.setForeground(foreground);
 
         // Button group to select type - create new game or join to the created game
         ButtonGroup selectGroup = new ButtonGroup();
@@ -165,53 +166,64 @@ public class Panel2 extends JPanel implements Updating{
         selectGroup.add(joinButton);
         createButton.setSelected(true);
         Box radioBox = Box.createVerticalBox();
-        radioBox.setPreferredSize(new Dimension(120, 50));
+        radioBox.add(Box.createVerticalStrut(10));
         radioBox.add(createButton);
+        radioBox.add(Box.createVerticalStrut(10));
         radioBox.add(joinButton);
+        radioBox.setPreferredSize(new Dimension(width-50, 80));
+        Box topBox = Box.createHorizontalBox();
+        topBox.add(Box.createHorizontalStrut(300));
+        topBox.add(radioBox);
+        topBox.add(Box.createHorizontalGlue());
 
         // createPanel
-        creatingPanel = new CreatingGameJPanel(parent);
-        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 150));
+        creatingPanel = new WCreatingGameJPanel();
+        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 50));
         createPanel.add(creatingPanel);
+        createPanel.setOpaque(false);
 
+        // initialization of MyTable with list of games
+        table = new JTable(new MyTableModel());
+        this.setSizesTable();
         // JoinPanel
         JPanel joinPanel = new JPanel();
         JScrollPane jsp = new JScrollPane(table, JScrollPane
                 .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setPreferredSize(new Dimension(width - 150, height - 150));
         joinPanel.add(jsp);
-        joinPanel.add(refreshJButton);
-        jsp.setPreferredSize(new Dimension(width - 150, height - 100));
-        joinPanel.setPreferredSize(new Dimension(width - 150, height - 50));
-        refreshJButton.setAction(new RefreshAction(this));
+        joinPanel.setOpaque(false);
+        joinPanel.setPreferredSize(new Dimension(400, 400));
 
         // mainPanel - cardLayout with createPanel and joinPanel
         mainPanel.setLayout(cardLayout);
         mainPanel.add(createPanel, CREATE_NAME);
         mainPanel.add(joinPanel, JOIN_NAME);
+        mainPanel.setOpaque(false);
+        mainPanel.setPreferredSize(new Dimension(200, height-100));
+        mainPanel.setMaximumSize(new Dimension(width - 120,height-100));
+        mainPanel.setBorder(new LineBorder(Color.ORANGE, 1));
+
+        // leftPanel
+        JPanel leftPanel = new JPanel();
+        leftPanel.setPreferredSize(new Dimension(30,100));
+        leftPanel.add(new JSeparator());
 
         // add radioPanel and mainPanel
-        this.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 0));
-        this.add(radioBox);
-        this.add(mainPanel);
+        Box mainBox = Box.createVerticalBox();
+        mainBox.add(topBox);
+        mainBox.add(mainPanel);
+        this.add(mainBox);
     }
-
-    private class RefreshAction extends AbstractAction {
-        Panel2 parent;
-        public RefreshAction(Panel2 panel) {
-            parent = panel;
-            putValue(NAME, "Refresh");
-            putValue(SHORT_DESCRIPTION, "Refresh information from server");
-            putValue(SMALL_ICON, null);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            try {
-                Controller.getInstance().requestGamesList();
-            } catch (NetException ex) {
-                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                getWizard().setCurrentJPanel(0);
-            }
+    private void initBackgroundImage() {
+        try{
+            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
+            this.image =
+                    this.image.getScaledInstance(this.getWidth(),
+                                                 this.getHeight(),
+                                                 Image.SCALE_SMOOTH);
+        }catch (IOException ex){
+            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            this.image = null;
         }
     }
 

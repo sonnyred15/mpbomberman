@@ -1,16 +1,9 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.client.view.mywizard;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
 
@@ -36,80 +29,74 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 
 /**
- * @author Michail Korovkin
- * @author Kirilchuk V.E.
+ *
+ * @author Michael Korovkin
+ * @author Kirilchuk Vadim
  */
-public class Panel3 extends JPanel implements Updating {
+public class Panel3 extends JPanel {
     private final static long serialVersionUID = 1L;
-    private final int         height = 480;
+
+    //
+    private final int width = 640;
+    private final int height = 480;
 
     //
     private int              maxPlayers = Constants.MAX_PLAYERS;
-    private final int        width = 640;
     private final JTextField messageTF = new JTextField();
+    private final JComponent playersPanel;
 
     //
-    private final JTextArea chatTA = new JTextArea();
-    private final JButton   chatJButton = new JButton("Send");
-    private final JButton   botRemoveJButton = new JButton("Remove");
+    private final JTextArea  chatTA = new JTextArea();
+    private final JButton    chatJButton = new JButton("Send");
+    private final JComponent chatPanel;
 
     //
-    private JButton botAddJButton = new JButton("Add bot");
+    private JButton          botAddJButton = new JButton("Add bot");
+    private final JButton    botRemoveJButton = new JButton("Remove");
+    private final JComponent botsPanel;
 
     //
-    private JList    playersList;
-    private MyWizard wizard;
+    private JList playersList;
 
-    public Panel3(MyWizard jframe) {
+    public Panel3() {
         super();
-        this.wizard = jframe;
         this.setSize(width, height);
+        this.playersPanel = this.createPlayersPanel();
+        this.botsPanel = this.createBotsPanel();
+        this.chatPanel = this.createChatPanel();
         initComponents();
         setVisible(true);
-    }
-
-    public void doBeforeShow() {
-        try {
-            chatTA.setText("");
-            Controller.getInstance().requestGameInfo();
-        } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Connection was lost.\n" + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            this.wizard.setCurrentJPanel(0);
-        }
     }
 
     public void setPlayersNum(int number) {    // TODO must be actually setMaxPlayers!
         this.maxPlayers = number;
     }
 
-    public void startGame() throws NetException {
-        wizard.dispose();
-        Controller.getInstance().setReceiveInfoListener((RequestResultListener) Model.getInstance());
-
-        GameJFrame jframe = new GameJFrame();
-
-        Model.getInstance().addListener(jframe);
-        Controller.getInstance().requestGameMap();
-    }
-
     public void setGameInfo(List<String> info) {
         if (info.get(0).equals("false")) {
-            botAddJButton.setEnabled(false);
-            botAddJButton.setVisible(false);
-            botRemoveJButton.setEnabled(false);
-            botRemoveJButton.setVisible(false);
-            wizard.setNextButtonEnable(false);
+            this.botsPanel.setVisible(false);
+
+            // TODO
+            // wizard.setNextButtonEnable(false);
         } else {
-            botAddJButton.setAction(new AddBotAction());
+            this.botsPanel.setVisible(true);
         }
 
         maxPlayers = Integer.parseInt(info.get(1));
@@ -140,18 +127,32 @@ public class Panel3 extends JPanel implements Updating {
         this.setLayout(new BorderLayout(10, 0));
 
         /* creating players and botsControl panels */
-        JPanel playersPanel = this.createPlayersPanel();
-        JPanel botsPanel = this.createBotsPanel();
-        Box    box = Box.createVerticalBox();
+        JPanel left = new JPanel(new GridBagLayout());
 
-        box.add(playersPanel);
-        box.add(botsPanel);
-        box.add(Box.createHorizontalStrut(190));    // TODO bad decisont to use magic 190
-        this.add(box, BorderLayout.WEST);
+        left.setBorder(new EmptyBorder(0, 5, 5, 0));
 
-        /* creating and adding chat panel in the center */
-        JPanel chatPanel = this.createChatPanel();
+        //
+        GridBagConstraints cons = new GridBagConstraints();
 
+        cons.anchor = GridBagConstraints.NORTHWEST;
+        cons.fill = GridBagConstraints.BOTH;
+        cons.gridx = 0;
+        cons.gridy = 0;
+        cons.weightx = 1;
+        cons.weighty = 1;
+        left.add(playersPanel, cons);
+
+        //
+        cons = new GridBagConstraints();
+        cons.anchor = GridBagConstraints.PAGE_END;
+        cons.gridx = 0;
+        cons.gridy = 1;
+        left.add(botsPanel, cons);
+
+        //
+        this.add(left, BorderLayout.WEST);
+
+        /* adding chat panel in the center */
         this.add(chatPanel, BorderLayout.CENTER);
         this.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
         messageTF.addKeyListener(new KeyAdapter() {
@@ -168,14 +169,14 @@ public class Panel3 extends JPanel implements Updating {
                         } catch (NetException ex) {
 
                             // is it good?
-                            ex.printStackTrace();
-                            wizard.setCurrentJPanel(0);
+                            ex.printStackTrace();    // TO DO
+
+                            // wizard.setCurrentJPanel(0);
                         }
                     }
                 }
             }
         });
-        chatJButton.setAction(new ChatAction());
     }
 
     private JPanel createPlayersPanel() {
@@ -184,19 +185,28 @@ public class Panel3 extends JPanel implements Updating {
         this.playersList = new JList(defaultListModel);
         this.playersList.setCellRenderer(new IconListRenderer());
 
-        JPanel      playersPanel = new JPanel(new GridLayout());
-        JScrollPane scroll = new JScrollPane(playersPanel);
+        JPanel      playersJPanel = new JPanel(new GridLayout());
+        JScrollPane scrollJList = new JScrollPane(playersList);
 
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.setWheelScrollingEnabled(true);
-        playersPanel.add(new JScrollPane(this.playersList));
-        playersPanel.setBorder(new EmptyBorder(0, 10, 0, 0));
+        scrollJList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollJList.setWheelScrollingEnabled(true);
+        playersJPanel.add(scrollJList);
 
-        return playersPanel;
+        return playersJPanel;
+    }
+
+    private JPanel createBotsPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        panel.add(botAddJButton);
+        this.botAddJButton.setAction(new AddBotAction());
+        panel.add(botRemoveJButton);
+
+        return panel;
     }
 
     private JPanel createChatPanel() {
-        JPanel             chatPanel = new JPanel(new GridBagLayout());
+        JPanel             chatJPanel = new JPanel(new GridBagLayout());
         GridBagConstraints cons = new GridBagConstraints();
 
         this.chatTA.setEditable(false);
@@ -210,7 +220,7 @@ public class Panel3 extends JPanel implements Updating {
         cons.gridheight = 1;
         cons.fill = GridBagConstraints.BOTH;
         cons.insets = new Insets(0, 0, 5, 10);
-        chatPanel.add(new JScrollPane(chatTA), cons);
+        chatJPanel.add(new JScrollPane(chatTA), cons);
 
         // TEXT FIELD
         cons = new GridBagConstraints();
@@ -220,7 +230,7 @@ public class Panel3 extends JPanel implements Updating {
         cons.gridwidth = GridBagConstraints.RELATIVE;
         cons.fill = GridBagConstraints.HORIZONTAL;
         cons.insets = new Insets(0, 0, 5, 10);
-        chatPanel.add(this.messageTF, cons);
+        chatJPanel.add(this.messageTF, cons);
 
         // SEND BUTTON
         cons = new GridBagConstraints();
@@ -229,9 +239,10 @@ public class Panel3 extends JPanel implements Updating {
         cons.gridwidth = GridBagConstraints.REMAINDER;
         cons.fill = GridBagConstraints.NONE;
         cons.insets = new Insets(0, 0, 5, 10);
-        chatPanel.add(this.chatJButton, cons);
+        this.chatJButton.setAction(new ChatAction());
+        chatJPanel.add(this.chatJButton, cons);
 
-        return chatPanel;
+        return chatJPanel;
     }
 
     private String getMessage() {
@@ -240,16 +251,6 @@ public class Panel3 extends JPanel implements Updating {
         messageTF.setText("");
 
         return message;
-    }
-
-    private JPanel createBotsPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-        panel.add(botAddJButton);
-        panel.add(botRemoveJButton);
-        panel.setBorder(new EmptyBorder(0, 10, 0, 0));
-
-        return panel;
     }
 
     private class AddBotAction extends AbstractAction {
@@ -265,10 +266,15 @@ public class Panel3 extends JPanel implements Updating {
             try {
                 Controller.getInstance().requestJoinBotIntoGame();
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(wizard,
-                        "Connection was lost.\n" + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                wizard.setCurrentJPanel(0);
+
+                // TO DO
+
+                /*
+                 * JOptionPane.showMessageDialog(wizard,
+                 *       "Connection was lost.\n" + ex.getMessage(), "Error",
+                 *       JOptionPane.ERROR_MESSAGE);
+                 * wizard.setCurrentJPanel(0);
+                 */
             }
         }
     }
@@ -290,10 +296,15 @@ public class Panel3 extends JPanel implements Updating {
                     Controller.getInstance().requestSendChatMessage(message);
                 }
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(wizard,
-                        "Connection was lost.\n" + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                wizard.setCurrentJPanel(0);
+
+                // TO DO
+
+                /*
+                 * JOptionPane.showMessageDialog(wizard,
+                 *       "Connection was lost.\n" + ex.getMessage(), "Error",
+                 *       JOptionPane.ERROR_MESSAGE);
+                 * wizard.setCurrentJPanel(0);
+                 */
             }
         }
     }

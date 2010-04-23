@@ -35,7 +35,7 @@ public class ProtocolConstants {
     public static final String UPDATE_GAME_INFO = "Update game info.";
     public static final String UPDATE_CHAT_MSGS = "Update chat messages.";
 
-    public static final String SPLIT_SYMBOL = " ";
+    //public static final String SPLIT_SYMBOL = " ";
 
 
     private  ProtocolConstants() {

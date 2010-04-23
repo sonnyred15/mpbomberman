@@ -11,7 +11,7 @@ import org.amse.bomberman.client.net.NetException;
  */
 public class PanelDescriptor2 extends PanelDescriptor{
     public PanelDescriptor2(Wizard wizard, String identifier) {
-        super(wizard, identifier, new WPanel2());
+        super(wizard, identifier, new Panel2());
     }
 
     @Override
@@ -28,9 +28,9 @@ public class PanelDescriptor2 extends PanelDescriptor{
 
     @Override
     public boolean goNext() {
-        WPanel2 panel2 = (WPanel2) this.getPanel();
+        Panel2 panel2 = (Panel2) this.getPanel();
         String state = panel2.getState();
-        if (state.equals(WPanel2.CREATE_NAME)) {
+        if (state.equals(Panel2.CREATE_NAME)) {
             IController con = Controller.getInstance();
             try {
                 String mapName = panel2.getMap();
