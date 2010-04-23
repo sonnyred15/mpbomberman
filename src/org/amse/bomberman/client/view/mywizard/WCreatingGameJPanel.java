@@ -1,5 +1,6 @@
 package org.amse.bomberman.client.view.mywizard;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 import org.amse.bomberman.util.Constants;
 /**
  *
@@ -19,7 +21,8 @@ import org.amse.bomberman.util.Constants;
  */
 public class WCreatingGameJPanel extends JPanel{
     private int width = 200;
-    private int heigth = 200;
+    private int heigth = 100;
+    private Color foreground = Color.ORANGE;
     private JComboBox mapBox = new JComboBox();;
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
@@ -28,12 +31,14 @@ public class WCreatingGameJPanel extends JPanel{
 
     public WCreatingGameJPanel(){
         this.setPreferredSize(new Dimension(width, heigth));
+        this.setBorder(new LineBorder(Color.ORANGE, 1));
 
         // creating top line for gameName Field
         Box topBox = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("GameName");
         nameLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        nameLabel.setForeground(foreground);
         gameNameTF.setPreferredSize(new Dimension(width/3, LINE_H));
         gameNameTF.setText("MyGame");
         topBox.add(nameLabel);
@@ -46,6 +51,7 @@ public class WCreatingGameJPanel extends JPanel{
         JLabel maxPlLabel = new JLabel("MaxPlayers");
         maxPlLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         maxPlLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        maxPlLabel.setForeground(foreground);
         centralBox.add(maxPlLabel);
         SpinnerModel spModel = new SpinnerNumberModel(Constants.MAX_PLAYERS
                 ,1,Constants.MAX_PLAYERS,1);
@@ -59,6 +65,7 @@ public class WCreatingGameJPanel extends JPanel{
         JLabel mapLabel = new JLabel("Map");
         mapLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
         mapLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        mapLabel.setForeground(foreground);
         bottomBox.add(mapLabel);
         bottomBox.add(Box.createHorizontalStrut(10));
         bottomBox.add(mapBox);
@@ -71,6 +78,7 @@ public class WCreatingGameJPanel extends JPanel{
         this.add(topBox);
         this.add(centralBox);
         this.add(bottomBox);
+        this.setOpaque(false);
         setVisible(true);
     }
     public void setMaps(List<String> maps) {
