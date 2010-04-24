@@ -10,8 +10,10 @@ import org.amse.bomberman.util.Creator;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -44,6 +46,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
+import org.amse.bomberman.client.view.wizard.WizardController;
+import org.amse.bomberman.client.view.wizard.WizardEvent;
 
 /**
  *
@@ -56,6 +60,12 @@ public class Panel3 extends JPanel {
     //
     private final int width = 640;
     private final int height = 480;
+
+    //
+    private Image image;
+    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
+            "/view/resources/cover3.png";
+    private static final URL BACKGROUND_URL = Panel3.class.getResource(BACKGROUND_PATH);
 
     //
     private int              maxPlayers = Constants.MAX_PLAYERS;
@@ -83,9 +93,10 @@ public class Panel3 extends JPanel {
         this.chatPanel = this.createChatPanel();
         initComponents();
         setVisible(true);
+        this.initBackgroundImage();
     }
 
-    public void setPlayersNum(int number) {    // TODO must be actually setMaxPlayers!
+    public void setMaxPlayers(int number) {
         this.maxPlayers = number;
     }
 
@@ -93,14 +104,12 @@ public class Panel3 extends JPanel {
         if (info.get(0).equals("false")) {
             this.botsPanel.setVisible(false);
 
-            // TODO
-            // wizard.setNextButtonEnable(false);
         } else {
             this.botsPanel.setVisible(true);
         }
 
         maxPlayers = Integer.parseInt(info.get(1));
-        this.setPlayersNum(maxPlayers);
+        this.setMaxPlayers(maxPlayers);
 
         DefaultListModel model = (DefaultListModel) this.playersList.getModel();
 
@@ -127,13 +136,34 @@ public class Panel3 extends JPanel {
         this.chatTA.setText("");
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+            g.drawImage(this.image, 0, 0, null);
+        }
+    }
+
+    private void initBackgroundImage() {
+        try{
+            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
+            this.image =
+                    this.image.getScaledInstance(this.getWidth(),
+                                                 this.getHeight(),
+                                                 Image.SCALE_SMOOTH);
+        }catch (IOException ex){
+            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            this.image = null;
+        }
+    }
+
     private void initComponents() {
         this.setLayout(new BorderLayout(10, 0));
 
         /* creating players and botsControl panels */
         JPanel left = new JPanel(new GridBagLayout());
-
         left.setBorder(new EmptyBorder(0, 5, 5, 0));
+        left.setOpaque(false);
 
         //
         GridBagConstraints cons = new GridBagConstraints();
@@ -151,11 +181,13 @@ public class Panel3 extends JPanel {
         cons.anchor = GridBagConstraints.PAGE_END;
         cons.gridx = 0;
         cons.gridy = 1;
+        botsPanel.setOpaque(false);
         left.add(botsPanel, cons);
 
         //
         this.add(left, BorderLayout.WEST);
 
+        chatPanel.setOpaque(false);
         /* adding chat panel in the center */
         this.add(chatPanel, BorderLayout.CENTER);
         this.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
@@ -172,10 +204,9 @@ public class Panel3 extends JPanel {
                             }
                         } catch (NetException ex) {
 
-                            // is it good?
-                            ex.printStackTrace();    // TO DO
-
-                            // wizard.setCurrentJPanel(0);
+                            System.out.println(ex);
+                            WizardController.throwWizardAction(new WizardEvent
+                                (BombWizard.ACTION_DISCONNECT));
                         }
                     }
                 }
@@ -251,9 +282,7 @@ public class Panel3 extends JPanel {
 
     private String getMessage() {
         String message = messageTF.getText();
-
         messageTF.setText("");
-
         return message;
     }
 
@@ -271,14 +300,8 @@ public class Panel3 extends JPanel {
                 Controller.getInstance().requestJoinBotIntoGame();
             } catch (NetException ex) {
 
-                // TO DO
-
-                /*
-                 * JOptionPane.showMessageDialog(wizard,
-                 *       "Connection was lost.\n" + ex.getMessage(), "Error",
-                 *       JOptionPane.ERROR_MESSAGE);
-                 * wizard.setCurrentJPanel(0);
-                 */
+                WizardController.throwWizardAction(new WizardEvent
+                                (BombWizard.ACTION_DISCONNECT));
             }
         }
     }
@@ -301,14 +324,8 @@ public class Panel3 extends JPanel {
                 }
             } catch (NetException ex) {
 
-                // TO DO
-
-                /*
-                 * JOptionPane.showMessageDialog(wizard,
-                 *       "Connection was lost.\n" + ex.getMessage(), "Error",
-                 *       JOptionPane.ERROR_MESSAGE);
-                 * wizard.setCurrentJPanel(0);
-                 */
+                WizardController.throwWizardAction(new WizardEvent
+                                (BombWizard.ACTION_DISCONNECT));
             }
         }
     }

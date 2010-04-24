@@ -4,14 +4,14 @@ package org.amse.bomberman.client.view.wizard;
  *
  * @author Michael Korovkin
  */
-public class WizardAction {
+public class WizardEvent {
     String message;
     String value;
 
-    public WizardAction(String s) {
+    public WizardEvent(String s) {
         message = s;
     }
-    public WizardAction(String message, String value) {
+    public WizardEvent(String message, String value) {
         this.message = message;
         this.value = value;
     }

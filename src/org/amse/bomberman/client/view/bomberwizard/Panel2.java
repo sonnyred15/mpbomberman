@@ -1,7 +1,7 @@
 package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.WizardController;
-import org.amse.bomberman.client.view.wizard.WizardAction;
+import org.amse.bomberman.client.view.wizard.WizardEvent;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -152,8 +152,8 @@ public class Panel2 extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, CREATE_NAME);
                 //----------------------------------------------------------
-                WizardController.throwWizardAction(new WizardAction
-                                (BombWizard.ACTION_NEXT_TEXT, "Create"));
+                //WizardController.throwWizardAction(new WizardEvent
+                //                (BombWizard.ACTION_NEXT_TEXT, "Create"));
             }
         });
         createButton.setOpaque(false);
@@ -163,8 +163,8 @@ public class Panel2 extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, JOIN_NAME);
                 //--------------------------------------------------------
-                WizardController.throwWizardAction(new WizardAction
-                                (BombWizard.ACTION_NEXT_TEXT, "Join"));
+                //WizardController.throwWizardAction(new WizardEvent
+                //                (BombWizard.ACTION_NEXT_TEXT, "Join"));
             }
         });
         joinButton.setOpaque(false);
@@ -202,7 +202,7 @@ public class Panel2 extends JPanel{
                 if (clicks > 1) {
                     if (table.getValueAt(table.getSelectedRow(), 0) != null) {
                         //-----------------------------------------------------
-                        WizardController.throwWizardAction(new WizardAction
+                        WizardController.throwWizardAction(new WizardEvent
                                 (BombWizard.ACTION_JOIN));
                     }
                 }

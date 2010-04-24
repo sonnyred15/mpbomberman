@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.view.wizard;
 
-import org.amse.bomberman.client.view.wizard.WizardAction;
+import org.amse.bomberman.client.view.wizard.WizardEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class WizardController {
     public void removeWizardListener(WizardListener w) {
         listeners.remove(w);
     }
-    public static void throwWizardAction(WizardAction a) {
+    public static void throwWizardAction(WizardEvent a) {
         for (WizardListener listener: listeners) {
             listener.wizardActionPerformed(a);
         }

@@ -165,7 +165,6 @@ public class AsynchroConnector implements IConnector {
                     }
                     message.add(oneLine);
                 }
-                //System.out.println(oneLine);
 
             } catch (IOException ex) {
                 System.out.println("ServerListen: run error. " + ex.getMessage());
@@ -203,6 +202,7 @@ public class AsynchroConnector implements IConnector {
             } catch (NetException ex) {
                 //TODO
                 ex.printStackTrace();
+                System.out.println("aaa");
             }
         }
 
