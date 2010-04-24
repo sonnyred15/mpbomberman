@@ -6,7 +6,7 @@ import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;
-import org.amse.bomberman.client.view.mywizard.RequestResultListener;
+import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.util.ProtocolConstants;
 import org.amse.bomberman.util.impl.Parser;
 

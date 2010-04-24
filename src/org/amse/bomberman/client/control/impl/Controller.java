@@ -9,7 +9,7 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
 import org.amse.bomberman.client.net.impl.SynchroConnector;
 import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.view.mywizard.RequestResultListener;
+import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 

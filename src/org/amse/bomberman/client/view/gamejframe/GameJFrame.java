@@ -12,7 +12,7 @@ import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.view.mywizard.BombWizard;
+import org.amse.bomberman.client.view.bomberwizard.BombWizard;
 
 /**
  *
