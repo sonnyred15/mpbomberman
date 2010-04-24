@@ -55,6 +55,7 @@ public class PanelDescriptor2 extends PanelDescriptor{
                     JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
                             + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
+                    return false;
                 }
             } else {
                 JOptionPane.showMessageDialog(this.getWizard(), "You did't select the game! "
@@ -66,7 +67,8 @@ public class PanelDescriptor2 extends PanelDescriptor{
     }
 
     @Override
-    public void goBack() {
+    public boolean goBack() {
         Controller.getInstance().disconnect();
+        return true;
     }
 }

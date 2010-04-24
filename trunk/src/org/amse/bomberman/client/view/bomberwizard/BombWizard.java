@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.view.bomberwizard;
 
-import org.amse.bomberman.client.view.wizard.WizardAction;
+import org.amse.bomberman.client.view.wizard.WizardEvent;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.net.RequestResultListener;
 import java.awt.Dimension;
@@ -157,7 +157,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
     }
 
     @Override
-    public void wizardActionPerformed(WizardAction a) {
+    public void wizardActionPerformed(WizardEvent a) {
         String action = a.getMessage();
         if (action.equals(ACTION_BACK_TEXT)) {
             this.setBackText(a.getValue());

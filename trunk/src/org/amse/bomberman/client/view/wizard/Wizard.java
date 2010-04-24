@@ -99,8 +99,9 @@ public class Wizard extends JFrame implements WizardListener{
     }
     public void goBack() {
         if (backJButton.isEnabled() && currentID > 0) {
-            myDescriptors.get(currentID).goBack();
-            this.setCurrentJPanel(myDescriptors.get(currentID - 1).getIdentifier());
+            if (myDescriptors.get(currentID).goBack()) {
+                this.setCurrentJPanel(myDescriptors.get(currentID - 1).getIdentifier());
+            }
         }
     }
     public void goNext() {
@@ -122,7 +123,7 @@ public class Wizard extends JFrame implements WizardListener{
 
     }
 
-    public void wizardActionPerformed(WizardAction a) {
+    public void wizardActionPerformed(WizardEvent a) {
         // override this
     }
 

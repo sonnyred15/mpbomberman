@@ -58,7 +58,7 @@ public abstract class PanelDescriptor {
         return true;
     }
 
-    public void goBack() {
-        
+    public boolean goBack() {
+        return true;
     }
 }

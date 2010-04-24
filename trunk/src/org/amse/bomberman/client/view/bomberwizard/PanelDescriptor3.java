@@ -29,13 +29,15 @@ public class PanelDescriptor3 extends PanelDescriptor {
     }
 
     @Override
-    public void goBack() {
+    public boolean goBack() {
         try {
             Controller.getInstance().requestLeaveGame();
+            return true;
         } catch (NetException ex) {
              JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
                     + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
              this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
+             return false;
         }
     }
 }
