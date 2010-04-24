@@ -21,9 +21,9 @@ import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.view.mywizard.MyWizard;
-import org.amse.bomberman.client.view.mywizard.Panel3;
-import org.amse.bomberman.client.view.mywizard.RequestResultListener;
+import org.amse.bomberman.client.view.bomberwizard.Panel3;
+import org.amse.bomberman.client.net.RequestResultListener;
+import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
 import org.amse.bomberman.util.Constants.Direction;
@@ -265,11 +265,11 @@ public class SynchroConnector implements IConnector {
                 c.requestIsGameStarted();
                 // how do it better??? ----------------------------------------
                 RequestResultListener listener = c.getReceiveInfoListener();
-                if (listener instanceof MyWizard) {
-                    JPanel panel = ((MyWizard) listener).getCurrentJPanel();
+                if (listener instanceof Wizard) {
+                    JPanel panel = ((Wizard) listener).getCurrentJPanel();
                     if (panel instanceof Panel3) {
                         Panel3 panel3 = (Panel3) panel;
-                        if (!((MyWizard) listener).isShowing()) {
+                        if (!((Wizard) listener).isShowing()) {
                             stopUpdating();
                         }
                     }
