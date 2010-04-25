@@ -29,24 +29,14 @@ import java.util.List;
  *
  * @author Kirilchuk V.E
  */
-public class Session extends AbstractSession implements ISession {
-    private final MyTimer      timer = new MyTimer(System.currentTimeMillis());
+public class SynchroSession extends AbstractSession implements ISession {
     protected final Controller controller;
+    private final MyTimer      timer = new MyTimer(System.currentTimeMillis());
 
-    public Session(Server server, Socket clientSocket, int sessionID,
-                   ILog log) {
+    public SynchroSession(Server server, Socket clientSocket, int sessionID,
+                          ILog log) {
         super(server, clientSocket, sessionID, log);
         this.controller = new Controller(server, this);
-    }
-
-    public void interruptSession() throws SecurityException {
-        this.interrupt();
-
-        try {
-            this.clientSocket.close();
-        } catch (IOException ex) {
-            writeToLog("Session: interruptSession error. " + ex.getMessage());
-        }
     }
 
     @Override
@@ -546,7 +536,7 @@ public class Session extends AbstractSession implements ISession {
         if (game != null) {
             List<String> linesToSend =
                 Stringalize.fieldExplPlayerInfo(game,
-                                              this.controller.getPlayer());
+                                                this.controller.getPlayer());
 
             sendAnswer(linesToSend);
             writeToLog("Session: sended mapArray+explosions+playerInfo" +
@@ -661,7 +651,7 @@ public class Session extends AbstractSession implements ISession {
         if (game != null) {
             List<String> linesToSend =
                 Stringalize.fieldExplPlayerInfo2(game,
-                                               this.controller.getPlayer());
+                                                 this.controller.getPlayer());
 
             sendAnswer(linesToSend);
             writeToLog("Session: sended mapArray+explosions+playerInfo" +

@@ -24,12 +24,11 @@ public interface ISession {
      */
     void run();
 
-    /**
-     * Must interrupt session and terminate it.
-     * @throws SecurityException if interrupting thread cannot interrupt session.
-     */
-    void interruptSession() throws SecurityException;    // must delegate to thread.interrupt()
 
+    /**
+     * Must terminate session.
+     */
+    void terminateSession();    
     /**
      * Tells session to start receiving requests and answer on them and to do
      * all needed for that things.

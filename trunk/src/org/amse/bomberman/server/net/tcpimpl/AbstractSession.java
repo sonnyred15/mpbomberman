@@ -38,6 +38,7 @@ public abstract class AbstractSession extends Thread implements ISession {
     protected final Socket  clientSocket;
     protected final IServer server;
     protected final int     sessionID;
+    protected boolean       mustEnd;
 
     public AbstractSession(Server server, Socket clientSocket, int sessionID,
                            ILog log) {
@@ -46,6 +47,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         this.clientSocket = clientSocket;
         this.sessionID = sessionID;
         this.log = log;
+        this.mustEnd = false;
     }
 
     @Override
@@ -68,7 +70,7 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             String clientQueryLine;
 
-            while (!Thread.interrupted()) {
+            while (!this.mustEnd) {
                 try {
                     clientQueryLine = in.readLine();    // throws IOException
 
@@ -113,7 +115,15 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
-    public abstract void interruptSession() throws SecurityException;
+    public void terminateSession() throws SecurityException {
+        this.mustEnd = true;
+
+        try {
+            this.clientSocket.close();
+        } catch (IOException ex) {
+            writeToLog("Session: interruptSession error. " + ex.getMessage());
+        }
+    }
 
     public void sendAnswer(String shortAnswer) {
         BufferedWriter out = null;

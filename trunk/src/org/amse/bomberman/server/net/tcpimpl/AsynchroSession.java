@@ -32,23 +32,14 @@ import java.util.List;
  * @author Kirilchuk V.E.
  */
 public class AsynchroSession extends AbstractSession {
-    private final MyTimer      timer = new MyTimer(System.currentTimeMillis());
-    protected final Controller controller;
+    private final MyTimer    timer = new MyTimer(System.currentTimeMillis());
+    private final Controller controller;
 
     public AsynchroSession(Server server, Socket clientSocket, int sessionID,
                            ILog log) {
         super(server, clientSocket, sessionID, log);
         this.controller = new Controller(server, this);
-    }
-
-    public void interruptSession() throws SecurityException {
-        this.interrupt();
-
-        try {
-            this.clientSocket.close();
-        } catch (IOException ex) {
-            writeToLog("Session: interruptSession error. " + ex.getMessage());
-        }
+        this.mustEnd = false;
     }
 
     @Override
@@ -204,7 +195,8 @@ public class AsynchroSession extends AbstractSession {
             gameName = queryArgs[1];
             mapName = queryArgs[2];
             playerName = queryArgs[4];
-            if(playerName.length()>10){
+
+            if (playerName.length() > 10) {
                 playerName = playerName.substring(0, 10);
             }
 
@@ -387,7 +379,8 @@ public class AsynchroSession extends AbstractSession {
             }
 
             playerName = queryArgs[2];
-            if(playerName.length() > 10){
+
+            if (playerName.length() > 10) {
                 playerName = playerName.substring(0, 10);
             }
         } else {    // wrong syntax
@@ -580,7 +573,7 @@ public class AsynchroSession extends AbstractSession {
         if (game != null) {
             List<String> linesToSend =
                 Stringalize.fieldExplPlayerInfo(game,
-                                              this.controller.getPlayer());
+                                                this.controller.getPlayer());
 
             messages.addAll(linesToSend);
             sendAnswer(messages);
@@ -672,11 +665,11 @@ public class AsynchroSession extends AbstractSession {
                 boolean success = this.controller.tryStartGame();
 
                 if (success) {
+                    messages.add("Game started.");
+                    sendAnswer(messages);
+                    writeToLog("Session: started game. " + "(gameName=" +
+                               this.controller.getMyGame().getName() + ")");
 
-                  messages.add("Game started.");
-                  sendAnswer(messages);
-                  writeToLog("Session: started game. " + "(gameName=" +
-                             this.controller.getMyGame().getName() + ")");
                     return;
                 } else {
                     messages.add("Not owner of game.");
@@ -714,17 +707,17 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            if(game.isStarted()){
-            List<String> linesToSend =
-                Stringalize.fieldExplPlayerInfo2(game,
-                                               this.controller.getPlayer());
+            if (game.isStarted()) {
+                List<String> linesToSend =
+                    Stringalize.fieldExplPlayerInfo2(game,
+                        this.controller.getPlayer());
 
-            messages.addAll(linesToSend);
-            sendAnswer(messages);
-            writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
+                messages.addAll(linesToSend);
+                sendAnswer(messages);
+                writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
 
-            return;
-            } else { //game not started
+                return;
+            } else {    // game not started
                 messages.add("Game is not started. You can`t get full game field info.");
                 sendAnswer(messages);
                 writeToLog("Session: sendMapArray warning. Canceled. Game is not started.");
