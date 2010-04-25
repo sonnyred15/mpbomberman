@@ -35,6 +35,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -181,7 +182,7 @@ public class Panel3 extends JPanel {
         cons.anchor = GridBagConstraints.PAGE_END;
         cons.gridx = 0;
         cons.gridy = 1;
-        botsPanel.setOpaque(false);
+        cons.weightx = 1;
         left.add(botsPanel, cons);
 
         //
@@ -218,13 +219,21 @@ public class Panel3 extends JPanel {
         DefaultListModel defaultListModel = new DefaultListModel();
 
         this.playersList = new JList(defaultListModel);
+        this.playersList.setOpaque(false);        
         this.playersList.setCellRenderer(new IconListRenderer());
 
         JPanel      playersJPanel = new JPanel(new GridLayout());
+        playersJPanel.setOpaque(false);
         JScrollPane scrollJList = new JScrollPane(playersList);
 
         scrollJList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollJList.setWheelScrollingEnabled(true);
+        scrollJList.setOpaque(false);
+        scrollJList.setBorder(null);
+        scrollJList.getViewport().setOpaque(false);
+        scrollJList.getViewport().setBackground(new Color(1f, 1f,
+                                                          1f, 0f));
+
         playersJPanel.add(scrollJList);
 
         return playersJPanel;
@@ -232,7 +241,7 @@ public class Panel3 extends JPanel {
 
     private JPanel createBotsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-
+        panel.setOpaque(false);
         panel.add(botAddJButton);
         this.botAddJButton.setAction(new AddBotAction());
         panel.add(botRemoveJButton);
@@ -354,9 +363,13 @@ public class Panel3 extends JPanel {
                 (JLabel) super.getListCellRendererComponent(list, value, index,
                                                             isSelected,
                                                             cellHasFocus);
-
-            // Set icon
+            // Set icon            
             label.setIcon(new ImageIcon(joinedIcon));
+//            label.setOpaque(false);
+            label.setBackground(new Color(1f, 1f,
+                                          1f, 0f));
+            label.setForeground(Color.ORANGE);
+
 
             // enabling or disabling label
             if (label.getText().equals("")) {
