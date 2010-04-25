@@ -10,8 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.IllegalBlockingModeException;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.server.view.ServerChangeListener;
@@ -242,6 +240,10 @@ public class Server implements IServer {
         this.changeListener = logListener;
     }
 
+    public ServerChangeListener getChangeListener() {
+        return this.changeListener;
+    }
+
     private class SocketListen implements Runnable {
 
         private Server server;
@@ -271,7 +273,7 @@ public class Server implements IServer {
                                 clientSocket,
                                 sessionCounter, this.server.log);
                     } else {
-                        newSession = new Session(this.server, clientSocket,
+                        newSession = new SynchroSession(this.server, clientSocket,
                                 sessionCounter, this.server.log);
                     }
                     //
@@ -300,7 +302,7 @@ public class Server implements IServer {
             int i = 1;
             for (ISession session : sessions) {
                 writeToLog("Server: interrupting session " + i + "...");
-                session.interruptSession();
+                session.terminateSession();
                 ++i;
             }
 
