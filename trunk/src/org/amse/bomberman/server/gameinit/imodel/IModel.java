@@ -128,7 +128,7 @@ public interface IModel {
      * Removes player with defined ID.
      * @param playerID ID of player to remove from model.
      */
-    void removePlayer(int playerID);
+    boolean removePlayer(int playerID);
 
     /**
      * Do some preparations and begin the game.

@@ -32,6 +32,7 @@ public class Controller implements GameEndedListener {
      * Possible return value of next methods:
      * <p> 1)tryJoinGame
      * <p> 2)tryAddBotIntoMyGame
+     * <p> 3)tryRemoveBot
      * <p> Tells that game was already started
      * and your operation is not success.
      */
@@ -49,6 +50,7 @@ public class Controller implements GameEndedListener {
     /**
      * Possible return value of next methods:
      * <p> 1)tryAddBotIntoMyGame
+     * <p> 2)tryRemoveBot
      * <p> Tells that you are not joined to any game so
      * you can not do this operation.
      */
@@ -57,6 +59,7 @@ public class Controller implements GameEndedListener {
     /**
      * Possible return value of next methods:
      * <p> 1)tryAddBotIntoMyGame
+     * <p> 2)tryRemoveBot
      * <p> Tells that you are not owner of game so
      * you can not do this operation.
      */
@@ -73,9 +76,17 @@ public class Controller implements GameEndedListener {
      * Possible return value of next methods:
      * <p> 1)tryJoinGame
      * <p> 2)tryAddBotIntoMyGame
+     * <p> 3)tryRemoveBot
      * <p> Tells that you operation was sucessful.
      */
     public static final int RESULT_SUCCESS = 1;
+
+    /**
+     * Possible return value of next methods:
+     * <p> tryRemoveBot
+     * <p> Tells that there wasn`t bot to remove from game.
+     */
+    public static final int NO_SUCH_BOT = -5;
     private Game            game;
     private int             playerID;
     private final ISession  session;
@@ -184,7 +195,6 @@ public class Controller implements GameEndedListener {
      * and you can not tryJoin bot.
      * <p>
      * Controller.NOT_OWNER_OF_GAME - if you are not owner of the game
-     * or game is full
      * <p>
      * Controller.GAME_IS_FULL - if game is full
      * and you can not join bot.
@@ -213,6 +223,46 @@ public class Controller implements GameEndedListener {
         }
 
         return joinResult;
+    }
+
+    /**
+     *
+     * @return integer value that have next meanings
+     * <p>
+     * Controller.NOT_JOINED - if you are not joined to any game
+     * and trying to remove bot.
+     * <p>
+     * Controller.GAME_IS_ALREADY_STARTED - if game was already started
+     * and you can not remove bot.
+     * <p>
+     * Controller.NOT_OWNER_OF_GAME - if you are not owner of the game
+     * and trying to remove bot.
+     * <p>
+     * Controller.NO_SUCH_BOT - if there is no bot to remove.
+     * <p>
+     * Controller.RESULT_SUCCESS - if bot was removed.
+     */
+    public int tryRemoveBot() {
+        int removeResult = Controller.NOT_JOINED;
+
+        if (this.game != null) {
+            removeResult = Controller.GAME_IS_ALREADY_STARTED;
+
+            if (!this.game.isStarted()) {
+                removeResult = Controller.NOT_OWNER_OF_GAME;
+
+                if (this.game.getOwner() == this) {
+                    boolean removed = this.game.tryRemoveLastBot();
+                    if(removed){
+                        removeResult = Controller.RESULT_SUCCESS;
+                    }else{
+                        removeResult = Controller.NO_SUCH_BOT;
+                    }
+                }
+            }
+        }
+
+        return removeResult;
     }
 
     /**

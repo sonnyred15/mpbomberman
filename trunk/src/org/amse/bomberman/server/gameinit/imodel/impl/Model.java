@@ -301,14 +301,17 @@ public class Model implements IModel, DieListener {
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
-    public void removePlayer(int playerID) {
+    public boolean removePlayer(int playerID) {
         for (Player player : players) {
             if (player.getID() == playerID) {
                 this.players.remove(player);
                 this.freeIDs.add(playerID);
                 this.gameMap.removePlayer(playerID);
+                return true;
             }
         }
+
+        return false;
     }
 
     public void startup() {

@@ -24,6 +24,7 @@ public class ProtocolConstants {
     public static final String CAPTION_GAME_MAPS_LIST = "Game maps list.";
     public static final String CAPTION_GAME_INFO = "Game info.";
     public static final String CAPTION_JOIN_BOT_INFO = "Join bot.";
+    public static final String CAPTION_REMOVE_BOT_INFO = "Remove bot info.";
     public static final String CAPTION_SEND_CHAT_MSG_INFO = "Send chat messages.";
     public static final String CAPTION_GET_CHAT_MSGS = "Get chat messages.";
 

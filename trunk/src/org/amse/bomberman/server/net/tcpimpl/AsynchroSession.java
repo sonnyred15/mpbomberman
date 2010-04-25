@@ -733,6 +733,75 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
+    protected void removeBotFromGame() {
+        List<String> messages = new ArrayList<String>();
+
+        messages.add(0, ProtocolConstants.CAPTION_REMOVE_BOT_INFO);
+
+        int removeResult = this.controller.tryRemoveBot();
+
+        switch (removeResult) {
+            case Controller.NOT_JOINED : {
+                messages.add("Not joined to any game.");
+                sendAnswer(messages);
+                writeToLog("Session: removeBot warning. " +
+                           "Tryed to remove bot from game, canceled." +
+                           " Not joined to any game.");
+
+                return;
+            }
+
+            case Controller.NOT_OWNER_OF_GAME : {
+                messages.add("Not owner of game.");
+                sendAnswer(messages);
+                writeToLog("Session: removeBot warning. " +
+                           "Tryed to remove bot from game, canceled." +
+                           " Not owner of the game.");
+
+                return;
+            }
+
+            case Controller.GAME_IS_ALREADY_STARTED : {
+                messages.add("Game was already started.");
+                sendAnswer(messages);
+                writeToLog("Session: removeBot warning. " +
+                           "Tryed to remove bot from game ,canceled. " +
+                           "Game is already started.");
+
+                return;
+            }
+
+            case Controller.NO_SUCH_BOT : {
+                messages.add("No bot to remove.");
+                sendAnswer(messages);
+                writeToLog("Session: removeBot warning. " +
+                           "Tryed to remove bot from game, canceled." +
+                           "No bot to remove.");
+
+                return;
+            }
+
+            case Controller.RESULT_SUCCESS : {
+                messages.add("Bot removed.");
+                sendAnswer(messages);
+                writeToLog("Session: removed bot from game." +
+                           controller.getMyGame().getName());
+
+                return;
+            }
+
+            default : {
+                messages.add("Error on server.");
+                sendAnswer(messages);
+                writeToLog("Session: removeBot error. Default block in switch " +
+                           "statement. Error on server side.");
+
+                return;
+            }
+        }
+    }
+
     private class MyTimer {
         private long startTime;
 

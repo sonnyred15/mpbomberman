@@ -46,7 +46,7 @@ public class Bot extends Player
     /**
      * Method from GameEndedListener interface.
      * In current realization switch bot gameEnded flag to true.
-     * It affects on bot thread, so it is endind on next iteration.
+     * It affects on bot thread, so it is ending on next iteration.
      */
     public void gameEnded() {
         this.gameEnded = true;
@@ -84,7 +84,7 @@ public class Bot extends Player
             System.out.println("Bot: removed from game(Game ended or he died)");
             game.removeGameStartedListener(this.bot);
             game.removeGameEndedListener(this.bot);
-            game.removeBotFromGame(this.bot);
+            game.tryRemoveBotFromGame(this.bot);
         }
     }
 }

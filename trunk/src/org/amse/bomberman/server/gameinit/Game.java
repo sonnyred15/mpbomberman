@@ -7,15 +7,16 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
+import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
+import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.util.ProtocolConstants;
@@ -23,6 +24,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -332,7 +334,11 @@ public class Game {
      * from gameField.
      * @param bot bot to remove from the game.
      */
-    public void removeBotFromGame(Bot bot) {    // TODO if bot removing by owner his thread is not die!
+    public boolean tryRemoveBotFromGame(Bot bot) {
+        boolean result = this.model.removePlayer(bot.getID());
+        bot.gameEnded();
+        this.chat.removePlayer(bot.getID());
+
         if (!this.started) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
@@ -340,8 +346,19 @@ public class Game {
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         }
 
-        this.model.removePlayer(bot.getID());
-        this.chat.removePlayer(bot.getID());
+        return result;
+    }
+
+    public boolean tryRemoveLastBot() {
+        List<Player> players = this.model.getPlayersList();
+        for(int i = players.size()-1; i>0; --i){
+            Player pl = players.get(i);
+            if(pl instanceof Bot){
+                return this.tryRemoveBotFromGame((Bot)pl);
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -395,6 +412,12 @@ public class Game {
     public boolean tryStartGame(Controller controller) {
         if (this.owner == controller) {
             this.started = true;
+
+            ServerChangeListener scl = this.server.getChangeListener();
+
+            if (scl != null) {
+                scl.changed(this.server);
+            }
 
             // Here model must change gameMap to support current num of players
             // and then give coordinates to Players.
