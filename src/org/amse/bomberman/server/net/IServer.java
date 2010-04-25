@@ -114,4 +114,10 @@ public interface IServer {
      * @param changeListener listener.
      */
     void setChangeListener(ServerChangeListener changeListener);
+
+    /**
+     * Returns reference to server change listener if it exists or null.
+     * @return reference to server change listener if it exists or null..
+     */
+    ServerChangeListener getChangeListener();
 }

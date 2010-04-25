@@ -667,6 +667,11 @@ public class SynchroSession extends AbstractSession implements ISession {
         }
     }
 
+    @Override
+    protected void removeBotFromGame() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     private class MyTimer {
         private long startTime;
 

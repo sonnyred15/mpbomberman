@@ -347,6 +347,12 @@ public abstract class AbstractSession extends Thread implements ISession {
                 break;
             }
 
+            case REMOVE_BOT_FROM_GAME : {
+
+                // "16"
+                removeBotFromGame();
+            }
+
             default : {
                 sendAnswer("Unrecognized command!");
                 writeToLog("Session: answerOnCommand error." +
@@ -400,4 +406,6 @@ public abstract class AbstractSession extends Thread implements ISession {
     protected abstract void getNewMessagesFromChat();
 
     protected abstract void sendGameMapArray2();
+
+    protected abstract void removeBotFromGame();
 }
