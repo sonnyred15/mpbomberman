@@ -60,4 +60,6 @@ public interface ISession {
      * @param message notification to send.
      */
     void notifyClient(String message);
+
+    void notifyClient(List<String> message);
 }

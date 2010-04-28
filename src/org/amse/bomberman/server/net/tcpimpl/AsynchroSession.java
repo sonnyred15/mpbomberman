@@ -47,6 +47,11 @@ public class AsynchroSession extends AbstractSession {
         this.sendAnswer(message);
     }
 
+    @Override
+    public void notifyClient(List<String> messages) {
+        this.sendAnswer(messages);
+    }
+
     protected void addBot(String[] queryArgs) {
 
         // "11" "botName"

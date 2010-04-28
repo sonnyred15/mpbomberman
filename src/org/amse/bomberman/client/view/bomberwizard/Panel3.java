@@ -231,8 +231,6 @@ public class Panel3 extends JPanel {
         scrollJList.setOpaque(false);
         scrollJList.setBorder(null);
         scrollJList.getViewport().setOpaque(false);
-        scrollJList.getViewport().setBackground(new Color(1f, 1f,
-                                                          1f, 0f));
 
         playersJPanel.add(scrollJList);
 
@@ -250,11 +248,13 @@ public class Panel3 extends JPanel {
     }
 
     private JPanel createChatPanel() {
-        JPanel             chatJPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints cons = new GridBagConstraints();
+        JPanel chatJPanel = new JPanel(new GridBagLayout());
 
         this.chatTA.setEditable(false);
         this.chatTA.setLineWrap(true);
+        this.chatTA.setOpaque(false);
+
+        GridBagConstraints cons = new GridBagConstraints();
 
         // TEXT AREA
         cons.weightx = 1;
@@ -264,7 +264,15 @@ public class Panel3 extends JPanel {
         cons.gridheight = 1;
         cons.fill = GridBagConstraints.BOTH;
         cons.insets = new Insets(0, 0, 5, 10);
-        chatJPanel.add(new JScrollPane(chatTA), cons);
+
+        JScrollPane scrollTA = new JScrollPane(chatTA);
+        scrollTA.setOpaque(false);
+        //scrollTA.getViewport().setOpaque(false);
+        scrollTA.getViewport().setBackground(new Color(1f,
+                1f, 1f, 0.2f));
+        scrollTA.setBorder(null);
+
+        chatJPanel.add(scrollTA , cons);
 
         // TEXT FIELD
         cons = new GridBagConstraints();

@@ -182,6 +182,8 @@ public abstract class AbstractSession extends Thread implements ISession {
 
     public abstract void notifyClient(String message);
 
+    public abstract void notifyClient(List<String> messages);
+
     protected abstract void freeResources();
 
     protected void answerOnCommand(String query) {
