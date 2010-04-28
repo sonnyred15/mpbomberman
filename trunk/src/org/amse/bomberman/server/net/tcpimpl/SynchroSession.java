@@ -44,6 +44,11 @@ public class SynchroSession extends AbstractSession implements ISession {
         ;    // do nothing in this realization
     }
 
+    @Override
+    public void notifyClient(List<String> messages) {
+         ;    // do nothing in this realization
+    }
+
     protected void addBot(String[] queryArgs) {    // migrating version need remove case 3
 
         // "11" "gameID" "botName"

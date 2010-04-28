@@ -17,7 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * represents the ingame log of some events like player deaths...
  * @author Kirilchuk V.E.
  */
-public class Chat {
+public class SynchroChat {
 
     // TODO this version of chat is compromise for syncronous and asynchronous
     // Session. Better way in asynchronous server is to send new messages to
@@ -31,7 +31,7 @@ public class Chat {
      * Constructor of chat. Creates it for specified number of players.
      * @param maxPlayers maximum players num in this chat.
      */
-    public Chat(int maxPlayers) {
+    public SynchroChat(int maxPlayers) {
         this.lastTakedMessageIndexes = new int[maxPlayers];
 
         for (int i = 0; i < lastTakedMessageIndexes.length; ++i) {
@@ -111,18 +111,18 @@ public class Chat {
 
     private void tryRemoveOldMessages() {
         for (int i = 0; i < this.lastTakedMessageIndexes.length; ++i) {
-            if (this.lastTakedMessageIndexes[i] < Chat.KEEP_OLD_MSGS_NUM) {
+            if (this.lastTakedMessageIndexes[i] < SynchroChat.KEEP_OLD_MSGS_NUM) {
                 return;
             }
         }
 
-        for (int i = 0; i < Chat.KEEP_OLD_MSGS_NUM; ++i) {
+        for (int i = 0; i < SynchroChat.KEEP_OLD_MSGS_NUM; ++i) {
             this.messages.remove(0);    // removePlayer new first
         }
 
         for (int i = 0; i < lastTakedMessageIndexes.length; ++i) {
             if (this.lastTakedMessageIndexes[i] != Integer.MAX_VALUE) {
-                this.lastTakedMessageIndexes[i] -= Chat.KEEP_OLD_MSGS_NUM;
+                this.lastTakedMessageIndexes[i] -= SynchroChat.KEEP_OLD_MSGS_NUM;
             }
         }
     }

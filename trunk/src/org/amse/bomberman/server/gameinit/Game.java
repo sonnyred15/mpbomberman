@@ -24,7 +24,6 @@ import org.amse.bomberman.util.ProtocolConstants;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Kirilchuk V.E.
  */
 public class Game {
-    private Chat                            chat;
+    private AsynchroChat                    chat;
     private final List<Controller>          controllers;
     private final List<GameEndedListener>   gameEndedListeners;
     private final String                    gameName;
@@ -79,7 +78,7 @@ public class Game {
             this.maxPlayers = gameMapMaxPlayers;
         }
 
-        this.chat = new Chat(this.maxPlayers);
+        this.chat = new AsynchroChat(this);
         this.model = new Model(gameMap, this);
         this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
         this.controllers = new CopyOnWriteArrayList<Controller>();
@@ -237,9 +236,9 @@ public class Game {
     }
 
     /**
-     * Return list of new messages from chat. See Chat class to view
+     * Return list of new messages from chat. See SynchroChat class to view
      * what will be sended if there is no new messages.
-     * @see Chat
+     * @see SynchroChat
      * @param playerID ID of player that requests his new messages.
      * @return list of new messages from chat.
      */
@@ -294,7 +293,6 @@ public class Game {
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
             playerID = this.model.addPlayer(name);
             this.controllers.add(controller);
-            this.chat.addPlayer(playerID);
 
             // notifying clients
             this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
@@ -315,7 +313,6 @@ public class Game {
     public void leaveFromGame(Controller controller) {
         this.controllers.remove(controller);
         this.model.removePlayer(controller.getID());    // this will call notify about gameMap change
-        this.chat.removePlayer(controller.getID());
 
         if (!this.started) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
@@ -337,7 +334,6 @@ public class Game {
     public boolean tryRemoveBotFromGame(Bot bot) {
         boolean result = this.model.removePlayer(bot.getID());
         bot.gameEnded();
-        this.chat.removePlayer(bot.getID());
 
         if (!this.started) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
@@ -424,7 +420,7 @@ public class Game {
             this.model.startup();
 
             // this.chat.clear();
-            // this.chat = new Chat(this.model.getCurrentPlayersNum());
+            // this.chat = new SynchroChat(this.model.getCurrentPlayersNum());
             notifyGameSessions(ProtocolConstants.MESSAGE_GAME_START);
 
             for (GameStartedListener gameStartedListener : gameStartedListeners) {
@@ -458,6 +454,17 @@ public class Game {
     public void notifyGameSessions(String message) {
         for (Controller controller : controllers) {
             controller.getSession().notifyClient(message);
+        }
+    }
+
+    /**
+     * Notifying  only clients that are joined to this game about something
+     * by sending messages to them.
+     * @param message message to send to clients.
+     */
+    public void notifyGameSessions(List<String> messages) {
+        for (Controller controller : controllers) {
+            controller.getSession().notifyClient(messages);
         }
     }
 
