@@ -306,7 +306,9 @@ public class Model implements IModel, DieListener {
             if (player.getID() == playerID) {
                 this.players.remove(player);
                 this.freeIDs.add(playerID);
-                this.gameMap.removePlayer(playerID);
+                if(this.game.isStarted()){
+                    this.gameMap.removePlayer(playerID);
+                }
                 return true;
             }
         }
