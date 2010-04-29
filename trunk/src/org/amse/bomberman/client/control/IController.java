@@ -36,4 +36,5 @@ public interface IController {
     public void requestNewChatMessages() throws NetException;
     public void requestDownloadMap(String gameMapName) throws NetException;
     public void receivedRequestResult(List<String> requestResult) throws NetException;
+    public void switchToWizard();
 }
