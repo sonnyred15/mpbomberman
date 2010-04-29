@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.view.bomberwizard.BombWizard;
 
 /**
  * @author Michail Korovkin
@@ -34,8 +35,7 @@ public class GameJMenuBar extends JMenuBar {
                 try {
                     Controller.getInstance().requestLeaveGame();
                 } catch (NetException ex) {
-                    JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    System.out.println(ex);
                 }
                 System.exit(0);
             }
@@ -57,8 +57,14 @@ public class GameJMenuBar extends JMenuBar {
             try {
                 Controller.getInstance().requestLeaveGame();
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(parent,"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent,
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                parent.dispose();
+                Model.getInstance().setStart(false);
+                Model.getInstance().removeListener(parent);
+                BombWizard wizard = new BombWizard();
+                Controller.getInstance().setReceiveInfoListener(wizard);
+                wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
             }
         }
     }

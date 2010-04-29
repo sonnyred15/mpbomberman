@@ -6,6 +6,8 @@ import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.view.bomberwizard.BombWizard;
 import org.amse.bomberman.util.Constants.Direction;
 /**
  * @author Michail Korovkin
@@ -47,8 +49,14 @@ public class GameJFrameListener implements KeyListener{
                     return;
             }
         } catch (NetException ex) {
-            JOptionPane.showMessageDialog(parent, "Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent,
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            parent.dispose();
+            Model.getInstance().setStart(false);
+            Model.getInstance().removeListener(parent);
+            BombWizard wizard = new BombWizard();
+            Controller.getInstance().setReceiveInfoListener(wizard);
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
         }
     }
 

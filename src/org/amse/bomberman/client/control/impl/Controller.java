@@ -41,6 +41,9 @@ public class Controller implements IController{
         return controller;
     }
 
+    public void switchToWizard() {
+        // TO DO
+    }
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
     }

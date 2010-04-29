@@ -59,8 +59,6 @@ public class GameJFrame extends JFrame implements IView{
     public synchronized void update() {
         IModel model = Model.getInstance();
         if (!model.isStarted()) {
-            //JOptionPane.showMessageDialog(this, "You leaved the game.\n"
-            //            , "STOP", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             Model.getInstance().removeListener(this);
             BombWizard wizard = new BombWizard();
