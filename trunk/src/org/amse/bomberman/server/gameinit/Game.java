@@ -333,7 +333,8 @@ public class Game {
      */
     public boolean tryRemoveBotFromGame(Bot bot) {
         boolean result = this.model.removePlayer(bot.getID());
-        bot.gameEnded();
+        this.gameStartedListeners.remove(bot);
+        this.gameEndedListeners.remove(bot);
 
         if (!this.started) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);

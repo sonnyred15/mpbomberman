@@ -68,7 +68,7 @@ public class Bot extends Player
         }
 
         public void run() {
-            while (isAlive() &&!gameEnded) {
+            while (isAlive() && !gameEnded) {
                 try {
                     IAction action = strategy.thinkAction(this.bot, model);
 
@@ -82,8 +82,6 @@ public class Bot extends Player
             }
 
             System.out.println("Bot: removed from game(Game ended or he died)");
-            game.removeGameStartedListener(this.bot);
-            game.removeGameEndedListener(this.bot);
             game.tryRemoveBotFromGame(this.bot);
         }
     }
