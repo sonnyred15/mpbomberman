@@ -32,9 +32,11 @@ public class Panel1 extends JPanel{
 
     private final int height = 480;
     private final int width = 640;
+
     private JTextField ipTF = new JTextField();
     private JTextField portTF = new JTextField();
     private JTextField playerNameTF = new JTextField();
+    private final int textWidth = 80;
 
     public Panel1() {
         setSize(width, height);
@@ -74,36 +76,39 @@ public class Panel1 extends JPanel{
     private JComponent createMainPanel(){
         Box bottomBox = Box.createHorizontalBox();
         JLabel ipLabel = new JLabel("IP");
-        ipLabel.setPreferredSize(new Dimension(width / 8, 20));
+        //ipLabel.setPreferredSize(new Dimension(width / 8, 20));
         ipLabel.setForeground(textColor);
         ipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        bottomBox.add(ipLabel);
-        ipTF.setPreferredSize(new Dimension(width / 4, 20));
+        ipTF.setPreferredSize(new Dimension(textWidth, 20));
         try {
             ipTF.setText(InetAddress.getByName("localhost").getHostAddress());
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
+        bottomBox.add(ipLabel);
+        bottomBox.add(Box.createHorizontalStrut(5));
         bottomBox.add(ipTF);
 
         Box centralBox = Box.createHorizontalBox();
         JLabel portLabel = new JLabel("Port");
         portLabel.setForeground(textColor);
-        portLabel.setPreferredSize(new Dimension(width / 8, 20));
+        //portLabel.setPreferredSize(new Dimension(width / 8, 20));
         portLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        centralBox.add(portLabel);
-        portTF.setPreferredSize(new Dimension(width / 4, 20));
+        portTF.setPreferredSize(new Dimension(textWidth, 20));
         portTF.setText("" + Constants.DEFAULT_PORT);
+        centralBox.add(portLabel);
+        centralBox.add(Box.createHorizontalStrut(5));
         centralBox.add(portTF);
 
         Box downBox = Box.createHorizontalBox();
         JLabel nameLabel = new JLabel("Player");
         nameLabel.setForeground(textColor);
-        nameLabel.setPreferredSize(new Dimension(width / 8, 20));
+        //nameLabel.setPreferredSize(new Dimension(width / 8, 20));
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-        downBox.add(nameLabel);
-        playerNameTF.setPreferredSize(new Dimension(width / 4, 20));
+        playerNameTF.setPreferredSize(new Dimension(textWidth, 20));
         playerNameTF.setText("unnamed");
+        downBox.add(nameLabel);
+        downBox.add(Box.createHorizontalStrut(5));
         downBox.add(playerNameTF);
 
         Box MainBox = Box.createVerticalBox();
