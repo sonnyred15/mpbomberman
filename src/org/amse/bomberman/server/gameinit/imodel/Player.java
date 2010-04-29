@@ -53,9 +53,13 @@ public class Player implements MoveableObject {
      * @return info about player state.
      */
     public String getInfo() {    // TODO ADD BONUSES AND OTHER INFO!
-        String ret = this.position.getX() + " " + this.position.getY() + " " +
-                     this.nickName + " " + this.lives + " " + this.bombs +
-                     " " + this.maxBombs;
+        String ret = this.position.getX() + " " +
+                     this.position.getY() + " " +
+                     this.nickName + " " +
+                     this.lives + " " +
+                     this.bombs + " " +
+                     this.maxBombs + " " +
+                     this.explRadius;
 
         return ret;
     }
