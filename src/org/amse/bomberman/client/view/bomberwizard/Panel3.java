@@ -12,6 +12,8 @@ import org.amse.bomberman.util.Creator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -163,19 +165,20 @@ public class Panel3 extends JPanel {
 
         /* creating players and botsControl panels */
         JPanel left = new JPanel(new GridBagLayout());
+        left.setPreferredSize(new Dimension(200, 480));
         left.setBorder(new EmptyBorder(0, 5, 5, 0));
         left.setOpaque(false);
 
         //
         GridBagConstraints cons = new GridBagConstraints();
 
-        //cons.anchor = GridBagConstraints.NORTHWEST;
+        cons.anchor = GridBagConstraints.NORTHWEST;
         cons.fill = GridBagConstraints.BOTH;
         cons.gridx = 0;
         cons.gridy = 0;
         cons.weightx = 1;
         cons.weighty = 1;
-        cons.gridwidth = 0;
+        cons.gridwidth = GridBagConstraints.REMAINDER;
         left.add(playersPanel, cons);
 
         //
@@ -184,6 +187,7 @@ public class Panel3 extends JPanel {
         cons.gridx = 0;
         cons.gridy = 1;
         cons.weightx = 1;
+        cons.gridwidth = 1;
         left.add(botsPanel, cons);
 
         //
@@ -239,9 +243,8 @@ public class Panel3 extends JPanel {
         return playersJPanel;
     }
 
-    private JComponent createBotsComponent() {
-        Box lineBox = Box.createHorizontalBox();
-        JPanel panel = new JPanel();
+    private JComponent createBotsComponent() {        
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         panel.setOpaque(false);
         panel.add(botAddJButton);
         this.botAddJButton.setAction(new AddBotAction());
@@ -258,7 +261,7 @@ public class Panel3 extends JPanel {
         this.chatTA.setEditable(false);
         this.chatTA.setLineWrap(true);
         this.chatTA.setForeground(Color.ORANGE);
-        this.chatTA.setFont(new Font(Font.MONOSPACED, Font.BOLD+Font.ITALIC, 16));
+        this.chatTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 15));
         this.chatTA.setOpaque(false);
 
         GridBagConstraints cons = new GridBagConstraints();
