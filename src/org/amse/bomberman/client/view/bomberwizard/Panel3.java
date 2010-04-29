@@ -208,7 +208,7 @@ public class Panel3 extends JPanel {
 
                             System.out.println(ex);
                             WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.ACTION_DISCONNECT));
+                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
                         }
                     }
                 }
@@ -227,7 +227,8 @@ public class Panel3 extends JPanel {
         playersJPanel.setOpaque(false);
         JScrollPane scrollJList = new JScrollPane(playersList);
 
-        scrollJList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollJList.setHorizontalScrollBarPolicy(ScrollPaneConstants
+                .HORIZONTAL_SCROLLBAR_NEVER);
         scrollJList.setWheelScrollingEnabled(true);
         scrollJList.setOpaque(false);
         scrollJList.setBorder(null);
@@ -327,7 +328,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.ACTION_DISCONNECT));
+                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }
@@ -346,7 +347,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.ACTION_DISCONNECT));
+                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }
@@ -370,7 +371,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.ACTION_DISCONNECT));
+                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }

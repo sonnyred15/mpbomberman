@@ -22,8 +22,8 @@ public class PanelDescriptor2 extends PanelDescriptor{
             Controller.getInstance().requestGamesList();
             Controller.getInstance().requestMapsList();
         } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this.getWizard(),"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this.getWizard(),
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
         }
     }
@@ -41,8 +41,8 @@ public class PanelDescriptor2 extends PanelDescriptor{
                 con.requestCreateGame(gameName, mapName, maxPlayers);
                 return true;
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(this.getWizard(),"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.getWizard(),
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
             }
         } else {
@@ -52,8 +52,8 @@ public class PanelDescriptor2 extends PanelDescriptor{
                     Controller.getInstance().requestJoinGame(gameNumber);
                     return true;
                 } catch (NetException ex) {
-                    JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
-                            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this.getWizard(),
+                            ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
                     return false;
                 }

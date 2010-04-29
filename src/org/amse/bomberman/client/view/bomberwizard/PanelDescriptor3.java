@@ -22,8 +22,8 @@ public class PanelDescriptor3 extends PanelDescriptor {
             panel3.clean();
             Controller.getInstance().requestGameInfo();
         } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this.getWizard(),
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
         }
     }
@@ -34,8 +34,8 @@ public class PanelDescriptor3 extends PanelDescriptor {
             Controller.getInstance().requestLeaveGame();
             return true;
         } catch (NetException ex) {
-             JOptionPane.showMessageDialog(this.getWizard(), "Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+             JOptionPane.showMessageDialog(this.getWizard(),
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
              this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
              return false;
         }

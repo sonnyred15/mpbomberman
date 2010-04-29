@@ -2,12 +2,9 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.WizardController;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -23,11 +20,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTable;
-import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumnModel;
 import org.amse.bomberman.util.Creator;
 /**
  *
@@ -36,7 +30,7 @@ import org.amse.bomberman.util.Creator;
 public class Panel2 extends JPanel{
     private final int width = 640;
     private final int height = 480;
-    private Color foreground = Color.ORANGE;
+    private Color foreground = new Color(255, 100, 100);
 
     private Image image;
     private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
@@ -176,7 +170,7 @@ public class Panel2 extends JPanel{
                 //cardLayout.show(mainPanel, CREATE_NAME);
                 //----------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
-                //                (BombWizard.ACTION_NEXT_TEXT, "Create"));
+                //                (BombWizard.EVENT_NEXT_TEXT, "Create"));
             }
         });
         createButton.setOpaque(false);
@@ -189,7 +183,7 @@ public class Panel2 extends JPanel{
                 //cardLayout.show(mainPanel, JOIN_NAME);
                 //--------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
-                //                (BombWizard.ACTION_NEXT_TEXT, "Join"));
+                //                (BombWizard.EVENT_NEXT_TEXT, "Join"));
             }
         });
         joinButton.setOpaque(false);
@@ -247,7 +241,7 @@ public class Panel2 extends JPanel{
                             if (getValueAt(getSelectedRow(), 0) != null) {
                                 //-------------------------------------------------
                                 WizardController.throwWizardAction
-                                        (new WizardEvent(BombWizard.ACTION_JOIN));
+                                        (new WizardEvent(BombWizard.EVENT_JOIN));
                             }
                         }
                     }
