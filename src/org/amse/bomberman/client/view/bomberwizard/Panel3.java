@@ -12,7 +12,6 @@ import org.amse.bomberman.util.Creator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -90,9 +89,9 @@ public class Panel3 extends JPanel {
     public Panel3() {
         super();
         this.setSize(width, height);
-        this.playersPanel = this.createPlayersPanel();
-        this.botsPanel = this.createBotsPanel();
-        this.chatPanel = this.createChatPanel();
+        this.playersPanel = this.createPlayersComponent();
+        this.botsPanel = this.createBotsComponent();
+        this.chatPanel = this.createChatComponent();
         initComponents();
         setVisible(true);
         this.initBackgroundImage();
@@ -170,12 +169,13 @@ public class Panel3 extends JPanel {
         //
         GridBagConstraints cons = new GridBagConstraints();
 
-        cons.anchor = GridBagConstraints.NORTHWEST;
+        //cons.anchor = GridBagConstraints.NORTHWEST;
         cons.fill = GridBagConstraints.BOTH;
         cons.gridx = 0;
         cons.gridy = 0;
         cons.weightx = 1;
         cons.weighty = 1;
+        cons.gridwidth = 0;
         left.add(playersPanel, cons);
 
         //
@@ -216,7 +216,7 @@ public class Panel3 extends JPanel {
         });
     }
 
-    private JPanel createPlayersPanel() {
+    private JComponent createPlayersComponent() {
         DefaultListModel defaultListModel = new DefaultListModel();
 
         this.playersList = new JList(defaultListModel);
@@ -239,8 +239,9 @@ public class Panel3 extends JPanel {
         return playersJPanel;
     }
 
-    private JPanel createBotsPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    private JComponent createBotsComponent() {
+        Box lineBox = Box.createHorizontalBox();
+        JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.add(botAddJButton);
         this.botAddJButton.setAction(new AddBotAction());
@@ -250,7 +251,7 @@ public class Panel3 extends JPanel {
         return panel;
     }
 
-    private JPanel createChatPanel() {
+    private JComponent createChatComponent() {
         JPanel chatJPanel = new JPanel(new GridBagLayout());
 
         //this.chatTA.setBorder(new TitledBorder("Chat"));
