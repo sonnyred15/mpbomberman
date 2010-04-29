@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -46,7 +47,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import org.amse.bomberman.client.view.wizard.WizardController;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
 
@@ -251,8 +254,11 @@ public class Panel3 extends JPanel {
     private JPanel createChatPanel() {
         JPanel chatJPanel = new JPanel(new GridBagLayout());
 
+        //this.chatTA.setBorder(new TitledBorder("Chat"));
         this.chatTA.setEditable(false);
         this.chatTA.setLineWrap(true);
+        this.chatTA.setForeground(Color.ORANGE);
+        this.chatTA.setFont(new Font(Font.MONOSPACED, Font.BOLD+Font.ITALIC, 16));
         this.chatTA.setOpaque(false);
 
         GridBagConstraints cons = new GridBagConstraints();
@@ -265,12 +271,16 @@ public class Panel3 extends JPanel {
         cons.gridheight = 1;
         cons.fill = GridBagConstraints.BOTH;
         cons.insets = new Insets(0, 0, 5, 10);
-
-        JScrollPane scrollTA = new JScrollPane(chatTA);
+        //
+        JScrollPane scrollTA = new JScrollPane(chatTA);        
         scrollTA.setOpaque(false);
-        //scrollTA.getViewport().setOpaque(false);
-        scrollTA.getViewport().setBackground(new Color(1f,
-                1f, 1f, 0.2f));
+        scrollTA.getViewport().setOpaque(false);
+        TitledBorder borderTA = new TitledBorder("Chat");
+        borderTA.setTitleColor(Color.WHITE);
+        borderTA.setTitleFont(new Font(null, Font.BOLD, 16));
+        scrollTA.setViewportBorder(borderTA);
+        //        scrollTA.getViewport().setBackground(new Color(1f,
+//                1f, 1f, 0.2f));
         scrollTA.setBorder(null);
 
         chatJPanel.add(scrollTA , cons);
@@ -294,7 +304,7 @@ public class Panel3 extends JPanel {
         cons.insets = new Insets(0, 0, 5, 10);
         this.chatJButton.setAction(new ChatAction());
         chatJPanel.add(this.chatJButton, cons);
-
+        
         return chatJPanel;
     }
 
