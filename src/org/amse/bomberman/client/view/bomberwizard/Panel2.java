@@ -5,6 +5,7 @@ import org.amse.bomberman.client.view.wizard.WizardEvent;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -42,10 +43,11 @@ public class Panel2 extends JPanel{
             "/view/resources/cover2.png";
     private static final URL BACKGROUND_URL = Panel2.class.getResource(BACKGROUND_PATH);
 
+    private JPanel joinPanel;
+    private CreatingGameJPanel createPanel;
+
     private JTable table;
-    private CreatingGameJPanel creatingPanel;
-    private JPanel mainPanel = new JPanel();
-    private CardLayout cardLayout = new CardLayout();
+    private JScrollPane jsp;
 
     private JRadioButton createButton;
     private JRadioButton joinButton;
@@ -89,7 +91,7 @@ public class Panel2 extends JPanel{
 
     public void setMaps(List<String> maps) {
         if (!maps.get(0).equals("No maps on server was founded.")) {
-            creatingPanel.setMaps(maps);
+            createPanel.setMaps(maps);
         }
     }
     public void setGames(List<String> games) {
@@ -110,31 +112,13 @@ public class Panel2 extends JPanel{
         table.repaint();
     }
     public String getMap() {
-        return this.creatingPanel.getMap();
+        return this.createPanel.getMap();
     }
     public String getGameName() {
-        return this.creatingPanel.getGameName();
+        return this.createPanel.getGameName();
     }
     public int getMaxPlayers() {
-        return this.creatingPanel.getMaxPlayers();
-    }
-
-    private void setSizesTable() {
-        table.getTableHeader().setReorderingAllowed(false);
-        TableColumnModel columnModel = table.getColumnModel();
-        columnModel.getColumn(0).setMaxWidth(40);
-        columnModel.getColumn(0).setMinWidth(40);
-        columnModel.getColumn(1).setWidth(150);
-        columnModel.getColumn(1).setMinWidth(100);
-        columnModel.getColumn(2).setWidth(150);
-        columnModel.getColumn(2).setMinWidth(50);
-        columnModel.getColumn(3).setMaxWidth(50);
-        columnModel.getColumn(3).setMinWidth(30);
-        columnModel.getColumn(4).setMaxWidth(100);
-        columnModel.getColumn(4).setMinWidth(50);
-        columnModel.getColumn(0).setResizable(false);
-        columnModel.getColumn(3).setResizable(false);
-        columnModel.getColumn(4).setResizable(false);
+        return this.createPanel.getMaxPlayers();
     }
 
     @Override
@@ -146,11 +130,50 @@ public class Panel2 extends JPanel{
     }
 
     private void initComponents() {
+        this.initRadioButtons();
+
+        // createPanel
+        createPanel = new CreatingGameJPanel();
+
+        // initialization of MyTable with list of games
+        table = new GamesTable();
+        
+        // JoinPanel
+        joinPanel = new JPanel();
+        jsp = new JScrollPane(table, JScrollPane
+                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setPreferredSize(new Dimension(width - 150, height - 150));
+        joinPanel.add(jsp);
+        joinPanel.setOpaque(false);
+        joinPanel.setPreferredSize(new Dimension(width - 150, height - 120));
+
+        // add all panels and buttons to the main Container
+        Box mainBox = Box.createVerticalBox();
+        createButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        joinButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        joinPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        createPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainBox.add(createButton);
+        mainBox.add(Box.createVerticalStrut(5));
+        mainBox.add(createPanel);
+        mainBox.add(Box.createVerticalStrut(15));
+        mainBox.add(joinButton);
+        mainBox.add(Box.createVerticalStrut(5));
+        mainBox.add(joinPanel);
+        this.add(mainBox);
+
+        // set first state to the "create"
+        createButton.setSelected(true);
+        table.setEnabled(false);
+    }
+    private void initRadioButtons() {
         // create JRadioButtons and set Actions to it
         createButton = new JRadioButton("New game");
         createButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, CREATE_NAME);
+                table.setEnabled(false);
+                createPanel.setEnabled(true);
+                //cardLayout.show(mainPanel, CREATE_NAME);
                 //----------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
                 //                (BombWizard.ACTION_NEXT_TEXT, "Create"));
@@ -161,7 +184,9 @@ public class Panel2 extends JPanel{
         joinButton = new JRadioButton("Join game");
         joinButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, JOIN_NAME);
+                table.setEnabled(true);
+                createPanel.setEnabled(false);
+                //cardLayout.show(mainPanel, JOIN_NAME);
                 //--------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
                 //                (BombWizard.ACTION_NEXT_TEXT, "Join"));
@@ -174,68 +199,6 @@ public class Panel2 extends JPanel{
         ButtonGroup selectGroup = new ButtonGroup();
         selectGroup.add(createButton);
         selectGroup.add(joinButton);
-        createButton.setSelected(true);
-        Box radioBox = Box.createVerticalBox();
-        radioBox.add(Box.createVerticalStrut(10));
-        radioBox.add(createButton);
-        radioBox.add(Box.createVerticalStrut(10));
-        radioBox.add(joinButton);
-        radioBox.setPreferredSize(new Dimension(width-50, 80));
-        Box topBox = Box.createHorizontalBox();
-        topBox.add(Box.createHorizontalStrut(300));
-        topBox.add(radioBox);
-        topBox.add(Box.createHorizontalGlue());
-
-        // createPanel
-        creatingPanel = new CreatingGameJPanel();
-        JPanel createPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 50));
-        createPanel.add(creatingPanel);
-        createPanel.setOpaque(false);
-
-        // initialization of MyTable with list of games
-        table = new JTable(new MyTableModel());
-        this.setSizesTable();
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int clicks = e.getClickCount();
-                if (clicks > 1) {
-                    if (table.getValueAt(table.getSelectedRow(), 0) != null) {
-                        //-----------------------------------------------------
-                        WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.ACTION_JOIN));
-                    }
-                }
-            }
-        });
-        // JoinPanel
-        JPanel joinPanel = new JPanel();
-        JScrollPane jsp = new JScrollPane(table, JScrollPane
-                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setPreferredSize(new Dimension(width - 150, height - 150));
-        joinPanel.add(jsp);
-        joinPanel.setOpaque(false);
-        joinPanel.setPreferredSize(new Dimension(400, 400));
-
-        // mainPanel - cardLayout with createPanel and joinPanel
-        mainPanel.setLayout(cardLayout);
-        mainPanel.add(createPanel, CREATE_NAME);
-        mainPanel.add(joinPanel, JOIN_NAME);
-        mainPanel.setOpaque(false);
-        mainPanel.setPreferredSize(new Dimension(200, height-100));
-        mainPanel.setMaximumSize(new Dimension(width - 120,height-100));
-        mainPanel.setBorder(new LineBorder(Color.ORANGE, 1));
-
-        // leftPanel
-        JPanel leftPanel = new JPanel();
-        leftPanel.setPreferredSize(new Dimension(30,100));
-        leftPanel.add(new JSeparator());
-
-        // add radioPanel and mainPanel
-        Box mainBox = Box.createVerticalBox();
-        mainBox.add(topBox);
-        mainBox.add(mainPanel);
-        this.add(mainBox);
     }
     private void initBackgroundImage() {
         try{
@@ -250,6 +213,53 @@ public class Panel2 extends JPanel{
         }
     }
 
+    private class GamesTable extends JTable {
+
+        public GamesTable() {
+            super(new MyTableModel());
+            this.setSizes();
+            this.setDoubleClick();
+        }
+        private void setSizes() {
+            this.getTableHeader().setReorderingAllowed(false);
+            columnModel.getColumn(0).setMaxWidth(40);
+            columnModel.getColumn(0).setMinWidth(40);
+            columnModel.getColumn(1).setWidth(150);
+            columnModel.getColumn(1).setMinWidth(100);
+            columnModel.getColumn(2).setWidth(150);
+            columnModel.getColumn(2).setMinWidth(50);
+            columnModel.getColumn(3).setMaxWidth(50);
+            columnModel.getColumn(3).setMinWidth(30);
+            columnModel.getColumn(4).setMaxWidth(100);
+            columnModel.getColumn(4).setMinWidth(50);
+            columnModel.getColumn(0).setResizable(false);
+            columnModel.getColumn(3).setResizable(false);
+            columnModel.getColumn(4).setResizable(false);
+        }
+        private void setDoubleClick() {
+            this.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (table.isEnabled()) {
+                        int clicks = e.getClickCount();
+                        if (clicks > 1) {
+                            if (table.getValueAt(table.getSelectedRow(), 0) != null) {
+                                //-------------------------------------------------
+                                WizardController.throwWizardAction
+                                        (new WizardEvent(BombWizard.ACTION_JOIN));
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        /*@Override
+        public void setEnabled(boolean b) {
+            this.tableHeader.setEnabled(b);
+
+        }*/
+    }
     private class MyTableModel extends AbstractTableModel {
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         Object[][] data = new Object[50][5];
