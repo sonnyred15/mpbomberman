@@ -241,10 +241,10 @@ public class Panel2 extends JPanel{
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (table.isEnabled()) {
+                    if (isEnabled()) {
                         int clicks = e.getClickCount();
                         if (clicks > 1) {
-                            if (table.getValueAt(table.getSelectedRow(), 0) != null) {
+                            if (getValueAt(getSelectedRow(), 0) != null) {
                                 //-------------------------------------------------
                                 WizardController.throwWizardAction
                                         (new WizardEvent(BombWizard.ACTION_JOIN));
@@ -254,11 +254,22 @@ public class Panel2 extends JPanel{
                 }
             });
         }
-        /*@Override
+        @Override
         public void setEnabled(boolean b) {
-            this.tableHeader.setEnabled(b);
+            super.setEnabled(b);
+            if (!b) {
+                this.setBackground(Color.lightGray);
+                this.tableHeader.setBackground(Color.gray);
+                this.getTableHeader().setForeground(Color.lightGray);
+                this.setForeground(Color.white);
+            } else {
+                this.setBackground(Color.white);
+                this.tableHeader.setBackground(new Color(238,238,238));
+                this.getTableHeader().setForeground(new Color(51,51,51));
+                this.setForeground(new Color(51,51,51));
+            }
 
-        }*/
+        }
     }
     private class MyTableModel extends AbstractTableModel {
         String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
