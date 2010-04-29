@@ -353,6 +353,8 @@ public abstract class AbstractSession extends Thread implements ISession {
 
                 // "16"
                 removeBotFromGame();
+
+                break;
             }
 
             default : {
