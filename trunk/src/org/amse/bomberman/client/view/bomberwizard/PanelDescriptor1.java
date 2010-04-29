@@ -32,8 +32,8 @@ public class PanelDescriptor1 extends PanelDescriptor{
             JOptionPane.showMessageDialog(this.getWizard(), "Can not connect to the server.\n"
                        + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }catch (NetException ex) {
-            JOptionPane.showMessageDialog(this.getWizard(),"Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this.getWizard(),
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }

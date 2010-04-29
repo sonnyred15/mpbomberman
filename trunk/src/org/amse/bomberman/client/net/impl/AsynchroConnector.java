@@ -174,6 +174,11 @@ public class AsynchroConnector implements IConnector {
             }
 
             System.out.println("ServerListen: run ended.");
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
         }
 
         private void processServerMessage(List<String> message) {
