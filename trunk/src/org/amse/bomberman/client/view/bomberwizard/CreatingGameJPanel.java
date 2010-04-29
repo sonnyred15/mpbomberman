@@ -20,64 +20,58 @@ import org.amse.bomberman.util.Constants;
  * @author Michael Korovkin
  */
 public class CreatingGameJPanel extends JPanel{
-    private int width = 200;
-    private int heigth = 100;
+    private final int width = 400;
+    private final int heigth = 30;
     private Color foreground = Color.ORANGE;
-    private JComboBox mapBox = new JComboBox();;
+
     private JTextField gameNameTF = new JTextField();
     private JSpinner playersSpinner;
-    private final int LINE_H = 20;
-    private final int LABEL_SIZE = width/3+10;
+    private JComboBox mapBox = new JComboBox();
+
+    private JLabel nameLabel;
+    private JLabel maxPlLabel;
+    private JLabel mapLabel;
 
     public CreatingGameJPanel(){
         this.setPreferredSize(new Dimension(width, heigth));
-        this.setBorder(new LineBorder(Color.ORANGE, 1));
+        //this.setBorder(new LineBorder(Color.ORANGE, 1));
 
-        // creating top line for gameName Field
-        Box topBox = Box.createHorizontalBox();
-        JLabel nameLabel = new JLabel("GameName");
-        nameLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
+        // creating leftPanel for gameName Field
+        Box leftBox = Box.createHorizontalBox();
+        nameLabel = new JLabel("GameName");
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         nameLabel.setForeground(foreground);
-        gameNameTF.setPreferredSize(new Dimension(width/3, LINE_H));
+        gameNameTF.setPreferredSize(new Dimension(width/4, this.heigth - 10));
         gameNameTF.setText("MyGame");
-        topBox.add(nameLabel);
-        topBox.add(Box.createHorizontalStrut(10));
-        topBox.add(gameNameTF);
-        topBox.setPreferredSize(new Dimension(width-30, LINE_H));
+        leftBox.add(nameLabel);
+        leftBox.add(Box.createHorizontalStrut(10));
+        leftBox.add(gameNameTF);
 
-        // creating central line for MaxPlayers Field
+        // creating centralPanel for MaxPlayers Field
         Box centralBox = Box.createHorizontalBox();
-        JLabel maxPlLabel = new JLabel("MaxPlayers");
-        maxPlLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
+        maxPlLabel = new JLabel("MaxPlayers");
         maxPlLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         maxPlLabel.setForeground(foreground);
-        centralBox.add(maxPlLabel);
         SpinnerModel spModel = new SpinnerNumberModel(Constants.MAX_PLAYERS
                 ,1,Constants.MAX_PLAYERS,1);
         playersSpinner = new JSpinner(spModel);
+        centralBox.add(maxPlLabel);
         centralBox.add(Box.createHorizontalStrut(10));
         centralBox.add(playersSpinner);
-        centralBox.setPreferredSize(new Dimension(width-30, LINE_H));
 
-        // creating bottom line for Map-Select Field
-        Box bottomBox = Box.createHorizontalBox();
-        JLabel mapLabel = new JLabel("Map");
-        mapLabel.setPreferredSize(new Dimension(LABEL_SIZE, LINE_H));
+        // creating rightPanel for Map-Select Field
+        Box rightBox = Box.createHorizontalBox();
+        mapLabel = new JLabel("Map");
         mapLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         mapLabel.setForeground(foreground);
-        bottomBox.add(mapLabel);
-        bottomBox.add(Box.createHorizontalStrut(10));
-        bottomBox.add(mapBox);
-        for (int i = 0; i < 4; i++) {
-            bottomBox.add(Box.createHorizontalGlue());
-        }
-        bottomBox.setPreferredSize(new Dimension(width-30, LINE_H));
+        rightBox.add(mapLabel);
+        rightBox.add(Box.createHorizontalStrut(10));
+        rightBox.add(mapBox);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        this.add(topBox);
+        this.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        this.add(leftBox);
         this.add(centralBox);
-        this.add(bottomBox);
+        this.add(rightBox);
         this.setOpaque(false);
         setVisible(true);
     }
@@ -95,5 +89,14 @@ public class CreatingGameJPanel extends JPanel{
     }
     public String getMap() {
         return (String)mapBox.getSelectedItem();
+    }
+    @Override
+    public void setEnabled(boolean b) {
+        this.gameNameTF.setEnabled(b);
+        this.nameLabel.setEnabled(b);
+        this.playersSpinner.setEnabled(b);
+        this.maxPlLabel.setEnabled(b);
+        this.mapBox.setEnabled(b);
+        this.mapLabel.setEnabled(b);
     }
 }
