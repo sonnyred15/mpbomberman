@@ -29,6 +29,7 @@ public interface IConnector {
     void requestDownloadGameMap(String gameMapName) throws NetException;
     void requestPlantBomb() throws NetException;
     void requestJoinBotIntoGame() throws NetException;
+    void requestRemoveBotFromGame() throws NetException;
     void requestGameMapsList() throws NetException;
     void requestIsGameStarted() throws NetException;
     void requestGameInfo() throws NetException;

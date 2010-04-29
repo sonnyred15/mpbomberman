@@ -120,6 +120,9 @@ public class AsynchroConnector implements IConnector {
         sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " " +
                 SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length - 1)]);
     }
+    public void requestRemoveBotFromGame() throws NetException {
+        sendRequest("" + Command.REMOVE_BOT_FROM_GAME.getValue());
+    }
 
     public void requestGameMapsList() throws NetException {
         sendRequest("" + Command.GET_GAME_MAPS_LIST.getValue());
