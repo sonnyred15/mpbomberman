@@ -11,5 +11,7 @@ public interface IPlayer {
     public void setLives(int lives);
     public int getLife();
     public void setCoord(Cell cell);
+    public int getBombRadius();
+    public void setBombRadius(int radius);
     public Cell getCoord();
 }
