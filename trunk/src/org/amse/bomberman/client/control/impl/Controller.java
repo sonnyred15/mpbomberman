@@ -101,6 +101,9 @@ public class Controller implements IController{
     public void requestJoinBotIntoGame() throws NetException {
         this.connector.requestJoinBotIntoGame();
     }
+    public void requestRemoveBotFromGame() throws NetException {
+        this.connector.requestRemoveBotFromGame();
+    }
 
     public void requestMapsList() throws NetException {
         this.connector.requestGameMapsList();

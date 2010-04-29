@@ -28,6 +28,7 @@ public interface IController {
     public void requestGameMap() throws NetException;
     public void requestPlantBomb() throws NetException;
     public void requestJoinBotIntoGame() throws NetException;
+    public void requestRemoveBotFromGame() throws NetException;
     public void requestMapsList() throws NetException;
     public void requestIsGameStarted() throws NetException;
     public void requestGameInfo() throws NetException;

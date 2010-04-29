@@ -243,6 +243,7 @@ public class Panel3 extends JPanel {
         panel.add(botAddJButton);
         this.botAddJButton.setAction(new AddBotAction());
         panel.add(botRemoveJButton);
+        this.botRemoveJButton.setAction(new RemoveBotAction());
 
         return panel;
     }
@@ -315,6 +316,25 @@ public class Panel3 extends JPanel {
         public void actionPerformed(ActionEvent e) {
             try {
                 Controller.getInstance().requestJoinBotIntoGame();
+            } catch (NetException ex) {
+
+                WizardController.throwWizardAction(new WizardEvent
+                                (BombWizard.ACTION_DISCONNECT));
+            }
+        }
+    }
+    private class RemoveBotAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
+
+        public RemoveBotAction() {
+            putValue(NAME, "Remove");
+            putValue(SHORT_DESCRIPTION, "Remove one bot from this game");
+            putValue(SMALL_ICON, null);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Controller.getInstance().requestRemoveBotFromGame();
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent

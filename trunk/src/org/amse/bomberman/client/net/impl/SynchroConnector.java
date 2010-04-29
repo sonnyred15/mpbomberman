@@ -145,6 +145,11 @@ public class SynchroConnector implements IConnector {
         list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
+    public void requestRemoveBotFromGame() throws NetException {
+        List<String> list = queryAnswer("" + Command.REMOVE_BOT_FROM_GAME.getValue());
+        list.add(0, ProtocolConstants.CAPTION_REMOVE_BOT_INFO);
+        Controller.getInstance().receivedRequestResult(list);
+    }
 
     public void requestGameMapsList() throws NetException {
         List<String> gameMaps = queryAnswer("" + Command.GET_GAME_MAPS_LIST.getValue());

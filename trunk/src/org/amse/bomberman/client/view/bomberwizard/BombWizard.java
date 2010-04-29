@@ -129,6 +129,15 @@ public class BombWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
+        }else if (command.equals(ProtocolConstants.CAPTION_REMOVE_BOT_INFO)) {
+            if (current instanceof Panel3) {
+                if (!list.get(0).equals("Bot removed.")) {
+                    JOptionPane.showMessageDialog(this, "Can not remove bot.\n"
+                            + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+            return;
         }else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
