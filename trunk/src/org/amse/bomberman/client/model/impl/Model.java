@@ -156,6 +156,12 @@ public class Model implements IModel, RequestResultListener{
     public int getPlayerBombs() {
         return player.getBombAmount();
     }
+    public void setPlayerRadius(int radius) {
+        player.setBombRadius(radius);
+    }
+    public int getPlayerRadius() {
+        return player.getBombRadius();
+    }
     public synchronized boolean isStarted() {
         return isStarted;
     }

@@ -7,12 +7,11 @@ import org.amse.bomberman.util.Constants;
  * @author Michail Korovkin
  */
 public class Player implements IPlayer{
-    private static Player player = null;
+    private static IPlayer player = null;
     private String name = "Noname";
     private int bombAmount = Constants.PLAYER_DEFAULT_MAX_BOMBS;
-    // ???
-    private int life = 3;
-    // ???
+    private int life = 0;
+    private int bombRadius = 0;
     private Cell myCoord = new Cell(0,0);
 
     private Player() {
@@ -47,5 +46,11 @@ public class Player implements IPlayer{
     }
     public Cell getCoord() {
         return myCoord;
+    }
+    public void setBombRadius(int r) {
+        this.bombRadius = r;
+    }
+    public int getBombRadius() {
+        return this.bombRadius;
     }
 }

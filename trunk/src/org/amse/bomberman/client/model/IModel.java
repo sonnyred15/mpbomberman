@@ -20,6 +20,8 @@ public interface IModel {
     public String getPlayerName();
     public void setPlayerBombs(int amount);
     public int getPlayerBombs();
+    public void setPlayerRadius(int radius);
+    public int getPlayerRadius();
     public boolean isStarted();
     public void setStart(boolean flag);
 }
