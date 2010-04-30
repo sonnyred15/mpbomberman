@@ -14,7 +14,6 @@ import org.amse.bomberman.util.Constants.Direction;
 public interface IController {
 
     public void setReceiveInfoListener(RequestResultListener receiveResultListener);
-    public RequestResultListener getReceiveInfoListener();
     public void connect(InetAddress serverIP, int serverPort)
             throws NetException, IOException;
     public void disconnect();
@@ -36,5 +35,8 @@ public interface IController {
     public void requestNewChatMessages() throws NetException;
     public void requestDownloadMap(String gameMapName) throws NetException;
     public void receivedRequestResult(List<String> requestResult) throws NetException;
-    public void switchToWizard();
+    
+    public void lostConnection(String message);
+    public void startGame();
+    public void leaveGame();
 }

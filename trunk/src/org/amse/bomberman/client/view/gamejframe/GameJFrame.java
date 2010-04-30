@@ -59,11 +59,12 @@ public class GameJFrame extends JFrame implements IView{
     public synchronized void update() {
         IModel model = Model.getInstance();
         if (!model.isStarted()) {
-            this.dispose();
-            Model.getInstance().removeListener(this);
+            Controller.getInstance().leaveGame();
+            /*this.dispose();
+            Model.getInstance().removeListeners();
             BombWizard wizard = new BombWizard();
             Controller.getInstance().setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);*/
         } else {
             gamePanel.update();
             int lives = model.getPlayerLives();

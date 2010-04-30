@@ -4,12 +4,19 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
 import org.amse.bomberman.client.net.impl.SynchroConnector;
 import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
+import org.amse.bomberman.client.view.IView;
+import org.amse.bomberman.client.view.bomberwizard.BombWizard;
+import org.amse.bomberman.client.view.gamejframe.GameJFrame;
+import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 
@@ -21,8 +28,12 @@ public class Controller implements IController{
 
     private IConnector connector = null;
     private static IController controller = null;
-    private boolean isAsynchro;
     private RequestResultListener receiveResultListener;
+
+    private JFrame gameJFrame = null;
+
+    private boolean isAsynchro;
+
 
     private Controller(boolean isAsynchro) {
         this.isAsynchro = isAsynchro;
@@ -41,19 +52,59 @@ public class Controller implements IController{
         return controller;
     }
 
-    public void switchToWizard() {
-        // TO DO
+    public void lostConnection(String exception) {
+        if (this.receiveResultListener instanceof Wizard) {
+            Wizard wizard = (Wizard)this.receiveResultListener;
+            System.out.println(exception);
+            JOptionPane.showMessageDialog(wizard, exception, "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
+            this.setReceiveInfoListener(receiveResultListener);
+            gameJFrame = null;
+        } else {
+            System.out.println(exception);
+            JOptionPane.showMessageDialog(gameJFrame,
+                    exception, "Error", JOptionPane.ERROR_MESSAGE);
+            gameJFrame.dispose();
+            gameJFrame = null;
+            Model.getInstance().setStart(false);
+            Model.getInstance().removeListeners();
+            BombWizard wizard = new BombWizard();
+            this.setReceiveInfoListener(wizard);
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
+        }
+    }
+    public void startGame() {
+        if (receiveResultListener instanceof Wizard) {
+            Wizard wizard = (Wizard) receiveResultListener;
+            wizard.dispose();
+            this.setReceiveInfoListener((RequestResultListener) Model.getInstance());
+            GameJFrame jframe = new GameJFrame();
+            Model.getInstance().addListener(jframe);
+            gameJFrame = jframe;
+            try {
+                this.requestGameMap();
+            } catch (NetException ex) {
+                this.lostConnection(ex.getMessage());
+            }
+        } else {
+            System.out.println("Game is already started or closed.");
+        }
+    }
+    public void leaveGame() {
+        if (!(receiveResultListener instanceof Wizard)) {
+            gameJFrame.dispose();
+            Model.getInstance().removeListeners();
+            BombWizard wizard = new BombWizard();
+            this.setReceiveInfoListener(wizard);
+            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);
+        } else {
+            System.out.println("Game is already leaved or closed.");
+        }
     }
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
-    }
-
-    public RequestResultListener getReceiveInfoListener() {
-        return receiveResultListener;
-    }
-    @Deprecated
-    public void showError(String message) {
-        Creator.createErrorDialog(null, "Error", message);
     }
 
     public void connect(InetAddress serverIP, int serverPort)
@@ -136,7 +187,8 @@ public class Controller implements IController{
         if (this.receiveResultListener != null) {
             this.receiveResultListener.received(requestResult);
         } else {
-            showError("No listener for received info.");
+            Creator.createErrorDialog(null, "Error", "No listener for " +
+                    "received info.");
         }
     }
 }

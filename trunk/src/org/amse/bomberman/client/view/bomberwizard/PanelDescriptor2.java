@@ -22,9 +22,10 @@ public class PanelDescriptor2 extends PanelDescriptor{
             Controller.getInstance().requestGamesList();
             Controller.getInstance().requestMapsList();
         } catch (NetException ex) {
-            JOptionPane.showMessageDialog(this.getWizard(),
+            Controller.getInstance().lostConnection(ex.getMessage());
+            /*JOptionPane.showMessageDialog(this.getWizard(),
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
+            this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
         }
     }
 
@@ -41,9 +42,10 @@ public class PanelDescriptor2 extends PanelDescriptor{
                 con.requestCreateGame(gameName, mapName, maxPlayers);
                 return true;
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(this.getWizard(),
+                Controller.getInstance().lostConnection(ex.getMessage());
+                /*JOptionPane.showMessageDialog(this.getWizard(),
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
+                this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
             }
         } else {
             int gameNumber = panel2.getSelectedGame();
@@ -52,9 +54,10 @@ public class PanelDescriptor2 extends PanelDescriptor{
                     Controller.getInstance().requestJoinGame(gameNumber);
                     return true;
                 } catch (NetException ex) {
-                    JOptionPane.showMessageDialog(this.getWizard(),
+                    Controller.getInstance().lostConnection(ex.getMessage());
+                    /*JOptionPane.showMessageDialog(this.getWizard(),
                             ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);
+                    this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
                     return false;
                 }
             } else {

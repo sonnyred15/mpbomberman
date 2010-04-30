@@ -124,8 +124,8 @@ public class Model implements IModel, RequestResultListener{
     public void addListener(IView view) {
         listener.add(view);
     }
-    public void removeListener(IView view) {
-        listener.remove(view);
+    public void removeListeners() {
+        listener.clear();
     }
     private void updateListeners() {
         for (int i = 0; i < listener.size(); i++) {
