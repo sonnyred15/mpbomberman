@@ -46,7 +46,7 @@ public class RandomMoveBotStrategy extends BotStrategy {
             try {
                 Thread.sleep(75);
                 direction = findWay(bot.getPosition(), target,
-                                    model.getGameMap().getField());
+                                    model.getGameMap().getField(), model);
 
                 // System.out.println("Direction" + direction.toString());
             } catch (IllegalArgumentException ex) {

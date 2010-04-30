@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class Bot extends Player
         implements GameStartedListener, GameEndedListener {
-    private static final long   BOT_STEP_DELAY = 100L;
+    private static final long   BOT_STEP_DELAY = 75L;
     private static final Random random = new Random();
     private boolean             gameEnded = false;
     private final Thread        botThread;
@@ -73,7 +73,7 @@ public class Bot extends Player
                     IAction action = strategy.thinkAction(this.bot, model);
 
                     action.executeAction(game);
-                    Thread.sleep(Bot.BOT_STEP_DELAY + random.nextInt(100));
+                    Thread.sleep(Bot.BOT_STEP_DELAY + random.nextInt(75));
                 } catch (InterruptedException ex) {
                     System.out.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
                 } catch (UnsupportedOperationException ex) {

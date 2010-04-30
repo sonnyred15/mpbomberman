@@ -31,12 +31,12 @@ public abstract class BotStrategy {
      * @return direction to move to became closer on one step to target.
      * @throws IllegalArgumentException if bot can`t find way to current target.
      */
-    public Direction findWay(Pair begin, Pair end, final int[][] field) throws
+    public Direction findWay(Pair begin, Pair end, final int[][] field, IModel model) throws
             IllegalArgumentException {
 
         this.temp = cloneField(field);
 
-        rec(begin, cons);
+        rec(begin, cons, model);
         int steps = temp[end.getX()][end.getY()] - cons;
         
         if(steps<0){ //bad desicion...it fixes one bug but error is in alghorithm...
@@ -102,52 +102,61 @@ public abstract class BotStrategy {
         return result;
     }
 
-    private void rec(Pair current, int steps) {
+    private void rec(Pair current, int steps, IModel model) {
         int x = current.getX();
         int y = current.getY();
         temp[x][y] = steps;
+        Pair next;
         if (y < temp.length - 1) {
             int nextX = x;
             int nextY = y + 1;
+            next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    && !model.isExplosion(next)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1);
+                rec(new Pair(nextX, nextY), steps + 1, model);
             }
         }
         if (y > 0) {
             int nextX = x;
             int nextY = y - 1;
+            next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    && !model.isExplosion(next)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1);
+                rec(new Pair(nextX, nextY), steps + 1, model);
             }
         }
         if (x > 0) {
             int nextX = x - 1;
             int nextY = y;
+            next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    && !model.isExplosion(next)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1);
+                rec(new Pair(nextX, nextY), steps + 1, model);
             }
         }
         if (x < temp.length - 1) {
             int nextX = x + 1;
             int nextY = y;
+            next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
+                    && !model.isExplosion(next)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
                     || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1);
+                rec(new Pair(nextX, nextY), steps + 1, model);
             }
         }
     }
