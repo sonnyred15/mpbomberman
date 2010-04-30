@@ -2,10 +2,11 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
-import javax.swing.JOptionPane;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.net.NetException;
+import javax.swing.JOptionPane;
+
 
 /**
  *

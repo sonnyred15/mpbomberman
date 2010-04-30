@@ -2,12 +2,13 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import javax.swing.JOptionPane;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import javax.swing.JOptionPane;
+
 
 /**
  *

@@ -6,7 +6,6 @@ import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.util.ProtocolConstants;
 import java.awt.Dimension;
 import java.util.List;

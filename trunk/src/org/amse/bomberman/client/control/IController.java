@@ -1,11 +1,12 @@
 package org.amse.bomberman.client.control;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.List;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.util.Constants.Direction;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.List;
+
 
 /**
  *

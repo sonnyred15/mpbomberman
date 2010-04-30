@@ -1,22 +1,16 @@
 package org.amse.bomberman.client.view.gamejframe;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.view.bomberwizard.BombWizard;
 import org.amse.bomberman.util.Constants.Direction;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 /**
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
 public class GameJFrameListener implements KeyListener{
-    private GameJFrame parent;
-    public GameJFrameListener(GameJFrame jframe) {
-        parent = jframe;
-    }
 
     public void keyTyped(KeyEvent e) {
     }
