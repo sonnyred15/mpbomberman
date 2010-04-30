@@ -2,6 +2,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.WizardController;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
+import org.amse.bomberman.util.Creator;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -22,7 +23,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import org.amse.bomberman.util.Creator;
+
 /**
  *
  * @author Michael Korovkin
@@ -167,7 +168,6 @@ public class Panel2 extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(false);
                 createPanel.setEnabled(true);
-                //cardLayout.show(mainPanel, CREATE_NAME);
                 //----------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
                 //                (BombWizard.EVENT_NEXT_TEXT, "Create"));
@@ -180,7 +180,6 @@ public class Panel2 extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(true);
                 createPanel.setEnabled(false);
-                //cardLayout.show(mainPanel, JOIN_NAME);
                 //--------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
                 //                (BombWizard.EVENT_NEXT_TEXT, "Join"));

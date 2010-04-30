@@ -1,11 +1,5 @@
 package org.amse.bomberman.client.control.impl;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
@@ -13,12 +7,18 @@ import org.amse.bomberman.client.net.impl.SynchroConnector;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
-import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.view.bomberwizard.BombWizard;
 import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 
 /**
  *

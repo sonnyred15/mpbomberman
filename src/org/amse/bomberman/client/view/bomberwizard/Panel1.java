@@ -1,5 +1,7 @@
 package org.amse.bomberman.client.view.bomberwizard;
 
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -16,8 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
+
 /**
  *
  * @author Michael Korovkin

@@ -3,8 +3,9 @@ package org.amse.bomberman.client.model.impl;
 import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IPlayer;
 import org.amse.bomberman.util.Constants;
+
 /**
- * @author Michail Korovkin
+ * @author Michael Korovkin
  */
 public class Player implements IPlayer{
     private static IPlayer player = null;

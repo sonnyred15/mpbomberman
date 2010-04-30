@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.client.net;
 
 /**
- *
+ * Exception to say that connection with server was lost.
+ * @author Michael Korovkin
  * @author Kirilchuk V.E.
  */
 public class NetException extends Exception {
@@ -13,6 +10,6 @@ public class NetException extends Exception {
     private final static long serialVersionUID = 1L;
 
     public NetException() {
-        super("NetException!!!\nServer is inaccessible now.\nPlease reconnect!");
+        super("Connection was lost!\nServer is inaccessible now.\nPlease reconnect!");
     }
 }

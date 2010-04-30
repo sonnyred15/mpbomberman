@@ -1,5 +1,11 @@
 package org.amse.bomberman.client.view.gamejframe;
 
+import org.amse.bomberman.client.Main;
+import org.amse.bomberman.client.model.BombMap;
+import org.amse.bomberman.client.model.Cell;
+import org.amse.bomberman.client.model.IModel;
+import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.util.Constants;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,12 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import org.amse.bomberman.client.Main;
-import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.Cell;
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.util.Constants;
+
 
 /**
  *
@@ -79,14 +80,6 @@ public class GamePanel  extends JPanel{
         BombMap gameMap = Model.getInstance().getMap();
         if (gameMap != null) {
             this.update();
-            /*for (int i = LUCell.getX(); i < RDCell.getX(); i++) {
-            for (int j = LUCell.getY(); j < RDCell.getY(); j++) {
-            Graphics2D g = buffer.createGraphics();
-            g.drawImage(ICON_PL1.getImage(), 0, 0, this);
-            Graphics gr = this.getGraphics();
-            gr.drawImage(buffer, cellSize * i + 30, cellSize * j + 30, this);
-            }
-            }*/
         } else {
             range = defaultRange;
             width = range*cellSize;
