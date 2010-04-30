@@ -11,5 +11,5 @@ public interface Expression extends Iterable<Variable> {
     Expression dash(Variable v);
 
     // Evaluation of expression in context(known meanings of variables)
-    Long evaluate(Map<Variable, Constant> context);
+    Double evaluate(Map<Variable, Constant> context);
 }

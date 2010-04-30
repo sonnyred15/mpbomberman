@@ -80,10 +80,10 @@ public class Binary implements Expression {
 	throw new IllegalArgumentException();
     }
 
-    public Long evaluate(Map<Variable, Constant> context) {
+    public Double evaluate(Map<Variable, Constant> context) {
 	// evaluating meanings of left and right operands
-	Long leftVal = left.evaluate(context);
-	Long rightVal = right.evaluate(context);
+	Double leftVal = left.evaluate(context);
+	Double rightVal = right.evaluate(context);
 
 	if (operator.equals("+")) {
 	    return leftVal + rightVal;
@@ -93,7 +93,7 @@ public class Binary implements Expression {
 	    return leftVal * rightVal;
 	} else if (operator.equals("/")) {	    
 	    try{
-	        Long bn = leftVal / rightVal;
+	        Double bn = leftVal / rightVal;
 		return bn;
 	    } catch(Exception ex) {
 		throw new ArithmeticException("Divide by zero exception");

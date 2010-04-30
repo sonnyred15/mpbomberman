@@ -72,9 +72,9 @@ public class Variable implements Expression {
 	return v.equals(this) ? Constant.ONE : Constant.ZERO;
     }
 
-    public Long evaluate(Map<Variable, Constant> context) {
+    public Double evaluate(Map<Variable, Constant> context) {
 	try{
-	    Long bn = context.get(this).getValue();
+	    Double bn = context.get(this).getValue();
 	    return bn;
 	} catch(NullPointerException ex){
 	    throw new IllegalArgumentException(name + ":unknown Variable ");
