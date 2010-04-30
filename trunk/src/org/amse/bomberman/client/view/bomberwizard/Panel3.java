@@ -212,7 +212,7 @@ public class Panel3 extends JPanel {
 
                             System.out.println(ex);
                             WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
+                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
                         }
                     }
                 }
@@ -332,7 +332,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
+                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }
@@ -351,7 +351,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
+                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }
@@ -375,7 +375,7 @@ public class Panel3 extends JPanel {
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
-                                (BombWizard.EVENT_DISCONNECT, ex.getMessage()));
+                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
             }
         }
     }

@@ -19,7 +19,7 @@ import javax.swing.SwingConstants;
  *
  * @author Michael Korovkin
  */
-public class CreatingGameJPanel extends JPanel{
+public class CreateGameJPanel extends JPanel{
     private final int width = 400;
     private final int heigth = 30;
     private Color foreground = Color.ORANGE;
@@ -32,7 +32,7 @@ public class CreatingGameJPanel extends JPanel{
     private JLabel maxPlLabel;
     private JLabel mapLabel;
 
-    public CreatingGameJPanel(){
+    public CreateGameJPanel(){
         this.setPreferredSize(new Dimension(width, heigth));
         //this.setBorder(new LineBorder(Color.ORANGE, 1));
 

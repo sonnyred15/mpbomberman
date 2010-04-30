@@ -7,7 +7,7 @@ import org.amse.bomberman.client.net.impl.SynchroConnector;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
-import org.amse.bomberman.client.view.bomberwizard.BombWizard;
+import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
 import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
@@ -59,7 +59,7 @@ public class Controller implements IController{
             JOptionPane.showMessageDialog(wizard, exception, "Error",
                     JOptionPane.ERROR_MESSAGE);
 
-            wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
+            wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
             this.setReceiveInfoListener(receiveResultListener);
             gameJFrame = null;
         } else {
@@ -70,9 +70,9 @@ public class Controller implements IController{
             gameJFrame = null;
             Model.getInstance().setStart(false);
             Model.getInstance().removeListeners();
-            BombWizard wizard = new BombWizard();
+            BomberWizard wizard = new BomberWizard();
             this.setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
+            wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
         }
     }
     public void startGame() {
@@ -96,9 +96,9 @@ public class Controller implements IController{
         if (!(receiveResultListener instanceof Wizard)) {
             gameJFrame.dispose();
             Model.getInstance().removeListeners();
-            BombWizard wizard = new BombWizard();
+            BomberWizard wizard = new BomberWizard();
             this.setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);
+            wizard.setCurrentJPanel(BomberWizard.IDENTIFIER2);
         } else {
             System.out.println("Game is already leaved or closed.");
         }

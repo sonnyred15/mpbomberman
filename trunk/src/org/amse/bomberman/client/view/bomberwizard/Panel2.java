@@ -39,7 +39,7 @@ public class Panel2 extends JPanel{
     private static final URL BACKGROUND_URL = Panel2.class.getResource(BACKGROUND_PATH);
 
     private JPanel joinPanel;
-    private CreatingGameJPanel createPanel;
+    private CreateGameJPanel createPanel;
 
     private JTable table;
     private JScrollPane jsp;
@@ -128,7 +128,7 @@ public class Panel2 extends JPanel{
         this.initRadioButtons();
 
         // createPanel
-        createPanel = new CreatingGameJPanel();
+        createPanel = new CreateGameJPanel();
 
         // initialization of MyTable with list of games
         table = new GamesTable();
@@ -137,10 +137,10 @@ public class Panel2 extends JPanel{
         joinPanel = new JPanel();
         jsp = new JScrollPane(table, JScrollPane
                 .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        jsp.setPreferredSize(new Dimension(width - 150, height - 150));
+        jsp.setPreferredSize(new Dimension(width - 150, height - 170));
         joinPanel.add(jsp);
         joinPanel.setOpaque(false);
-        joinPanel.setPreferredSize(new Dimension(width - 150, height - 120));
+        joinPanel.setPreferredSize(new Dimension(width - 150, height - 140));
 
         // add all panels and buttons to the main Container
         Box mainBox = Box.createVerticalBox();
@@ -148,10 +148,11 @@ public class Panel2 extends JPanel{
         joinButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         joinPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         createPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mainBox.add(Box.createVerticalStrut(25));
         mainBox.add(createButton);
         mainBox.add(Box.createVerticalStrut(5));
         mainBox.add(createPanel);
-        mainBox.add(Box.createVerticalStrut(15));
+        mainBox.add(Box.createVerticalStrut(10));
         mainBox.add(joinButton);
         mainBox.add(Box.createVerticalStrut(5));
         mainBox.add(joinPanel);
@@ -170,7 +171,7 @@ public class Panel2 extends JPanel{
                 createPanel.setEnabled(true);
                 //----------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
-                //                (BombWizard.EVENT_NEXT_TEXT, "Create"));
+                //                (BomberWizard.EVENT_NEXT_TEXT, "Create"));
             }
         });
         createButton.setOpaque(false);
@@ -182,7 +183,7 @@ public class Panel2 extends JPanel{
                 createPanel.setEnabled(false);
                 //--------------------------------------------------------
                 //WizardController.throwWizardAction(new WizardEvent
-                //                (BombWizard.EVENT_NEXT_TEXT, "Join"));
+                //                (BomberWizard.EVENT_NEXT_TEXT, "Join"));
             }
         });
         joinButton.setOpaque(false);
@@ -240,7 +241,7 @@ public class Panel2 extends JPanel{
                             if (getValueAt(getSelectedRow(), 0) != null) {
                                 //-------------------------------------------------
                                 WizardController.throwWizardAction
-                                        (new WizardEvent(BombWizard.EVENT_JOIN));
+                                        (new WizardEvent(BomberWizard.EVENT_JOIN));
                             }
                         }
                     }

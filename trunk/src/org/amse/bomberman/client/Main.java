@@ -3,7 +3,7 @@ package org.amse.bomberman.client;
 //~--- non-JDK imports --------------------------------------------------------
 
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.view.bomberwizard.BombWizard;
+import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
 
 /**
  *
@@ -19,7 +19,7 @@ public class Main {
 
             public void run() {
                 //new BomberWizard();
-                new BombWizard();
+                new BomberWizard();
             }
         });
     }
