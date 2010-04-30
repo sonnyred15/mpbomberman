@@ -21,7 +21,7 @@ public class GameJFrame extends JFrame implements IView{
     private GamePanel gamePanel;
     private JLabel livesJLabel;
     private boolean dead = false;
-    private GameJFrameListener listener;
+    private GameJFrameListener listener = new GameJFrameListener();
     private final int height = 600;
     private final int width = 500;
     
