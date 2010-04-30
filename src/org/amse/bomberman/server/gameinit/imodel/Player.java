@@ -25,6 +25,11 @@ public class Player implements MoveableObject {
     private DieListener  playerDieListener;
     private Pair         position;
 
+    //
+    private int          kills  = 0;
+    private int          deaths = 0;
+
+
     /**
      * Default constructor. Empty.
      */
@@ -62,6 +67,14 @@ public class Player implements MoveableObject {
                      this.explRadius;
 
         return ret;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
     }
 
     /**
@@ -148,13 +161,18 @@ public class Player implements MoveableObject {
      * This method calls if player was damaged. So he must lost some bonuses
      * and one live.
      */
-    public synchronized void bombed() {    // TODO synchronized(player)
+    public synchronized void bombed() {    // TODO synchronized(player)        
         this.lives -= 1;
+        this.deaths -= 1;
         this.decBonuses();
 
         if (this.lives <= 0) {    // CHECK THIS
             playerDieListener.playerDied(this);
         }
+    }
+
+    public synchronized void killedSomeone(){
+        this.kills += 1;
     }
 
     /**

@@ -107,7 +107,7 @@ public class Controller implements GameEndedListener {
      * @param toString
      */
     public void addMessageToChat(String toString) {    // TODO must check if no game.
-        this.game.addMessageToChat(this.playerID, toString);
+        this.game.addMessageToChat(this.game.getPlayer(playerID), toString);
     }
 
     /**

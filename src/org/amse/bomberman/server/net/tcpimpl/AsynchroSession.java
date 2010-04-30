@@ -807,6 +807,40 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
+    protected void sendGamePlayersStats() {
+        List<String> messages = new ArrayList<String>();
+
+        messages.add(0, ProtocolConstants.CAPTION_GET_MY_GAME_PLAYERS_STATS);
+
+        Game game = this.controller.getMyGame();
+        if (game != null) {
+            if (game.isStarted()) {
+                List<String> linesToSend = Stringalize.playersStats(game);
+
+                messages.addAll(linesToSend);
+                sendAnswer(messages);
+                writeToLog("Session: sended gamePlayersStats to client.");
+
+                return;
+            } else {    // game not started
+                messages.add("Game is not started. You can`t get stats.");
+                sendAnswer(messages);
+                writeToLog("Session: sendGamePlayersStats warning. Canceled. " +
+                           "Game is not started.");
+
+                return;
+            }
+        } else {
+            messages.add("Not joined to any game.");
+            sendAnswer(messages);
+            writeToLog("Session: sendGamePlayersStats warning. Canceled. " +
+                       "Not joined to any game.");
+
+            return;
+        }
+    }
+
     private class MyTimer {
         private long startTime;
 

@@ -28,8 +28,7 @@ public class Bomb implements MoveableObject {
     //TODO need to be tested. One timer on all Bombs can cause some problems
     //when number of bombes in game would be too much.
     //It is only guess, so need to be checked.
-    private static final ScheduledExecutorService timer =
-                                   Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService timer;
     private boolean       wasDetonated = false;
     private final GameMap gameMap;
     private final IModel  model;
@@ -43,7 +42,8 @@ public class Bomb implements MoveableObject {
      * @param player Player that setted the bomb.
      * @param bombPosition coordinates on gameMap where Bomb was placed.
      */
-    public Bomb(IModel model, Player player, Pair bombPosition) {
+    public Bomb(IModel model, Player player, Pair bombPosition,
+                ScheduledExecutorService timer) {
 
         /*init object fields*/
         this.model    = model;
@@ -51,10 +51,10 @@ public class Bomb implements MoveableObject {
         this.gameMap  = this.model.getGameMap();
         this.position = bombPosition;
         this.radius   = this.owner.getRadius();
-
+        this.timer = timer;
         /*additional stuff*/
         this.owner.placedBomb(); //takes bomb from player
-        Bomb.timer.schedule(new DetonateTask(), Constants.BOMB_TIMER_VALUE,
+        this.timer.schedule(new DetonateTask(), Constants.BOMB_TIMER_VALUE,
                             TimeUnit.MILLISECONDS);
     }
 
@@ -153,7 +153,7 @@ public class Bomb implements MoveableObject {
 
         this.model.addExplosions(explosions);    // add explosions to model
         this.owner.detonatedBomb(); //must return bomb to player
-        Bomb.timer.schedule(new ClearExplosionTask(explosions),
+        this.timer.schedule(new ClearExplosionTask(explosions),
                             Constants.BOMB_DETONATION_TIME,
                             TimeUnit.MILLISECONDS);
     }
@@ -186,6 +186,7 @@ public class Bomb implements MoveableObject {
         } else if (gameMap.playerIDAt(x, y) != -1) {    // playerSquare
             int id = gameMap.playerIDAt(x, y);
 
+            this.owner.killedSomeone();
             model.playerBombed(this.owner, id);
 
             return false;

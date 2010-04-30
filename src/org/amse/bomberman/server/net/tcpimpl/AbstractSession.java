@@ -28,6 +28,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import java.util.List;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
@@ -198,7 +199,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
 
         Command  cmd = null;
-        String[] queryArgs = query.split(" ");
+        String[] queryArgs = query.split(ProtocolConstants.SPLIT_SYMBOL);
 
         try {
             int command = Integer.parseInt(queryArgs[0]);
@@ -357,6 +358,14 @@ public abstract class AbstractSession extends Thread implements ISession {
                 break;
             }
 
+            case GET_MY_GAME_PLAYERS_STATS : {
+
+                // "17"
+                sendGamePlayersStats();
+
+                break;
+            }
+
             default : {
                 sendAnswer("Unrecognized command!");
                 writeToLog("Session: answerOnCommand error." +
@@ -412,4 +421,7 @@ public abstract class AbstractSession extends Thread implements ISession {
     protected abstract void sendGameMapArray2();
 
     protected abstract void removeBotFromGame();
+
+    protected abstract void sendGamePlayersStats();
+
 }

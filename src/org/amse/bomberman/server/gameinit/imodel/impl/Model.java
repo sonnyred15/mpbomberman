@@ -25,6 +25,8 @@ import org.amse.bomberman.util.Constants.Direction;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.amse.bomberman.util.ProtocolConstants;
 
 /**
@@ -33,12 +35,16 @@ import org.amse.bomberman.util.ProtocolConstants;
  * @author Kirilchuk V.E.
  */
 public class Model implements IModel, DieListener {
+    private static final ScheduledExecutorService timer =
+                                   Executors.newSingleThreadScheduledExecutor();
+
     private final List<Bomb>                  bombs;
     private final List<Pair>                  explosionSquares;
     private final List<Integer>               freeIDs;
     private final Game                        game;
     private final GameMap                     gameMap;
     private final List<Player>                players;
+    private boolean                           ended = false;
 
     /**
      * Constructor of Model.
@@ -211,6 +217,11 @@ public class Model implements IModel, DieListener {
 
         // if object is making move to explosion zone.
         if (isExplosion(newPosition)) {
+            if(objectToMove instanceof Player) {
+                String name = ((Player)objectToMove).getNickName();
+                this.game.addMessageToChat("Ouch, " + name +
+                                           " just rushed into the fire.");
+            }
             objectToMove.bombed();
         }
     }
@@ -258,21 +269,30 @@ public class Model implements IModel, DieListener {
 
     public void playerBombed(Player atacker, int victimID) {
         Player victim = this.getPlayer(victimID);
-
-        victim.bombed();
-        this.game.addMessageToChat(victimID,
-                                   "was bombed by " + atacker.getNickName());
+        this.playerBombed(atacker, victim);
     }
 
     public void playerBombed(Player atacker, Player victim) {
         victim.bombed();
-        this.game.addMessageToChat(victim.getID(),
-                                   "was bombed by " + atacker.getNickName());
+        this.game.addMessageToChat("Bomb of " + atacker.getNickName() + " " +
+                                   "damaged " + victim.getNickName());
     }
 
     public void playerDied(Player player) {
         this.gameMap.removePlayer(player.getID());
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+        this.game.addMessageToChat("Oh, no. " + player.getNickName() +
+                                   "was cruelly killed.");
+
+        int aliveCount = 0;
+        for (Player pl : players) {
+            if(pl.isAlive()){
+                aliveCount++;
+            }
+        }
+        if(aliveCount<=1){
+            this.end();
+        }
     }
 
     /**
@@ -332,6 +352,11 @@ public class Model implements IModel, DieListener {
         }
     }
 
+    public void end() {
+        //this.ended = true;
+        //TODO !!! 
+    }
+
     /**
      * Trying to move the player in defined direction.
      * @param player Player to move
@@ -389,7 +414,7 @@ public class Model implements IModel, DieListener {
                         return false;    // if player staying under the bomb or explosion
                     }
 
-                    Bomb bomb = new Bomb(this, player, new Pair(x, y));
+                    Bomb bomb = new Bomb(this, player, new Pair(x, y), Model.timer);
 
                     this.bombs.add(bomb);
 
