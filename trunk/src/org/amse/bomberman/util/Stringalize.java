@@ -14,6 +14,8 @@ import org.amse.bomberman.server.gameinit.imodel.Player;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,6 +26,39 @@ import java.util.List;
  */
 public final class Stringalize {
     private Stringalize() {}
+
+    public static List<String> playersStats(Game game) {
+        List<Player> players = game.getCurrentPlayersListCopy();
+
+        Collections.sort(players, new Comparator<Player>() {
+
+            public int compare(Player player1, Player player2) {
+                int kills1 = player1.getKills();
+                int kills2 = player2.getKills();
+
+                if(kills1 == kills2){
+                    return 0;
+                }else if(kills1>kills2){
+                    return 1;
+                }else{
+                    return -1;
+                }
+            }
+        });
+
+        List<String> result = new ArrayList<String>();
+        StringBuilder str = new StringBuilder();
+        for (Player player : players) {
+            str.append(player.getNickName());
+            str.append(' ');
+            str.append(player.getKills());
+            str.append(' ');
+            str.append(player.getDeaths());
+            result.add(str.toString());
+        }
+        
+        return result;
+    }
 
     /**
      * Creates list of explosions.
@@ -83,7 +118,7 @@ public final class Stringalize {
      * @return string of some game parameters for client.
      */
     public static List<String> gameInfoForClient(Controller controller) {
-        List<String> lst = new ArrayList<String>();
+        List<String> lst  = new ArrayList<String>();
         Game         game = controller.getMyGame();
 
         if (controller == game.getOwner()) {
@@ -94,7 +129,7 @@ public final class Stringalize {
 
         lst.add("" + game.getMaxPlayers());
 
-        List<Player> players = game.getCurrentPlayers();
+        List<Player> players = game.getCurrentPlayersListCopy();
 
         lst.add("" + players.size());
 
@@ -216,8 +251,8 @@ public final class Stringalize {
     }
 
     public static List<String> fieldExplPlayerInfo2(Game game, Player player) {    // TODO temporary
-        int[][]      field = game.getGameField();
-        List<Player> players = game.getCurrentPlayers();
+        int[][]      field             = game.getGameField();
+        List<Player> players           = game.getCurrentPlayersListCopy();
         List<String> stringalizedField = new ArrayList<String>();
 
         stringalizedField.add("" + field.length);

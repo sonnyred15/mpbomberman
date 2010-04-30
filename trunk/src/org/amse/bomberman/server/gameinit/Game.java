@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
@@ -138,9 +139,14 @@ public class Game {
      * @param playerID id of player which is adding message.
      * @param message message to add in chat.
      */
-    public void addMessageToChat(int playerID, String message) {
-        this.chat.addMessage(this.model.getPlayer(playerID).getNickName(),
+    public void addMessageToChat(Player player, String message) {
+        this.chat.addMessage(player.getNickName(),
                              message);
+        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
+    }
+
+    public void addMessageToChat(String message) {
+        this.chat.addMessage(message);
         notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
     }
 
@@ -179,8 +185,8 @@ public class Game {
      * bots.
      * @return unmodifiableList of all Players that are playing in game.
      */
-    public List<Player> getCurrentPlayers() {
-        return Collections.unmodifiableList(this.model.getPlayersList());
+    public List<Player> getCurrentPlayersListCopy() {
+        return new ArrayList<Player>(this.model.getPlayersList());
     }
 
     /**

@@ -90,15 +90,10 @@ public class Binary implements Expression {
 	} else if (operator.equals("-")) {
 	    return leftVal - rightVal;
 	} else if (operator.equals("*")) {
-	    return leftVal * rightVal;
-	} else if (operator.equals("/")) {	    
-	    try{
-	        Double bn = leftVal / rightVal;
-		return bn;
-	    } catch(Exception ex) {
-		throw new ArithmeticException("Divide by zero exception");
-	    }
-	}
+            return leftVal * rightVal;
+        } else if (operator.equals("/")) {
+            return leftVal / rightVal; //for Double not throwing DivideByZero exception
+        }
 
 	throw new IllegalArgumentException();
     }
