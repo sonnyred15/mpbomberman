@@ -27,7 +27,7 @@ import java.util.Random;
  * @author Kirilchuck V.E.
  */
 public class RandomFullBotStrategy extends BotStrategy {
-    private final static int PLACE__BOMB_PROBABILITY = 10;
+    private final static int PLACE__BOMB_PROBABILITY = 5;
     private Pair             target;
 
     /**
@@ -50,7 +50,7 @@ public class RandomFullBotStrategy extends BotStrategy {
             try {
                 Thread.sleep(75);    // here bot thread will wait for some time.
                 direction = findWay(bot.getPosition(), target,
-                                    model.getGameMap().getField());
+                                    model.getGameMap().getField(), model);
 
                 // System.out.println("Direction" + direction.toString());
             } catch (IllegalArgumentException ex) {
