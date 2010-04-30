@@ -16,7 +16,7 @@ import javax.swing.JPanel;
  *
  * @author Michael Korovkin
  */
-public class BombWizard extends Wizard implements RequestResultListener {
+public class BomberWizard extends Wizard implements RequestResultListener {
     public static final String IDENTIFIER1 = "Server_Panel";
     public static final String IDENTIFIER2 = "Create/Join_Panel";
     public static final String IDENTIFIER3 = "GameInfo_Panel";
@@ -24,7 +24,7 @@ public class BombWizard extends Wizard implements RequestResultListener {
     public static final String EVENT_JOIN = "Join selected game";
     public static final String EVENT_NEXT_TEXT = "Back text";
     public static final String EVENT_BACK_TEXT = "Next text";
-    public BombWizard() {
+    public BomberWizard() {
         super(new Dimension(640, 480),"Let's BOMBERMANNING!!!");
         this.addPanelDescriptor(new PanelDescriptor1(this, IDENTIFIER1));
         this.addPanelDescriptor(new PanelDescriptor2(this, IDENTIFIER2));
