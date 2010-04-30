@@ -52,9 +52,9 @@ public class Unary implements Expression {
 	throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public Long evaluate(Map<Variable, Constant> context) {
+    public Double evaluate(Map<Variable, Constant> context) {
 	// evaluating meanings of left and right operands
-	Long val = operand.evaluate(context);
+	Double val = operand.evaluate(context);
 
 	if (operator.equals("-")) {
 	    return (-val);

@@ -10,16 +10,16 @@ import java.util.Map;
 
 public class Constant implements Expression, Comparable<Constant> {
 
-    private final Long value;    // More often used constants
-    public final static Constant ZERO = new Constant(new Long(0));
-    public final static Constant ONE = new Constant(new Long(1));
+    private final Double value;    // More often used constants
+    public final static Constant ZERO = new Constant(new Double(0));
+    public final static Constant ONE = new Constant(new Double(1));
 
     // Constructor of constant
-    public Constant(Long value) {
+    public Constant(Double value) {
 	this.value = value;
     }
     // function to get value of constant
-    public Long getValue() {
+    public Double getValue() {
 	return value;
     }
 
@@ -72,7 +72,7 @@ public class Constant implements Expression, Comparable<Constant> {
 	return ZERO;
     }
 
-    public Long evaluate(Map<Variable, Constant> context) {
+    public Double evaluate(Map<Variable, Constant> context) {
 	return value;
     }
 }

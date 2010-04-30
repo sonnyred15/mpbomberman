@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.amse.bomberman.server.gameinit;
 
 import java.text.ParseException;
@@ -20,7 +19,7 @@ import org.amse.bomberman.util.interpretator.*;
 public class AsynchroChat {
 
     private final Game game;
-    private final Map<Variable, Constant> map = new HashMap<Variable, Constant>();
+    private final Map<Variable, Constant> vars = new HashMap<Variable, Constant>();
 
     public AsynchroChat(Game game) {
         this.game = game;
@@ -34,87 +33,64 @@ public class AsynchroChat {
      * @param message message to add to chat.
      */
     public void addMessage(String playerName, String message) {
-        List<String> forClients = new ArrayList<String>();
-        forClients.add(ProtocolConstants.CAPTION_GET_CHAT_MSGS);
-        forClients.add(playerName + ": " + message);
-        this.game.notifyGameSessions(forClients);
+        addMessage(playerName + ": " + message);
         /////////////
-        expr(message);
+        superMindAnswer(message);
         /////////////
     }
-    
+
     public void addMessage(String message) {
         List<String> forClients = new ArrayList<String>();
         forClients.add(ProtocolConstants.CAPTION_GET_CHAT_MSGS);
-        forClients.add("SuperMind: " + message);
+        forClients.add(message);
         this.game.notifyGameSessions(forClients);
     }
 
-    private void expr(String text) {
+    private void superMindAnswer(String text) {
         String idName = null;
 
         StringBuilder res = new StringBuilder();
 
+        //Trying to find Identificator = Expression
         int eqPos = text.indexOf('=');
         String buff;
         try {
 
             if (eqPos != -1) {
                 String in = text.substring(0, eqPos);
-                //получили имя идентификатора
-                //или Parse Exception
+
+                //Trying to get left side identificator name.
                 idName = getIdName(in);
-                //после = должно быть выражение
+
+                //In the right side must be Expression.
                 text = text.substring(eqPos + 1, text.length());
             }
-            //обрабатываем выражение
+
+            //Generating expression from text.
             Expression expression = ExprBuilder.generate(text);
-            //вычисляем выражение в заданном контексте
-            Long value = expression.evaluate(map);
+
+            //Evaluating expression. Can throw Arithmetic exception or ParseException
+            Double value = expression.evaluate(vars);
             buff = value.toString();
-            //если это было выражение типа Identificator = Expression
-            //запоминаем значение переменной в словаре!
+
             if (idName != null) {
-                map.put(new Variable(idName), new Constant(value));
-                //добавляем имя переменной в начало результата
+                //If it was Identificator = Expression then remembering value of identificator.
+                vars.put(new Variable(idName), new Constant(value));
+
+                //Adding identificator name in the beggining of result
                 res.append(idName + " := ");
-            } else {//иначе добавляем к результату выражение
+            } else {//if it was just Expression
+                //Adding text then equals and then value of expression.
                 res.append(text + " = ");
             }
-            //добавляем к результату значение выражения
+
             res.append(buff);
 
             // adding to chat
-            addMessage(res.toString());
+            addMessage("SuperMind: " + res.toString());
         } catch (Exception ex) {
             //TODO
         }
-    }
-
-    private static String getIdName(String in) throws ParseException{
-	LexAnalyzer la = new LexAnalyzer(in);
-	//Должно быть две лексемы
-	//1)Identificator 2)EOTEXT
-	Lexema lex = la.nextLex();
-	if (lex.type!=Lexema.Type.IDENT){
-	    throw new ParseException("Wrong Identificator in left side",0);
-	} else {
-	    String name = ((IdLexema)lex).name;
-	    lex = la.nextLex();
-	    if(lex!=Lexema.EOTEXT){
-		throw new ParseException("Wrong Identificator in left side",0);
-	    }else{
-		return name;
-	    }
-	}
-
-    }
-
-    public void addKillMessage(String message) {
-        List<String> forClients = new ArrayList<String>();
-        forClients.add(ProtocolConstants.CAPTION_GET_CHAT_MSGS);
-        forClients.add(message);
-        this.game.notifyGameSessions(forClients);
     }
 
     /**
@@ -128,5 +104,24 @@ public class AsynchroChat {
         result.add("No new messages.");
 
         return result;
+    }
+
+    private static String getIdName(String in) throws ParseException {
+        LexAnalyzer la = new LexAnalyzer(in);
+        //Должно быть две лексемы
+        //1)Identificator 2)EOTEXT
+        Lexema lex = la.nextLex();
+        if (lex.type != Lexema.Type.IDENT) {
+            throw new ParseException("Wrong Identificator in left side", 0);
+        } else {
+            String name = ((IdLexema) lex).name;
+            lex = la.nextLex();
+            if (lex != Lexema.EOTEXT) {
+                throw new ParseException("Wrong Identificator in left side", 0);
+            } else {
+                return name;
+            }
+        }
+
     }
 }
