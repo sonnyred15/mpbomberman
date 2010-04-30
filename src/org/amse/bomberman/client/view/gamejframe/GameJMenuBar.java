@@ -31,7 +31,7 @@ public class GameJMenuBar extends JMenuBar {
         exit.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                Model.getInstance().removeListener(parent);
+                Model.getInstance().removeListeners();
                 try {
                     Controller.getInstance().requestLeaveGame();
                 } catch (NetException ex) {
@@ -57,14 +57,15 @@ public class GameJMenuBar extends JMenuBar {
             try {
                 Controller.getInstance().requestLeaveGame();
             } catch (NetException ex) {
-                JOptionPane.showMessageDialog(parent,
+                Controller.getInstance().lostConnection(ex.getMessage());
+                /*JOptionPane.showMessageDialog(parent,
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 parent.dispose();
                 Model.getInstance().setStart(false);
-                Model.getInstance().removeListener(parent);
+                Model.getInstance().removeListeners();
                 BombWizard wizard = new BombWizard();
                 Controller.getInstance().setReceiveInfoListener(wizard);
-                wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);
+                wizard.setCurrentJPanel(BombWizard.IDENTIFIER1);*/
             }
         }
     }

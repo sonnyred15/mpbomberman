@@ -269,7 +269,7 @@ public class SynchroConnector implements IConnector {
                 c.requestNewChatMessages();
                 c.requestIsGameStarted();
                 // how do it better??? ----------------------------------------
-                RequestResultListener listener = c.getReceiveInfoListener();
+                /*RequestResultListener listener = c.getReceiveInfoListener();
                 if (listener instanceof Wizard) {
                     JPanel panel = ((Wizard) listener).getCurrentJPanel();
                     if (panel instanceof Panel3) {
@@ -278,7 +278,7 @@ public class SynchroConnector implements IConnector {
                             stopUpdating();
                         }
                     }
-                }
+                }*/
 
             } catch (NetException ex) {
                 // is it good???

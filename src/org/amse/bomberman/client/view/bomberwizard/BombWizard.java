@@ -3,15 +3,15 @@ package org.amse.bomberman.client.view.bomberwizard;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.net.RequestResultListener;
-import java.awt.Dimension;
-import java.util.List;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.util.ProtocolConstants;
+import java.awt.Dimension;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
@@ -157,44 +157,33 @@ public class BombWizard extends Wizard implements RequestResultListener {
         try {
             Controller.getInstance().requestStartGame();
         } catch (NetException ex) {
-            System.out.println(ex);
-            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-                + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.setCurrentJPanel(IDENTIFIER1);
+            Controller.getInstance().lostConnection(ex.getMessage());
+            /*System.out.println(ex);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            this.setCurrentJPanel(IDENTIFIER1);*/
         }
     }
 
     @Override
-    public void wizardActionPerformed(WizardEvent a) {
-        String event = a.getValue();
+    public void wizardActionPerformed(WizardEvent e) {
+        String event = e.getValue();
         if (event.equals(EVENT_BACK_TEXT)) {
-            this.setBackText(a.getValue());
+            this.setBackText(e.getValue());
         } else if (event.equals(EVENT_NEXT_TEXT)) {
-            this.setNextText(a.getValue());
+            this.setNextText(e.getValue());
         } else if (event.equals(EVENT_JOIN)) {
             this.goNext();
         } else if (event.equals(EVENT_DISCONNECT)) {
-            JOptionPane.showMessageDialog(this, a.getMessage(), "Error",
+            Controller.getInstance().lostConnection(e.getMessage());
+            /*JOptionPane.showMessageDialog(this, a.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
-            this.setCurrentJPanel(IDENTIFIER1);
+            this.setCurrentJPanel(IDENTIFIER1);*/
         } else {
             System.out.println(event);
         }
     }
     private void startGame() {
-        this.dispose();
-        Controller.getInstance().setReceiveInfoListener((RequestResultListener)
-                Model.getInstance());
-        GameJFrame jframe = new GameJFrame();
-        Model.getInstance().addListener(jframe);
-        try {
-            Controller.getInstance().requestGameMap();
-        } catch (NetException ex) {
-            System.out.println(ex);
-            JOptionPane.showMessageDialog(this, "Connection was lost.\n"
-                    + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.setCurrentJPanel(IDENTIFIER1);
-            Controller.getInstance().setReceiveInfoListener(this);
-        }
+        Controller.getInstance().startGame();
     }
 }

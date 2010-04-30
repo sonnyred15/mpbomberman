@@ -9,7 +9,7 @@ import org.amse.bomberman.client.view.IView;
 public interface IModel {
     public void setMap(BombMap map);
     public void addListener(IView view);
-    public void removeListener(IView view);
+    public void removeListeners();
     public BombMap getMap();
     public List<Cell> getChanges();
     public void setPlayerLives(int lives);
