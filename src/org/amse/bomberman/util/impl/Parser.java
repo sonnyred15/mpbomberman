@@ -51,7 +51,7 @@ public class Parser implements IParser {
                 IModel model = Model.getInstance();
                 model.setPlayerLives(lives);
                 model.setPlayerCoord(new Cell(x, y));
-                model.setPlayerBombs(bombs);
+                model.setPlayerBombs(maxBombs);
                 model.setPlayerRadius(radius);
             }
             map.setExplosions(expl);
