@@ -12,6 +12,7 @@ public interface IModel {
     public void removeListeners();
     public BombMap getMap();
     public List<Cell> getChanges();
+    public List<String> getHistory();
     public void setPlayerLives(int lives);
     public int getPlayerLives();
     public void setPlayerCoord(Cell cell);

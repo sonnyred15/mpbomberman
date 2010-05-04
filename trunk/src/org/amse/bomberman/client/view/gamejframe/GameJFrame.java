@@ -1,5 +1,6 @@
 package org.amse.bomberman.client.view.gamejframe;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
@@ -9,6 +10,11 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -16,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
 
@@ -35,7 +42,7 @@ public class GameJFrame extends JFrame implements IView{
     private boolean dead = false;
 
     private final int width = 500;
-    private final int height = 600;
+    private final int height = 640;
 
     private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart-48.png";
     private static final String B_RADIUS_ICON_PATH = "org/amse/bomberman/client/icons/b_radius-48.png";
@@ -60,20 +67,23 @@ public class GameJFrame extends JFrame implements IView{
         radiusLabel = new BonusLabel(ICON_BONUS_B_RADIUS, 0);
         listener = new GameJFrameListener();
 
-
         Box bonusBox = Box.createHorizontalBox();
         bonusBox.add(livesLabel);
+        bonusBox.add(Box.createHorizontalStrut(30));
         bonusBox.add(bombsLabel);
+        bonusBox.add(Box.createHorizontalStrut(30));
         bonusBox.add(radiusLabel);
 
-        Box topBox = Box.createHorizontalBox();
-        topBox.add(bonusBox);
-        //topBox.add(this.createInfoPanel());
+        Box mainBox = Box.createVerticalBox();
+        mainBox.add(bonusBox);
+        mainBox.add(gamePanel);
+        mainBox.add(new JSeparator(JSeparator.VERTICAL));
+        mainBox.add(this.createInfoPanel());
 
         Container c = getContentPane();
         c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        c.add(topBox);
-        c.add(gamePanel);
+        c.add(mainBox);
+
         this.addKeyListener(listener);
         this.setJMenuBar(new GameJMenuBar());
 
@@ -92,7 +102,8 @@ public class GameJFrame extends JFrame implements IView{
             wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);*/
         } else {
             gamePanel.update();
-            this.updateBonusPanels();
+            updateBonusPanels();
+            updateHistory();
             int lives = model.getPlayerLives();
             if (lives <= 0) {
                 if (!dead) {
@@ -118,21 +129,29 @@ public class GameJFrame extends JFrame implements IView{
             radiusLabel.update(radius);
         }
     }
+    private void updateHistory() {
+        List<String> history = Model.getInstance().getHistory();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < history.size(); i ++) {
+            if (history.size() - i < 4 ) {
+                sb.append(history.get(i));
+                sb.append("\n");
+            }
+        }
+        infoTA.setText(sb.toString());
+    }
     private JPanel createInfoPanel() {
-        JPanel infoPanel = new JPanel(new FlowLayout());
+        JPanel infoPanel = new JPanel();
 
         infoTA = new JTextArea();
-        infoTA.setPreferredSize(new Dimension(200, 50));
-        this.infoTA.setEditable(false);
-        this.infoTA.setLineWrap(true);
-        this.infoTA.setForeground(Color.ORANGE);
-        this.infoTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 10));
-        //this.infoTA.setOpaque(false);
+        infoTA.setPreferredSize(new Dimension(width - 50, 40));
+        infoTA.setFocusable(false);
+        infoTA.setEditable(false);
+        infoTA.setLineWrap(true);
+        infoTA.setForeground(Color.RED);
+        infoTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 10));
 
         JScrollPane scrollTA = new JScrollPane(infoTA);
-        //scrollTA.setOpaque(false);
-        //scrollTA.getViewport().setOpaque(false);
-        //scrollTA.setBorder(null);
 
         infoPanel.add(scrollTA);
 
@@ -143,12 +162,13 @@ public class GameJFrame extends JFrame implements IView{
         private int count;
 
         private JLabel label;
+        private final int size = 32;
 
         private BonusLabel(ImageIcon icon, int firstCount) {
-            image = icon;
+            image = new ImageIcon(getScaledImage(icon.getImage(), size, size
+                    , new Color(238,238,238)));
 
             label = new JLabel("x" + firstCount, image, JLabel.CENTER);
-
             Container c = getContentPane();
             c.add(label);
         }
@@ -161,5 +181,22 @@ public class GameJFrame extends JFrame implements IView{
         private int getCount() {
             return count;
         }
+    }
+    /**
+     * Resizes an image using a Graphics2D object backed by a BufferedImage.
+     * @param srcImg - source image to scale
+     * @param w - desired width
+     * @param h - desired height
+     * @param background - color for background
+     * @return - the new resized image
+     */
+    private static Image getScaledImage(Image srcImg, int w, int h, Color background){
+        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION
+                , RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(srcImg, 0, 0, w, h, background, null);
+        g2.dispose();
+        return resizedImg;
     }
 }

@@ -22,6 +22,7 @@ public class Model implements IModel, RequestResultListener{
     private List<IView> listener = new ArrayList<IView>();
     private List<Cell> changes = new ArrayList<Cell>();
     private volatile boolean isStarted = false;
+    private List<String> history = new ArrayList<String>();
 
     private Model() {
     }
@@ -113,6 +114,11 @@ public class Model implements IModel, RequestResultListener{
             JOptionPane.showMessageDialog(null, "Host is escaped from game!\n"
                        , "Game ended.", JOptionPane.INFORMATION_MESSAGE);
             escapeGame();
+        } else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
+            if (!list.get(0).equals("No new messages.")) {
+                history.addAll(list);
+                this.updateListeners();
+            }
         }
     }
     public BombMap getMap() {
@@ -120,6 +126,9 @@ public class Model implements IModel, RequestResultListener{
     }
     public List<Cell> getChanges() {
         return changes;
+    }
+    public List<String> getHistory() {
+        return history;
     }
     public void addListener(IView view) {
         listener.add(view);
@@ -174,5 +183,6 @@ public class Model implements IModel, RequestResultListener{
         changes.clear();
         updateListeners();
         listener.clear();
+        history.clear();
     }
 }
