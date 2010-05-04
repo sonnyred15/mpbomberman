@@ -274,15 +274,15 @@ public class Model implements IModel, DieListener {
 
     public void playerBombed(Player atacker, Player victim) {
         victim.bombed();
-        this.game.addMessageToChat("Bomb of " + atacker.getNickName() + " " +
-                                   "damaged " + victim.getNickName());
+        this.game.addMessageToChat(/*"Bomb of " + */atacker.getNickName() +
+                                   " damaged " + victim.getNickName());
     }
 
     public void playerDied(Player player) {
         this.gameMap.removePlayer(player.getID());
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         this.game.addMessageToChat("Oh, no. " + player.getNickName() +
-                                   "was cruelly killed.");
+                                   " was cruelly killed.");
 
         int aliveCount = 0;
         for (Player pl : players) {
