@@ -68,6 +68,7 @@ public class Model implements IModel, DieListener {
     }
 
     // TODO is this is normal realization?
+    @Override
     public Player addBot(String botName) {
         Bot bot = new Bot(botName, this.game, this,
                           new RandomFullBotStrategy());
@@ -79,12 +80,14 @@ public class Model implements IModel, DieListener {
         return bot;
     }
 
+    @Override
     public void addExplosions(List<Pair> explSq) {
         this.explosionSquares.addAll(explSq);
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
     // TODO is this is normal realization?
+    @Override
     public int addPlayer(String name) {
         Player playerToAdd = new Player(name);
 
@@ -95,6 +98,7 @@ public class Model implements IModel, DieListener {
         return playerToAdd.getID();
     }
 
+    @Override
     public void bombDetonated(Bomb bomb) {
         this.bombs.remove(bomb);
 
@@ -109,6 +113,7 @@ public class Model implements IModel, DieListener {
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
+    @Override
     public void detonateBombAt(Pair position) {
         Bomb bombToDetonate = null;
 
@@ -123,6 +128,7 @@ public class Model implements IModel, DieListener {
         bombToDetonate.detonate();
     }
 
+    @Override
     public int getCurrentPlayersNum() {
         return this.players.size();
     }
@@ -131,6 +137,7 @@ public class Model implements IModel, DieListener {
      * Return list of explosions.
      * @return List of explosions
      */
+    @Override
     public List<Pair> getExplosionSquares() {
         return this.explosionSquares;
     }
@@ -139,10 +146,12 @@ public class Model implements IModel, DieListener {
         return this.freeIDs.remove(0);
     }
 
+    @Override
     public GameMap getGameMap() {
         return gameMap;
     }
 
+    @Override
     public Player getPlayer(int playerID) {
         Player player = null;
         for (Player pl : players) {
@@ -154,10 +163,12 @@ public class Model implements IModel, DieListener {
         return player;
     }
 
+    @Override
     public List<Player> getPlayersList() {
         return Collections.unmodifiableList(players);
     }
 
+    @Override
     public boolean isExplosion(Pair coords) {
         return this.explosionSquares.contains(coords);
     }
@@ -267,17 +278,20 @@ public class Model implements IModel, DieListener {
         return arr;
     }
 
+    @Override
     public void playerBombed(Player atacker, int victimID) {
         Player victim = this.getPlayer(victimID);
         this.playerBombed(atacker, victim);
     }
 
-    public void playerBombed(Player atacker, Player victim) {
-        victim.bombed();
+    @Override
+    public void playerBombed(Player atacker, Player victim) {        
         this.game.addMessageToChat(/*"Bomb of " + */atacker.getNickName() +
                                    " damaged " + victim.getNickName());
+        victim.bombed();
     }
 
+    @Override
     public void playerDied(Player player) {
         this.gameMap.removePlayer(player.getID());
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
@@ -298,6 +312,7 @@ public class Model implements IModel, DieListener {
     /**
      * Printing matrix of GameMap to console. Maybe would be deleted soon.
      */
+    @Override
     public void printToConsole() {    // useless?
         int dim = this.gameMap.getDimension();
 
@@ -312,6 +327,7 @@ public class Model implements IModel, DieListener {
         System.out.println();
     }
 
+    @Override
     public void removeExplosions(List<Pair> explosions) {
 
         for (Pair pair : explosions) {
@@ -321,6 +337,7 @@ public class Model implements IModel, DieListener {
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
+    @Override
     public boolean removePlayer(int playerID) {
         for (Player player : players) {
             if (player.getID() == playerID) {
@@ -336,6 +353,7 @@ public class Model implements IModel, DieListener {
         return false;
     }
 
+    @Override
     public void startup() {
         this.gameMap.changeMapForCurMaxPlayers(this.players.size());
 
@@ -363,6 +381,7 @@ public class Model implements IModel, DieListener {
      * @param direction Direction of move
      * @return true if player moved, false otherwise
      */
+    @Override
     public boolean tryDoMove(MoveableObject objToMove, Direction direction) {    // TODO synchronization?
         synchronized (gameMap) {
             synchronized (objToMove) {
@@ -402,6 +421,7 @@ public class Model implements IModel, DieListener {
      * Trying to place bomb of defined player.
      * @param player Player which trying to place bomb.
      */
+    @Override
     public boolean tryPlaceBomb(Player player) {    // whats about synchronization??
         synchronized (gameMap) {
             synchronized (player) {    // whats about syncronize(map)???
