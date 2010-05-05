@@ -7,6 +7,7 @@ package org.amse.bomberman.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.net.URL;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.net.IServer;
@@ -14,6 +15,7 @@ import org.amse.bomberman.server.net.IServer;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Component;
+import java.io.File;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,6 +40,13 @@ public class Creator {
      */
     public static List<String> createGameMapsList() {
         return new ArrayList<String>(Constants.maps);
+    }
+
+    public static String[] createGameMapsListFromDirectory(){
+        File f = new File(Creator.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        f = f.getParentFile();
+        f = new File(f.getPath()+"/resources/maps");
+        return f.list();
     }
 
     /**
@@ -95,5 +104,12 @@ public class Creator {
                                          String message) {
         JOptionPane.showMessageDialog(parent, description + "\n" + message,
                                       "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public static void main(String[] args) {        
+        String[] maps = createGameMapsListFromDirectory();
+        for (String string : maps) {
+            createErrorDialog(null, "bl", string);
+        }        
     }
 }
