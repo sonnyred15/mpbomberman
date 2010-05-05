@@ -41,36 +41,29 @@
     </target>   
 
     <target name="jar" depends="compile" description="generate the distribution" >
-        <!-- Put everything in ${build} into the bomberman.jar file -->           
-        <jar jarfile="${dist}/bombermanClient.jar"
-             basedir="${build}/classes"
+        <!-- Creates bombermanClient.jar file -->           
+        <jar jarfile="${dist}/bombermanClient.jar"             
              index="no"
              compress="yes">
-           <!-- HERE CAN BE USED FILESET FOR JAR COMMAND!!! -->  
-           <manifest>
-           <!--attribute name="Built-By" value="${user.name}"/>
-           <attribute name="Specification-Title"    value="Amateur"/>
-           <attribute name="Specification-Version"  value="${version}"/>
-           <attribute name="Specification-Vendor"   value="Elliotte Rusty Harold"/>
-           <attribute name="Implementation-Title"   value="Amateur"/>
-           <attribute name="Implementation-Version" value="${version}"/>
-           <attribute name="Implementation-Vendor"  value="Elliotte Rusty Harold"/-->          
-           <attribute name="Main-Class" value="org.amse.bomberman.client.Main"/>
-           <attribute name="Classpath" value=""/>
-           <!--section name="com/elharo/quicktime/">
-               <attribute name="Sealed" value="true"/>
-               <attribute name="Specification-Title"   value="Amateur core classes"/>
-               <attribute name="Implementation-Title"  value="com.elharo.quicktime"/>
-            <attribute name="Implementation-Version" value="${version}"/>
-            <attribute name="Implementation-Vendor"  value="Elliotte Rusty Harold"/>          
-           </section-->
-          </manifest>
+             
+           <fileset dir="${build.classes}" excludes="org/amse/bomberman/server/**"/>
+           <fileset dir="${src}" includes="org/amse/bomberman/client/view/resources/**"/>
+           <fileset dir="${src}" includes="org/amse/bomberman/client/icons/**"/>
+           
+           <manifest>        
+               <attribute name="Main-Class" value="org.amse.bomberman.client.Main"/>
+               <attribute name="Classpath" value=""/>
+           </manifest>
         </jar>
-
-        <jar jarfile="${dist}/bombermanServer.jar"
-             basedir="${build}/classes"
+        
+        <!-- Creates bombermanServer.jar file -->     
+        <jar jarfile="${dist}/bombermanServer.jar"            
              index="no"
              compress="yes">
+
+            <fileset dir="${build.classes}" excludes="org/amse/bomberman/client/**"/>
+           <fileset dir="${src}" includes="org/amse/bomberman/server/resources/**"/>
+             
              <manifest>
                   <attribute name="Main-Class" value="org.amse.bomberman.server.Main"/>
                   <attribute name="Classpath" value=""/>
