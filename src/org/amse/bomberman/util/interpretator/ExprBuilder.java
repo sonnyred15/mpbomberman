@@ -49,16 +49,16 @@ public abstract class ExprBuilder {
 		    operands.push(new Constant(((NumLexema) lex).value));
 		    status = Status.WAIT_OPERATOR;
 		} else if (lex.type == Lexema.Type.IDENT) {
-		    // Идентификатор вталкивается в стек операндов
+		    // Identificator is pushed to the stack of operands
 		    operands.push(new Variable(((IdLexema) lex).name));
 		    status = Status.WAIT_OPERATOR;
 		} else if (lex == Lexema.LEFTPAR) {
-		    // Скобка вталкивается в стек операций с приоритетом 0
+		    // ")" is pushed to the stack of operands with priority 0
 		    operators.push((OpLexema) (lex));
 		} else if (lex.type == Lexema.Type.OPERATOR) {
 		    if (((OpLexema) lex).getOperator().equals("-")) {
-			// "Исполняются" все унарные операции,
-			// а затем унарный минус запоминается с приоритетом 3
+			// Invokes all unary oparations,
+			// and then unary "-" is remembered with priority 3
 			doExpressions(operands, operators, Prio.UNARY);
 			operators.push(new OpLexema(((OpLexema) lex).getOperator(), Prio.UNARY));
 		    } else {
@@ -69,8 +69,8 @@ public abstract class ExprBuilder {
 		}
 	    } else if (status == Status.WAIT_OPERATOR) {
 		if (lex == Lexema.RIGHTPAR) {
-		    // "Исполняются" все операции,
-		    // а затем из стека выталкивается открывающая скобка
+		    // Invokes all oparations,
+		    // and then "(" is pushed out of stack
 		    doExpressions(operands, operators, Prio.PLUS);
 
 		    if (operators.empty() || operators.peek() != Lexema.LEFTPAR) {
@@ -79,8 +79,8 @@ public abstract class ExprBuilder {
 			operators.pop();
 		    }
 		} else if (lex.type == Lexema.Type.OPERATOR) {
-		    // "Исполняются" все операции приоритета не меньше найденного,
-		    // а затем встретившаяся операция запоминается в стеке операций
+		    // Invokes all operations with priority  < that found,
+                    // and then new operation remembered in stack of operations
 		    int prio = 100500;
 		    String op = ((OpLexema) lex).getOperator();
 		    char ch = op.charAt(0);
