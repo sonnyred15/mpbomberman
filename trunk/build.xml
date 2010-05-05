@@ -8,7 +8,98 @@
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
 <project name="bomberman" default="default" basedir=".">
-    <description>Builds, tests, and runs the project bomberman.</description>
+    <description>
+	    Builds the bomberman project.
+    </description>
+    
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+    <property name="build.classes" location="${build}/classes"/>
+    <property name="dist"  location="dist"/>
+    <property name="maps"  location="maps"/>
+
+    <target name="-pre-init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${dist}"/>
+    </target>
+
+    <target name="compile" depends="-pre-init" description="compile the source " >
+        <!-- Compile the java code from ${src} into ${build} -->
+        <javac srcdir="${src}" destdir="${build.classes}"/>
+        <!-- Copy resources in the source code parent directory -->
+        <property name ="build.resources" location="${build}/resources"/>
+        <mkdir dir="${build.resources}"/>
+        <mkdir dir="${build.resources}/maps"/>
+        <copy todir="${build.resources}/maps">
+            <fileset dir="${maps}"/>
+        </copy>
+    </target>   
+
+    <target name="jar" depends="compile" description="generate the distribution" >
+        <!-- Put everything in ${build} into the bomberman.jar file -->           
+        <jar jarfile="${dist}/bombermanClient.jar"
+             basedir="${build}/classes"
+             index="no"
+             compress="yes">
+           <!-- HERE CAN BE USED FILESET FOR JAR COMMAND!!! -->  
+           <manifest>
+           <!--attribute name="Built-By" value="${user.name}"/>
+           <attribute name="Specification-Title"    value="Amateur"/>
+           <attribute name="Specification-Version"  value="${version}"/>
+           <attribute name="Specification-Vendor"   value="Elliotte Rusty Harold"/>
+           <attribute name="Implementation-Title"   value="Amateur"/>
+           <attribute name="Implementation-Version" value="${version}"/>
+           <attribute name="Implementation-Vendor"  value="Elliotte Rusty Harold"/-->          
+           <attribute name="Main-Class" value="org.amse.bomberman.client.Main"/>
+           <attribute name="Classpath" value=""/>
+           <!--section name="com/elharo/quicktime/">
+               <attribute name="Sealed" value="true"/>
+               <attribute name="Specification-Title"   value="Amateur core classes"/>
+               <attribute name="Implementation-Title"  value="com.elharo.quicktime"/>
+            <attribute name="Implementation-Version" value="${version}"/>
+            <attribute name="Implementation-Vendor"  value="Elliotte Rusty Harold"/>          
+           </section-->
+          </manifest>
+        </jar>
+
+        <jar jarfile="${dist}/bombermanServer.jar"
+             basedir="${build}/classes"
+             index="no"
+             compress="yes">
+             <manifest>
+                  <attribute name="Main-Class" value="org.amse.bomberman.server.Main"/>
+                  <attribute name="Classpath" value=""/>
+             </manifest>
+        </jar>
+
+        <!-- Copy resources in the jar parent directory -->  
+        <property name ="dist.resources" location="${dist}/resources"/>
+        <mkdir dir="${dist.resources}"/>
+        <mkdir dir="${dist.resources}/maps"/>
+        <copy todir="${dist.resources}/maps">
+            <fileset dir="${maps}"/>
+        </copy>
+    </target>
+
+    <target name="dist" depends="compile" description="generate the distribution" >
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}/lib"/>
+        <!-- Put everything in ${build} into the bomberman.jar file -->   
+        <jar jarfile="${dist}/lib/bomberman.jar" basedir="${build}"/>        
+    </target>
+    
+
+    <target name="clean" description="clean up" >
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+
     <import file="nbproject/build-impl.xml"/>
     <!--
 
