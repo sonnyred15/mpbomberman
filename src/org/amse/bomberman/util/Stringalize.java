@@ -32,6 +32,7 @@ public final class Stringalize {
 
         Collections.sort(players, new Comparator<Player>() {
 
+            @Override
             public int compare(Player player1, Player player2) {
                 int kills1 = player1.getKills();
                 int kills2 = player2.getKills();
@@ -242,15 +243,6 @@ public final class Stringalize {
      * @return list of strings of gameMapField and explosions
      */
     public static List<String> fieldExplPlayerInfo(Game game, Player player) {
-        List<String> result = Stringalize.fieldAndExplosionsInfo(game);
-
-        result.add("" + 1);
-        result.add(Stringalize.playerInfo(player));
-
-        return result;
-    }
-
-    public static List<String> fieldExplPlayerInfo2(Game game, Player player) {    // TODO temporary
         int[][]      field             = game.getGameField();
         List<Player> players           = game.getCurrentPlayersListCopy();
         List<String> stringalizedField = new ArrayList<String>();

@@ -116,6 +116,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
+    @Override
     public void terminateSession() throws SecurityException {
         this.mustEnd = true;
 
@@ -126,6 +127,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
+    @Override
     public void sendAnswer(String shortAnswer) {
         BufferedWriter out = null;
 
@@ -149,6 +151,7 @@ public abstract class AbstractSession extends Thread implements ISession {
      * Send strings from linesToSend to client.
      * @param linesToSend lines to send.
      */
+    @Override
     public void sendAnswer(List<String> linesToSend)
                                     throws IllegalArgumentException {
         BufferedWriter out = null;
@@ -181,8 +184,10 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
+    @Override
     public abstract void notifyClient(String message);
 
+    @Override
     public abstract void notifyClient(List<String> messages);
 
     protected abstract void freeResources();
@@ -323,7 +328,7 @@ public abstract class AbstractSession extends Thread implements ISession {
                 // "12"
                 sendGameInfo();
 
-                break;    // TODO
+                break;
             }
 
             case CHAT_ADD_MSG : {
@@ -331,21 +336,13 @@ public abstract class AbstractSession extends Thread implements ISession {
                 // "13 message"
                 addMessageToChat(queryArgs);
 
-                break;    // TODO
+                break;
             }
 
             case CHAT_GET_NEW_MSGS : {
 
                 // "14"
                 getNewMessagesFromChat();
-
-                break;    // TODO
-            }
-
-            case GET_GAME_MAP_INFO2 : {
-
-                // "15"
-                sendGameMapArray2();
 
                 break;
             }
@@ -417,8 +414,6 @@ public abstract class AbstractSession extends Thread implements ISession {
     protected abstract void addMessageToChat(String[] queryArgs);
 
     protected abstract void getNewMessagesFromChat();
-
-    protected abstract void sendGameMapArray2();
 
     protected abstract void removeBotFromGame();
 

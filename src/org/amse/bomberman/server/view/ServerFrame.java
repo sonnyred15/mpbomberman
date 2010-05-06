@@ -37,14 +37,13 @@ public class ServerFrame extends JFrame {
     private static final long serialVersionUID = 1L;
 
     //
-    private final String     BTN_TEXT_DOWN = "Down";
-    private final String     BTN_TEXT_RAISE = "Raise";
-    private final ServerInfo info = new ServerInfo();
-    private final JLabel     portLabel = new JLabel("Server Port");
-    private final JTextField portField = new JTextField("" +
-                                                        Constants.DEFAULT_PORT);
-    private final AbstractButton btnStatus = new JButton("Status");
-    private final AbstractButton btnControl = new JButton(BTN_TEXT_RAISE);
+    private final String         BTN_TEXT_DOWN  = "Down";
+    private final String         BTN_TEXT_RAISE = "Raise";
+    private final ServerInfo     info           = new ServerInfo();
+    private final JLabel         portLabel      = new JLabel("Server Port");
+    private final JTextField     portField      = new JTextField("" + Constants.DEFAULT_PORT);
+    private final AbstractButton btnStatus      = new JButton("Status");
+    private final AbstractButton btnControl     = new JButton(BTN_TEXT_RAISE);
     private IServer              server;
 
     /**
@@ -90,23 +89,23 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new Server(port, true);
+            server = new Server(port);    // Now always Asynchronous server with asynchronous session
             server.setChangeListener(info);
             info.clearLog();
             server.start();
-        } catch (NumberFormatException ex) {    // parse errors
+        } catch (NumberFormatException ex) {                     // parse errors
             showErrorMessage(ex.getMessage());
 
             return;
-        } catch (IllegalArgumentException ex) {    // wrong port(not in 0..65535)
+        } catch (IllegalArgumentException ex) {                  // wrong port(not in 0..65535)
             showErrorMessage(ex.getMessage());
 
             return;
-        } catch (IOException ex) {    // sockets errors. Server logging them.
+        } catch (IOException ex) {                               // sockets errors. Server logging them.
             showErrorMessage(ex.getMessage());
 
             return;
-        } catch (IllegalStateException ex) {    // must never happen
+        } catch (IllegalStateException ex) {                     // must never happen
             showErrorMessage(ex.getMessage());
 
             return;
@@ -125,7 +124,7 @@ public class ServerFrame extends JFrame {
 
                 showErrorMessage(message);
             }
-        } catch (IOException ex) {    // Server loggs IOErrors and throw them again.
+        } catch (IOException ex) {              // Server loggs IOErrors and throw them again.
             showErrorMessage(ex.getMessage());
 
             return;
@@ -144,6 +143,7 @@ public class ServerFrame extends JFrame {
     }
 
     private class ServerControlButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (btnControl.getText().equals(BTN_TEXT_RAISE)) {
                 raiseServer();
@@ -155,6 +155,7 @@ public class ServerFrame extends JFrame {
 
 
     private class StatusButtonListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             info.setVisible(true);
         }

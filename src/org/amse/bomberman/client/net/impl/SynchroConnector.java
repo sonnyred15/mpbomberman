@@ -126,7 +126,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestGameMap() throws NetException {
-        List<String> gameMap = queryAnswer("" + Command.GET_GAME_MAP_INFO2.getValue());
+        List<String> gameMap = queryAnswer("" + Command.GET_GAME_MAP_INFO.getValue());
         gameMap.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
         Controller.getInstance().receivedRequestResult(gameMap);
     }

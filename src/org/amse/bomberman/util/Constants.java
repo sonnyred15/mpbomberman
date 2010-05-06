@@ -1,5 +1,6 @@
 package org.amse.bomberman.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,15 +37,16 @@ public final class Constants {
     public static final int DEFAULT_CLIENT_TIMEOUT = 300000;
     
     public static final String DEFAULT_FILE_LOG_NAME = "server.log";
-
-    public static final List<String> maps = new ArrayList<String>(4);
-
-    static {
-        maps.add("1.map");
-        maps.add("2.map");
-        maps.add("16.map");
-        maps.add("19.map");
+    public static File RESOURSES_GAMEMAPS_DIRECTORY;
+    static{
+        String path = Constants.class.getProtectionDomain()
+                        .getCodeSource().getLocation().getPath();
+        File f = new File(path);
+        f = f.getParentFile();
+        f = new File(f.getPath() + "/resources/maps");
+        RESOURSES_GAMEMAPS_DIRECTORY = f;
     }
+
 
     public static enum Direction {
 
@@ -97,9 +99,8 @@ public final class Constants {
         GET_MY_GAME_INFO(12),
         CHAT_ADD_MSG(13),
         CHAT_GET_NEW_MSGS(14),
-        GET_GAME_MAP_INFO2(15),
-        REMOVE_BOT_FROM_GAME(16),
-        GET_MY_GAME_PLAYERS_STATS(17);
+        REMOVE_BOT_FROM_GAME(15),
+        GET_MY_GAME_PLAYERS_STATS(16);
 
 
         private final int value;
@@ -145,10 +146,8 @@ public final class Constants {
                 case 14:
                     return CHAT_GET_NEW_MSGS;
                 case 15:
-                    return GET_GAME_MAP_INFO2;
-                case 16:
                     return REMOVE_BOT_FROM_GAME;
-                case 17:
+                case 16:
                     return GET_MY_GAME_PLAYERS_STATS;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +

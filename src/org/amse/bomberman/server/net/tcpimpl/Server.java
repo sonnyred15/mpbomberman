@@ -39,11 +39,10 @@ public class Server implements IServer {
     private boolean              shutdowned = true;    // true until we start accepting clients.
     private Thread               listeningThread;
     private final List<ISession> sessions =
-        new CopyOnWriteArrayList<ISession>();
+                                         new CopyOnWriteArrayList<ISession>();
     private int                  sessionCounter = 0;    // need to generate name of log files.
     private long                 startTime;
     private ServerChangeListener changeListener;
-    private boolean              isAsynchro = false;
 
     /**
      * Constructor with default port.
@@ -62,15 +61,11 @@ public class Server implements IServer {
         this.port = port;
     }
 
-    public Server(int port, boolean isAsynchro) {
-        this(port);
-        this.isAsynchro = isAsynchro;
-    }
-
     /**
      * Starts listening thread where ServerSocket.accept() method is using.
      *
      */
+    @Override
     public synchronized void start() throws IOException,
                                             IllegalStateException {
         try {
@@ -109,6 +104,7 @@ public class Server implements IServer {
      * @throws java.io.IOException if an error occurs when closing socket.
      * @throws IllegalStateException if we are trying to shutdown not raised server.
      */
+    @Override
     public synchronized void shutdown()
                                     throws IOException,
                                            IllegalStateException,
@@ -160,6 +156,7 @@ public class Server implements IServer {
         writeToLog("Server: shutdowned.");
     }
 
+    @Override
     public int addGame(Game game) {
         int n = -1;
 
@@ -179,6 +176,7 @@ public class Server implements IServer {
         return n;
     }
 
+    @Override
     public void removeGame(Game gameToRemove) {
         if (!this.shutdowned) {    // is it redundant?
             if (this.games.remove(gameToRemove)) {
@@ -202,6 +200,7 @@ public class Server implements IServer {
      * @param n
      * @return
      */
+    @Override
     public Game getGame(int n) {
         Game game = null;
 
@@ -220,6 +219,7 @@ public class Server implements IServer {
         return game;
     }
 
+    @Override
     public List<Game> getGamesList() {
         if (this.shutdowned) {    // is it redundant?
             writeToLog("Server: getGamesList warning. " +
@@ -229,22 +229,27 @@ public class Server implements IServer {
         return this.games;
     }
 
+    @Override
     public synchronized boolean isShutdowned() {
         return this.shutdowned;
     }
 
+    @Override
     public int getPort() {
         return this.port;
     }
 
+    @Override
     public long getWorkTime() {
         return (System.currentTimeMillis() - startTime) / 1000;
     }
 
+    @Override
     public List<ISession> getSessions() {
         return this.sessions;
     }
 
+    @Override
     public void sessionTerminated(ISession endedSession) {
         this.sessions.remove(endedSession);
         this.sessionCounter--;
@@ -256,18 +261,22 @@ public class Server implements IServer {
         writeToLog("Server: session removed.");
     }
 
+    @Override
     public void setChangeListener(ServerChangeListener logListener) {
         this.changeListener = logListener;
     }
 
+    @Override
     public ServerChangeListener getChangeListener() {
         return this.changeListener;
     }
 
+    @Override
     public List<String> getLog() {
         return log.getLog();
     }
 
+    @Override
     public void writeToLog(String message) {
         if ((log == null) || log.isClosed()) {
             System.out.println(message);
@@ -287,6 +296,7 @@ public class Server implements IServer {
             this.server = net;
         }
 
+        @Override
         public void run() {
             writeToLog("Server: waiting for a new client...");
 
@@ -304,17 +314,10 @@ public class Server implements IServer {
                     ISession newSession = null;
 
                     //
-                    if (isAsynchro) {
-                        newSession = new AsynchroSession(this.server,
+                    newSession = new AsynchroSession(this.server,
                                                          clientSocket,
                                                          sessionCounter,
                                                          this.server.log);
-                    } else {
-                        newSession = new SynchroSession(this.server,
-                                                        clientSocket,
-                                                        sessionCounter,
-                                                        this.server.log);
-                    }
 
                     //
                     sessions.add(newSession);

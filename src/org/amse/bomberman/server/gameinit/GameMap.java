@@ -26,6 +26,7 @@ import java.util.Random;
  * @author Kirilchuk V.E.
  */
 public final class GameMap {
+
     private int           maxPlayers = Constants.MAX_PLAYERS;
     private final int     dimension;
     private final int[][] field;
@@ -40,6 +41,13 @@ public final class GameMap {
         this.field = field;
         this.maxPlayers = countMaxPlayers(this.field);
         this.gameMapName = "intArrayMap";
+    }
+
+    public GameMap(String gameMapName, int[][] field, int dimension, int maxPlayers) {
+        this.gameMapName = gameMapName;
+        this.field = field;
+        this.dimension = dimension;
+        this.maxPlayers = maxPlayers;
     }
 
     /**

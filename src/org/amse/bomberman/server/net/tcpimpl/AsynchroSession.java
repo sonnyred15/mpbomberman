@@ -52,6 +52,7 @@ public class AsynchroSession extends AbstractSession {
         this.sendAnswer(messages);
     }
 
+    @Override
     protected void addBot(String[] queryArgs) {
 
         // "11" "botName"
@@ -138,6 +139,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void addMessageToChat(String[] queryArgs) {
         List<String> message = new ArrayList<String>(2);
 
@@ -176,6 +178,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void createGame(String[] queryArgs) {
 
         // Example queryArgs = "1" "gameName" "mapName" "maxpl" "playerName"
@@ -249,6 +252,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void doMove(String[] queryArgs) {
         List<String> messages = new ArrayList<String>();
 
@@ -317,6 +321,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void freeResources() {
         if (this.controller != null) {
             this.controller.tryLeaveGame();
@@ -325,6 +330,7 @@ public class AsynchroSession extends AbstractSession {
         this.server.sessionTerminated(this);
     }
 
+    @Override
     protected void getNewMessagesFromChat() {
         List<String> messages = new ArrayList<String>();
 
@@ -348,6 +354,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void joinGame(String[] queryArgs) {
 
         // "2" "gameID" "playerName"
@@ -442,6 +449,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void leaveGame() {
         List<String> messages = new ArrayList<String>();
 
@@ -466,6 +474,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void placeBomb() {
         List<String> messages = new ArrayList<String>();
 
@@ -499,6 +508,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void sendDownloadingGameMap(String[] queryArgs) {
         List<String> messages = new ArrayList<String>();
 
@@ -546,6 +556,7 @@ public class AsynchroSession extends AbstractSession {
                    mapFileName);
     }
 
+    @Override
     protected void sendGameInfo() {
         List<String> info = new ArrayList<String>();
 
@@ -568,6 +579,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void sendGameMapArray() {
         List<String> messages = new ArrayList<String>();
 
@@ -576,15 +588,23 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
 
         if (game != null) {
-            List<String> linesToSend =
-                Stringalize.fieldExplPlayerInfo(game,
-                                                this.controller.getPlayer());
+            if (game.isStarted()) {
+                List<String> linesToSend =
+                    Stringalize.fieldExplPlayerInfo(game,
+                        this.controller.getPlayer());
 
-            messages.addAll(linesToSend);
-            sendAnswer(messages);
-            writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
+                messages.addAll(linesToSend);
+                sendAnswer(messages);
+                writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
 
-            return;
+                return;
+            } else {    // game not started
+                messages.add("Game is not started. You can`t get full game field info.");
+                sendAnswer(messages);
+                writeToLog("Session: sendMapArray warning. Canceled. Game is not started.");
+
+                return;
+            }
         } else {
             messages.add("Not joined to any game.");
             sendAnswer(messages);
@@ -594,6 +614,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void sendGameMapsList() {
         List<String> messages = Stringalize.gameMapsList();
 
@@ -614,6 +635,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void sendGameStatus() {
         List<String> messages = new ArrayList<String>();
 
@@ -638,6 +660,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void sendGames() {
         List<String> linesToSend =
             Stringalize.unstartedGames(this.server.getGamesList());
@@ -658,6 +681,7 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    @Override
     protected void startGame() {
         List<String> messages = new ArrayList<String>();
 
@@ -699,40 +723,6 @@ public class AsynchroSession extends AbstractSession {
             sendAnswer(messages);
             writeToLog("Session: client tryed to start game, canceled. " +
                        "Not joined to any game.");
-
-            return;
-        }
-    }
-
-    protected void sendGameMapArray2() {
-        List<String> messages = new ArrayList<String>();
-
-        messages.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
-
-        Game game = this.controller.getMyGame();
-
-        if (game != null) {
-            if (game.isStarted()) {
-                List<String> linesToSend =
-                    Stringalize.fieldExplPlayerInfo2(game,
-                        this.controller.getPlayer());
-
-                messages.addAll(linesToSend);
-                sendAnswer(messages);
-                writeToLog("Session: sended mapArray+explosions+playerInfo to client.");
-
-                return;
-            } else {    // game not started
-                messages.add("Game is not started. You can`t get full game field info.");
-                sendAnswer(messages);
-                writeToLog("Session: sendMapArray warning. Canceled. Game is not started.");
-
-                return;
-            }
-        } else {
-            messages.add("Not joined to any game.");
-            sendAnswer(messages);
-            writeToLog("Session: sendMapArray warning. Canceled. Not joined to any game.");
 
             return;
         }
