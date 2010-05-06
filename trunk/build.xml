@@ -17,7 +17,7 @@
     <property name="build" location="build"/>
     <property name="build.classes" location="${build}/classes"/>
     <property name="dist"  location="dist"/>
-    <property name="maps"  location="maps"/>
+    <property name="resources"  location="resources"/>
 
     <target name="-pre-init">
         <!-- Create the time stamp -->
@@ -32,11 +32,8 @@
         <!-- Compile the java code from ${src} into ${build} -->
         <javac srcdir="${src}" destdir="${build.classes}"/>
         <!-- Copy resources in the source code parent directory -->
-        <property name ="build.resources" location="${build}/resources"/>
-        <mkdir dir="${build.resources}"/>
-        <mkdir dir="${build.resources}/maps"/>
-        <copy todir="${build.resources}/maps">
-            <fileset dir="${maps}"/>
+        <copy todir="${build}/resources">
+            <fileset dir="${resources}"/>
         </copy>
     </target>   
 
@@ -62,7 +59,7 @@
              compress="yes">
 
             <fileset dir="${build.classes}" excludes="org/amse/bomberman/client/**"/>
-           <fileset dir="${src}" includes="org/amse/bomberman/server/resources/**"/>
+            <fileset dir="${src}" includes="org/amse/bomberman/server/resources/**"/>
              
              <manifest>
                   <attribute name="Main-Class" value="org.amse.bomberman.server.Main"/>
@@ -71,11 +68,8 @@
         </jar>
 
         <!-- Copy resources in the jar parent directory -->  
-        <property name ="dist.resources" location="${dist}/resources"/>
-        <mkdir dir="${dist.resources}"/>
-        <mkdir dir="${dist.resources}/maps"/>
-        <copy todir="${dist.resources}/maps">
-            <fileset dir="${maps}"/>
+        <copy todir="${dist}/resources">
+            <fileset dir="${resources}"/>
         </copy>
     </target>
 

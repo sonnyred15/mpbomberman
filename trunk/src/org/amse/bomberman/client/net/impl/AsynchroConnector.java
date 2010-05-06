@@ -108,7 +108,7 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestGameMap() throws NetException {
-        sendRequest("" + Command.GET_GAME_MAP_INFO2.getValue());
+        sendRequest("" + Command.GET_GAME_MAP_INFO.getValue());
     }
 
     public void requestPlantBomb() throws NetException {
