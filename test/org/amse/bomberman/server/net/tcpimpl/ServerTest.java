@@ -57,6 +57,7 @@ public class ServerTest {
 
             Thread t = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     for (int i = 0; i < MAX_GAMES_BY_THREAD; i++) {
                         Game game = null;
@@ -101,6 +102,7 @@ public class ServerTest {
 
             Thread t = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     for (int i = 0; i < MAX_GAMES_BY_THREAD; i++) {
                         synchronized (this) {

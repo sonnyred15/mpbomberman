@@ -48,14 +48,20 @@ public class Bot extends Player
      * In current realization switch bot gameEnded flag to true.
      * It affects on bot thread, so it is ending on next iteration.
      */
+    @Override
     public void gameEnded() {
         this.gameEnded = true;
+        this.game.removeGameStartedListener(this);
+        this.game.removeGameEndedListener(this);
+        this.game.tryRemoveBotFromGame(this);
+        System.out.println("Bot removed.");
     }
 
     /**
      * Method from GameStartedListener interface.
      * Starts the bot thread.
      */
+    @Override
     public void started() {
         botThread.start();
     }
@@ -67,6 +73,7 @@ public class Bot extends Player
             this.bot = parent;
         }
 
+        @Override
         public void run() {
             while (isAlive() && !gameEnded) {
                 try {
@@ -81,8 +88,7 @@ public class Bot extends Player
                 }
             }
 
-            System.out.println("Bot: removed from game(Game ended or he died)");
-            game.tryRemoveBotFromGame(this.bot);
+            System.out.println("Bot thread ended.");
         }
     }
 }
