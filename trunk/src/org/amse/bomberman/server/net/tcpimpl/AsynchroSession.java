@@ -806,7 +806,7 @@ public class AsynchroSession extends AbstractSession {
         Game game = this.controller.getMyGame();
         if (game != null) {
             if (game.isStarted()) {
-                List<String> linesToSend = Stringalize.playersStats(game);
+                List<String> linesToSend = Stringalize.playersStats(game.getCurrentPlayers());
 
                 messages.addAll(linesToSend);
                 sendAnswer(messages);

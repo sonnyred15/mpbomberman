@@ -185,8 +185,8 @@ public class Game {
      * bots.
      * @return unmodifiableList of all Players that are playing in game.
      */
-    public List<Player> getCurrentPlayersListCopy() {
-        return new ArrayList<Player>(this.model.getPlayersList());
+    public List<Player> getCurrentPlayers() {
+        return this.model.getPlayersList();
     }
 
     /**

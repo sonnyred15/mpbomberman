@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.util.Stringalize;
 
 /**
  * Model that is responsable for game rules and responsable for connection
@@ -44,7 +46,7 @@ public class Model implements IModel, DieListener {
     private final Game                        game;
     private final GameMap                     gameMap;
     private final List<Player>                players;
-    private boolean                           ended = false;
+    private boolean                           ended;
 
     /**
      * Constructor of Model.
@@ -56,6 +58,7 @@ public class Model implements IModel, DieListener {
         this.game = game;
         this.bombs = new CopyOnWriteArrayList<Bomb>();
         this.players = new CopyOnWriteArrayList<Player>();
+        this.ended = false;
 
         Integer[] freeIDArray = new Integer[this.game.getMaxPlayers()];
 
@@ -66,8 +69,7 @@ public class Model implements IModel, DieListener {
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
     }
-
-    // TODO is this is normal realization?
+    
     @Override
     public Player addBot(String botName) {
         Bot bot = new Bot(botName, this.game, this,
@@ -86,7 +88,6 @@ public class Model implements IModel, DieListener {
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
 
-    // TODO is this is normal realization?
     @Override
     public int addPlayer(String name) {
         Player playerToAdd = new Player(name);
@@ -153,14 +154,13 @@ public class Model implements IModel, DieListener {
 
     @Override
     public Player getPlayer(int playerID) {
-        Player player = null;
         for (Player pl : players) {
             if (pl.getID() == playerID) {
-                player = pl;
+                return pl;
             }
         }
 
-        return player;
+        return null;
     }
 
     @Override
@@ -173,14 +173,20 @@ public class Model implements IModel, DieListener {
         return this.explosionSquares.contains(coords);
     }
 
-    private boolean isMoveToReserved(int x, int y) {    // note that on explosions isEmpty = true!!!
+    private boolean isMoveToReserved(Pair pair) {    // note that on explosions isEmpty = true!!!
+        int x = pair.getX();
+        int y = pair.getY();
+
         boolean isFree = this.gameMap.isEmpty(x, y)
                          || this.gameMap.isBonus(x, y);
 
         return !isFree;
     }
 
-    private boolean isOutMove(int x, int y) {
+    private boolean isOutMove(Pair pair) {
+        int x = pair.getX();
+        int y = pair.getY();
+
         int dim = this.gameMap.getDimension();
 
         if ((x < 0) || (x > dim - 1)) {
@@ -194,9 +200,11 @@ public class Model implements IModel, DieListener {
         return false;
     }
 
-    private void makeMove(MoveableObject objectToMove, int newX, int newY) {
+    private void makeMove(MoveableObject objectToMove, Pair destination) {
         int x = objectToMove.getPosition().getX();
         int y = objectToMove.getPosition().getY();
+        int newX = destination.getX();
+        int newY = destination.getY();
 
         if (objectToMove instanceof Player) {
             if (this.gameMap.isBomb(x, y)) {    // if player setted mine but still in same square
@@ -237,36 +245,23 @@ public class Model implements IModel, DieListener {
         }
     }
 
-    private int[] newCoords(Pair currentPosition, Direction direction) {    // whats about catch illegalArgumentException???
-        int[] arr = new int[2];
+    private Pair newCoords(Pair curPos, Direction direction) {    // whats about catch illegalArgumentException???
 
         switch (direction) {
             case DOWN : {
-                arr[0] = currentPosition.getX() + 1;
-                arr[1] = currentPosition.getY();
-
-                break;
+                return new Pair(curPos.getX() + 1,curPos.getY());
             }
 
             case LEFT : {
-                arr[0] = currentPosition.getX();
-                arr[1] = currentPosition.getY() - 1;
-
-                break;
+                return new Pair(curPos.getX(),curPos.getY() - 1);
             }
 
             case UP : {
-                arr[0] = currentPosition.getX() - 1;
-                arr[1] = currentPosition.getY();
-
-                break;
+                return new Pair( curPos.getX() - 1,curPos.getY());
             }
 
             case RIGHT : {
-                arr[0] = currentPosition.getX();
-                arr[1] = currentPosition.getY() + 1;
-
-                break;
+                return new Pair( curPos.getX(),curPos.getY() + 1);
             }
 
             default : {
@@ -274,8 +269,6 @@ public class Model implements IModel, DieListener {
                         "in switch(ENUM). Error in code.");
             }
         }
-
-        return arr;
     }
 
     @Override
@@ -304,7 +297,7 @@ public class Model implements IModel, DieListener {
                 aliveCount++;
             }
         }
-        if(aliveCount<=1){
+        if(aliveCount<=1 && !this.ended){
             this.end();
         }
     }
@@ -371,8 +364,10 @@ public class Model implements IModel, DieListener {
     }
 
     public void end() {
-        //this.ended = true;
-        //TODO !!! 
+        this.ended = true;
+        List<String> stats = Stringalize.playersStats(this.players);
+        stats.add(0, ProtocolConstants.CAPTION_GAME_ENDED);
+        this.game.notifyGameSessions(stats);
     }
 
     /**
@@ -385,18 +380,15 @@ public class Model implements IModel, DieListener {
     public boolean tryDoMove(MoveableObject objToMove, Direction direction) {    // TODO synchronization?
         synchronized (gameMap) {
             synchronized (objToMove) {
-                int arr[] = newCoords(objToMove.getPosition(), direction);
-                int newX = arr[0];
-                int newY = arr[1];
+                Pair newCoords = newCoords(objToMove.getPosition(), direction);
 
-                if (!isOutMove(newX, newY)) {
-                    if (this.gameMap.isBomb(newX, newY)
+                if (!isOutMove(newCoords)) {
+                    if (this.gameMap.isBomb(newCoords)
                             && (objToMove instanceof Player)) {
                         Bomb bombToMove = null;
 
                         for (Bomb bomb : bombs) {
-                            if (bomb.getPosition().equals(new Pair(newX,
-                                                                   newY))) {
+                            if (bomb.getPosition().equals(newCoords)) {
                                 bombToMove = bomb;
                                 tryDoMove(bombToMove, direction);
 
@@ -405,8 +397,8 @@ public class Model implements IModel, DieListener {
                         }
                     }
 
-                    if (!isMoveToReserved(newX, newY)) {
-                        makeMove(objToMove, newX, newY);                        
+                    if (!isMoveToReserved(newCoords)) {
+                        makeMove(objToMove, newCoords);
 
                         return true;
                     }

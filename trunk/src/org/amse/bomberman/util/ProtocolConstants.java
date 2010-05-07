@@ -28,6 +28,7 @@ public class ProtocolConstants {
     public static final String CAPTION_SEND_CHAT_MSG_INFO = "Send chat messages.";
     public static final String CAPTION_GET_CHAT_MSGS = "Get chat messages.";
     public static final String CAPTION_GET_MY_GAME_PLAYERS_STATS = "Game players stats.";
+    public static final String CAPTION_GAME_ENDED = "Game ended players stats.";
 
     public static final String MESSAGE_GAME_KICK = "You were kicked from the game.";
     public static final String MESSAGE_GAME_START = "Game started.";

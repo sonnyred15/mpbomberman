@@ -27,8 +27,8 @@ import java.util.List;
 public final class Stringalize {
     private Stringalize() {}
 
-    public static List<String> playersStats(Game game) {
-        List<Player> players = game.getCurrentPlayersListCopy();
+    public static List<String> playersStats(final List<Player> playersList) {
+        List<Player> players = new ArrayList<Player>(playersList);
 
         Collections.sort(players, new Comparator<Player>() {
 
@@ -40,22 +40,27 @@ public final class Stringalize {
                 if(kills1 == kills2){
                     return 0;
                 }else if(kills1>kills2){
-                    return 1;
-                }else{
                     return -1;
+                }else{
+                    return 1;
                 }
             }
         });
 
         List<String> result = new ArrayList<String>();
-        StringBuilder str = new StringBuilder();
+        StringBuilder str = null;
         for (Player player : players) {
+            str = new StringBuilder();
             str.append(player.getNickName());
             str.append(' ');
             str.append(player.getKills());
             str.append(' ');
             str.append(player.getDeaths());
             result.add(str.toString());
+        }
+        System.out.println("RESULT STATS!!!!");
+        for (String string : result) {
+            System.out.println(string);
         }
         
         return result;
@@ -130,7 +135,7 @@ public final class Stringalize {
 
         lst.add("" + game.getMaxPlayers());
 
-        List<Player> players = game.getCurrentPlayersListCopy();
+        List<Player> players = game.getCurrentPlayers();
 
         lst.add("" + players.size());
 
@@ -244,7 +249,7 @@ public final class Stringalize {
      */
     public static List<String> fieldExplPlayerInfo(Game game, Player player) {
         int[][]      field             = game.getGameField();
-        List<Player> players           = game.getCurrentPlayersListCopy();
+        List<Player> players           = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 
         stringalizedField.add("" + field.length);
