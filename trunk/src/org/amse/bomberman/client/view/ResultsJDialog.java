@@ -14,14 +14,14 @@ import javax.swing.table.AbstractTableModel;
  * @author Michael Korovkin
  */
 public class ResultsJDialog extends JDialog{
-    private JTable myTable;
+    private ResultsTable myTable;
     private final int width = 300;
     private final int height = 100;
 
     public ResultsJDialog(List<String> results) {
         super((JDialog)null, "Game Results", true);
-        myTable = new JTable(new ResultsTableModel(results));
-        myTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
+        myTable = new ResultsTable(results);
+        myTable.setPreferredScrollableViewportSize(new Dimension(500, 100));
         myTable.setFillsViewportHeight(true);
 
         JScrollPane scrollPane = new JScrollPane(myTable);
@@ -33,6 +33,24 @@ public class ResultsJDialog extends JDialog{
         this.setLayout(new GridLayout(1,0));
         this.add(scrollPane);
         this.setVisible(true);
+    }
+
+    private class ResultsTable extends JTable {
+
+        public ResultsTable(List<String> results) {
+            super(new ResultsTableModel(results));
+            this.setSizes();
+        }
+
+        private void setSizes() {
+            this.getTableHeader().setReorderingAllowed(false);
+            columnModel.getColumn(0).setPreferredWidth(20);
+            columnModel.getColumn(0).setResizable(false);
+            columnModel.getColumn(2).setPreferredWidth(20);
+            columnModel.getColumn(2).setResizable(false);
+            columnModel.getColumn(3).setPreferredWidth(20);
+            columnModel.getColumn(3).setResizable(false);
+        }
     }
 
     private class ResultsTableModel extends AbstractTableModel {
