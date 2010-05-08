@@ -40,4 +40,5 @@ public interface IController {
     public void lostConnection(String message);
     public void startGame();
     public void leaveGame();
+    public void showResults(List<String> results);
 }

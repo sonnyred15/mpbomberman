@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.amse.bomberman.client.view.ResultsJDialog;
 
 
 /**
@@ -102,6 +103,9 @@ public class Controller implements IController{
         } else {
             System.out.println("Game is already leaved or closed.");
         }
+    }
+    public void showResults(List<String> results) {
+        ResultsJDialog rjd = new ResultsJDialog(results);
     }
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;

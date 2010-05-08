@@ -266,8 +266,8 @@ public class Panel2 extends JPanel{
         }
     }
     private class MyTableModel extends AbstractTableModel {
-        String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
-        Object[][] data = new Object[50][5];
+        private String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
+        private Object[][] data = new Object[50][columnNames.length];
 
         public int getRowCount() {
             return data.length;
@@ -292,7 +292,7 @@ public class Panel2 extends JPanel{
             fireTableCellUpdated(row, col);
         }
         public void clear() {
-            data = new Object[50][5];
+            data = new Object[50][columnNames.length];
         }
     }
 }
