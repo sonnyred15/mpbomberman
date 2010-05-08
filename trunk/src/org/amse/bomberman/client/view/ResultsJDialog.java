@@ -1,10 +1,22 @@
 package org.amse.bomberman.client.view;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -16,23 +28,52 @@ import javax.swing.table.AbstractTableModel;
 public class ResultsJDialog extends JDialog{
     private ResultsTable myTable;
     private final int width = 300;
-    private final int height = 100;
+    private JButton okButton;
 
-    public ResultsJDialog(List<String> results) {
-        super((JDialog)null, "Game Results", true);
+    @SuppressWarnings("static-access")
+    public ResultsJDialog(JFrame parent, List<String> results) {
+        super(parent, "Game Results", true);
+
         myTable = new ResultsTable(results);
-        myTable.setPreferredScrollableViewportSize(new Dimension(500, 100));
-        myTable.setFillsViewportHeight(true);
 
-        JScrollPane scrollPane = new JScrollPane(myTable);
+        //System.out.println("height = " + myTable.getRowCount() + " * "
+        //        + myTable.getRowHeight() + " + 50");
+        int tableHeight = (myTable.getRowCount()+1)*myTable.getRowHeight();
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setSize(new Dimension(width, height));
-        this.setLocationByPlatform(true);
+        // BEAUTIFULL setting sizes by incredible number 83 !!!!
+        this.setSize(new Dimension(width, tableHeight+83));
 
-        this.setLayout(new GridLayout(1,0));
-        this.add(scrollPane);
+        okButton = new JButton("Ok");
+        okButton.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        Box mainBox = Box.createVerticalBox();
+        mainBox.add(this.createTablePanel());
+        mainBox.add(Box.createVerticalGlue());
+        mainBox.add(Box.createVerticalStrut(20));
+        mainBox.add(okButton);
+        mainBox.add(Box.createVerticalStrut(10));
+
+        Container c = getContentPane();
+        //c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+        c.add(mainBox);
+
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
+
+    private JComponent createTablePanel() {
+        JPanel tablePanel = new JPanel(new GridLayout(1,0));
+        JScrollPane scrollPane = new JScrollPane(myTable);
+        tablePanel.add(scrollPane);
+
+        return tablePanel;
     }
 
     private class ResultsTable extends JTable {
@@ -78,12 +119,12 @@ public class ResultsJDialog extends JDialog{
         public int getColumnCount() {
             return columnNames.length;
         }
+        public Object getValueAt(int row, int col) {
+            return data[row][col];
+        }
         @Override
         public String getColumnName(int col) {
             return columnNames[col];
-        }
-        public Object getValueAt(int row, int col) {
-            return data[row][col];
         }
         @Override
         public boolean isCellEditable(int row, int col) {

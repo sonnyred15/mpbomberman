@@ -99,7 +99,7 @@ public class GameJFrame extends JFrame implements IView{
     }
     private void initComponents() {
         this.setSize(width, height);
-        this.setMinimumSize(new Dimension(width / 2, height / 2));
+        //this.setMinimumSize(new Dimension(width / 2, height / 2));
 
         gamePanel = new GamePanel();
         livesLabel = new BonusLabel(ICON_BONUS_LIFE, 0);
