@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import org.amse.bomberman.server.gameinit.control.Controller;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
@@ -79,7 +80,11 @@ public class Creator {
      * @throws FileNotFoundException if gameMap with defined name was not finded.
      * @throws IOException if IO errors occurs while creating gameMap.
      */
-    public static Game createGame(IServer server, String gameMapName, String gameName, int maxPlayers)
+    public static Game createGame(IServer server,
+                                   Controller controller,
+                                   String gameMapName,
+                                   String gameName,
+                                   int maxPlayers)
             throws FileNotFoundException, IOException {
 
         File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
@@ -98,7 +103,7 @@ public class Creator {
             throw new IOException("Wrong gameMap xml file." + ex.getMessage());
         }
 
-        return new Game(server, gameMap, gameName, maxPlayers);
+        return new Game(server, controller, gameMap, gameName, maxPlayers);
     }
 
     /**
@@ -109,15 +114,19 @@ public class Creator {
      * @param description description of error.
      * @param message message of error.
      */
-    public static void createErrorDialog(Component parent, String description, String message) {
-        JOptionPane.showMessageDialog(parent, description + "\n" + message, "Error", JOptionPane.ERROR_MESSAGE);
+    public static void createErrorDialog(Component parent, 
+                                        String description,
+                                        String message) {
+        //
+        JOptionPane.showMessageDialog(parent, description + "\n" + message,
+                                     "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     public static void main(String[] args) {
         String[] maps = Creator.createGameMapsListFromDirectory();
 
         for (String string : maps) {
-            createErrorDialog(null, "bl", string);
+            createErrorDialog(null, "Game maps.", string);
         }
     }
 }

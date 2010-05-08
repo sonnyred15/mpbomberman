@@ -84,6 +84,9 @@ public class Model implements IModel, DieListener {
 
     @Override
     public void addExplosions(List<Pair> explSq) {
+        if(this.ended){
+            return;
+        }
         this.explosionSquares.addAll(explSq);
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
     }
@@ -101,6 +104,9 @@ public class Model implements IModel, DieListener {
 
     @Override
     public void bombDetonated(Bomb bomb) {
+        if(this.ended){
+            return;
+        }
         this.bombs.remove(bomb);
 
         Player owner = bomb.getOwner();
@@ -116,6 +122,9 @@ public class Model implements IModel, DieListener {
 
     @Override
     public void detonateBombAt(Pair position) {
+        if(this.ended){
+            return;
+        }
         Bomb bombToDetonate = null;
 
         for (Bomb bomb : bombs) {
@@ -273,6 +282,9 @@ public class Model implements IModel, DieListener {
 
     @Override
     public void playerBombed(Player atacker, int victimID) {
+        if(this.ended){
+            return;
+        }
         Player victim = this.getPlayer(victimID);
         this.playerBombed(atacker, victim);
     }
@@ -378,6 +390,9 @@ public class Model implements IModel, DieListener {
      */
     @Override
     public boolean tryDoMove(MoveableObject objToMove, Direction direction) {    // TODO synchronization?
+        if(this.ended){
+            return false;
+        }
         synchronized (gameMap) {
             synchronized (objToMove) {
                 Pair newCoords = newCoords(objToMove.getPosition(), direction);
@@ -415,6 +430,9 @@ public class Model implements IModel, DieListener {
      */
     @Override
     public boolean tryPlaceBomb(Player player) {    // whats about synchronization??
+        if(this.ended){
+            return false;
+        }
         synchronized (gameMap) {
             synchronized (player) {    // whats about syncronize(map)???
                 if (player.canPlaceBomb()) {    // player is alive and have bombs to set up

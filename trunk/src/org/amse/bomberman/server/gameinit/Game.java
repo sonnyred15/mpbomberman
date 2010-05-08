@@ -7,7 +7,6 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.ArrayList;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
@@ -24,9 +23,9 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.amse.bomberman.server.gameinit.imodel.ModelFactory;
 
 /**
  * Class that represents Game.
@@ -40,14 +39,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Kirilchuk V.E.
  */
 public class Game {
-    private AsynchroChat                    chat;
+    private final AsynchroChat              chat;
     private final List<Controller>          controllers;
     private final List<GameEndedListener>   gameEndedListeners;
     private final String                    gameName;
     private final List<GameStartedListener> gameStartedListeners;
     private final int                       maxPlayers;
     private final IModel                    model;
-    private Controller                      owner;
+    private       Controller                owner;
     private final IServer                   server;
     private boolean                         started;
 
@@ -64,15 +63,17 @@ public class Game {
      * @param gameName name of this game.
      * @param maxPlayers maxPLayers of thisGame.
      */
-    public Game(IServer server, GameMap gameMap, String gameName,
+    public Game(IServer server, Controller owner, GameMap gameMap, String gameName,
                 int maxPlayers) {
 
         // initialization
         this.server = server;
+        this.owner = owner;
         this.gameName = gameName;
 
         int gameMapMaxPlayers = gameMap.getMaxPlayers();
 
+        /* If maxPlayers param was incorrect then gameMap maxPlayers will be used*/
         if ((maxPlayers > 0) && (maxPlayers <= gameMapMaxPlayers)) {
             this.maxPlayers = maxPlayers;
         } else {
@@ -80,15 +81,19 @@ public class Game {
         }
 
         this.chat = new AsynchroChat(this);
-        this.model = new Model(gameMap, this);
+        this.model = ModelFactory.createModel(this, gameMap);
+
+        //
         this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
         this.controllers = new CopyOnWriteArrayList<Controller>();
         this.gameStartedListeners =
             new CopyOnWriteArrayList<GameStartedListener>();
+
+        //
+        this.server.addGame(this);
         this.started = false;
 
-        // additional stuff
-        this.server.addGame(this);
+        //
         this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
@@ -140,8 +145,7 @@ public class Game {
      * @param message message to add in chat.
      */
     public void addMessageToChat(Player player, String message) {
-        this.chat.addMessage(player.getNickName(),
-                             message);
+        this.chat.addMessage(player.getNickName(), message);
         notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
     }
 
@@ -159,14 +163,15 @@ public class Game {
      * or move was not done.
      */
     public boolean tryDoMove(int playerID, Direction direction) {
+        if(!this.started){
+            return false;
+        }
+
         boolean moved = false;
+        moved = model.tryDoMove(this.model.getPlayer(playerID), direction);
 
-        if (this.started) {
-            moved = model.tryDoMove(this.model.getPlayer(playerID), direction);
-
-            if (moved) {
-                notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
-            }
+        if (moved) {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         }
 
         return moved;
@@ -274,8 +279,7 @@ public class Game {
      * @return true if game already have maxPlayers joined, false otherwise.
      */
     public boolean isFull() {
-        return ((this.model.getCurrentPlayersNum() == this.maxPlayers) ? true
-                                                                       : false);
+        return (this.model.getCurrentPlayersNum() == this.maxPlayers);
     }
 
     /**
@@ -294,6 +298,10 @@ public class Game {
      * @return ingame ID for this controller or -1 if client can not be joined.
      */
     public synchronized int tryJoin(String name, Controller controller) {
+        if(this.started){
+            return -1;
+        }
+
         int playerID = -1;
 
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
@@ -394,14 +402,15 @@ public class Game {
      * @return true if bomb was placed, false otherwise.
      */
     public boolean tryPlaceBomb(int playerID) {
+        if (!this.started) {
+            return false;
+        }
+
         boolean placed = false;
+        placed = this.model.tryPlaceBomb(this.model.getPlayer(playerID));
 
-        if (this.started) {
-            placed = this.model.tryPlaceBomb(this.model.getPlayer(playerID));
-
-            if (placed) {
-                notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
-            }
+        if (placed) {
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         }
 
         return placed;
@@ -413,31 +422,29 @@ public class Game {
      * @return true if game was started, false otherwise.
      */
     public boolean tryStartGame(Controller controller) {
-        if (this.owner == controller) {
-            this.started = true;
-
-            ServerChangeListener scl = this.server.getChangeListener();
-
-            if (scl != null) {
-                scl.changed(this.server);
-            }
-
-            // Here model must change gameMap to support current num of players
-            // and then give coordinates to Players.
-            this.model.startup();
-
-            // this.chat.clear();
-            // this.chat = new SynchroChat(this.model.getCurrentPlayersNum());
-            notifyGameSessions(ProtocolConstants.MESSAGE_GAME_START);
-
-            for (GameStartedListener gameStartedListener : gameStartedListeners) {
-                gameStartedListener.started();
-            }
-
-            return true;
+        if (this.owner != controller) {
+            return false;
         }
 
-        return false;
+        //TODO is it bad place to do this?
+        ServerChangeListener scl = this.server.getChangeListener();
+
+        if (scl != null) {
+            scl.changed(this.server);
+        }
+
+        // Here model must change gameMap to support current num of players
+        // and then give coordinates to Players.
+        this.model.startup();
+        this.started = true;
+
+        notifyGameSessions(ProtocolConstants.MESSAGE_GAME_START);
+
+        for (GameStartedListener gameStartedListener : gameStartedListeners) {
+            gameStartedListener.started();
+        }
+
+        return true;
     }
 
     /**
