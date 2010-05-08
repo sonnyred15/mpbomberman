@@ -26,10 +26,12 @@ import javax.swing.JPanel;
 public class GamePanel  extends JPanel{
     private BombMap map;
     private List<Cell> changes;
-    private final int cellSize = 48;
+
+    public static final int CELL_SIZE = 48;
     // amount of cells at the one line on the Screen
     private int range;
-    private final int defaultRange = 10;
+    public static final int DEFAULT_RANGE = 10;
+
     private int height;
     private int width;
     // amount of cells at one line in the Full map
@@ -39,10 +41,12 @@ public class GamePanel  extends JPanel{
     // Cell that is the most Right and Down at the screen
     private Cell RDCell;
     private Cell myCoord;
+
     private final int step = 4;
     private boolean isFirst = true;
-    private BufferedImage buffer = new BufferedImage(cellSize, cellSize
+    private BufferedImage buffer = new BufferedImage(CELL_SIZE, CELL_SIZE
             , BufferedImage.TYPE_INT_ARGB);
+
     private static final Color EMPTY_COLOR = Color.LIGHT_GRAY;
     private static final Color PL_EXPL_COLOR = Color.RED;
     private static final String BOMB_ICON_PATH = "org/amse/bomberman/client/icons/bomb-48.png";
@@ -81,9 +85,9 @@ public class GamePanel  extends JPanel{
         if (gameMap != null) {
             this.update();
         } else {
-            range = defaultRange;
-            width = range*cellSize;
-            height = range*cellSize;
+            range = DEFAULT_RANGE;
+            width = range*CELL_SIZE;
+            height = range*CELL_SIZE;
             this.setPreferredSize(new Dimension(width, height));
         }
     }
@@ -99,13 +103,13 @@ public class GamePanel  extends JPanel{
             map = newMap;
             changes = new ArrayList<Cell>();
             size = map.getSize();
-            if (size < defaultRange) {
+            if (size < DEFAULT_RANGE) {
                 range = size;
             } else {
-                range = defaultRange;
+                range = DEFAULT_RANGE;
             }
-            width = range * cellSize;
-            height = range * cellSize;
+            width = range * CELL_SIZE;
+            height = range * CELL_SIZE;
             this.setPreferredSize(new Dimension(width, height));
             myCoord = Model.getInstance().getPlayerCoord();
             this.findEyeShot();
@@ -135,13 +139,13 @@ public class GamePanel  extends JPanel{
                 for (int j = LUCell.getY(); j <= RDCell.getY(); j++) {
                     Cell c = parseToMyCoord(new Cell(i,j));
                     graphics.drawImage(drawNotExpl(buffer,new Cell(i,j))
-                            , c.getY()*cellSize, c.getX()*cellSize, this);
+                            , c.getY()*CELL_SIZE, c.getX()*CELL_SIZE, this);
                 }
             }
             for (Cell cell:expl) {
                 Cell myCell = parseToMyCoord(cell);
-                graphics.drawImage(drawExplosion(buffer,cell), cellSize*myCell.getY()
-                                , cellSize * myCell.getX(), this);
+                graphics.drawImage(drawExplosion(buffer,cell), CELL_SIZE*myCell.getY()
+                                , CELL_SIZE * myCell.getX(), this);
             }
             //isFirst = false;
             return;
@@ -257,7 +261,7 @@ public class GamePanel  extends JPanel{
         Image icon = null;
         Graphics2D g = image.createGraphics();
         g.setBackground(EMPTY_COLOR);
-        g.clearRect(0, 0, cellSize, cellSize);
+        g.clearRect(0, 0, CELL_SIZE, CELL_SIZE);
         int mapValue = map.getValue(cell);
         // if it is wall
         if (mapValue < Constants.MAP_EMPTY && mapValue
@@ -272,7 +276,7 @@ public class GamePanel  extends JPanel{
                     <= Constants.MAX_PLAYERS) {
                 icon = getPlayerIcon(mapValue);
                 g.setBackground(PL_EXPL_COLOR);
-                g.clearRect(0, 0, cellSize, cellSize);
+                g.clearRect(0, 0, CELL_SIZE, CELL_SIZE);
                 g.drawImage(icon, 0, 0, this);
             } else {
                 // others
@@ -285,7 +289,7 @@ public class GamePanel  extends JPanel{
     private BufferedImage drawNotExpl(BufferedImage image, Cell cell) {
         Graphics2D g = image.createGraphics();
         g.setBackground(EMPTY_COLOR);
-        g.clearRect(0, 0, cellSize, cellSize);
+        g.clearRect(0, 0, CELL_SIZE, CELL_SIZE);
         // if it is player on the bomb
         if (map.getValue(cell) >= Constants.MAP_BOMB + 100 + 1) {
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 10 * 0.1f));

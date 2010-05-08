@@ -41,8 +41,10 @@ public class GameJFrame extends JFrame implements IView{
     private GameJFrameListener listener;
     private boolean dead = false;
 
-    private final int width = 500;
-    private final int height = 640;
+    private boolean isFirstInit = true;
+
+    private int width = 500;
+    private int height = 640;
 
     private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart-48.png";
     private static final String B_RADIUS_ICON_PATH = "org/amse/bomberman/client/icons/b_radius-48.png";
@@ -56,9 +58,47 @@ public class GameJFrame extends JFrame implements IView{
     
     public GameJFrame() {
         super("BomberMan");
-        this.setSize(width, height);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 100);
+        
+
+        this.setResizable(true);
+        this.setVisible(true);
+    }
+
+    public synchronized void update() {
+        IModel model = Model.getInstance();
+        if (!model.isStarted()) {
+            Controller.getInstance().leaveGame();
+        } else {
+            if (isFirstInit) {
+                int mapSize = Model.getInstance().getMap().getSize();
+                if (mapSize < GamePanel.DEFAULT_RANGE) {
+                    width = mapSize*GamePanel.CELL_SIZE + 20;
+                    height = mapSize*GamePanel.CELL_SIZE + 160;
+                }
+                this.initComponents();
+                isFirstInit = false;
+            }
+            gamePanel.update();
+            updateBonusPanels();
+            updateHistory();
+            int lives = model.getPlayerLives();
+            if (lives <= 0) {
+                if (!dead) {
+                    dead = true;
+                    JOptionPane.showMessageDialog(this, "You are dead!!!"
+                            , "Death", JOptionPane.INFORMATION_MESSAGE);
+                    this.removeKeyListener(listener);
+                    livesLabel.setEnabled(false);
+                    bombsLabel.setEnabled(false);
+                    radiusLabel.setEnabled(false);
+                }
+            }
+        }
+    }
+    private void initComponents() {
+        this.setSize(width, height);
         this.setMinimumSize(new Dimension(width / 2, height / 2));
 
         gamePanel = new GamePanel();
@@ -86,37 +126,6 @@ public class GameJFrame extends JFrame implements IView{
 
         this.addKeyListener(listener);
         this.setJMenuBar(new GameJMenuBar());
-
-        setResizable(true);
-        setVisible(true);
-    }
-
-    public synchronized void update() {
-        IModel model = Model.getInstance();
-        if (!model.isStarted()) {
-            Controller.getInstance().leaveGame();
-            /*this.dispose();
-            Model.getInstance().removeListeners();
-            BombWizard wizard = new BombWizard();
-            Controller.getInstance().setReceiveInfoListener(wizard);
-            wizard.setCurrentJPanel(BombWizard.IDENTIFIER2);*/
-        } else {
-            gamePanel.update();
-            updateBonusPanels();
-            updateHistory();
-            int lives = model.getPlayerLives();
-            if (lives <= 0) {
-                if (!dead) {
-                    dead = true;
-                    JOptionPane.showMessageDialog(this, "You are dead!!!"
-                            , "Death", JOptionPane.INFORMATION_MESSAGE);
-                    this.removeKeyListener(listener);
-                    livesLabel.setEnabled(false);
-                    bombsLabel.setEnabled(false);
-                    radiusLabel.setEnabled(false);
-                }
-            }
-        }
     }
     private void updateBonusPanels() {
         int lives = Model.getInstance().getPlayerLives();
