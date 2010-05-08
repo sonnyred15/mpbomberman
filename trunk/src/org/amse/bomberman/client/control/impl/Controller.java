@@ -106,6 +106,7 @@ public class Controller implements IController{
     }
     public void showResults(List<String> results) {
         ResultsJDialog rjd = new ResultsJDialog(results);
+        this.leaveGame();
     }
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
