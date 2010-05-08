@@ -163,7 +163,7 @@ public class Player implements MoveableObject {
      */
     public synchronized void bombed() {    // TODO synchronized(player)        
         this.lives -= 1;
-        this.deaths -= 1;
+        this.deaths += 1;
         this.decBonuses();
 
         if (this.lives <= 0) {    // CHECK THIS
