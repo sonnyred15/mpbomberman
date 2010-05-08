@@ -78,8 +78,10 @@ public class Bot extends Player
             while (isAlive() && !gameEnded) {
                 try {
                     IAction action = strategy.thinkAction(this.bot, model);
-
-                    action.executeAction(game);
+                    //TODO this is hack fix of problem when bot make move after death.
+                    if(isAlive()) {
+                        action.executeAction(game);
+                    }
                     Thread.sleep(Bot.BOT_STEP_DELAY + random.nextInt(75));
                 } catch (InterruptedException ex) {
                     System.out.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
