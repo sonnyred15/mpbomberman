@@ -115,6 +115,7 @@ public class Controller implements GameEndedListener {
      * just setting game of controller to null and ID of player to -1.
      * @see GameEndedListener
      */
+    @Override
     public void gameEnded() {
         this.game.removeGameEndedListener(this);
 
@@ -293,10 +294,9 @@ public class Controller implements GameEndedListener {
             game.leaveFromGame(this);
         }
 
-        this.game = Creator.createGame(this.sessionServer, gameMapName,
+        this.game = Creator.createGame(this.sessionServer, this, gameMapName,
                                        gameName, maxPlayers);
-        this.game.setOwner(this);    // TODO Game constructor must have owner argument!!!
-        this.playerID = this.game.tryJoin(playerName, this);
+        this.playerID = this.game.tryJoin(playerName, this); //TODO must auto join as creator of game.
 
         if (this.playerID == -1) {
             throw new NullPointerException("Error while creating game. " +
