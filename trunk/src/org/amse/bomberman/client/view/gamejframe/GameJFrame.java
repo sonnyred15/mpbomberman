@@ -111,6 +111,9 @@ public class GameJFrame extends JFrame implements IView{
                     JOptionPane.showMessageDialog(this, "You are dead!!!"
                             , "Death", JOptionPane.INFORMATION_MESSAGE);
                     this.removeKeyListener(listener);
+                    livesLabel.setEnabled(false);
+                    bombsLabel.setEnabled(false);
+                    radiusLabel.setEnabled(false);
                 }
             }
         }
@@ -161,12 +164,13 @@ public class GameJFrame extends JFrame implements IView{
         private ImageIcon image;
         private int count;
 
+        private final Color bg = new Color(238,238,238);
+
         private JLabel label;
         private final int size = 32;
 
         private BonusLabel(ImageIcon icon, int firstCount) {
-            image = new ImageIcon(getScaledImage(icon.getImage(), size, size
-                    , new Color(238,238,238)));
+            image = new ImageIcon(getScaledImage(icon.getImage(),size,size,bg));
 
             label = new JLabel("x" + firstCount, image, JLabel.CENTER);
             Container c = getContentPane();
@@ -180,6 +184,11 @@ public class GameJFrame extends JFrame implements IView{
         }
         private int getCount() {
             return count;
+        }
+        @Override
+        public void setEnabled(boolean b) {
+            label.setEnabled(b);
+            //this.setBackground(bg);
         }
     }
     /**
