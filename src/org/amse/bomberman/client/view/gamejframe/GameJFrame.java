@@ -72,7 +72,7 @@ public class GameJFrame extends JFrame implements IView{
             Controller.getInstance().leaveGame();
         } else {
             if (isFirstInit) {
-                int mapSize = Model.getInstance().getMap().getSize();
+                 int mapSize = Model.getInstance().getMap().getSize();
                 if (mapSize < GamePanel.DEFAULT_RANGE) {
                     width = mapSize*GamePanel.CELL_SIZE + 20;
                     height = mapSize*GamePanel.CELL_SIZE + 160;
