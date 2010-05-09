@@ -1,5 +1,7 @@
 package org.amse.bomberman.client.control.impl;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
@@ -106,7 +108,11 @@ public class Controller implements IController{
     }
     public void showResults(List<String> results) {
         ResultsJDialog rjd = new ResultsJDialog(gameJFrame,results);
-        this.leaveGame();
+        try {
+            this.requestLeaveGame();
+        } catch (NetException ex) {
+            this.lostConnection(ex.getMessage());
+        }
     }
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
