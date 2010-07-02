@@ -11,6 +11,7 @@ import org.amse.bomberman.server.gameinit.imodel.Player;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Random;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Class that represents bots(AI controlled players).
@@ -35,8 +36,10 @@ public class Bot extends Player
      * @param model model that owns bot.
      * @param strategy bot strategy.
      */
-    public Bot(String nickName, Game game, IModel model, BotStrategy strategy) {
-        super(nickName);
+    public Bot(String nickName, Game game, IModel model, 
+    		                    BotStrategy strategy, 
+    		                    ScheduledExecutorService timer) {
+        super(nickName, timer);
         this.game = game;
         this.model = model;
         this.strategy = strategy;

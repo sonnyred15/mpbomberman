@@ -16,7 +16,6 @@ import org.amse.bomberman.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -25,9 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @author Kirilchuk V.E.
  */
 public class Bomb implements MoveableObject {
-    //TODO need to be tested. One timer on all Bombs can cause some problems
-    //when number of bombes in game would be too much.
-    //It is only guess, so need to be checked.
+	
     private final ScheduledExecutorService timer;
     private boolean       wasDetonated = false;
     private final GameMap gameMap;
@@ -50,9 +47,10 @@ public class Bomb implements MoveableObject {
         this.owner    = player;
         this.gameMap  = this.model.getGameMap();
         this.position = bombPosition;
-        this.radius   = this.owner.getRadius();
-        this.timer = timer;
+        this.radius   = this.owner.getRadius();        
+        
         /*additional stuff*/
+        this.timer = timer;
         this.owner.placedBomb(); //takes bomb from player
         this.timer.schedule(new DetonateTask(), Constants.BOMB_TIMER_VALUE,
                             TimeUnit.MILLISECONDS);
