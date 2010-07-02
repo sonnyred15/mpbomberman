@@ -73,7 +73,7 @@ public class Model implements IModel, DieListener {
     @Override
     public Player addBot(String botName) {
         Bot bot = new Bot(botName, this.game, this,
-                          new RandomFullBotStrategy());
+                          new RandomFullBotStrategy(), Model.timer);
 
         bot.setID(getFreeID());
         bot.setDieListener(this);
@@ -93,7 +93,7 @@ public class Model implements IModel, DieListener {
 
     @Override
     public int addPlayer(String name) {
-        Player playerToAdd = new Player(name);
+        Player playerToAdd = new Player(name, Model.timer);
 
         playerToAdd.setID(getFreeID());
         playerToAdd.setDieListener(this);

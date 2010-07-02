@@ -31,6 +31,7 @@ public final class Constants {
 
     public static final int PLAYER_DEFAULT_MAX_BOMBS = 3;
     public static final int PLAYER_DEFAULT_BOMB_RADIUS = 2;
+    public static final int PLAYER_IMMORTALITY_TIME = 1000;
 
     public static final int DEFAULT_PORT = 10500;
     public static final int DEFAULT_ACCEPT_TIMEOUT = 60000;
