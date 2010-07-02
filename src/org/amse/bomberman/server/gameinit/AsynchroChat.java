@@ -101,6 +101,10 @@ public class AsynchroChat {
             System.err.println("Chat: addMessage warning. " +
                               "SuperMind can`t parse expression."
                               + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+        	System.err.println("Chat: addMessage warning. " +
+                    "SuperMind can`t parse expression."
+                    + ex.getMessage());
         }
     }
 

@@ -17,6 +17,7 @@ import java.awt.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import org.xml.sax.SAXException;
 /**
  * Utility class.
  * Main appointment to create something.
- * @author Kirilchuk V.E
+ * @author Kirilchuk V.E.
  */
 public class Creator {
     private Creator() {}
@@ -51,7 +52,14 @@ public class Creator {
     }
 
     private static String[] createGameMapsListFromDirectory() {    // TODO fix NPE and others
-        return Constants.RESOURSES_GAMEMAPS_DIRECTORY.list();
+        return Constants.RESOURSES_GAMEMAPS_DIRECTORY.list(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File dir, String name) {
+				// TODO Auto-generated method stub
+				return name.endsWith(".map");
+			}
+		});
     }
 
     /**
