@@ -4,7 +4,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public abstract class PanelDescriptor {
     private Wizard parent;

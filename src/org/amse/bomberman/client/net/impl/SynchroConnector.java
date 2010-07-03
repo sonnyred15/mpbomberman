@@ -31,7 +31,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
- * @author Kirilchuk V.E. and Michael Korovkin
+ * @author Kirilchuk V.E. and Mikhail Korovkin
  */
 public class SynchroConnector implements IConnector {
 

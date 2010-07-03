@@ -17,7 +17,7 @@ import javax.swing.SwingConstants;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class CreateGameJPanel extends JPanel{
     private final int width = 400;

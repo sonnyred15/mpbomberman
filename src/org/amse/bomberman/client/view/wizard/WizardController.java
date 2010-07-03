@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class WizardController {
     private static List<WizardListener> listeners;

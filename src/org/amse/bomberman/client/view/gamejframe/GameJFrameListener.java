@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class GameJFrameListener implements KeyListener{
 

@@ -23,7 +23,7 @@ import org.amse.bomberman.client.view.ResultsJDialog;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class Controller implements IController{
 

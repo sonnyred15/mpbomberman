@@ -24,7 +24,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
 public class AsynchroConnector implements IConnector {

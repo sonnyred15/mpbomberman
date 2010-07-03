@@ -54,7 +54,7 @@ import org.amse.bomberman.client.view.wizard.WizardEvent;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  * @author Kirilchuk Vadim
  */
 public class Panel3 extends JPanel {

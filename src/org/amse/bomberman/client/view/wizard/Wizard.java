@@ -18,7 +18,7 @@ import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class Wizard extends JFrame implements WizardListener{
     private List<PanelDescriptor> myDescriptors;

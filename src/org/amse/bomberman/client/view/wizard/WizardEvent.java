@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.wizard;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class WizardEvent {
     String event;

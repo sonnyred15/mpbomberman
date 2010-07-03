@@ -5,7 +5,7 @@ import org.amse.bomberman.client.model.IPlayer;
 import org.amse.bomberman.util.Constants;
 
 /**
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class Player implements IPlayer{
     private static IPlayer player = null;
