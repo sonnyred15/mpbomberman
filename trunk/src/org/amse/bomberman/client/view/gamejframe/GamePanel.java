@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class GamePanel  extends JPanel{
     private BombMap map;

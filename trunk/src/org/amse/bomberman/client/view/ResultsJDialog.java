@@ -24,7 +24,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class ResultsJDialog extends JDialog{
     private ResultsTable myTable;

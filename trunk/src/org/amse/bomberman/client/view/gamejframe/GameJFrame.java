@@ -29,7 +29,7 @@ import org.amse.bomberman.client.Main;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class GameJFrame extends JFrame implements IView{
     private GamePanel gamePanel;

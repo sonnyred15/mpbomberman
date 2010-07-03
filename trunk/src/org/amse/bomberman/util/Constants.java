@@ -7,7 +7,7 @@ import java.util.List;
 /**
  *
  * @author Kirilchuk V.E
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public final class Constants {
     

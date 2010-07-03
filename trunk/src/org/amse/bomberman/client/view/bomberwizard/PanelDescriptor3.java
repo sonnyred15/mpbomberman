@@ -7,7 +7,7 @@ import org.amse.bomberman.client.net.NetException;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class PanelDescriptor3 extends PanelDescriptor {
     public PanelDescriptor3(Wizard wizard, String identifier) {

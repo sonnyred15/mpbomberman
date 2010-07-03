@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class BomberWizard extends Wizard implements RequestResultListener {
     public static final String IDENTIFIER1 = "Server_Panel";

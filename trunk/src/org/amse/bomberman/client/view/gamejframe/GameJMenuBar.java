@@ -12,7 +12,7 @@ import javax.swing.JMenuItem;
 
 
 /**
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class GameJMenuBar extends JMenuBar {
 

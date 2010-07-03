@@ -27,7 +27,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class Panel2 extends JPanel{
     private final int width = 640;

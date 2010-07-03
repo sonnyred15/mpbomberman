@@ -11,7 +11,7 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class Parser implements IParser {
 

@@ -10,7 +10,7 @@ import java.net.UnknownHostException;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  * @author Kirilchuk V.E
  */
 public interface IConnector {

@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.amse.bomberman.util;
 
 /**
  *
  * @author Kirilchuk V.E.
+ * @author Mikhail Korovkin
  */
 public class ProtocolConstants {
 

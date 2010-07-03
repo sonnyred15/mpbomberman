@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public interface IController {
 

@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Michael Korovkin
+ * @author Mikhail Korovkin
  */
 public class PanelDescriptor1 extends PanelDescriptor{
     public PanelDescriptor1(Wizard wizard, String identifier) {
