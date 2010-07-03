@@ -7,6 +7,7 @@ import org.amse.bomberman.client.model.Cell;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.IParser;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *

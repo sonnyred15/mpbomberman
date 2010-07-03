@@ -22,7 +22,8 @@ public class BombMap {
         explosions = new ArrayList<Cell>();
     }
 
-    public BombMap(String fileName) throws FileNotFoundException, UnsupportedOperationException, IOException {
+    public BombMap(String fileName) throws FileNotFoundException
+            , UnsupportedOperationException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         try {
             int buf = Integer.parseInt(br.readLine());

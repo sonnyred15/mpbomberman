@@ -31,6 +31,7 @@ public class AsynchroConnector implements IConnector {
 
     private Socket socket;
     private static IConnector connector = null;
+    private static final char split = ProtocolConstants.SPLIT_SYMBOL.charAt(0);
 
     private AsynchroConnector() {
     }
@@ -89,18 +90,18 @@ public class AsynchroConnector implements IConnector {
             throws NetException {
 
         sendRequest("" + Command.CREATE_GAME.getValue() +
-                " " + gameName +
-                " " + mapName +
-                " " + maxPl +
-                " " + Model.getInstance().getPlayerName());
+                split + gameName +
+                split + mapName +
+                split + maxPl +
+                split + Model.getInstance().getPlayerName());
     }
 
     public void requestJoinGame(int gameID) throws NetException {
-        sendRequest("2 " + gameID + " " + Model.getInstance().getPlayerName());
+        sendRequest("2" + split + gameID + split + Model.getInstance().getPlayerName());
     }
 
     public void requestDoMove(Direction dir) throws NetException {
-        sendRequest("3 " + dir.getValue());
+        sendRequest("3" + split + dir.getValue());
     }
 
     public void requestStartGame() throws NetException {
@@ -117,7 +118,7 @@ public class AsynchroConnector implements IConnector {
 
     public void requestJoinBotIntoGame() throws NetException {
         Random r = new Random();
-        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + " " +
+        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + split +
                 SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length - 1)]);
     }
     public void requestRemoveBotFromGame() throws NetException {
@@ -137,7 +138,7 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void sendChatMessage(String message) throws NetException {
-        sendRequest("" + Command.CHAT_ADD_MSG.getValue() + " " + message);
+        sendRequest("" + Command.CHAT_ADD_MSG.getValue() + split + message);
     }
 
     public void requestNewChatMessages() throws NetException {
@@ -146,7 +147,7 @@ public class AsynchroConnector implements IConnector {
 
     public void requestDownloadGameMap(String gameMapName) throws NetException {
         sendRequest(
-                "" + Command.DOWNLOAD_GAME_MAP.getValue() + " " + gameMapName);
+                "" + Command.DOWNLOAD_GAME_MAP.getValue() + split + gameMapName);
     }
 
     private class ServerListen implements Runnable {
