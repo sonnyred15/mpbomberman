@@ -23,6 +23,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import org.amse.bomberman.util.ProtocolConstants;
 
 /**
  *
@@ -95,7 +96,7 @@ public class Panel2 extends JPanel{
         if (!games.get(0).equals("No unstarted games finded.")) {
             int counter = 0;
             for (String game : games) {
-                String[] buf = game.split(" ");
+                String[] buf = game.split(ProtocolConstants.SPLIT_SYMBOL);
                 table.setValueAt(buf[0], counter, 0);
                 table.setValueAt(buf[1], counter, 1);
                 table.setValueAt(buf[2], counter, 2);

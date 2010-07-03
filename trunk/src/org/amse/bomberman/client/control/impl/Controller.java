@@ -1,7 +1,5 @@
 package org.amse.bomberman.client.control.impl;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
@@ -25,7 +23,7 @@ import org.amse.bomberman.client.view.ResultsJDialog;
 
 /**
  *
- * @author Kirilchuk V.E.
+ * @author Michael Korovkin
  */
 public class Controller implements IController{
 

@@ -108,6 +108,8 @@ public class Panel1 extends JPanel{
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         playerNameTF.setPreferredSize(new Dimension(textWidth, 20));
         playerNameTF.setText("unnamed");
+        // TO DO
+        //playerNameTF.
         downBox.add(nameLabel);
         downBox.add(Box.createHorizontalStrut(5));
         downBox.add(playerNameTF);
