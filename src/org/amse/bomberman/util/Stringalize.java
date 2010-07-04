@@ -99,13 +99,13 @@ public final class Stringalize {
         StringBuilder result = new StringBuilder();
 
         result.append(gameID);
-        result.append(' ');
+        result.append(ProtocolConstants.SPLIT_SYMBOL);
         result.append(game.getName());
-        result.append(' ');
+        result.append(ProtocolConstants.SPLIT_SYMBOL);
         result.append(game.getGameMapName());
-        result.append(' ');
+        result.append(ProtocolConstants.SPLIT_SYMBOL);
         result.append(game.getCurrentPlayersNum());
-        result.append(' ');
+        result.append(ProtocolConstants.SPLIT_SYMBOL);
         result.append(game.getMaxPlayers());
 
         return result.toString();
