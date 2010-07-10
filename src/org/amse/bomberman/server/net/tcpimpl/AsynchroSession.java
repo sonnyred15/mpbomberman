@@ -229,8 +229,7 @@ public class AsynchroSession extends AbstractSession {
         }
 
         try {
-            this.controller.tryCreateGame(mapName, gameName, maxPlayers,
-                                          playerName);
+            this.controller.tryCreateGame(mapName, gameName, maxPlayers);
             messages.add("Game created.");
             sendAnswer(messages);
 
@@ -404,7 +403,7 @@ public class AsynchroSession extends AbstractSession {
         }
 
         // all is ok
-        int joinResult = this.controller.tryJoinGame(gameID, playerName);
+        int joinResult = this.controller.tryJoinGame(gameID);
 
         switch (joinResult) {
             case Controller.NO_SUCH_UNSTARTED_GAME : {
@@ -515,7 +514,7 @@ public class AsynchroSession extends AbstractSession {
         messages.add(0, ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP);
 
         int[][] ret = null;
-        String  mapFileName = queryArgs[1] + ".map";
+        String  mapFileName = queryArgs[1] + ".map"; //TODO args[1] may not exist!
 
         if (queryArgs.length == 2) {
             try {
@@ -829,6 +828,30 @@ public class AsynchroSession extends AbstractSession {
 
             return;
         }
+    }
+
+    @Override
+    protected void setClientName(String[] queryArgs) {
+
+        //"17 name"
+        List<String> message = new ArrayList<String>();
+        message.add(0, ProtocolConstants.CAPTION_SET_CLIENT_NAME);
+
+        String name = null;
+        if (queryArgs.length == 2) {
+            name = queryArgs[1];
+            this.controller.setClientName(name);
+            message.add("Name was set.");
+            sendAnswer(message);
+
+        } else {
+            message.add("Wrong query. Wrong number of arguments");
+            sendAnswer(message);
+            writeToLog("Session: setClientName error. Canceled. Wrong query.");
+
+            return;
+        }
+        
     }
 
     private class MyTimer {

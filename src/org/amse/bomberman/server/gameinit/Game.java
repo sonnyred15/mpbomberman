@@ -94,7 +94,7 @@ public class Game {
         this.gameStartedListeners =
             new CopyOnWriteArraySet<GameStartedListener>();
         //
-        int playerID = this.tryJoin(owner.getName(), owner);
+        int playerID = this.tryJoin(owner);
         assert playerID!=(-1); //if owner can`t autojoin it is very strange problem...
         owner.setPlayerID(playerID);
 
@@ -308,7 +308,7 @@ public class Game {
      * @param controller controller of player that tryes to join.
      * @return ingame ID for this controller or -1 if client can not be joined.
      */
-    public synchronized int tryJoin(String name, Controller controller) {
+    public synchronized int tryJoin(Controller controller) {
         if(this.started){
             return -1;
         }
@@ -316,6 +316,7 @@ public class Game {
         int playerID = -1;
 
         if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
+            String name = controller.getName();
             playerID = this.model.addPlayer(name);
             this.controllers.add(controller);
 

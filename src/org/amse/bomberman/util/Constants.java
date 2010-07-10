@@ -101,7 +101,8 @@ public final class Constants {
         CHAT_ADD_MSG(13),
         CHAT_GET_NEW_MSGS(14),
         REMOVE_BOT_FROM_GAME(15),
-        GET_MY_GAME_PLAYERS_STATS(16);
+        GET_MY_GAME_PLAYERS_STATS(16),
+        SET_PLAYER_NAME(17);
 
 
         private final int value;
@@ -150,6 +151,8 @@ public final class Constants {
                     return REMOVE_BOT_FROM_GAME;
                 case 16:
                     return GET_MY_GAME_PLAYERS_STATS;
+                case 17:
+                    return SET_PLAYER_NAME;
                 default:
                     throw new IllegalArgumentException("Wrong argument " +
                             "must be between 0 and 15 inclusive");
