@@ -110,7 +110,7 @@ public abstract class AbstractSession extends Thread implements ISession {
             } catch (IOException ex) {
 
                 // can`t close log stream. Log wont be saved
-                System.out.println("Session: run error. Can`t close log stream. " +
+                System.err.println("Session: run error. Can`t close log stream. " +
                                    "Log won`t be saved. " + ex.getMessage());
             }
         }
@@ -123,7 +123,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         try {
             this.clientSocket.close();
         } catch (IOException ex) {
-            writeToLog("Session: interruptSession error. " + ex.getMessage());
+            writeToLog("Session: terminateSession error. " + ex.getMessage());
         }
     }
 
@@ -349,7 +349,7 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             case REMOVE_BOT_FROM_GAME : {
 
-                // "16"
+                // "15"
                 removeBotFromGame();
 
                 break;
@@ -357,8 +357,16 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             case GET_MY_GAME_PLAYERS_STATS : {
 
-                // "17"
+                // "16"
                 sendGamePlayersStats();
+
+                break;
+            }
+
+            case SET_PLAYER_NAME : {
+
+                // "17 name"
+                setClientName(queryArgs);
 
                 break;
             }
@@ -422,5 +430,7 @@ public abstract class AbstractSession extends Thread implements ISession {
     protected abstract void removeBotFromGame();
 
     protected abstract void sendGamePlayersStats();
+
+    protected abstract void setClientName(String[] name);
 
 }

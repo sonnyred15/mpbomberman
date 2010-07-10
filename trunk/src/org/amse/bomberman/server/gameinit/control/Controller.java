@@ -252,7 +252,7 @@ public class Controller implements GameEndedListener {
      * @throws IOException if IO errors occurs while creating gameMap.
      */
     public void tryCreateGame(String gameMapName, String gameName,
-                              int maxPlayers, String playerName)
+                              int maxPlayers)
                                     throws FileNotFoundException,
                                            IOException {
         if (this.game != null) {    // if not correct client can create multiple games
@@ -309,7 +309,7 @@ public class Controller implements GameEndedListener {
      * <p>
      * Controller.RESULT_SUCCESS - if you was joined.
      */
-    public int tryJoinGame(int gameID, String playerName) {
+    public int tryJoinGame(int gameID) {
         if (this.game != null) {    // if not correct client can create multiple games
                                     // we just disconnect him from first game!
             game.leaveFromGame(this);
@@ -325,7 +325,7 @@ public class Controller implements GameEndedListener {
                 joinResult = Controller.GAME_IS_ALREADY_STARTED;
 
                 if (!gameToJoin.isStarted()) {
-                    this.playerID = gameToJoin.tryJoin(playerName, this);
+                    this.playerID = gameToJoin.tryJoin(this);
                     this.game = gameToJoin;
 
                     assert this.playerID != (-1);
