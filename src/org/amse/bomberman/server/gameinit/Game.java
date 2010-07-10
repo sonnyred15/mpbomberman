@@ -13,7 +13,6 @@ import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.Player;
-import org.amse.bomberman.server.gameinit.imodel.impl.Model;
 import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.server.view.ServerChangeListener;
@@ -24,7 +23,9 @@ import org.amse.bomberman.util.ProtocolConstants;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.amse.bomberman.server.gameinit.imodel.ModelFactory;
 
 /**
@@ -40,19 +41,20 @@ import org.amse.bomberman.server.gameinit.imodel.ModelFactory;
  */
 public class Game {
     private final AsynchroChat              chat;
-    private final List<Controller>          controllers;
-    private final List<GameEndedListener>   gameEndedListeners;
+    private final Set<Controller>           controllers;
+    private final Set<GameEndedListener>    gameEndedListeners;
     private final String                    gameName;
-    private final List<GameStartedListener> gameStartedListeners;
+    private final Set<GameStartedListener>  gameStartedListeners;
     private final int                       maxPlayers;
     private final IModel                    model;
-    private       Controller                owner;
+    private       Controller                owner; // perhaps owner can change during game
     private final IServer                   server;
     private boolean                         started;
 
     /**
      * Constructor of Game.
      * Create Game object and add Game in server games list.
+     * Autojoin creator in game as owner.
      * <p> if maxPlayers argument would be less than zero then
      * gameMap maxPlayers must be setted as maxPLayers of this game.
      * <p>
@@ -62,6 +64,9 @@ public class Game {
      * @param gameMap gameMap of this game.
      * @param gameName name of this game.
      * @param maxPlayers maxPLayers of thisGame.
+     * @param owner controller that created game. If he leaves game terminates
+     * except situations when owner was changed during game.
+     * Owner autojoins into game.
      */
     public Game(IServer server, Controller owner, GameMap gameMap, String gameName,
                 int maxPlayers) {
@@ -84,10 +89,14 @@ public class Game {
         this.model = ModelFactory.createModel(this, gameMap);
 
         //
-        this.gameEndedListeners = new CopyOnWriteArrayList<GameEndedListener>();
-        this.controllers = new CopyOnWriteArrayList<Controller>();
+        this.gameEndedListeners = new CopyOnWriteArraySet<GameEndedListener>();
+        this.controllers = new CopyOnWriteArraySet<Controller>();
         this.gameStartedListeners =
-            new CopyOnWriteArrayList<GameStartedListener>();
+            new CopyOnWriteArraySet<GameStartedListener>();
+        //
+        int playerID = this.tryJoin(owner.getName(), owner);
+        assert playerID!=(-1); //if owner can`t autojoin it is very strange problem...
+        owner.setPlayerID(playerID);
 
         //
         this.server.addGame(this);
@@ -181,7 +190,7 @@ public class Game {
      * Return list of controllers that joined to this game.
      * @return list of controllers that joined to this game.
      */
-    public List<Controller> getControllers() {
+    public Set<Controller> getControllers() {
         return controllers;
     }
 
@@ -252,6 +261,8 @@ public class Game {
      * @see SynchroChat
      * @param playerID ID of player that requests his new messages.
      * @return list of new messages from chat.
+     * @deprecated Dead code. In current asynchro realization always sends
+     * "No new messages". Need only cause documented in protocol.
      */
     public List<String> getNewMessagesFromChat(int playerID) {
         return this.chat.getNewMessages(playerID);
@@ -332,7 +343,7 @@ public class Game {
             notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
         } else {
-            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP); //TODO is it duplicate model.removePlayer notify?
         }
 
         if (controller == this.owner) {

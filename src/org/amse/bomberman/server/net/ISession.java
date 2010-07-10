@@ -24,7 +24,6 @@ public interface ISession {
      */
     void run();
 
-
     /**
      * Must terminate session.
      */
@@ -62,4 +61,6 @@ public interface ISession {
     void notifyClient(String message);
 
     void notifyClient(List<String> message);
+
+    IServer getServer();
 }

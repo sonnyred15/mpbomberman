@@ -10,7 +10,6 @@ package org.amse.bomberman.server.gameinit.control;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.imodel.Player;
-import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
@@ -87,87 +86,50 @@ public class Controller implements GameEndedListener {
      * <p> Tells that there wasn`t bot to remove from game.
      */
     public static final int NO_SUCH_BOT = -5;
+
+    //    
+    private final ISession  session;
     private Game            game;
     private int             playerID;
-    private final ISession  session;
-    private final IServer   sessionServer;
+    private String          clientName = "Default_name";
 
     /**
      * Constructor of controller.
      * @param sessionServer server of session that owns this controller.
      * @param session owner of this controller.
      */
-    public Controller(IServer sessionServer, ISession session) {
-        this.sessionServer = sessionServer;
+    public Controller(ISession session) {
         this.session = session;
     }
 
     /**
-     * Method to add message to game chat.
-     * @param toString
+     * Method to add message to client`s game chat.
+     * If client not joined to any game message will be ignored.
+     * @param message message to add in chat.
      */
-    public void addMessageToChat(String toString) {    // TODO must check if no game.
-        this.game.addMessageToChat(this.game.getPlayer(playerID), toString);
+    public void addMessageToChat(String message) {
+        if(game==null){
+            System.err.println("Controller: addMessageToChat warning. " +
+                    "Client not joined to any game. Message ignored.");
+            return;
+        }
+
+        this.game.addMessageToChat(this.game.getPlayer(playerID), message);
     }
 
     /**
      * Method from GameEndedListener interface. In current realization
-     * just setting game of controller to null and ID of player to -1.
+     * removes GameEndedListener from game and leaving game,
+     * setting game of controller to null and ID of player to -1.
+     *
      * @see GameEndedListener
      */
     @Override
     public void gameEnded() {
         this.game.removeGameEndedListener(this);
-
-//      this.game.leaveFromGame(this); //TODO is it really need?
+        this.game.leaveFromGame(this);
         this.game = null;
         this.playerID = -1;
-    }
-
-    /**
-     * Returns ingame ID of controller`s player.
-     * @return ingame ID of controller`s player.
-     */
-    public int getID() {
-        return this.playerID;
-    }
-
-    /**
-     * Returns reference to your game or null if you are not joined
-     * to any game.
-     * @return reference to your game or null if you are not joined
-     * to any game.
-     */
-    public Game getMyGame() {
-        return game;
-    }
-
-    /**
-     * Returns List of Strings - new messages from chat or List of only
-     * one String - "No new messages." if there is no new messages available.
-     * @return List of Strings - new messages, or
-     * List of only String - "No new messages." if there is no new messages available.
-     */
-    public List<String> getNewMessagesFromChat() {
-        return this.game.getNewMessagesFromChat(this.playerID);
-    }
-
-    /**
-     * Returns reference to your Player
-     * or null if you are not joined to any game.
-     * @return reference to your Player
-     * or null if you are not joined to any game.
-     */
-    public Player getPlayer() {
-        return this.game.getPlayer(this.playerID);
-    }
-
-    /**
-     * Returns reference to ISession that created this Controller.
-     * @return reference to ISession that created this Controller.
-     */
-    public ISession getSession() {
-        return session;
     }
 
     /**
@@ -176,8 +138,12 @@ public class Controller implements GameEndedListener {
      * <p>
      * If client was not joined to any game, this method do nothing.
      */
-    public void tryLeaveGame() {
-        if (this.game != null) {
+    public void tryLeaveGame() {//TODO maybe make return type boolean and say to client about error?
+        if(game==null){
+            System.err.println("Controller: tryLeaveGame warning. " +
+                    "Client not joined to any game. Leave ignored.");
+            return;
+        }else {
             this.game.removeGameEndedListener(this);
             this.game.leaveFromGame(this);
             this.game = null;
@@ -185,7 +151,7 @@ public class Controller implements GameEndedListener {
     }
 
     /**
-     * Tryes to tryJoin bot into your game with specified nick name.
+     * Tryes to join bot into your game with specified nick name.
      * @param botName nick name of bot.
      * @return integer value that have next meanings
      * <p>
@@ -193,7 +159,7 @@ public class Controller implements GameEndedListener {
      * and trying to add bot.
      * <p>
      * Controller.GAME_IS_ALREADY_STARTED - if game was already started
-     * and you can not tryJoin bot.
+     * and you can not join bot.
      * <p>
      * Controller.NOT_OWNER_OF_GAME - if you are not owner of the game
      * <p>
@@ -227,7 +193,8 @@ public class Controller implements GameEndedListener {
     }
 
     /**
-     *
+     * Tryes to remove some bot. It is not guarantied but
+     * this method must remove last joined bot.
      * @return integer value that have next meanings
      * <p>
      * Controller.NOT_JOINED - if you are not joined to any game
@@ -289,30 +256,39 @@ public class Controller implements GameEndedListener {
                                     throws FileNotFoundException,
                                            IOException {
         if (this.game != null) {    // if not correct client can create multiple games
-
-            // we just disconnect him from first game!
+                                    // we just disconnect him from first game!
+                                    // TODO must send error to client. Not to do action.
             game.leaveFromGame(this);
         }
 
-        this.game = Creator.createGame(this.sessionServer, this, gameMapName,
-                                       gameName, maxPlayers);
-        this.playerID = this.game.tryJoin(playerName, this); //TODO must auto join as creator of game.
-
-        if (this.playerID == -1) {
-            throw new NullPointerException("Error while creating game. " +
-                    "Owner tryed to create and join but join returned null.");
-        }
+        this.game = Creator.createGame(this.session.getServer(), this, gameMapName,
+                                       gameName, maxPlayers);        
 
         this.game.addGameEndedListener(this);
     }
 
     /**
+     * Setting the ingame playerID.
+     * @param playerID ID to set up.
+     */
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
+    }
+
+    /**
      * Tryes to move controller`s player in defined direction
-     * in controller`s game.
+     * in controller`s game. If player was not joined to
+     * any game move will be ignored.
      * @param dir move direction
      * @return true if player was moved, false otherwise.
      */
-    public boolean tryDoMove(Direction dir) {    // TODO what if game==null
+    public boolean tryDoMove(Direction dir) {
+        if(game==null){
+            System.err.println("Controller: tryDoMove warning. " +
+                    "Client not joined to any game. DoMove ignored.");
+            return false;
+        }
+
         return this.game.tryDoMove(this.playerID, dir);
     }
 
@@ -335,12 +311,11 @@ public class Controller implements GameEndedListener {
      */
     public int tryJoinGame(int gameID, String playerName) {
         if (this.game != null) {    // if not correct client can create multiple games
-
-            // we just disconnect him from first game!
+                                    // we just disconnect him from first game!
             game.leaveFromGame(this);
         }
 
-        Game gameToJoin = this.sessionServer.getGame(gameID);
+        Game gameToJoin = this.session.getServer().getGame(gameID);
         int  joinResult = Controller.NO_SUCH_UNSTARTED_GAME;
 
         if (gameToJoin != null) {
@@ -353,12 +328,17 @@ public class Controller implements GameEndedListener {
                     this.playerID = gameToJoin.tryJoin(playerName, this);
                     this.game = gameToJoin;
 
-                    if (this.playerID == -1) {
-                        joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
-                    } else {
-                        joinResult = Controller.RESULT_SUCCESS;
-                        this.game.addGameEndedListener(this);
-                    }
+                    assert this.playerID != (-1);
+
+                    joinResult = Controller.RESULT_SUCCESS;
+                    this.game.addGameEndedListener(this);
+
+//                    if (this.playerID == -1) {
+//                        joinResult = Controller.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
+//                    } else {
+//                        joinResult = Controller.RESULT_SUCCESS;
+//                        this.game.addGameEndedListener(this);
+//                    }
                 }
             }
         }
@@ -368,17 +348,94 @@ public class Controller implements GameEndedListener {
 
     /**
      * Tryes to place bomb by controller`s player in controller`s game.
+     * If client is not joined to any game then placing bomb will be ignored.
      */
-    public void tryPlaceBomb() {    // TODO what if game == null
+    public void tryPlaceBomb() {   
+        if(game==null){
+            System.err.println("Controller: tryPlaceBomb warning. " +
+                    "Client not joined to any game. PlaceBomb ignored.");
+            return;
+        }
+
         this.game.tryPlaceBomb(this.playerID);
     }
 
     /**
      * Tryes to start game by this controller. Start of game possible
      * only if this controller is the owner of game.
+     * If player was not joined to any game then false returns.
      * @return true if game was started, false otherwise.
      */
-    public boolean tryStartGame() {    // TODO what if game ==null // ONLY HOST(CREATER) CAN START GAME!!!
+    public boolean tryStartGame() {   
+        if(game==null){
+            System.err.println("Controller: tryStartGame warning. " +
+                    "Client not joined to any game. StartGame ignored.");
+            return false;
+        }
         return this.game.tryStartGame(this);
+    }
+
+    /**
+     * Returns List of Strings - new messages from chat or List of only
+     * one String - "No new messages." if there is no new messages available.
+     * @return List of Strings - new messages, or
+     * List of only String - "No new messages." if there is no new messages available.
+     * @deprecated Dead code. In current asynchro realization always sends
+     * "No new messages". Need cause documented in protocol.
+     */
+    public List<String> getNewMessagesFromChat() {
+        return this.game.getNewMessagesFromChat(this.playerID);
+    }
+
+    /**
+     * Setting the name of current client. This is inchat and ingame name.
+     * @param clientName name of client.
+     */
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    /**
+     * Returns name of client.
+     * @return name of client.
+     */
+    public String getName() {
+        return clientName;
+    }
+
+    /**
+     * Returns ingame ID of controller`s player.
+     * @return ingame ID of controller`s player.
+     */
+    public int getID() {
+        return this.playerID;
+    }
+
+    /**
+     * Returns reference to your game or null if you are not joined
+     * to any game.
+     * @return reference to your game or null if you are not joined
+     * to any game.
+     */
+    public Game getMyGame() {
+        return game;
+    }
+
+    /**
+     * Returns reference to your Player
+     * or null if you are not joined to any game.
+     * @return reference to your Player
+     * or null if you are not joined to any game.
+     */
+    public Player getPlayer() {
+        return this.game.getPlayer(this.playerID);
+    }
+
+    /**
+     * Returns reference to ISession that created this Controller.
+     * @return reference to ISession that created this Controller.
+     */
+    public ISession getSession() {
+        return session;
     }
 }
