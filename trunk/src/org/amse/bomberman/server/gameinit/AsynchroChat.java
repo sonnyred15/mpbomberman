@@ -112,6 +112,8 @@ public class AsynchroChat {
      * Always returns "No new messages."
      * @param chatID id of player that wants to get new messages.
      * @return list of messages or list with only item - "No new messages."
+     * @deprecated not used. Dead code. But still here
+     * cause described in protocol.
      */
     public List<String> getNewMessages(int chatID) {
         List<String> result = new ArrayList<String>();

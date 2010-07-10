@@ -38,7 +38,7 @@ public class AsynchroSession extends AbstractSession {
     public AsynchroSession(Server server, Socket clientSocket, int sessionID,
                            ILog log) {
         super(server, clientSocket, sessionID, log);
-        this.controller = new Controller(server, this);
+        this.controller = new Controller(this);
         this.mustEnd = false;
     }
 

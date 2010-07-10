@@ -385,6 +385,10 @@ public abstract class AbstractSession extends Thread implements ISession {
         return false;
     }
 
+    public IServer getServer() {
+        return server;
+    }
+
     protected abstract void sendGames();
 
     protected abstract void createGame(String[] queryArgs);
