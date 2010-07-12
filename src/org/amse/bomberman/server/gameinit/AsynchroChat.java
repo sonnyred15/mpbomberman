@@ -97,14 +97,18 @@ public class AsynchroChat {
 
             // adding to chat
             addMessage("SuperMind: " + res.toString());
+        } catch (ArithmeticException ex) {
+            System.err.println("Chat: addMessage warning. " +
+                              "SuperMind got arithmetic exception."
+                              + ex.getMessage());
         } catch (ParseException ex) {
             System.err.println("Chat: addMessage warning. " +
                               "SuperMind can`t parse expression."
                               + ex.getMessage());
         } catch (IllegalArgumentException ex) {
-        	System.err.println("Chat: addMessage warning. " +
-                    "SuperMind can`t parse expression."
-                    + ex.getMessage());
+            System.err.println("Chat: addMessage warning. " +
+                              "SuperMind can`t parse expression."
+                              + ex.getMessage());
         }
     }
 

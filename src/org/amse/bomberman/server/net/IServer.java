@@ -7,7 +7,6 @@ package org.amse.bomberman.server.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.view.ServerChangeListener;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -22,13 +21,7 @@ import java.util.List;
  * for them. Additionally server knows about games created by server`s clients.
  * @author Kirilchuk V.E.
  */
-public interface IServer {
-
-    /**
-     * Tells to server that session thread was ended so it can be removed.
-     * @param endedSession
-     */
-    void sessionTerminated(ISession endedSession);
+public interface IServer extends SessionEndListener{
 
     /**
      * Raise server on it`s port.
@@ -47,31 +40,31 @@ public interface IServer {
     void shutdown() throws IOException,
                            IllegalStateException;
 
-    /**
-     * Add game to server.
-     * @param game game to add.
-     * @return ID of the game. By this ID game can be getted from server.
-     */
-    int addGame(Game game);
-
-    /**
-     * Removing game from server.
-     * @param game gam to remove.
-     */
-    void removeGame(Game game);
-
-    /**
-     * Gets game from server by game ID.
-     * @param gameID ID of game to get.
-     * @return game with defined ID.
-     */
-    Game getGame(int gameID);
-
-    /**
-     * Returns list of games on server.
-     * @return list of games on server.
-     */
-    List<Game> getGamesList();
+//    /**
+//     * Add game to server.
+//     * @param game game to add.
+//     * @return ID of the game. By this ID game can be getted from server.
+//     */
+//    int addGame(Game game);
+//
+//    /**
+//     * Removing game from server.
+//     * @param game gam to remove.
+//     */
+//    void removeGame(Game game);
+//
+//    /**
+//     * Gets game from server by game ID.
+//     * @param gameID ID of game to get.
+//     * @return game with defined ID.
+//     */
+//    Game getGame(int gameID);
+//
+//    /**
+//     * Returns list of games on server.
+//     * @return list of games on server.
+//     */
+//    List<Game> getGamesList();
 
     /**
      * Checks if server is shutdowned.

@@ -96,38 +96,38 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
      * @param server Reference to server from which we must take changes.
      */
     public void changed(IServer server) {
-        if (server != null) {
-            this.labelPort.setText(PORT_LABEL_TEXT + server.getPort());
-            this.labelClients.setText(CLIENTS_LABEL_TEXT +
-                                      server.getSessions().size());
-            this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT +
-                                         server.isShutdowned());
-
-            if (!server.isShutdowned()) {
-                List<Game> games = server.getGamesList();
-                int        startedGamesCount = 0;
-                int        unstartedGamesCount = 0;
-
-                for (Game game : games) {
-                    if (game.isStarted()) {
-                        startedGamesCount++;
-                    } else if (!game.isStarted()) {
-                        unstartedGamesCount++;
-                    }
-                }
-
-                this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT +
-                                               startedGamesCount);
-                this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT +
-                                                 unstartedGamesCount);
-
-            } else {
-                this.labelStartedGames.setText(this.labelStartedGames.getText() +
-                                               "(was)");
-                this.labelUnstartedGames.setText(this.labelUnstartedGames.getText() +
-                                                 "(was)");
-            }
-        }
+//        if (server != null) {
+//            this.labelPort.setText(PORT_LABEL_TEXT + server.getPort());
+//            this.labelClients.setText(CLIENTS_LABEL_TEXT +
+//                                      server.getSessions().size());
+//            this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT +
+//                                         server.isShutdowned());
+//
+//            if (!server.isShutdowned()) {
+//                List<Game> games = server.getGamesList();
+//                int        startedGamesCount = 0;
+//                int        unstartedGamesCount = 0;
+//
+//                for (Game game : games) {
+//                    if (game.isStarted()) {
+//                        startedGamesCount++;
+//                    } else if (!game.isStarted()) {
+//                        unstartedGamesCount++;
+//                    }
+//                }
+//
+//                this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT +
+//                                               startedGamesCount);
+//                this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT +
+//                                                 unstartedGamesCount);
+//
+//            } else {
+//                this.labelStartedGames.setText(this.labelStartedGames.getText() +
+//                                               "(was)");
+//                this.labelUnstartedGames.setText(this.labelUnstartedGames.getText() +
+//                                                 "(was)");
+//            }
+//        }
     }
 
     /**

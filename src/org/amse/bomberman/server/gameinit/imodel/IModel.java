@@ -87,6 +87,8 @@ public interface IModel {
 
     /**
      * Returns list of players including bots.
+     * By contract must return unmodifiable list cause
+     * only model must operate with players!
      * @return list of players including bots.
      */
     List<Player> getPlayersList();

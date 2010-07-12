@@ -5,6 +5,8 @@
  */
 package org.amse.bomberman.server.gameinit.control;
 
+import org.amse.bomberman.server.gameinit.Game;
+
 /**
  * Interface for game start listeners.
  * @author Kirilchuk V.E
@@ -14,5 +16,5 @@ public interface GameStartedListener {
     /**
      * Tells that game was started.
      */
-    void started();
+    void started(Game game);
 }

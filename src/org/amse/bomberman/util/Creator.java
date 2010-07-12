@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import org.amse.bomberman.server.gameinit.GameStorage;
 import org.amse.bomberman.server.gameinit.control.Controller;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
@@ -51,15 +52,18 @@ public class Creator {
         return result;
     }
 
-    private static String[] createGameMapsListFromDirectory() {    // TODO fix NPE and others
-        return Constants.RESOURSES_GAMEMAPS_DIRECTORY.list(new FilenameFilter() {
-			
-			@Override
-			public boolean accept(File dir, String name) {
-				// TODO Auto-generated method stub
-				return name.endsWith(".map");
-			}
-		});
+    private static String[] createGameMapsListFromDirectory() {
+        assert Constants.RESOURSES_GAMEMAPS_DIRECTORY != null;
+
+        String[] list = Constants.RESOURSES_GAMEMAPS_DIRECTORY.list(new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".map");
+            }
+        });
+
+        return list;
     }
 
     /**
@@ -88,7 +92,7 @@ public class Creator {
      * @throws FileNotFoundException if gameMap with defined name was not finded.
      * @throws IOException if IO errors occurs while creating gameMap.
      */
-    public static Game createGame(IServer server,
+    public static Game createGame(GameStorage gameStorage,
                                    Controller controller,
                                    String gameMapName,
                                    String gameName,
@@ -111,7 +115,7 @@ public class Creator {
             throw new IOException("Wrong gameMap xml file." + ex.getMessage());
         }
 
-        return new Game(server, controller, gameMap, gameName, maxPlayers);
+        return new Game(gameStorage, controller, gameMap, gameName, maxPlayers);
     }
 
     /**

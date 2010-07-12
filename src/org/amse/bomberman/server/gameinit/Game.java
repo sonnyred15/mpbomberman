@@ -13,9 +13,6 @@ import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.Player;
-import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.ISession;
-import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.util.ProtocolConstants;
@@ -24,8 +21,8 @@ import org.amse.bomberman.util.ProtocolConstants;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import org.amse.bomberman.server.gameinit.control.GameChangeListener;
 import org.amse.bomberman.server.gameinit.imodel.ModelFactory;
 
 /**
@@ -48,8 +45,8 @@ public class Game {
     private final int                       maxPlayers;
     private final IModel                    model;
     private       Controller                owner; // perhaps owner can change during game
-    private final IServer                   server;
-    private boolean                         started;
+    private final GameChangeListener        gameChangeListener;
+    private boolean                         started; //TODO use State pattern
 
     /**
      * Constructor of Game.
@@ -68,11 +65,11 @@ public class Game {
      * except situations when owner was changed during game.
      * Owner autojoins into game.
      */
-    public Game(IServer server, Controller owner, GameMap gameMap, String gameName,
+    public Game(GameStorage gameStorage, Controller owner, GameMap gameMap, String gameName,
                 int maxPlayers) {
 
         // initialization
-        this.server = server;
+        this.gameChangeListener = gameStorage;
         this.owner = owner;
         this.gameName = gameName;
 
@@ -99,11 +96,8 @@ public class Game {
         owner.setPlayerID(playerID);
 
         //
-        this.server.addGame(this);
-        this.started = false;
-
-        //
-        this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        gameStorage.addGame(this);
+        this.started = false;        
     }
 
     /**
@@ -111,21 +105,24 @@ public class Game {
      * <p> Note that only owner of game can add bots.
      * @param name nickName of bot.
      * @param controller controller of player that tryes to add bot.
-     * @return object of Bot class wrapped by Player.
+     * @return Null if controller is not owner or maxpPlayers reached.
+     * Otherwise returns Bot wrapped by Player.
      */
-    public synchronized Player tryAddBot(String name, Controller controller) {
+    public Player tryAddBot(String name, Controller controller) {
         if (controller != this.owner) {
             return null;
         }
 
         Player bot = null;
 
-        if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
-            bot = this.model.addBot(name);
-            this.gameStartedListeners.add((GameStartedListener) bot);
-            this.gameEndedListeners.add((GameEndedListener) bot);
-            this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
-            this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+        synchronized (this) { //TODO can we synchronize not by Game? mb Model or something else?
+            if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
+                bot = this.model.addBot(name);
+                this.gameStartedListeners.add((GameStartedListener) bot);
+                this.gameEndedListeners.add((GameEndedListener) bot);
+                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+                this.gameChangeListener.parametersChanged(this);
+            }
         }
 
         return bot;
@@ -150,7 +147,7 @@ public class Game {
 
     /**
      * Adding message to chat.
-     * @param playerID id of player which is adding message.
+     * @param player player which is adding message.
      * @param message message to add in chat.
      */
     public void addMessageToChat(Player player, String message) {
@@ -171,7 +168,7 @@ public class Game {
      * @return true if move was done. false if game is not started
      * or move was not done.
      */
-    public boolean tryDoMove(int playerID, Direction direction) {
+    public boolean tryDoMove(int playerID, Direction direction) {//TODO think about synchronization
         if(!this.started){
             return false;
         }
@@ -200,6 +197,7 @@ public class Game {
      * @return unmodifiableList of all Players that are playing in game.
      */
     public List<Player> getCurrentPlayers() {
+        //model must return unmodifiable list by IModel contract.
         return this.model.getPlayersList();
     }
 
@@ -289,7 +287,7 @@ public class Game {
      * Checks if game is full or not.
      * @return true if game already have maxPlayers joined, false otherwise.
      */
-    public boolean isFull() {
+    public boolean isFull() { //TODO whats about sync
         return (this.model.getCurrentPlayersNum() == this.maxPlayers);
     }
 
@@ -297,7 +295,7 @@ public class Game {
      * Checks if game is started.
      * @return true if game is started, false otherwise.
      */
-    public boolean isStarted() {
+    public boolean isStarted() {//TODO what`s about sync //TODO use state pattern
         return this.started;
     }
 
@@ -308,21 +306,23 @@ public class Game {
      * @param controller controller of player that tryes to join.
      * @return ingame ID for this controller or -1 if client can not be joined.
      */
-    public synchronized int tryJoin(Controller controller) {
+    public int tryJoin(Controller controller) {
         if(this.started){
             return -1;
         }
 
         int playerID = -1;
 
-        if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
-            String name = controller.getName();
-            playerID = this.model.addPlayer(name);
-            this.controllers.add(controller);
+        synchronized (this) {
+            if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
+                String name = controller.getName();
+                playerID = this.model.addPlayer(name);
+                this.controllers.add(controller);
 
-            // notifying clients
-            this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
-            this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+                // notifying clients
+                this.notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
+                this.gameChangeListener.parametersChanged(this);
+            }
         }
 
         return playerID;
@@ -338,13 +338,13 @@ public class Game {
      */
     public void leaveFromGame(Controller controller) {
         this.controllers.remove(controller);
-        this.model.removePlayer(controller.getID());    // this will call notify about gameMap change
+        this.model.removePlayer(controller.getID());// not notifying
 
         if (!this.started) {
-            notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.gameChangeListener.parametersChanged(this);
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
         } else {
-            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP); //TODO is it duplicate model.removePlayer notify?
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         }
 
         if (controller == this.owner) {
@@ -357,13 +357,13 @@ public class Game {
      * from gameField.
      * @param bot bot to remove from the game.
      */
-    public boolean tryRemoveBotFromGame(Bot bot) {
+    public boolean tryRemoveBotFromGame(Bot bot) {//TODO CHECK THIS
         boolean result = this.model.removePlayer(bot.getID());
         this.gameStartedListeners.remove(bot);
         this.gameEndedListeners.remove(bot);
 
         if (!this.started) {
-            notifyGameSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.gameChangeListener.parametersChanged(this);
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_INFO);
         } else {
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
@@ -372,7 +372,7 @@ public class Game {
         return result;
     }
 
-    public boolean tryRemoveLastBot() {
+    public boolean tryRemoveLastBot() { // TODO CHECK THIS
         List<Player> players = this.model.getPlayersList();
         for(int i = players.size()-1; i>0; --i){
             Player pl = players.get(i);
@@ -422,7 +422,7 @@ public class Game {
         placed = this.model.tryPlaceBomb(this.model.getPlayer(playerID));
 
         if (placed) {
-            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
+            notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);//TODO model must notify about this
         }
 
         return placed;
@@ -438,38 +438,19 @@ public class Game {
             return false;
         }
 
-        //TODO is it bad place to do this?
-        ServerChangeListener scl = this.server.getChangeListener();
-
-        if (scl != null) {
-            scl.changed(this.server);
-        }
-
         // Here model must change gameMap to support current num of players
         // and then give coordinates to Players.
         this.model.startup();
         this.started = true;
+        this.gameChangeListener.started(this);
 
         notifyGameSessions(ProtocolConstants.MESSAGE_GAME_START);
 
         for (GameStartedListener gameStartedListener : gameStartedListeners) {
-            gameStartedListener.started();
+            gameStartedListener.started(this);
         }
 
         return true;
-    }
-
-    /**
-     * Notifying all clients from server about something by sending
-     * message to them.
-     * @param message message to send to clients.
-     */
-    public void notifyAllSessions(String message) {
-        List<ISession> sessions = this.server.getSessions();
-
-        for (ISession iSession : sessions) {
-            iSession.notifyClient(message);
-        }
     }
 
     /**
@@ -500,14 +481,10 @@ public class Game {
      */
     private void terminateGame() {
         for (GameEndedListener gameEndedListener : gameEndedListeners) {
-            gameEndedListener.gameEnded();
+            gameEndedListener.gameEnded(this);
         }
 
-        this.server.removeGame(this);
-
-        if (!this.started) {
-            notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
-        }
+        this.gameChangeListener.gameEnded(this);
 
         notifyGameSessions(ProtocolConstants.MESSAGE_GAME_KICK);
     }

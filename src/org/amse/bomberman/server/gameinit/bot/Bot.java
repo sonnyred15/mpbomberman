@@ -22,7 +22,7 @@ public class Bot extends Player
         implements GameStartedListener, GameEndedListener {
     private static final long   BOT_STEP_DELAY = 75L;
     private static final Random random = new Random();
-    private boolean             gameEnded = false;
+    private volatile boolean    gameEnded = false;
     private final Thread        botThread;
     private final Game          game;
     private final IModel        model;
@@ -52,7 +52,7 @@ public class Bot extends Player
      * It affects on bot thread, so it is ending on next iteration.
      */
     @Override
-    public void gameEnded() {
+    public void gameEnded(Game gameThatEnded) {
         this.gameEnded = true;
         this.game.removeGameStartedListener(this);
         this.game.removeGameEndedListener(this);
@@ -65,7 +65,7 @@ public class Bot extends Player
      * Starts the bot thread.
      */
     @Override
-    public void started() {
+    public void started(Game gameThatStarted) {
         botThread.start();
     }
 
@@ -87,7 +87,7 @@ public class Bot extends Player
                     }
                     Thread.sleep(Bot.BOT_STEP_DELAY + random.nextInt(75));
                 } catch (InterruptedException ex) {
-                    System.out.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
+                    System.err.println("INTERRUPTED EXCEPTION IN BOT THREAD!!!!");
                 } catch (UnsupportedOperationException ex) {
                     ex.printStackTrace();
                 }

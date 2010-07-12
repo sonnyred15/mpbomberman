@@ -8,6 +8,7 @@ package org.amse.bomberman.server.net;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
+import org.amse.bomberman.server.gameinit.GameStorage;
 
 /**
  * Interface that represents session between client side and server side
@@ -62,5 +63,5 @@ public interface ISession {
 
     void notifyClient(List<String> message);
 
-    IServer getServer();
+    GameStorage getGameStorage();
 }

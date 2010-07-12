@@ -9,7 +9,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.control.Controller;
-import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
@@ -26,6 +25,8 @@ import java.net.Socket;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.net.SessionEndListener;
 
 /**
  *
@@ -34,12 +35,15 @@ import java.util.List;
 public class AsynchroSession extends AbstractSession {
     private final MyTimer    timer = new MyTimer(System.currentTimeMillis());
     private final Controller controller;
+    private final SessionEndListener endListener;
 
-    public AsynchroSession(Server server, Socket clientSocket, int sessionID,
+    public AsynchroSession(SessionEndListener endListener, Socket clientSocket,
+                           GameStorage gameStorage, int sessionID,
                            ILog log) {
-        super(server, clientSocket, sessionID, log);
-        this.controller = new Controller(this);
-        this.mustEnd = false;
+       super(clientSocket,gameStorage, sessionID, log);
+       this.endListener = endListener;
+       this.controller = new Controller(this);
+       this.mustEnd = false;
     }
 
     @Override
@@ -326,7 +330,9 @@ public class AsynchroSession extends AbstractSession {
             this.controller.tryLeaveGame();
         }
 
-        this.server.sessionTerminated(this);
+        if (this.endListener != null) {
+            this.endListener.sessionTerminated(this);
+        }
     }
 
     @Override
@@ -444,7 +450,7 @@ public class AsynchroSession extends AbstractSession {
                            gameID + " Player=" + playerName);
 
                 return;
-            }
+            }//TODO DEFAULT BLOCK!
         }
     }
 
@@ -662,7 +668,7 @@ public class AsynchroSession extends AbstractSession {
     @Override
     protected void sendGames() {
         List<String> linesToSend =
-            Stringalize.unstartedGames(this.server.getGamesList());
+            Stringalize.unstartedGames(this.gameStorage.getGamesList());
 
         linesToSend.add(0, ProtocolConstants.CAPTION_GAMES_LIST);
 
