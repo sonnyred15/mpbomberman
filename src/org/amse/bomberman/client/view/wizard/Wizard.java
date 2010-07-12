@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.view.wizard;
 
-import org.amse.bomberman.client.view.wizard.PanelDescriptor;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;

@@ -14,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -73,14 +74,16 @@ public class Panel2 extends JPanel{
             return result;
         }
     }
-    public int getSelectedGame() {
-        int result = -1;
+    public List<String> getSelectedGame() {
+        List<String> result = new ArrayList<String>();
         if (table.getSelectedRow() != -1
                 && table.getValueAt(table.getSelectedRow(), 0) != null) {
-            result = Integer.parseInt(
-                    (String) table.getValueAt(table.getSelectedRow(), 0));
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                result.add((String) table.getValueAt(table.getSelectedRow(), i));
+            }
             return result;
         } else {
+            result.add("-1");
             return result;
         }
     }

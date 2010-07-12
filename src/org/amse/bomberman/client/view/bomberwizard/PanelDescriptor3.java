@@ -22,9 +22,6 @@ public class PanelDescriptor3 extends PanelDescriptor {
             Controller.getInstance().requestGameInfo();
         } catch (NetException ex) {
             Controller.getInstance().lostConnection(ex.getMessage());
-            /*JOptionPane.showMessageDialog(this.getWizard(),
-                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
         }
     }
 
@@ -35,9 +32,6 @@ public class PanelDescriptor3 extends PanelDescriptor {
             return true;
         } catch (NetException ex) {
             Controller.getInstance().lostConnection(ex.getMessage());
-            /*JOptionPane.showMessageDialog(this.getWizard(),
-            ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
             return false;
         }
     }

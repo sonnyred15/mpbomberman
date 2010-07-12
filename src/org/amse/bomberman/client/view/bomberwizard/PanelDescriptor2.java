@@ -1,5 +1,6 @@
 package org.amse.bomberman.client.view.bomberwizard;
 
+import java.util.List;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
 import org.amse.bomberman.client.control.IController;
@@ -44,27 +45,27 @@ public class PanelDescriptor2 extends PanelDescriptor{
                 return true;
             } catch (NetException ex) {
                 Controller.getInstance().lostConnection(ex.getMessage());
-                /*JOptionPane.showMessageDialog(this.getWizard(),
-                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
             }
         } else {
-            int gameNumber = panel2.getSelectedGame();
-            if (gameNumber != -1) {
+            List<String> selectedGame = panel2.getSelectedGame();
+            int gameNumber = Integer.parseInt(selectedGame.get(0));
+            if (gameNumber == -1) {
+                JOptionPane.showMessageDialog(this.getWizard(), "You did't select the game! "
+                        + " Do this and then click join.", "Not selected game", JOptionPane.WARNING_MESSAGE);
+                return false;
+            } else  if (selectedGame.get(selectedGame.size()-1).equals
+                    (selectedGame.get(selectedGame.size()-2))) {
+                JOptionPane.showMessageDialog(this.getWizard(), "Selected game is full!\n"
+                        + "Please choose another one or create new.", "Game is full", JOptionPane.WARNING_MESSAGE);
+                return false;
+            } else {
                 try {
                     Controller.getInstance().requestJoinGame(gameNumber);
                     return true;
                 } catch (NetException ex) {
                     Controller.getInstance().lostConnection(ex.getMessage());
-                    /*JOptionPane.showMessageDialog(this.getWizard(),
-                            ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
                     return false;
                 }
-            } else {
-                JOptionPane.showMessageDialog(this.getWizard(), "You did't select the game! "
-                        + " Do this and then click join.", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
             }
         }
         return false;
