@@ -93,14 +93,6 @@ public class Model implements IModel, RequestResultListener{
                     escapeGame();
                 }
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
-            if (list.get(0).equals("false")) {
-                //System.out.println("You try to do move uncorrectly.");
-            } else {
-                if (list.get(0).equals("Not joined to any game.")) {
-                    escapeGame();
-                }
-            }
         } else if (command.equals(ProtocolConstants.CAPTION_PLACE_BOMB_INFO)) {
             if (!list.get(0).equals("Ok.")) {
                 escapeGame();
