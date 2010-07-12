@@ -7,7 +7,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Command;
@@ -28,6 +27,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import java.util.List;
+import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.ProtocolConstants;
 
 /**
@@ -35,17 +36,18 @@ import org.amse.bomberman.util.ProtocolConstants;
  * @author Kirilchuk V.E.
  */
 public abstract class AbstractSession extends Thread implements ISession {
-    protected ILog log = null;    // it can be null. So use writeToLog() instead of log.println()
-    protected final Socket  clientSocket;
-    protected final IServer server;
-    protected final int     sessionID;
-    protected boolean       mustEnd;
+    protected ILog                     log = null;    // it can be null. So use writeToLog() instead of log.println()
+    protected final Socket             clientSocket;
+    protected final GameStorage        gameStorage;
+    protected final int                sessionID;
+    protected volatile boolean         mustEnd;
 
-    public AbstractSession(Server server, Socket clientSocket, int sessionID,
+    public AbstractSession(Socket clientSocket,
+                           GameStorage gameStorage, int sessionID,
                            ILog log) {
-        this.setDaemon(true);
-        this.server = server;
+        this.setDaemon(true);      
         this.clientSocket = clientSocket;
+        this.gameStorage = gameStorage;
         this.sessionID = sessionID;
         this.log = log;
         this.mustEnd = false;
@@ -100,7 +102,7 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             writeToLog("Session: freeing resources.");
             freeResources();
-            writeToLog("Session: ended.");
+            writeToLog("Session: closing log...and end.");
 
             try {
                 if (this.log != null) {
@@ -113,11 +115,13 @@ public abstract class AbstractSession extends Thread implements ISession {
                 System.err.println("Session: run error. Can`t close log stream. " +
                                    "Log won`t be saved. " + ex.getMessage());
             }
+
+            System.out.println("Session: session ended.");
         }
     }
 
     @Override
-    public void terminateSession() throws SecurityException {
+    public void terminateSession() {
         this.mustEnd = true;
 
         try {
@@ -139,7 +143,7 @@ public abstract class AbstractSession extends Thread implements ISession {
             writeToLog("Session: sending answer...");
             out.write(shortAnswer);
             out.newLine();
-            out.write("");
+            out.write(""); //TODO magic code...
             out.newLine();
             out.flush();
         } catch (IOException ex) {
@@ -176,7 +180,7 @@ public abstract class AbstractSession extends Thread implements ISession {
                 }
             }
 
-            out.write("");
+            out.write(""); //TODO magic code...
             out.newLine();
             out.flush();
         } catch (IOException ex) {
@@ -192,7 +196,7 @@ public abstract class AbstractSession extends Thread implements ISession {
 
     protected abstract void freeResources();
 
-    protected void answerOnCommand(String query) {
+    protected void answerOnCommand(String query) { //TODO cmd must use polymorphism! Don`t use such switch case!
         writeToLog("Session: query received. query=" + query);
 
         if (query.length() == 0) {
@@ -393,8 +397,8 @@ public abstract class AbstractSession extends Thread implements ISession {
         return false;
     }
 
-    public IServer getServer() {
-        return server;
+    public GameStorage getGameStorage() {
+        return this.gameStorage;
     }
 
     protected abstract void sendGames();

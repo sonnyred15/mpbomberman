@@ -7,7 +7,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.net.*;
 import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.util.Constants;
@@ -26,6 +25,7 @@ import java.nio.channels.IllegalBlockingModeException;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.amse.bomberman.server.gameinit.GameStorage;
 
 /**
  *
@@ -34,9 +34,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Server implements IServer {
     private ILog log = new ConsoleLog();    // could be never initialized. Use writeToLog(...) instead of log.println(...)
     private final int            port;
-    private final List<Game>     games = new CopyOnWriteArrayList<Game>();
+
+    //
+    private final GameStorage    gameStorage = new GameStorage(this);
+    private final ServerState    serverState = ServerState.SHUTDOWNED;
+    //
     private ServerSocket         serverSocket;
-    private boolean              shutdowned = true;    // true until we start accepting clients.
+    private volatile boolean     shutdowned = true;    // true until we start accepting clients.
     private Thread               listeningThread;
     private final List<ISession> sessions =
                                          new CopyOnWriteArrayList<ISession>();
@@ -119,7 +123,7 @@ public class Server implements IServer {
 
                 // this.sessionCounter = 0;
                 // this.sessions.clear(); SESSIONS MUST AUTOCLEAR BY INTERRUPT!!!
-                this.games.clear();
+                this.gameStorage.clearGames();
 
                 if (this.serverSocket != null) {
                     this.serverSocket.close();
@@ -157,80 +161,7 @@ public class Server implements IServer {
     }
 
     @Override
-    public int addGame(Game game) {
-        int n = -1;
-
-        if (!this.shutdowned) {    // is it redundant?
-            this.games.add(game);
-            n = this.games.indexOf(game);
-            writeToLog("Server: game added.");
-        } else {
-            writeToLog("Server: addGame warning. " +
-                       "Tryed to add game to shutdowned server.");
-        }
-
-        if (this.changeListener != null) {
-            this.changeListener.changed(this);
-        }
-
-        return n;
-    }
-
-    @Override
-    public void removeGame(Game gameToRemove) {
-        if (!this.shutdowned) {    // is it redundant?
-            if (this.games.remove(gameToRemove)) {
-                if (this.changeListener != null) {
-                    this.changeListener.changed(this);
-                }
-
-                writeToLog("Server: game removed.");
-            } else {
-                writeToLog("Server: removeGame warning. " +
-                           "No specified game found.");
-            }
-        } else {
-            writeToLog("Server: removeGame warning. " +
-                       "Tryed to remove game from shutdowned server.");
-        }
-    }
-
-    /**
-     * Return game from list at the specified index
-     * @param n
-     * @return
-     */
-    @Override
-    public Game getGame(int n) {
-        Game game = null;
-
-        if (!this.shutdowned) {    // is it redundant?
-            try {
-                game = this.games.get(n);
-            } catch (IndexOutOfBoundsException ex) {
-                writeToLog("Server: getGame warning. " +
-                           "Tryed to get game with illegal ID.");
-            }
-        } else {
-            writeToLog("Server: getGame warning. " +
-                       "Tryed to get game from shutdowned server.");
-        }
-
-        return game;
-    }
-
-    @Override
-    public List<Game> getGamesList() {
-        if (this.shutdowned) {    // is it redundant?
-            writeToLog("Server: getGamesList warning. " +
-                       "Tryed to get games list from shutdowned server.");
-        }
-
-        return this.games;
-    }
-
-    @Override
-    public synchronized boolean isShutdowned() {
+    public boolean isShutdowned() {
         return this.shutdowned;
     }
 
@@ -314,10 +245,11 @@ public class Server implements IServer {
                     ISession newSession = null;
 
                     //
-                    newSession = new AsynchroSession(this.server,
-                                                         clientSocket,
-                                                         sessionCounter,
-                                                         this.server.log);
+                    newSession = new AsynchroSession( this.server,
+                                                     clientSocket,
+                                                     gameStorage,
+                                                     sessionCounter,
+                                                     this.server.log);
 
                     //
                     sessions.add(newSession);

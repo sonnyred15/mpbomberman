@@ -125,7 +125,7 @@ public class Controller implements GameEndedListener {
      * @see GameEndedListener
      */
     @Override
-    public void gameEnded() {
+    public void gameEnded(Game gameThatEnded) {
         this.game.removeGameEndedListener(this);
         this.game.leaveFromGame(this);
         this.game = null;
@@ -141,9 +141,8 @@ public class Controller implements GameEndedListener {
     public void tryLeaveGame() {//TODO maybe make return type boolean and say to client about error?
         if(game==null){
             System.err.println("Controller: tryLeaveGame warning. " +
-                    "Client not joined to any game. Leave ignored.");
-            return;
-        }else {
+                    "Client not joined to any game. Leave ignored.");            
+        } else {
             this.game.removeGameEndedListener(this);
             this.game.leaveFromGame(this);
             this.game = null;
@@ -261,7 +260,7 @@ public class Controller implements GameEndedListener {
             game.leaveFromGame(this);
         }
 
-        this.game = Creator.createGame(this.session.getServer(), this, gameMapName,
+        this.game = Creator.createGame(this.session.getGameStorage(), this, gameMapName,
                                        gameName, maxPlayers);        
 
         this.game.addGameEndedListener(this);
@@ -315,7 +314,7 @@ public class Controller implements GameEndedListener {
             game.leaveFromGame(this);
         }
 
-        Game gameToJoin = this.session.getServer().getGame(gameID);
+        Game gameToJoin = this.session.getGameStorage().getGame(gameID);
         int  joinResult = Controller.NO_SUCH_UNSTARTED_GAME;
 
         if (gameToJoin != null) {

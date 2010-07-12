@@ -63,7 +63,7 @@ public class Model implements IModel, DieListener {
         Integer[] freeIDArray = new Integer[this.game.getMaxPlayers()];
 
         for (int i = 0; i < freeIDArray.length; ++i) {
-            freeIDArray[i] = i + 1;
+            freeIDArray[i] = i + 1;//cause players indexes are from 1 to ..
         }
 
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
@@ -104,11 +104,12 @@ public class Model implements IModel, DieListener {
 
     @Override
     public void bombDetonated(Bomb bomb) {
+        this.bombs.remove(bomb);
+
         if(this.ended){
             return;
         }
-        this.bombs.remove(bomb);
-
+        
         Player owner = bomb.getOwner();
 
         if (owner.getPosition().equals(bomb.getPosition())) {
@@ -163,9 +164,9 @@ public class Model implements IModel, DieListener {
 
     @Override
     public Player getPlayer(int playerID) {
-        for (Player pl : players) {
-            if (pl.getID() == playerID) {
-                return pl;
+        for (Player player : players) {
+            if (player.getID() == playerID) {
+                return player;
             }
         }
 
@@ -182,6 +183,7 @@ public class Model implements IModel, DieListener {
         return this.explosionSquares.contains(coords);
     }
 
+    //TODO rewrite this casuistic logic
     private boolean isMoveToReserved(Pair pair) {    // note that on explosions isEmpty = true!!!
         int x = pair.getX();
         int y = pair.getY();
@@ -209,6 +211,7 @@ public class Model implements IModel, DieListener {
         return false;
     }
 
+    //TODO use polymorphism instead of instanceof construction
     private void makeMove(MoveableObject objectToMove, Pair destination) {
         int x = objectToMove.getPosition().getX();
         int y = objectToMove.getPosition().getY();
