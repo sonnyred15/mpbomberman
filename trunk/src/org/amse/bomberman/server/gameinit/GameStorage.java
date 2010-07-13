@@ -2,6 +2,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import org.amse.bomberman.server.net.tcpimpl.Notificator;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,10 +18,13 @@ import org.amse.bomberman.util.ProtocolConstants;
 public class GameStorage implements GameChangeListener {
     private final List<Game> games = new LinkedList<Game>();
     private final IServer server;
+    private final Notificator notificator;
 
 
     public GameStorage(IServer server) {
         this.server = server;
+        this.notificator = new Notificator(server);
+        this.notificator.start();
     }
 
     public synchronized int addGame(Game gameToAdd) {
@@ -29,7 +33,9 @@ public class GameStorage implements GameChangeListener {
         this.games.add(gameToAdd);
         n = this.games.indexOf(gameToAdd);
         System.out.println("GameStorage: game added.");
-        this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);//TODO this must do Notifyier thread!
+        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);//TODO this must do Notifyier thread!
+        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
+
 
         return n;
     }
@@ -37,7 +43,8 @@ public class GameStorage implements GameChangeListener {
     public synchronized void removeGame(Game gameToRemove) {
         if (this.games.remove(gameToRemove)) {
             System.out.println("GameStorage: game removed.");
-            this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
         } else {
             System.err.println("GameStorage: removeGame warning. " + "No specified game found.");
         }
@@ -65,12 +72,14 @@ public class GameStorage implements GameChangeListener {
 
     @Override
     public void parametersChanged(Game game) {
-        this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override
     public void started(Game game) {
-        this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
+        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override

@@ -35,11 +35,11 @@ public class Server implements IServer {
     private ILog log = new ConsoleLog();    // could be never initialized. Use writeToLog(...) instead of log.println(...)
     private final int            port;
 
-    //
-    private final GameStorage    gameStorage = new GameStorage(this);
+    //    
     private final ServerState    serverState = ServerState.SHUTDOWNED;
     //
     private ServerSocket         serverSocket;
+    private GameStorage          gameStorage;
     private volatile boolean     shutdowned = true;    // true until we start accepting clients.
     private Thread               listeningThread;
     private final List<ISession> sessions =
@@ -78,6 +78,7 @@ public class Server implements IServer {
                 this.serverSocket = new ServerSocket(port, 0);    // throws IOExeption,SecurityException
                 this.listeningThread = new Thread(new SocketListen(this));
                 this.listeningThread.start();
+                this.gameStorage = new GameStorage(this);
             } else {
                 throw new IllegalStateException("Server: start error. " +
                                                 "Already accepting. " +
