@@ -29,6 +29,7 @@ public final class Constants {
     public static final long BOMB_TIMER_VALUE = 200L*10;
     public static final long BOMB_DETONATION_TIME = 200L*3;
 
+    public static final int PLAYER_DEFAULT_LIVES = 3;
     public static final int PLAYER_DEFAULT_MAX_BOMBS = 3;
     public static final int PLAYER_DEFAULT_BOMB_RADIUS = 2;
     public static final int PLAYER_IMMORTALITY_TIME = 1000;

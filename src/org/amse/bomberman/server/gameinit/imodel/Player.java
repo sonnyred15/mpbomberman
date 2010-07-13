@@ -7,33 +7,43 @@ package org.amse.bomberman.server.gameinit.imodel;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Pair;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that represents player. Player is part of Model not part of Game.
  * @author Kirilchuk V.E
  */
 public class Player implements MoveableObject {
+    //
     private final ScheduledExecutorService timer;
-	
-	private int          settedBombs = 0;
-    private int          id = 1;
-    private int          lives = 3;
-    private String       nickName = "unnamed";
-    private int          maxBombs = Constants.PLAYER_DEFAULT_MAX_BOMBS;
-    private int          explRadius = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
-    private final Object BOMBS_LOCK = new Object();
-    private DieListener  playerDieListener;
-    private Pair         position;
-    private boolean      immortal = false;
 
     //
-    private int          kills  = 0;
-    private int          deaths = 0;
+    private int deaths = 0;
+    private int kills  = 0;
+
+    //
+    private int          id = 1;
+    private final String nickName;
+
+    //
+    protected int lives       = Constants.PLAYER_DEFAULT_LIVES;
+    protected int settedBombs = 0;
+    protected int maxBombs    = Constants.PLAYER_DEFAULT_MAX_BOMBS;
+    protected int explRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
+
+
+    //
+    private Pair             position; //TODO maybe must be volatile?
+
+    //
+    private final Object BOMBS_LOCK = new Object();
+    private DieListener  playerDieListener;
 
     /**
      * Constructor of player with defined nickName.
@@ -41,7 +51,7 @@ public class Player implements MoveableObject {
      */
     public Player(String nickName, ScheduledExecutorService timer) {
         this.nickName = nickName;
-        this.timer = timer;
+        this.timer    = timer;
     }
 
     /**
@@ -58,7 +68,7 @@ public class Player implements MoveableObject {
      * <p> positionX positionY nickName lives bombs maxBombs
      * @return info about player state.
      */
-    public String getInfo() {    
+    public String getInfo() {
         String ret = this.position.getX() + " " +
                      this.position.getY() + " " +
                      this.nickName + " " +
@@ -82,7 +92,7 @@ public class Player implements MoveableObject {
      * Checks if this player is alive(if his lives more than zero).
      * @return true if alive, false otherwise.
      */
-    public boolean isAlive() {
+    public synchronized boolean isAlive() {
         return (this.lives > 0);
     }
 
@@ -90,9 +100,9 @@ public class Player implements MoveableObject {
      * Checks if this player can place bomb.
      * @return true if can, false otherwise.
      */
-    public boolean canPlaceBomb() {    // CHECK THIS is deadLock possible by isAlive lock?
+    public boolean canPlaceBomb() {
         synchronized (BOMBS_LOCK) {
-            return ((this.settedBombs < this.maxBombs) && isAlive());
+            return ((this.settedBombs < this.maxBombs) && this.isAlive());
         }
     }
 
@@ -103,7 +113,7 @@ public class Player implements MoveableObject {
      * @return
      */
     public int getSettedBombsNum() {
-        return settedBombs;
+        return this.settedBombs;
     }
 
     /**
@@ -161,39 +171,14 @@ public class Player implements MoveableObject {
     /**
      * This method calls if player was damaged. If he wasnt immortal at this moment
      * he must lost some bonuses and one live. Then he became immortal for some time.
-     * 
+     *
      * If player was immortal then nothing will happen.
      */
-    public synchronized void bombed() {    // TODO synchronized(player)        
-		if (immortal) {
-			return;
-		}
-    	
-    	this.lives -= 1;
-        this.deaths += 1;
-        this.decBonuses();
-
-        assert(this.lives>=0); //here may be synchronization problem
-        
-        if (this.lives == 0) {
-            playerDieListener.playerDied(this);
-        } else {
-        	this.makeImmortal();
-        }
+    public synchronized void bombed() {
+        this.state.bombed(this);
     }
 
-    private void makeImmortal() {
-		this.immortal = true;
-		this.timer.schedule(new Runnable() {
-			
-			@Override
-			public void run() {
-				immortal = false;
-			}
-		}, Constants.PLAYER_IMMORTALITY_TIME,TimeUnit.MILLISECONDS);
-	}
-
-	public synchronized void killedSomeone(){
+    public synchronized void damagedSomeone() {//TODO maybe model must calculate all such things?
         this.kills += 1;
     }
 
@@ -218,34 +203,12 @@ public class Player implements MoveableObject {
      * some player pareametres must increase or change.
      * @param bonusID ID of taked bonus.
      */
-    public void takeBonus(int bonusID) {
-        switch (bonusID) {
-            case Constants.MAP_BONUS_LIFE : {
-                this.lives++;
-
-                break;
-            }
-
-            case Constants.MAP_BONUS_BOMB_COUNT : {
-                this.maxBombs++;
-
-                break;
-            }
-
-            case Constants.MAP_BONUS_BOMB_RADIUS : {
-                this.explRadius++;
-
-                break;
-            }
-
-            default : {
-                throw new IllegalArgumentException("Such bonus is not supported." +
-                                                   " Bonus = " + bonusID);
-            }
-        }
+    public synchronized void takeBonus(int bonusID) {
+        Bonus bonus = Bonus.valueOf(bonusID);
+        bonus.applyBy(this);
     }
 
-    private void decBonuses() {
+    private synchronized void decBonuses() {
         if (explRadius > Constants.PLAYER_DEFAULT_BOMB_RADIUS) {
             explRadius--;
         }
@@ -253,5 +216,45 @@ public class Player implements MoveableObject {
         if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
             maxBombs--;
         }
+    }
+
+    private volatile PlayerState state = PlayerState.NORMAL;
+
+    static enum PlayerState{
+        NORMAL {
+            @Override
+            void bombed(Player player){
+                player.lives  -= 1;
+                player.deaths += 1;
+                player.decBonuses();
+
+                assert (player.lives >= 0);    // here may be synchronization problem
+
+                if (player.lives == 0) {
+                    player.playerDieListener.playerDied(player);
+                } else {
+                    makeImmortal(player);
+                }
+            }
+
+            private void makeImmortal(final Player player) {
+                player.state = PlayerState.IMMORTAL;
+                player.timer.schedule(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        player.state = PlayerState.NORMAL;
+                    }
+                }, Constants.PLAYER_IMMORTALITY_TIME, TimeUnit.MILLISECONDS);
+            }
+        },
+
+        IMMORTAL {
+            void bombed(Player player){
+                ; //do nothing.
+            }
+        };
+
+        abstract void bombed(Player player);
     }
 }

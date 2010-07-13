@@ -46,7 +46,7 @@ public class Game {
     private final IModel                    model;
     private       Controller                owner; // perhaps owner can change during game
     private final GameChangeListener        gameChangeListener;
-    private boolean                         started; //TODO use State pattern
+    private volatile boolean                started; //TODO use State pattern
 
     /**
      * Constructor of Game.
@@ -90,14 +90,15 @@ public class Game {
         this.controllers = new CopyOnWriteArraySet<Controller>();
         this.gameStartedListeners =
             new CopyOnWriteArraySet<GameStartedListener>();
+
         //
         int playerID = this.tryJoin(owner);
         assert playerID!=(-1); //if owner can`t autojoin it is very strange problem...
         owner.setPlayerID(playerID);
 
         //
-        gameStorage.addGame(this);
-        this.started = false;        
+        this.started = false;
+        gameStorage.addGame(this); //only after this others can see the game.
     }
 
     /**
