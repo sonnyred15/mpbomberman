@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.ProtocolConstants;
 import org.amse.bomberman.util.Stringalize;
 
@@ -136,7 +135,19 @@ public class Model implements IModel, DieListener {
             }
         }
 
-        bombToDetonate.detonate();
+        bombToDetonate.detonate(true);
+    }
+
+    public void tryEnd() {
+        int aliveCount = 0;
+        for (Player pl : players) {
+            if (pl.isAlive()) {
+                aliveCount++;
+            }
+        }
+        if (aliveCount <= 1 && !this.ended) {
+            this.end();
+        }
     }
 
     @Override
@@ -226,7 +237,7 @@ public class Model implements IModel, DieListener {
             }
 
             if (this.gameMap.isBonus(newX, newY)) {
-                int bonus = this.gameMap.bonusAt(newX, newY);
+                int bonus = this.gameMap.getSquare(newX, newY);
 
                 ((Player) objectToMove).takeBonus(bonus);
             }
@@ -257,7 +268,7 @@ public class Model implements IModel, DieListener {
         }
     }
 
-    private Pair newCoords(Pair curPos, Direction direction) {    // whats about catch illegalArgumentException???
+    private Pair newPosition(Pair curPos, Direction direction) {    // whats about catch illegalArgumentException???
 
         switch (direction) {
             case DOWN : {
@@ -305,16 +316,6 @@ public class Model implements IModel, DieListener {
         this.game.notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
         this.game.addMessageToChat("Oh, no. " + player.getNickName() +
                                    " was cruelly killed.");
-
-        int aliveCount = 0;
-        for (Player pl : players) {
-            if(pl.isAlive()){
-                aliveCount++;
-            }
-        }
-        if(aliveCount<=1 && !this.ended){
-            this.end();
-        }
     }
 
     /**
@@ -398,15 +399,15 @@ public class Model implements IModel, DieListener {
         }
         synchronized (gameMap) {
             synchronized (objToMove) {
-                Pair newCoords = newCoords(objToMove.getPosition(), direction);
+                Pair destination = newPosition(objToMove.getPosition(), direction);
 
-                if (!isOutMove(newCoords)) {
-                    if (this.gameMap.isBomb(newCoords)
+                if (!isOutMove(destination)) {
+                    if (this.gameMap.isBomb(destination)
                             && (objToMove instanceof Player)) {
                         Bomb bombToMove = null;
 
                         for (Bomb bomb : bombs) {
-                            if (bomb.getPosition().equals(newCoords)) {
+                            if (bomb.getPosition().equals(destination)) {
                                 bombToMove = bomb;
                                 tryDoMove(bombToMove, direction);
 
@@ -415,8 +416,8 @@ public class Model implements IModel, DieListener {
                         }
                     }
 
-                    if (!isMoveToReserved(newCoords)) {
-                        makeMove(objToMove, newCoords);
+                    if (!isMoveToReserved(destination)) {
+                        makeMove(objToMove, destination);
 
                         return true;
                     }

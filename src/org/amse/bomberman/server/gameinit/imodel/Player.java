@@ -39,7 +39,8 @@ public class Player implements MoveableObject {
 
 
     //
-    private Pair             position; //TODO maybe must be volatile?
+    private Pair               position; //TODO maybe must be volatile?
+    private volatile PlayerState state = PlayerState.NORMAL;
 
     //
     private final Object BOMBS_LOCK = new Object();
@@ -216,9 +217,7 @@ public class Player implements MoveableObject {
         if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
             maxBombs--;
         }
-    }
-
-    private volatile PlayerState state = PlayerState.NORMAL;
+    }    
 
     static enum PlayerState{
         NORMAL {

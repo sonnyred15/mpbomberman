@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import java.util.Random;
+import org.amse.bomberman.server.gameinit.imodel.Bonus;
 
 /**
  * Class that represents game field and stuff to work with this field.
@@ -35,15 +35,12 @@ public final class GameMap {
     /**
      * Constructor of GameMap from square matrix.
      * @param field square matrix of ints.
+     * @param gameMapName name of this GameMap
+     * @param dimension
+     * @param maxPlayers
      */
-    public GameMap(int[][] field) {    // CHECK < THIS// What if we get non square matrix???
-        this.dimension = field.length;
-        this.field = field;
-        this.maxPlayers = countMaxPlayers(this.field);
-        this.gameMapName = "intArrayMap";
-    }
-
     public GameMap(String gameMapName, int[][] field, int dimension, int maxPlayers) {
+        assert (field.length==field[0].length);
         this.gameMapName = gameMapName;
         this.field = field;
         this.dimension = dimension;
@@ -103,62 +100,18 @@ public final class GameMap {
         }
     }
 
-    /**
-     * Returnes int that represents the block on the field
-     * at the defined position.
-     * <p> returnes -1 if there is no block at such position.
-     * <p> returnes 1 for undestroyable block.
-     * @param position position to check.
-     * @return int that represents the block on the field
-     * at the defined position.
-     */
-    public int blockAt(Pair position) {
-        return this.blockAt(position.getX(), position.getY());
+    public boolean isBlock(Pair position){
+        return this.isBlock(position.getX(), position.getY());
     }
 
-    /**
-     * Returnes int that represents the block on the field
-     * at the defined position.
-     * <p> returnes -1 if there is no block at such position.
-     * <p> returnes 1 for undestroyable block.
-     * @param x position by x to check.
-     * @param y position by y to check.
-     * @return int that represents the block on the field
-     * at the defined position.
-     */
-    public int blockAt(int x, int y) {
+    public boolean isBlock(int x, int y) {
         int square = this.field[x][y];
 
-        if ((square >= 0) || (square < -8)) {
-            return -1;
+        if (square >= Constants.MAP_PROOF_WALL && square <= -1) {
+            return true;
         }
 
-        return square + 9;    // TODO MAGIC NUMBERS ARE BAD AND MAYBE USE ABSOLUTE INSTEAD!?!?!?
-    }
-
-    /**
-     * Return value of bonus at the defined position.
-     * @param position position to check.
-     * @return integer value of bonus and -1 if it is not a bonus.
-     */
-    public int bonusAt(Pair position) {
-        return this.bonusAt(position.getX(), position.getY());
-    }
-
-    /**
-     * Return value of bonus at specific cell with coords x and y.
-     * @param x coord in line.
-     * @param y coord in column.
-     * @return integer value of bonus and -1 if it is not a bonus.
-     */
-    public int bonusAt(int x, int y) {
-        if ((this.field[x][y] == Constants.MAP_BONUS_BOMB_COUNT)
-                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_RADIUS)
-                || (this.field[x][y] == Constants.MAP_BONUS_LIFE)) {
-            return this.field[x][y];
-        } else {
-            return -1;
-        }
+        return false;
     }
 
     /**
@@ -173,8 +126,9 @@ public final class GameMap {
     }
 
     /**
-     * Damage block at the defined or do nothing if
-     * there is no block or block is undestroyable.
+     * Damage block at the defined position or do nothing if
+     * there block is undestroyable. If block was destroyed
+     * then there is some probability that bonus will appear instead of it.
      * @param position position of block to damage.
      */
     public void damageBlock(Pair position) {
@@ -183,30 +137,30 @@ public final class GameMap {
 
     /**
      * Damage block at the defined position or do nothing if
-     * there is no block or block is undestroyable.
+     * there block is undestroyable. If block was destroyed
+     * then there is some probability that bonus will appear instead of it.
      * @param x position by x.
      * @param y position by y.
      */
     public void damageBlock(int x, int y) {
-        if (this.field[x][y] != -1) {
+        if (this.field[x][y] == Constants.MAP_PROOF_WALL) {
             return;
         }
 
-        Random generator = new Random();
-        int    random = generator.nextInt(99);
+        this.field[x][y] += 1; // note that blocks has negative values.
 
-        if (random < 5) {
-            this.field[x][y] = Constants.MAP_BONUS_LIFE;
+        //if after damage block was destroyed then bonus can appear.
+        if (this.field[x][y] == Constants.MAP_EMPTY) {
+            generateBonusAndAddToField(x, y);
+        }
+    }
+
+    private void generateBonusAndAddToField(int x, int y) {
+        Bonus randomBonus = Bonus.randomBonus();
+        if (randomBonus == null) {
+            this.field[x][y] = Constants.MAP_EMPTY;
         } else {
-            if (random < 10) {
-                this.field[x][y] = Constants.MAP_BONUS_BOMB_COUNT;
-            } else {
-                if (random < 15) {
-                    this.field[x][y] = Constants.MAP_BONUS_BOMB_RADIUS;
-                } else {
-                    this.field[x][y] = Constants.MAP_EMPTY;
-                }
-            }
+            this.field[x][y] = randomBonus.getID();
         }
     }
 
@@ -296,9 +250,7 @@ public final class GameMap {
      * @return true if there is bomb, false otherwise.
      */
     public boolean isBonus(int x, int y) {
-        return ((this.field[x][y] == Constants.MAP_BONUS_LIFE)
-                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_RADIUS)
-                || (this.field[x][y] == Constants.MAP_BONUS_BOMB_COUNT));
+        return Bonus.isBonus(this.field[x][y]);
     }
 
     /**

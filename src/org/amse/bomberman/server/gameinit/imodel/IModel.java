@@ -58,6 +58,8 @@ public interface IModel {
      */
     void detonateBombAt(Pair position);
 
+    void tryEnd();
+
     /**
      * Returns current players num including bots.
      * @return current players num including bots.
