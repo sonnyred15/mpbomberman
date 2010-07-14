@@ -16,18 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class Notificator extends Thread {
-    private final Queue<String> queue;
+    private final BlockingQueue<String> queue;
     private final IServer       server;
 
     public Notificator(IServer server) {
         this.server = server;
-        this.queue  = new ArrayBlockingQueue<String>(10);
+        this.queue  = new ArrayBlockingQueue<String>(5);
         this.setDaemon(true);
     }
 
@@ -38,11 +39,7 @@ public class Notificator extends Thread {
 
                 // get all messages into list
                 List<String> messages = new ArrayList<String>();
-                String       message  = null;
-
-                while ((message = queue.poll()) != null) {//TODO maybe use drainTo?
-                    messages.add(message);
-                }
+                queue.drainTo(messages);
 
                 // notifying all sessions
                 List<ISession> sesions = this.server.getSessions();
@@ -69,6 +66,11 @@ public class Notificator extends Thread {
      * @param message to send.
      */
     public void addToQueue(String message) {
+        if(queue.contains(message)){ //not need to duplicate global messages.
+            return;
+        }
+
+        //if message is new then try to add it to queue.
         this.queue.offer(message);    // actually can return boolean
     }
 }

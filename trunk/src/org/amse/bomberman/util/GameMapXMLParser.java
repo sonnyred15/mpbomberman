@@ -77,7 +77,7 @@ public class GameMapXMLParser {
                                                "No gameMap name.");
         }
 
-        /* Taking gameMap maxPLayers from attribute. */
+        /* Taking gameMap maxPlayers from attribute. */
         Node maxPlayersNode = attributes.getNamedItem("maxPlayers");
 
         if (maxPlayersNode != null) {
@@ -124,7 +124,7 @@ public class GameMapXMLParser {
 
     private int[][] parseField(Node fieldNode, int dimension)
                                              throws DOMException,
-                                                    IllegalArgumentException {
+                                                    IllegalArgumentException { //TODO what if rowsNum<dimension
 
         int[][]  result      = new int[dimension][dimension];
         NodeList fieldChilds = fieldNode.getChildNodes();
@@ -136,6 +136,10 @@ public class GameMapXMLParser {
             if (child.getNodeName().equals("row")) {
                 String str = child.getTextContent();
                 String[] cells = str.split(" ");
+                if(cells.length!=dimension){
+                   throw new IllegalArgumentException("Wrong xml gameMap file. "
+                                                    + "Wrong field data.");
+                }
                 try {
                     for (int column = 0; column < cells.length; ++column) {
                         result[row][column] = Integer.parseInt(cells[column]);

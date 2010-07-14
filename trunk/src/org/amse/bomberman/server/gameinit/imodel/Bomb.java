@@ -8,9 +8,9 @@ package org.amse.bomberman.server.gameinit.imodel;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.*;
-import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -24,14 +24,13 @@ import java.util.concurrent.TimeUnit;
  * @author Kirilchuk V.E.
  */
 public class Bomb implements MoveableObject {
-	
+
+    private boolean                        wasDetonated = false;
+    private final IModel                   model;
+    private final Player                   owner;
+    private final Pair                     position;
+    private final int                      radius;
     private final ScheduledExecutorService timer;
-    private boolean       wasDetonated = false;
-    private final GameMap gameMap;
-    private final IModel  model;
-    private final Player  owner;
-    private final Pair    position;
-    private final int     radius;
 
     /**
      * Constructor of Bomb. Should be called in model when someone places bomb.
@@ -39,17 +38,15 @@ public class Bomb implements MoveableObject {
      * @param player Player that setted the bomb.
      * @param bombPosition coordinates on gameMap where Bomb was placed.
      */
-    public Bomb(IModel model, Player player, Pair bombPosition,
-                ScheduledExecutorService timer) {
+    public Bomb(IModel model, Player player, Pair bombPosition, ScheduledExecutorService timer) {
 
-        /*init object fields*/
+        /* init object fields */
         this.model    = model;
         this.owner    = player;
-        this.gameMap  = this.model.getGameMap();
         this.position = bombPosition;
-        this.radius   = this.owner.getRadius();        
-        
-        /*additional stuff*/
+        this.radius   = this.owner.getRadius();
+
+        /* additional stuff */
         this.timer = timer;
         this.owner.placedBomb(); //takes bomb from player
         this.timer.schedule(new DetonateTask(), Constants.BOMB_TIMER_VALUE,
@@ -62,7 +59,7 @@ public class Bomb implements MoveableObject {
      * @see MoveableObject
      */
     public void bombed() {
-        this.detonate();
+        this.detonate(true);
     }
 
     /**
@@ -70,7 +67,7 @@ public class Bomb implements MoveableObject {
      * explode and detonate this bomb, or from DetonateTask,
      * when time to explode has come.
      */
-    public void detonate() {
+    public void detonate(boolean chained) {
         if (this.wasDetonated) {
             return;
         }
@@ -81,11 +78,13 @@ public class Bomb implements MoveableObject {
         // and clearing it from gameMap
         this.model.bombDetonated(this);
 
+        //
+        GameMap gameMap = this.model.getGameMap();
         ArrayList<Pair> explosions = new ArrayList<Pair>();
 
         // explosion lines
-        int     i;    // common iterator
-        int     k;    // common radius counter
+        int     i;         // common iterator
+        int     k;         // common radius counter
         boolean contin;    // common continue boolean
         int     bombX = this.position.getX();
         int     bombY = this.position.getY();
@@ -94,7 +93,7 @@ public class Bomb implements MoveableObject {
         k = radius;
 
         for (i = bombX - 1; ((i >= 0) && (k > 0)); --i, --k) {
-            contin = explodeSquare(i, bombY);
+            contin = explodeSquare(i, bombY, gameMap);
             explosions.add(new Pair(i, bombY));
 
             if (!contin) {
@@ -105,9 +104,8 @@ public class Bomb implements MoveableObject {
         // downlines
         k = radius;
 
-        for (i = bombX + 1; ((i < gameMap.getDimension()) && (k > 0));
-                ++i, --k) {
-            contin = explodeSquare(i, bombY);
+        for (i = bombX + 1; ((i < gameMap.getDimension()) && (k > 0)); ++i, --k) {
+            contin = explodeSquare(i, bombY, gameMap);
             explosions.add(new Pair(i, bombY));
 
             if (!contin) {
@@ -119,7 +117,7 @@ public class Bomb implements MoveableObject {
         k = radius;
 
         for (i = bombY - 1; ((i >= 0) && (k > 0)); --i, --k) {
-            contin = explodeSquare(bombX, i);
+            contin = explodeSquare(bombX, i, gameMap);
             explosions.add(new Pair(bombX, i));
 
             if (!contin) {
@@ -132,7 +130,7 @@ public class Bomb implements MoveableObject {
 
         for (i = bombY + 1; ((i < gameMap.getDimension()) && (k > 0));
                 ++i, --k) {
-            contin = explodeSquare(bombX, i);
+            contin = explodeSquare(bombX, i, gameMap);
             explosions.add(new Pair(bombX, i));
 
             if (!contin) {
@@ -154,11 +152,15 @@ public class Bomb implements MoveableObject {
         this.timer.schedule(new ClearExplosionTask(explosions),
                             Constants.BOMB_DETONATION_TIME,
                             TimeUnit.MILLISECONDS);
+
+        if(!chained){
+            this.model.tryEnd();
+        }
     }
 
     // true if we must continue cycle
     // false if we must break cycle;
-    private boolean explodeSquare(int x, int y) {
+    private boolean explodeSquare(int x, int y, GameMap gameMap) {
         Pair squareToExplode = new Pair(x, y);
 
         if (gameMap.isEmpty(x, y)) {
@@ -166,29 +168,19 @@ public class Bomb implements MoveableObject {
                 return true;
             }
 
-            return true;    // emptySquare
-        } else if (gameMap.blockAt(x, y) != -1) {    // blockSquare
-            if (gameMap.blockAt(x, y) == 1) {    // undestroyableBlock
-
-                // undestroyable so do nothing
-                // going to return false;
-            } else {    // destroyable block
-                if (gameMap.blockAt(x, y) == 8) {    // destroyed block
-                    gameMap.damageBlock(x, y);
-                } else {
-                    gameMap.setSquare(x, y, gameMap.blockAt(x, y) + 1 - 9);
-                }
-            }
+            return true;                                 // emptySquare
+        } else if (gameMap.isBlock(squareToExplode)) {        // blockSquare
+            gameMap.damageBlock(x, y);
 
             return false;
-        } else if (gameMap.playerIDAt(x, y) != -1) {    // playerSquare
+        } else if (gameMap.playerIDAt(x, y) != -1) {     // playerSquare
             int id = gameMap.playerIDAt(x, y);
 
             this.owner.damagedSomeone();
             model.playerBombed(this.owner, id);
 
             return false;
-        } else if (gameMap.isBomb(x, y)) {    // another bomb
+        } else if (gameMap.isBomb(x, y)) {               // another bomb
             model.detonateBombAt(squareToExplode);
 
             return false;
@@ -246,12 +238,10 @@ public class Bomb implements MoveableObject {
         }
     }
 
-
     private class DetonateTask implements Runnable {
-
         @Override
         public void run() {
-            detonate();
+            detonate(false);
         }
     }
 }

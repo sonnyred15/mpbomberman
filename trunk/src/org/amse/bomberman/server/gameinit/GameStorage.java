@@ -17,12 +17,10 @@ import org.amse.bomberman.util.ProtocolConstants;
  */
 public class GameStorage implements GameChangeListener {
     private final List<Game> games = new LinkedList<Game>();
-    private final IServer server;
     private final Notificator notificator;
 
 
     public GameStorage(IServer server) {
-        this.server = server;
         this.notificator = new Notificator(server);
         this.notificator.start();
     }
@@ -33,7 +31,6 @@ public class GameStorage implements GameChangeListener {
         this.games.add(gameToAdd);
         n = this.games.indexOf(gameToAdd);
         System.out.println("GameStorage: game added.");
-        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);//TODO this must do Notifyier thread!
         this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
 
 
@@ -43,7 +40,6 @@ public class GameStorage implements GameChangeListener {
     public synchronized void removeGame(Game gameToRemove) {
         if (this.games.remove(gameToRemove)) {
             System.out.println("GameStorage: game removed.");
-            //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
             this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
         } else {
             System.err.println("GameStorage: removeGame warning. " + "No specified game found.");
@@ -72,31 +68,16 @@ public class GameStorage implements GameChangeListener {
 
     @Override
     public void parametersChanged(Game game) {
-        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
         this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override
     public void started(Game game) {
-        //this.notifyAllSessions(ProtocolConstants.UPDATE_GAMES_LIST);
         this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override
     public void gameEnded(Game game) {
         this.removeGame(game);
-    }
-
-    /**
-     * Notifying all clients from server about something by sending
-     * message to them.
-     * @param message message to send to clients.
-     */
-    public void notifyAllSessions(String message) {
-        List<ISession> sessions = this.server.getSessions();
-
-        for (ISession iSession : sessions) {
-            iSession.notifyClient(message);
-        }
     }
 }
