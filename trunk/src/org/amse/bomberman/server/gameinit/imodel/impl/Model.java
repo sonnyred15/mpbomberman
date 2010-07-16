@@ -307,7 +307,12 @@ public class Model implements IModel, DieListener {
     public void playerBombed(Player atacker, Player victim) {        
         this.game.addMessageToChat(/*"Bomb of " + */atacker.getNickName() +
                                    " damaged " + victim.getNickName());
+        if (atacker != victim) {
+            atacker.damagedSomeone();     //TODO clear such damn hardcoded code
+            atacker.changePoints(+1);
+        }
         victim.bombed();
+        victim.changePoints(-1);
     }
 
     @Override
@@ -381,6 +386,11 @@ public class Model implements IModel, DieListener {
 
     public void end() {
         this.ended = true;
+        for (Player player : players) {
+            if(player.isAlive()){
+                player.changePoints(+3);
+            }
+        }
         List<String> stats = Stringalize.playersStats(this.players);
         stats.add(0, ProtocolConstants.CAPTION_GAME_ENDED);
         this.game.notifyGameSessions(stats);

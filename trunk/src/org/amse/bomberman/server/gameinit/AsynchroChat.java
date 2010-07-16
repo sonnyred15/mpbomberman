@@ -35,6 +35,7 @@ public class AsynchroChat {
      * Adding message to chat in next notation:
      * <p>
      * playerName: message.
+     * Additionally SuperMind will try to parse expression and do something.
      * @param playerName nickName of player that added message.
      * @param message message to add to chat.
      */

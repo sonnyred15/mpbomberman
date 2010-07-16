@@ -34,14 +34,14 @@ public final class Stringalize {
 
             @Override
             public int compare(Player player1, Player player2) {
-                int kills1 = player1.getKills();
-                int kills2 = player2.getKills();
+                int points1 = player1.getPoints();
+                int points2 = player2.getPoints();
 
-                if(kills1 == kills2){
+                if (points1 == points2) {
                     return 0;
-                }else if(kills1>kills2){
+                } else if (points1 > points2) {
                     return -1;
-                }else{
+                } else {
                     return 1;
                 }
             }
@@ -53,14 +53,10 @@ public final class Stringalize {
             str = new StringBuilder();
             str.append(player.getNickName());
             str.append(' ');
-            str.append(player.getKills());
+            str.append(player.getPoints());
             str.append(' ');
             str.append(player.getDeaths());
             result.add(str.toString());
-        }
-        System.out.println("RESULT STATS!!!!");
-        for (String string : result) {
-            System.out.println(string);
         }
         
         return result;
