@@ -26,6 +26,7 @@ public class Player implements MoveableObject {
     //
     private int deaths = 0;
     private int kills  = 0;
+    private int points  = 0;
 
     //
     private int          id = 1;
@@ -65,31 +66,6 @@ public class Player implements MoveableObject {
     }
 
     /**
-     * Returns info about player state in next format:
-     * <p> positionX positionY nickName lives bombs maxBombs
-     * @return info about player state.
-     */
-    public String getInfo() {
-        String ret = this.position.getX() + " " +
-                     this.position.getY() + " " +
-                     this.nickName + " " +
-                     this.lives + " " +
-                     this.settedBombs + " " +
-                     this.maxBombs + " " +
-                     this.explRadius;
-
-        return ret;
-    }
-
-    public int getKills() {
-        return kills;
-    }
-
-    public int getDeaths() {
-        return deaths;
-    }
-
-    /**
      * Checks if this player is alive(if his lives more than zero).
      * @return true if alive, false otherwise.
      */
@@ -105,16 +81,6 @@ public class Player implements MoveableObject {
         synchronized (BOMBS_LOCK) {
             return ((this.settedBombs < this.maxBombs) && this.isAlive());
         }
-    }
-
-    /**
-     * Returns how much bombes player already setted.
-     * <p> This is not the amount of bombes that player placed during all game.
-     * This is number of bombs placed simultaneously.
-     * @return
-     */
-    public int getSettedBombsNum() {
-        return this.settedBombs;
     }
 
     /**
@@ -146,22 +112,6 @@ public class Player implements MoveableObject {
     }
 
     /**
-     * Returns ID of this player.
-     * @return ID of this player.
-     */
-    public int getID() {
-        return this.id;
-    }
-
-    /**
-     * Returnes position of this player.
-     * @return position of this player.
-     */
-    public Pair getPosition() {
-        return position;
-    }
-
-    /**
      * Setting new position to this player.
      * @param position position to set.
      */
@@ -184,22 +134,6 @@ public class Player implements MoveableObject {
     }
 
     /**
-     * Returns current explosion radius parameter.
-     * @return current explosion radius parameter.
-     */
-    public int getRadius() {
-        return this.explRadius;
-    }
-
-    /**
-     * Returns nickName of this player.
-     * @return nickName of this player.
-     */
-    public String getNickName() {
-        return nickName;
-    }
-
-    /**
      * If this method was called, then depending on bonus
      * some player pareametres must increase or change.
      * @param bonusID ID of taked bonus.
@@ -217,7 +151,83 @@ public class Player implements MoveableObject {
         if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
             maxBombs--;
         }
-    }    
+    }
+
+    public synchronized void changePoints(int delta){
+        this.points += delta;
+    }
+
+    /**
+     * Returns ID of this player.
+     * @return ID of this player.
+     */
+    public int getID() {
+        return this.id;
+    }
+
+    /**
+     * Returnes position of this player.
+     * @return position of this player.
+     */
+    public Pair getPosition() {
+        return position;
+    }
+    
+    /**
+     * Returns current explosion radius parameter.
+     * @return current explosion radius parameter.
+     */
+    public int getRadius() {
+        return this.explRadius;
+    }
+
+    /**
+     * Returns nickName of this player.
+     * @return nickName of this player.
+     */
+    public String getNickName() {
+        return nickName;
+    }
+
+
+    /**
+     * Returns how much bombes player already setted.
+     * <p> This is not the amount of bombes that player placed during all game.
+     * This is number of bombs placed simultaneously.
+     * @return
+     */
+    public int getSettedBombsNum() {
+        return this.settedBombs;
+    }
+
+    /**
+     * Returns info about player state in next format:
+     * <p> positionX positionY nickName lives bombs maxBombs
+     * @return info about player state.
+     */
+    public String getInfo() {
+        String ret = this.position.getX() + " " +
+                     this.position.getY() + " " +
+                     this.nickName + " " +
+                     this.lives + " " +
+                     this.settedBombs + " " +
+                     this.maxBombs + " " +
+                     this.explRadius;
+
+        return ret;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public int getPoints() { //TODO PLAYER MUST NOT TO HAVE THIS. MOdel must calculate points!
+        return points;
+    }
 
     static enum PlayerState{
         NORMAL {

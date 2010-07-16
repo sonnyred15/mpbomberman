@@ -175,8 +175,6 @@ public class Bomb implements MoveableObject {
             return false;
         } else if (gameMap.playerIDAt(x, y) != -1) {     // playerSquare
             int id = gameMap.playerIDAt(x, y);
-
-            this.owner.damagedSomeone();
             model.playerBombed(this.owner, id);
 
             return false;

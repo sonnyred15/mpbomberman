@@ -93,7 +93,7 @@ public class Game {
 
         //
         int playerID = this.tryJoin(owner);
-        assert playerID!=(-1); //if owner can`t autojoin it is very strange problem...
+        assert (playerID > 0); //if owner can`t autojoin it is very strange problem...
         owner.setPlayerID(playerID);
 
         //
@@ -116,7 +116,7 @@ public class Game {
 
         Player bot = null;
 
-        synchronized (this) { //TODO can we synchronize not by Game? mb Model or something else?
+        synchronized (this) {
             if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
                 bot = this.model.addBot(name);
                 this.gameStartedListeners.add((GameStartedListener) bot);
@@ -130,20 +130,20 @@ public class Game {
     }
 
     /**
-     * Adding listener that listens for game ended event.
-     * @param gameEndedListener listener.
-     */
-    public void addGameEndedListener(GameEndedListener gameEndedListener) {
-        this.gameEndedListeners.add(gameEndedListener);
-    }
-
-    /**
      * Adding listener that listens for game started event.
      * @param gameStartedListener listener;
      */
     public void addGameStartedListener(
             GameStartedListener gameStartedListener) {
         this.gameStartedListeners.add(gameStartedListener);
+    }
+
+    /**
+     * Adding listener that listens for game ended event.
+     * @param gameEndedListener listener.
+     */
+    public void addGameEndedListener(GameEndedListener gameEndedListener) {
+        this.gameEndedListeners.add(gameEndedListener);
     }
 
     /**
@@ -169,7 +169,8 @@ public class Game {
      * @return true if move was done. false if game is not started
      * or move was not done.
      */
-    public boolean tryDoMove(int playerID, Direction direction) {//TODO think about synchronization
+    public boolean tryDoMove(int playerID, Direction direction) {
+        //all synchronization of such actions as Move, PlaceBomb etc must be provided by IModel
         if(!this.started){
             return false;
         }
@@ -296,7 +297,7 @@ public class Game {
      * Checks if game is started.
      * @return true if game is started, false otherwise.
      */
-    public boolean isStarted() {//TODO what`s about sync //TODO use state pattern
+    public boolean isStarted() {//TODO introduce Lobby class where game must start
         return this.started;
     }
 
@@ -415,6 +416,7 @@ public class Game {
      * @return true if bomb was placed, false otherwise.
      */
     public boolean tryPlaceBomb(int playerID) {
+        //all synchronization of such actions as Move, PlaceBomb etc must be provided by IModel
         if (!this.started) {
             return false;
         }
