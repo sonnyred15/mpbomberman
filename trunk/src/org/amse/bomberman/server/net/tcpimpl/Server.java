@@ -8,7 +8,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.net.*;
-import org.amse.bomberman.server.view.ServerChangeListener;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
 import org.amse.bomberman.util.impl.ConsoleLog;
@@ -21,7 +20,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import java.nio.channels.IllegalBlockingModeException;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,21 +30,18 @@ import org.amse.bomberman.server.gameinit.GameStorage;
  * @author Kirilchuk V.E.
  */
 public class Server implements IServer {
-    private ILog log = new ConsoleLog();    // could be never initialized. Use writeToLog(...) instead of log.println(...)
+    private ILog log = new ConsoleLog();//TODO make fabric for this.
     private final int            port;
 
     //    
-    private final ServerState    serverState = ServerState.SHUTDOWNED;
+    private volatile StateControl stateControl = StateControl.SHUTDOWNED;
     //
     private ServerSocket         serverSocket;
-    private GameStorage          gameStorage;
-    private volatile boolean     shutdowned = true;    // true until we start accepting clients.
+    private GameStorage          gameStorage;    
     private Thread               listeningThread;
     private final List<ISession> sessions =
                                          new CopyOnWriteArrayList<ISession>();
     private int                  sessionCounter = 0;    // need to generate name of log files.
-    private long                 startTime;
-    private ServerChangeListener changeListener;
 
     /**
      * Constructor with default port.
@@ -72,35 +67,7 @@ public class Server implements IServer {
     @Override
     public synchronized void start() throws IOException,
                                             IllegalStateException {
-        try {
-            if (shutdowned) {
-                this.shutdowned = false;
-                this.serverSocket = new ServerSocket(port, 0);    // throws IOExeption,SecurityException
-                this.listeningThread = new Thread(new SocketListen(this));
-                this.listeningThread.start();
-                this.gameStorage = new GameStorage(this);
-            } else {
-                throw new IllegalStateException("Server: start error. " +
-                                                "Already accepting. " +
-                                                "Can`t raise.");
-            }
-        } catch (IOException ex) {
-            writeToLog("Server: start error. " + ex.getMessage());
-
-            throw ex;
-        } catch (SecurityException ex) {
-            writeToLog("Server: start error. " + ex.getMessage());
-
-            throw ex;
-        }
-
-        this.startTime = System.currentTimeMillis();
-
-        if (this.changeListener != null) {
-            this.changeListener.changed(this);
-        }
-
-        writeToLog("Server: started.");
+        this.stateControl.start(this);
     }
 
     /**
@@ -114,56 +81,12 @@ public class Server implements IServer {
                                     throws IOException,
                                            IllegalStateException,
                                            SecurityException {
-        try {
-            if (!this.shutdowned) {
-                this.shutdowned = true;
-
-                if (this.listeningThread != null) {
-                    this.listeningThread = null;
-                }
-
-                // this.sessionCounter = 0;
-                // this.sessions.clear(); SESSIONS MUST AUTOCLEAR BY INTERRUPT!!!
-                this.gameStorage.clearGames();
-
-                if (this.serverSocket != null) {
-                    this.serverSocket.close();
-                    this.serverSocket = null;
-                }
-
-                if (this.log != null) {
-                    try {
-                        this.log.close();
-                    } catch (IOException ex) {
-                        System.out.println("Server: stop warning. " +
-                                           "Can`t save log." + ex.getMessage());
-                    }
-                }
-            } else {
-                throw new IllegalStateException("Server: stop error. " +
-                                                "Is not raised. " +
-                                                "Can`t shutdown.");
-            }
-        } catch (IOException ex) {
-            writeToLog("Server: stop error. " + ex.getMessage());
-
-            throw ex;
-        } catch (SecurityException ex) {
-            writeToLog("Server: stop error. " + ex.getMessage());
-
-            throw ex;
-        }
-
-        if (this.changeListener != null) {
-            this.changeListener.changed(this);
-        }
-
-        writeToLog("Server: shutdowned.");
+        this.stateControl.shutdown(this);
     }
 
     @Override
     public boolean isShutdowned() {
-        return this.shutdowned;
+        return (this.stateControl==StateControl.SHUTDOWNED);
     }
 
     @Override
@@ -172,13 +95,12 @@ public class Server implements IServer {
     }
 
     @Override
-    public long getWorkTime() {
-        return (System.currentTimeMillis() - startTime) / 1000;
-    }
-
-    @Override
     public List<ISession> getSessions() {
         return this.sessions;
+    }
+
+    public GameStorage getGameStorage() {
+        return gameStorage;
     }
 
     @Override
@@ -186,26 +108,7 @@ public class Server implements IServer {
         this.sessions.remove(endedSession);
         this.sessionCounter--;
 
-        if (this.changeListener != null) {
-            this.changeListener.changed(this);
-        }
-
         writeToLog("Server: session removed.");
-    }
-
-    @Override
-    public void setChangeListener(ServerChangeListener logListener) {
-        this.changeListener = logListener;
-    }
-
-    @Override
-    public ServerChangeListener getChangeListener() {
-        return this.changeListener;
-    }
-
-    @Override
-    public List<String> getLog() {
-        return log.getLog();
     }
 
     @Override
@@ -214,10 +117,6 @@ public class Server implements IServer {
             System.out.println(message);
         } else {
             log.println(message);
-        }
-
-        if (changeListener != null) {
-            changeListener.addedToLog(message);
         }
     }
 
@@ -230,23 +129,17 @@ public class Server implements IServer {
 
         @Override
         public void run() {
-            writeToLog("Server: waiting for a new client...");
-
             try {
-                while (!shutdowned) {
-
-                    // throws IO, Security, SocketTimeout, IllegalBlockingMode
-                    // exceptions
+                while (!isShutdowned()) {
+                    writeToLog("Server: waiting for a new client...");
                     Socket clientSocket = serverSocket.accept();
 
                     writeToLog("Server: client connected. " +
                                "Starting new session thread...");
                     sessionCounter++;
 
-                    ISession newSession = null;
-
                     //
-                    newSession = new AsynchroSession( this.server,
+                    ISession newSession = new AsynchroSession(this.server,
                                                      clientSocket,
                                                      gameStorage,
                                                      sessionCounter,
@@ -255,10 +148,6 @@ public class Server implements IServer {
                     //
                     sessions.add(newSession);
                     newSession.start();
-
-                    if (changeListener != null) {
-                        changeListener.changed(this.server);
-                    }
                 }
             } catch (SocketTimeoutException ex) {    // never happen in current realization
                 writeToLog("Server: run warning. " + ex.getMessage());
@@ -268,22 +157,123 @@ public class Server implements IServer {
                 } else {
                     writeToLog("Server: error. " + ex.getMessage());    // else exception
                 }
-            } catch (SecurityException ex) {    // accept wasn`t allowed
-                writeToLog("Server: run error. " + ex.getMessage());
-            } catch (IllegalBlockingModeException ex) {    // CHECK < THIS// what comments should i write?
-                writeToLog("Server: run error. " + ex.getMessage());
             }
 
-            /* must free resources and stop our thread. */
-            int i = 1;
+            //
+            writeToLog("Server: listening(run) thread come to end. Freeing resources.");
+            freeResources();
+        }
 
+        private void freeResources() {
+            int i = 0;
+            
+            //Terminating all sessions
             for (ISession session : sessions) {
                 writeToLog("Server: interrupting session " + i + "...");
                 session.terminateSession();
                 ++i;
             }
 
-            writeToLog("Server: listening(run) thread come to end.");
+            //Clear all games.
+            if (server.gameStorage != null) {
+                server.gameStorage.clearGames();
+                server.gameStorage = null;
+            }
+
+            //Closing log
+            if (server.log != null) {
+                try {
+                    server.log.close();
+                } catch (IOException ex) {
+                    System.err.println("Server: freeing resources warning. "
+                            + "Can`t save log." + ex.getMessage());
+                }
+            }
+
         }
+    }
+
+    private enum StateControl {
+
+        STARTED() {
+
+            @Override
+            public void start(Server server) {
+                System.err.println(
+                        "Server: start error. Already in started state.");
+                throw new IllegalStateException("Server: start error. "
+                        + "Already in started state.");
+
+            }
+
+            @Override
+            public void shutdown(Server server) throws IOException {
+                try {
+                    //Stop accepting clients by closing ServerSocket
+                    //So, listening thread will end, but before he must clear
+                    //all resources: clear games, terminate sessions and so on.
+                    if (server.serverSocket != null) {
+                        server.serverSocket.close();
+                        server.serverSocket = null;
+                    }
+
+                    //nulling listeningThread.
+                    if (server.listeningThread != null) {
+                        server.listeningThread = null;
+                    }                  
+                } catch (IOException ex) {
+                    server.writeToLog("Server: stop error. " + ex.getMessage());
+
+                    throw ex;
+                } catch (SecurityException ex) {
+                    server.writeToLog("Server: stop error. " + ex.getMessage());
+
+                    throw ex;
+                }
+
+                server.stateControl = StateControl.SHUTDOWNED;
+                server.writeToLog("Server: shutdowned.");
+            }
+        },
+        SHUTDOWNED() {
+
+            @Override
+            public void start(Server server) throws IOException {
+                try {
+                    server.log = new ConsoleLog();//TODO this is HARDCODE! Refactor!
+                    server.serverSocket = new ServerSocket(server.port, 0);    // throws IOExeption,SecurityException
+                    server.listeningThread =
+                            new Thread(server.new SocketListen(server));                    
+                    server.gameStorage = new GameStorage(server);
+                } catch (IOException ex) {
+                    server.writeToLog("Server: start error. " + ex.getMessage());
+
+                    throw ex;
+                } catch (SecurityException ex) {
+                    server.writeToLog("Server: start error. " + ex.getMessage());
+
+                    throw ex;
+                }
+
+                server.stateControl = StateControl.STARTED;
+                server.listeningThread.start();
+                server.writeToLog("Server: started.");
+            }
+
+            @Override
+            public void shutdown(Server server) {
+                System.err.println("Server: shutdown error. Already shutdowned.");
+                throw new IllegalStateException("Server: shutdown error. "
+                        + "Already shutdowned.");
+            }
+        };
+
+        public abstract void start(Server server) throws IOException,
+                                                         IllegalStateException;
+
+        public abstract void shutdown(Server server)
+                throws IOException,
+                       IllegalStateException,
+                       SecurityException;
     }
 }

@@ -5,23 +5,23 @@
  */
 package org.amse.bomberman.server.view;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.net.IServer;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.net.IServer;
 
 /**
  * Class that represents ServerInfo JFrame. ServerInfo JFrame shows
@@ -29,27 +29,29 @@ import javax.swing.JTextArea;
  * like number of started/unstarted games, number of clients, etc.
  * @author Kirilchuk V.E.
  */
-public class ServerInfo extends JFrame implements ServerChangeListener {
+public class ServerInfo extends JFrame {
     private static final long serialVersionUID = 1L;
 
     //
-    private final String CLIENTS_LABEL_TEXT = "Clients: ";
-    private final String PORT_LABEL_TEXT = "Port: ";
-    private final String SHUTDOWNED_LABEL_TEXT = "Shutdowned: ";
-    private final String STARTED_GAMES_LABEL_TEXT = "Started games: ";
+    private final String CLIENTS_LABEL_TEXT         = "Clients: ";
+    private final String PORT_LABEL_TEXT            = "Port: ";
+    private final String SHUTDOWNED_LABEL_TEXT      = "Shutdowned: ";
+    private final String STARTED_GAMES_LABEL_TEXT   = "Started games: ";
     private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
 
     //
-    private final JTextArea log = new JTextArea();
-    private final JLabel    labelUnstartedGames =
-                                         new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
-    private final JLabel    labelStartedGames =
-                                         new JLabel(STARTED_GAMES_LABEL_TEXT);
+    private IServer         server;
+    private final JTextArea log                 = new JTextArea();
+    private final JLabel    labelUnstartedGames = new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
+    private final JLabel    labelStartedGames   = new JLabel(STARTED_GAMES_LABEL_TEXT);
 
     //
     private final JLabel labelShutdowned = new JLabel(SHUTDOWNED_LABEL_TEXT);
     private final JLabel labelPort       = new JLabel(PORT_LABEL_TEXT);
     private final JLabel labelClients    = new JLabel(CLIENTS_LABEL_TEXT);
+
+    //
+    private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Constructor of ServerInfo JFrame. Creates it.
@@ -85,65 +87,52 @@ public class ServerInfo extends JFrame implements ServerChangeListener {
 
         /* adding log to down panel */
         JPanel logPanel = new JPanel(new GridLayout());
-
         logPanel.add(new JScrollPane(log));
+        log.setText("This text area will be removed in next version.");
+
         this.add(logPanel);
+
+        //
+        timer.scheduleAtFixedRate(new Runnable() {
+
+            public void run() {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        update();
+                    }
+                });
+            }
+        }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * ServerChangeListener interface method.
-     * @see ServerChangeListener
-     * @param server Reference to server from which we must take changes.
-     */
-    public void changed(IServer server) {
-//        if (server != null) {
-//            this.labelPort.setText(PORT_LABEL_TEXT + server.getPort());
-//            this.labelClients.setText(CLIENTS_LABEL_TEXT +
-//                                      server.getSessions().size());
-//            this.labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT +
-//                                         server.isShutdowned());
-//
-//            if (!server.isShutdowned()) {
-//                List<Game> games = server.getGamesList();
-//                int        startedGamesCount = 0;
-//                int        unstartedGamesCount = 0;
-//
-//                for (Game game : games) {
-//                    if (game.isStarted()) {
-//                        startedGamesCount++;
-//                    } else if (!game.isStarted()) {
-//                        unstartedGamesCount++;
-//                    }
-//                }
-//
-//                this.labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT +
-//                                               startedGamesCount);
-//                this.labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT +
-//                                                 unstartedGamesCount);
-//
-//            } else {
-//                this.labelStartedGames.setText(this.labelStartedGames.getText() +
-//                                               "(was)");
-//                this.labelUnstartedGames.setText(this.labelUnstartedGames.getText() +
-//                                                 "(was)");
-//            }
-//        }
+    public void setServer(IServer server) {
+        this.server = server;
     }
 
-    /**
-     * ServerChangeListener interface method.
-     * @see ServerChangeListener
-     * @param line message that was added to log.
-     */
-    public void addedToLog(String line) {
-        log.append(line + "\n");
-        log.setCaretPosition(log.getText().length() - 1 - line.length());
+    private void update() {
+        if (server != null) {
+            this.labelShutdowned.setText(this.SHUTDOWNED_LABEL_TEXT + this.server.isShutdowned());
+            this.labelPort.setText(this.PORT_LABEL_TEXT + this.server.getPort());
+            this.labelClients.setText(this.CLIENTS_LABEL_TEXT + this.server.getSessions().size());
+
+            if(!server.isShutdowned()) {
+                List<Game> games = server.getGameStorage().getGamesList();
+                int started = 0;
+                int unstarted = 0;
+                for (Game game : games) {
+                    if(game.isStarted()) {
+                        started++;
+                    } else {
+                        unstarted++;
+                    }
+                }
+
+                this.labelStartedGames.setText(this.STARTED_GAMES_LABEL_TEXT + started);
+                this.labelUnstartedGames.setText(this.UNSTARTED_GAMES_LABEL_TEXT + unstarted);
+            }
+        }
     }
 
-    /**
-     * Clears text of log.
-     */
-    public void clearLog() {
-        log.setText("");
-    }
+
 }
