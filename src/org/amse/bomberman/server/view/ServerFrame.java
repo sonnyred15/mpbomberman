@@ -21,13 +21,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.text.MaskFormatter;
 
 /**
  * Server startup window class.
@@ -39,12 +41,29 @@ public class ServerFrame extends JFrame {
     //
     private final String         BTN_TEXT_DOWN  = "Down";
     private final String         BTN_TEXT_RAISE = "Raise";
-    private final ServerInfo     info           = new ServerInfo();
-    private final JLabel         portLabel      = new JLabel("Server Port");
-    private final JTextField     portField      = new JTextField("" + Constants.DEFAULT_PORT);
+    private final ServerInfo     infoFrame      = new ServerInfo();
+    private final JLabel         portLabel      = new JLabel("Server Port");    
     private final AbstractButton btnStatus      = new JButton("Status");
     private final AbstractButton btnControl     = new JButton(BTN_TEXT_RAISE);
     private IServer              server;
+
+    //
+    private final JFormattedTextField portField
+                                                = new JFormattedTextField();
+    MaskFormatter f;
+    {
+        portField.setColumns(5);        
+        try{
+            f = new MaskFormatter("#####");
+            f.setOverwriteMode(true);
+            f.setPlaceholder("" + Constants.DEFAULT_PORT);
+            f.setPlaceholderCharacter('0');
+            f.install(portField);            
+        } catch (ParseException ex){
+            throw new RuntimeException("Wrong configuration " +
+                    "of formatter for input." + ex.getMessage());
+        }
+    }
 
     /**
      * Constructor of ServerFrame. Create and show it.
@@ -89,60 +108,39 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new Server(port);    // Now always Asynchronous server with asynchronous session
-            server.setChangeListener(info);
-            info.clearLog();
+            server = new Server(port);//TODO mb make fabric?            
             server.start();
+            infoFrame.setServer(server);
+            btnStatus.setEnabled(true);
+            btnControl.setText(BTN_TEXT_DOWN);
         } catch (NumberFormatException ex) {                     // parse errors
             showErrorMessage(ex.getMessage());
-
-            return;
         } catch (IllegalArgumentException ex) {                  // wrong port(not in 0..65535)
             showErrorMessage(ex.getMessage());
-
-            return;
         } catch (IOException ex) {                               // sockets errors. Server logging them.
             showErrorMessage(ex.getMessage());
-
-            return;
         } catch (IllegalStateException ex) {                     // must never happen
             showErrorMessage(ex.getMessage());
-
-            return;
         }
-
-        btnStatus.setEnabled(true);
-        btnControl.setText(BTN_TEXT_DOWN);
     }
 
     private void downServer() {
         try {
-            if (server != null) {
-                server.shutdown();
-            } else {
-                String message = "No server. Can`t shutdown";
-
-                showErrorMessage(message);
-            }
+            server.shutdown();
+            btnStatus.setEnabled(false);
+            btnControl.setText(BTN_TEXT_RAISE);
         } catch (IOException ex) {              // Server loggs IOErrors and throw them again.
             showErrorMessage(ex.getMessage());
-
-            return;
-        } catch (IllegalStateException ex) {    // must never happen
+        } catch (IllegalStateException ex) {
             showErrorMessage(ex.getMessage());
-
-            return;
         }
-
-        btnStatus.setEnabled(false);
-        btnControl.setText(BTN_TEXT_RAISE);
     }
 
     private void showErrorMessage(String message) {
-        Creator.createErrorDialog(this, message, "Error");
+        Creator.createErrorDialog(this, "Error.", message);
     }
 
-    private class ServerControlButtonListener implements ActionListener {
+    private class ServerControlButtonListener implements ActionListener { //TODO bad practice code...
         @Override
         public void actionPerformed(ActionEvent e) {
             if (btnControl.getText().equals(BTN_TEXT_RAISE)) {
@@ -153,11 +151,10 @@ public class ServerFrame extends JFrame {
         }
     }
 
-
     private class StatusButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            info.setVisible(true);
+            infoFrame.setVisible(true);
         }
     }
 }
