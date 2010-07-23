@@ -327,7 +327,9 @@ public class AsynchroSession extends AbstractSession {
     @Override
     protected void freeResources() {
         if (this.controller != null) {
-            this.controller.tryLeaveGame();
+            if (this.controller.getMyGame() != null) { //without this check controller will print error.
+                this.controller.tryLeaveGame();
+            }
         }
 
         if (this.endListener != null) {

@@ -22,7 +22,11 @@ public class ConsoleLog implements ILog {
             temporaryLog.clear();
         }
         temporaryLog.add(message);
-        System.out.println(message);
+        if(message.contains("error")){
+            System.err.println(message);
+        } else {
+            System.out.println(message);
+        }
     }
 
     public void close() {

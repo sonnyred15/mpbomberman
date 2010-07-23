@@ -146,6 +146,7 @@ public class ServerFrame extends JFrame {
             if (btnControl.getText().equals(BTN_TEXT_RAISE)) {
                 raiseServer();
             } else {
+                infoFrame.setVisible(false); // Note that timer in it still works!!
                 downServer();
             }
         }

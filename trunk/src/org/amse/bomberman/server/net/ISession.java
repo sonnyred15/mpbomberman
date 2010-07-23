@@ -64,4 +64,6 @@ public interface ISession {
     void notifyClient(List<String> message);
 
     GameStorage getGameStorage();
+
+    int getID();
 }

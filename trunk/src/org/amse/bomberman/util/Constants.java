@@ -116,7 +116,7 @@ public final class Constants {
             return this.value;
         }
 
-        public static Command fromInt(int command) {
+        public static Command valueOf(int command) {
             switch (command) {
                 case 0:
                     return GET_GAMES;

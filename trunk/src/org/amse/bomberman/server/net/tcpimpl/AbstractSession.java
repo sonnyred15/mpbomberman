@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 
 import java.net.Socket;
 import java.net.SocketException;
@@ -36,7 +37,7 @@ import org.amse.bomberman.util.ProtocolConstants;
  * @author Kirilchuk V.E.
  */
 public abstract class AbstractSession extends Thread implements ISession {
-    protected ILog                     log = null;    // it can be null. So use writeToLog() instead of log.println()
+    protected final ILog               log;    // it can be null. So use writeToLog() instead of log.println()
     protected final Socket             clientSocket;
     protected final GameStorage        gameStorage;
     protected final int                sessionID;
@@ -45,7 +46,10 @@ public abstract class AbstractSession extends Thread implements ISession {
     public AbstractSession(Socket clientSocket,
                            GameStorage gameStorage, int sessionID,
                            ILog log) {
-        this.setDaemon(true);      
+        assert (clientSocket != null);
+        assert (gameStorage != null);
+
+        this.setDaemon(true);
         this.clientSocket = clientSocket;
         this.gameStorage = gameStorage;
         this.sessionID = sessionID;
@@ -55,68 +59,65 @@ public abstract class AbstractSession extends Thread implements ISession {
 
     @Override
     public void run() {
+        setClientSocketTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);
+
         BufferedReader in = null;
-
-        try {
-            this.clientSocket.setSoTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);    // throws SocketException
-        } catch (SocketException ex) {
-            writeToLog("Session: exception in run method. " + ex.getMessage());    // Error in the underlaying TCP protocol.
-        }
-
-        writeToLog("Session: waiting query from client...");
-
         try {
             InputStream       is = this.clientSocket.getInputStream();
             InputStreamReader isr = new InputStreamReader(is, "UTF-8");
 
             in = new BufferedReader(isr);
-
-            String clientQueryLine;
-
+            String clientQueryLine = null;
+            writeToLog("Session: waiting queries from client...");
             while (!this.mustEnd) {
-                try {
-                    clientQueryLine = in.readLine();    // throws IOException
+                clientQueryLine = in.readLine();    // throws IOException
 
-                    if (clientQueryLine == null) {
-                        break;
-                    }
-
-                    answerOnCommand(clientQueryLine);
-                } catch (SocketTimeoutException ex) {    // if client not responsable
-                    writeToLog("Session: terminated by socket timeout. " +
-                               ex.getMessage());
-
+                if (clientQueryLine == null) {      //EOF (client is OFF.)
                     break;
                 }
+
+                answerOnCommand(clientQueryLine);
             }
-        } catch (IOException ex) {    // IOException in in.readLine()
+        } catch (SocketTimeoutException ex) {
+            writeToLog("Session: terminated by socket timeout. "
+                    + ex.getMessage());
+        } catch (IOException ex) {
             writeToLog("Session: run error. " + ex.getMessage());
         } finally {
             try {
                 if (in != null) {
-                    this.clientSocket.close();
+                    in.close();                         //this will close socket too...
+                } else {
+                    this.clientSocket.close();          //will close "is".
                 }
-            } catch (IOException ex) {
-                writeToLog("Session: run error. " + ex.getMessage());
+            } catch (IOException ex){
+                ex.printStackTrace();
             }
 
             writeToLog("Session: freeing resources.");
             freeResources();
+
             writeToLog("Session: closing log...and end.");
+            tryCloseLog();
+        }
+    }
 
-            try {
-                if (this.log != null) {
-                    this.log.close();    // throws IOException
-                    this.log = null;
-                }
-            } catch (IOException ex) {
-
-                // can`t close log stream. Log wont be saved
-                System.err.println("Session: run error. Can`t close log stream. " +
-                                   "Log won`t be saved. " + ex.getMessage());
+    private void tryCloseLog() {
+        try {
+            if (this.log != null) {
+                this.log.close(); // throws IOException                
             }
+        } catch (IOException ex) {
+            // can`t close log stream. Log wont be saved
+            System.err.println("Session: run error. Can`t close log stream. " + "Log won`t be saved. " + ex.getMessage());
+        }
+    }
 
-            System.out.println("Session: session ended.");
+    private void setClientSocketTimeout(int timeout) {
+        try {
+            this.clientSocket.setSoTimeout(timeout); // throws SocketException
+        } catch (SocketException ex) {
+            writeToLog("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
         }
     }
 
@@ -125,7 +126,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         this.mustEnd = true;
 
         try {
-            this.clientSocket.close();
+            this.clientSocket.shutdownInput();
         } catch (IOException ex) {
             writeToLog("Session: terminateSession error. " + ex.getMessage());
         }
@@ -158,6 +159,9 @@ public abstract class AbstractSession extends Thread implements ISession {
     @Override
     public void sendAnswer(List<String> linesToSend)
                                     throws IllegalArgumentException {
+        assert(linesToSend!=null);
+        assert(linesToSend.size()>0);
+
         BufferedWriter out = null;
 
         try {
@@ -167,17 +171,9 @@ public abstract class AbstractSession extends Thread implements ISession {
             out = new BufferedWriter(osw);
             writeToLog("Session: sending answer...");
 
-            if ((linesToSend == null) || (linesToSend.size() == 0)) {
-                writeToLog("Session: sendAnswer error. Realization error." +
-                           " Tryed to send 0 strings to client.");
-
-                throw new IllegalArgumentException("Session sendAnswer method must send" +
-                                                   " at least one string to client.");
-            } else {
-                for (String string : linesToSend) {
-                    out.write(string);
-                    out.newLine();
-                }
+            for (String string : linesToSend) {
+                out.write(string);
+                out.newLine();
             }
 
             out.write(""); //TODO magic code...
@@ -192,11 +188,9 @@ public abstract class AbstractSession extends Thread implements ISession {
     public abstract void notifyClient(String message);
 
     @Override
-    public abstract void notifyClient(List<String> messages);
+    public abstract void notifyClient(List<String> messages);    
 
-    protected abstract void freeResources();
-
-    protected void answerOnCommand(String query) { //TODO cmd must use polymorphism! Don`t use such switch case!
+    protected void answerOnCommand(String query) {
         writeToLog("Session: query received. query=" + query);
 
         if (query.length() == 0) {
@@ -213,7 +207,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         try {
             int command = Integer.parseInt(queryArgs[0]);
 
-            cmd = Command.fromInt(command);    // throws IllegalArgumentException
+            cmd = Command.valueOf(command);    // throws IllegalArgumentException
         } catch (NumberFormatException ex) {
             sendAnswer("Wrong query.");
             writeToLog("Session: answerOnCommand error. " +
@@ -376,9 +370,7 @@ public abstract class AbstractSession extends Thread implements ISession {
             }
 
             default : {
-                sendAnswer("Unrecognized command!");
-                writeToLog("Session: answerOnCommand error." +
-                           " Getted unrecognized command.");
+                assert false; //must never happen cause IllegalArgument already catched.
             }
         }
     }
@@ -400,6 +392,12 @@ public abstract class AbstractSession extends Thread implements ISession {
     public GameStorage getGameStorage() {
         return this.gameStorage;
     }
+
+    public int getID() {
+        return sessionID;
+    }
+
+    protected abstract void freeResources();
 
     protected abstract void sendGames();
 

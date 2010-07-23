@@ -165,14 +165,12 @@ public class Server implements IServer {
         }
 
         private void freeResources() {
-            int i = 0;
-            
             //Terminating all sessions
             for (ISession session : sessions) {
-                writeToLog("Server: interrupting session " + i + "...");
+                writeToLog("Server: interrupting session " + session.getID() + "...");
                 session.terminateSession();
-                ++i;
             }
+            sessionCounter = 0;
 
             //Clear all games.
             if (server.gameStorage != null) {
