@@ -14,7 +14,6 @@ import org.amse.bomberman.server.net.ISession;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -34,11 +33,13 @@ public class Notificator extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Notificator thread started.");
+        List<String> messages = new ArrayList<String>();
         while (!server.isShutdowned()) {
             try {
 
                 // get all messages into list
-                List<String> messages = new ArrayList<String>();
+                messages.clear();
                 queue.drainTo(messages);
 
                 // notifying all sessions
@@ -48,7 +49,7 @@ public class Notificator extends Thread {
                     if(messages.size()==0) {
                         break;
                     }
-                    ses.sendAnswer(messages);
+                    ses.notifyClient(messages);
                 }
 
                 // sleeping at least for 1 second

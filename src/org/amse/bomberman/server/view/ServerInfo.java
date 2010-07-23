@@ -65,10 +65,8 @@ public class ServerInfo extends JFrame {
         this.setMinimumSize(new Dimension(400, 300));
         this.setResizable(true);
 
-        // this.setLocationRelativeTo(null); //null for center position
-
-        /* setting main layout of server control JFrame */
-        this.setLayout(new GridLayout(2, 1));
+        // null for center position nothing for upper left corner
+        // this.setLocationRelativeTo(null);
 
         /* adding elements to up panel */
         JPanel infoPanel = new JPanel(new GridLayout(3, 2));
@@ -79,18 +77,7 @@ public class ServerInfo extends JFrame {
         infoPanel.add(labelUnstartedGames);
         infoPanel.add(labelStartedGames);
 
-        // infoPanel.add(labelTime);
         this.add(infoPanel);
-
-        /* settings of log text area */
-        log.setEditable(false);
-
-        /* adding log to down panel */
-        JPanel logPanel = new JPanel(new GridLayout());
-        logPanel.add(new JScrollPane(log));
-        log.setText("This text area will be removed in next version.");
-
-        this.add(logPanel);
 
         //
         timer.scheduleAtFixedRate(new Runnable() {

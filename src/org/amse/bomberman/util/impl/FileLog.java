@@ -15,7 +15,7 @@ import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
 
 /**
- *
+ * @deprecated 
  * @author Kirilchuck V.E.
  */
 public class FileLog implements ILog {
