@@ -48,22 +48,11 @@ public interface ISession {
      */
     void sendAnswer(String message);
 
-    /**
-     * Notifyes client about something by sending message to him.
-     * <p>This method is not the same as sendAnswer by one reason:
-     * if connection between session and client is synchronous then session
-     * can only answer on such client requests and can`t notify client about
-     * something without his request, so notifyClient must do nothing.
-     * On the other hand if connection is
-     * asynchronous then session can send messages to client whenever
-     * it is needed.
-     * @param message notification to send.
-     */
-    void notifyClient(String message);
-
-    void notifyClient(List<String> message);
-
     GameStorage getGameStorage();
+    
+    CommandExecutor getCommandExecutor();
 
     int getID();
+
+    boolean isMustEnd();
 }
