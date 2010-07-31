@@ -21,11 +21,12 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Kirilchuk V.E.
  */
-public class Notificator extends Thread {
+public class GlobalNotificator extends Thread {
     private final BlockingQueue<String> queue;
     private final IServer       server;
 
-    public Notificator(IServer server) {
+    public GlobalNotificator(IServer server) {
+        super("Global notificator");
         this.server = server;
         this.queue  = new ArrayBlockingQueue<String>(5);
         this.setDaemon(true);
@@ -33,7 +34,7 @@ public class Notificator extends Thread {
 
     @Override
     public void run() {
-        System.out.println("Notificator thread started.");
+        System.out.println("Global notificator thread started.");
         List<String> messages = new ArrayList<String>();
         while (!server.isShutdowned()) {
             try {
@@ -49,7 +50,7 @@ public class Notificator extends Thread {
                     if(messages.size()==0) {
                         break;
                     }
-                    ses.notifyClient(messages);
+                    ses.sendAnswer(messages); //not ses.notifyClient cause notifyClient already asynchronous.
                 }
 
                 // sleeping at least for 1 second
@@ -59,7 +60,7 @@ public class Notificator extends Thread {
             }
         }
 
-        System.out.println("Notificator thread ended.");
+        System.out.println("Global notificator thread ended.");
     }
 
     /**

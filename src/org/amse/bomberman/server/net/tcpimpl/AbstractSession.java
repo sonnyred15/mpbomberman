@@ -9,7 +9,7 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Constants.Command;
+import org.amse.bomberman.util.Command; 
 import org.amse.bomberman.util.ILog;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 
 import java.net.Socket;
 import java.net.SocketException;
@@ -29,6 +28,7 @@ import java.net.SocketTimeoutException;
 
 import java.util.List;
 import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.net.CommandExecutor;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.ProtocolConstants;
 
@@ -37,7 +37,7 @@ import org.amse.bomberman.util.ProtocolConstants;
  * @author Kirilchuk V.E.
  */
 public abstract class AbstractSession extends Thread implements ISession {
-    protected final ILog               log;    // it can be null. So use writeToLog() instead of log.println()
+    protected final ILog               log;    // it can be null. So use System.out.println() instead of log.println()
     protected final Socket             clientSocket;
     protected final GameStorage        gameStorage;
     protected final int                sessionID;
@@ -57,6 +57,10 @@ public abstract class AbstractSession extends Thread implements ISession {
         this.mustEnd = false;
     }
 
+    public boolean isMustEnd() {
+        return this.mustEnd;
+    }
+
     @Override
     public void run() {
         setClientSocketTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);
@@ -68,7 +72,7 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             in = new BufferedReader(isr);
             String clientQueryLine = null;
-            writeToLog("Session: waiting queries from client...");
+            System.out.println("Session: waiting queries from client...");
             while (!this.mustEnd) {
                 clientQueryLine = in.readLine();    // throws IOException
 
@@ -79,10 +83,10 @@ public abstract class AbstractSession extends Thread implements ISession {
                 answerOnCommand(clientQueryLine);
             }
         } catch (SocketTimeoutException ex) {
-            writeToLog("Session: terminated by socket timeout. "
+            System.out.println("Session: terminated by socket timeout. "
                     + ex.getMessage());
         } catch (IOException ex) {
-            writeToLog("Session: run error. " + ex.getMessage());
+            System.err.println("Session: run error. " + ex.getMessage());
         } finally {
             try {
                 if (in != null) {
@@ -94,10 +98,10 @@ public abstract class AbstractSession extends Thread implements ISession {
                 ex.printStackTrace();
             }
 
-            writeToLog("Session: freeing resources.");
+            System.out.println("Session: freeing resources.");
             freeResources();
 
-            writeToLog("Session: closing log...and end.");
+            System.out.println("Session: closing log...and end.");
             tryCloseLog();
         }
     }
@@ -117,7 +121,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         try {
             this.clientSocket.setSoTimeout(timeout); // throws SocketException
         } catch (SocketException ex) {
-            writeToLog("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
+            System.err.println("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
         }
     }
 
@@ -128,7 +132,7 @@ public abstract class AbstractSession extends Thread implements ISession {
         try {
             this.clientSocket.shutdownInput();
         } catch (IOException ex) {
-            writeToLog("Session: terminateSession error. " + ex.getMessage());
+            System.err.println("Session: terminateSession error. " + ex.getMessage());
         }
     }
 
@@ -141,14 +145,14 @@ public abstract class AbstractSession extends Thread implements ISession {
             OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 
             out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
+            System.out.println("Session: sending answer...");
             out.write(shortAnswer);
             out.newLine();
             out.write(""); //TODO magic code...
             out.newLine();
             out.flush();
         } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
+            System.err.println("Session: sendAnswer error. " + ex.getMessage());
         }
     }
 
@@ -169,7 +173,7 @@ public abstract class AbstractSession extends Thread implements ISession {
             OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
 
             out = new BufferedWriter(osw);
-            writeToLog("Session: sending answer...");
+            System.out.println("Session: sending answer...");
 
             for (String string : linesToSend) {
                 out.write(string);
@@ -180,22 +184,16 @@ public abstract class AbstractSession extends Thread implements ISession {
             out.newLine();
             out.flush();
         } catch (IOException ex) {
-            writeToLog("Session: sendAnswer error. " + ex.getMessage());
+            System.err.println("Session: sendAnswer error. " + ex.getMessage());
         }
     }
 
-    @Override
-    public abstract void notifyClient(String message);
-
-    @Override
-    public abstract void notifyClient(List<String> messages);    
-
-    protected void answerOnCommand(String query) {
-        writeToLog("Session: query received. query=" + query);
+    protected void answerOnCommand(String query) {//TODO what if query==null is it possible?
+        System.out.println("Session: query received. query=" + query);
 
         if (query.length() == 0) {
-            sendAnswer("Empty query. Error on client side.");
-            writeToLog("Session: answerOnCommand warning. " +
+            sendAnswer(Protocol.emptyQueryError());
+            System.out.println("Session: answerOnCommand warning. " +
                        "Empty query received. Error on client side.");
 
             return;
@@ -209,184 +207,22 @@ public abstract class AbstractSession extends Thread implements ISession {
 
             cmd = Command.valueOf(command);    // throws IllegalArgumentException
         } catch (NumberFormatException ex) {
-            sendAnswer("Wrong query.");
-            writeToLog("Session: answerOnCommand error. " +
+            sendAnswer(Protocol.wrongQuery());
+            System.out.println("Session: answerOnCommand error. " +
                        "Wrong first part of query. " +
                        "Wrong query from client. " + ex.getMessage());
 
             return;
         } catch (IllegalArgumentException ex) {
-            sendAnswer("Wrong query. Not supported command.");
-            writeToLog("Session: answerOnCommand error. " +
+            sendAnswer(Protocol.wrongQuery("Not supported command."));
+            System.out.println("Session: answerOnCommand error. " +
                        "Non supported command int from client. " +
                        ex.getMessage());
 
             return;
         }
-
-        switch (cmd) {
-            case GET_GAMES : {
-
-                // "0"
-                sendGames();
-
-                break;
-            }
-
-            case CREATE_GAME : {
-
-                // "1 gameName mapName maxPlayers playerName" or just "1" for defaults
-                createGame(queryArgs);
-
-                break;
-            }
-
-            case JOIN_GAME : {
-
-                // "2 gameID botName"
-                joinGame(queryArgs);
-
-                break;
-            }
-
-            case DO_MOVE : {
-
-                // "3 direction"
-                doMove(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_MAP_INFO : {
-
-                // "4"
-                sendGameMapArray();
-
-                break;
-            }
-
-            case START_GAME : {
-
-                // "5"
-                startGame();
-
-                break;
-            }
-
-            case LEAVE_GAME : {
-
-                // "6"
-                leaveGame();
-
-                break;
-            }
-
-            case PLACE_BOMB : {
-
-                // "7"
-                placeBomb();
-
-                break;
-            }
-
-            case DOWNLOAD_GAME_MAP : {
-
-                // "8 mapName"
-                sendDownloadingGameMap(queryArgs);
-
-                break;
-            }
-
-            case GET_GAME_STATUS : {
-
-                // "9"
-                sendGameStatus();
-
-                break;
-            }
-
-            case GET_GAME_MAPS_LIST : {
-
-                // "10"
-                sendGameMapsList();
-
-                break;
-            }
-
-            case ADD_BOT_TO_GAME : {
-
-                // "11 gameID botName"
-                addBot(queryArgs);
-
-                break;
-            }
-
-            case GET_MY_GAME_INFO : {
-
-                // "12"
-                sendGameInfo();
-
-                break;
-            }
-
-            case CHAT_ADD_MSG : {
-
-                // "13 message"
-                addMessageToChat(queryArgs);
-
-                break;
-            }
-
-            case CHAT_GET_NEW_MSGS : {
-
-                // "14"
-                getNewMessagesFromChat();
-
-                break;
-            }
-
-            case REMOVE_BOT_FROM_GAME : {
-
-                // "15"
-                removeBotFromGame();
-
-                break;
-            }
-
-            case GET_MY_GAME_PLAYERS_STATS : {
-
-                // "16"
-                sendGamePlayersStats();
-
-                break;
-            }
-
-            case SET_PLAYER_NAME : {
-
-                // "17 name"
-                setClientName(queryArgs);
-
-                break;
-            }
-
-            default : {
-                assert false; //must never happen cause IllegalArgument already catched.
-            }
-        }
-    }
-
-    protected void writeToLog(String message) {
-        if ((this.log != null) &&!filtred(message)) {
-            this.log.println(message + "(sessionID=" + sessionID + ")");
-        }
-    }
-
-    protected boolean filtred(String message) {
-
-//      if (message.startsWith("Session")) {
-//          return true;
-//      }
-        return false;
+        
+        cmd.execute(this.getCommandExecutor(), queryArgs);
     }
 
     public GameStorage getGameStorage() {
@@ -399,40 +235,6 @@ public abstract class AbstractSession extends Thread implements ISession {
 
     protected abstract void freeResources();
 
-    protected abstract void sendGames();
-
-    protected abstract void createGame(String[] queryArgs);
-
-    protected abstract void joinGame(String[] queryArgs);
-
-    protected abstract void doMove(String[] queryArgs);
-
-    protected abstract void sendGameMapArray();
-
-    protected abstract void startGame();
-
-    protected abstract void leaveGame();
-
-    protected abstract void placeBomb();
-
-    protected abstract void sendDownloadingGameMap(String[] queryArgs);
-
-    protected abstract void sendGameStatus();
-
-    protected abstract void sendGameMapsList();
-
-    protected abstract void addBot(String[] queryArgs);
-
-    protected abstract void sendGameInfo();
-
-    protected abstract void addMessageToChat(String[] queryArgs);
-
-    protected abstract void getNewMessagesFromChat();
-
-    protected abstract void removeBotFromGame();
-
-    protected abstract void sendGamePlayersStats();
-
-    protected abstract void setClientName(String[] name);
+    public  abstract CommandExecutor getCommandExecutor();
 
 }

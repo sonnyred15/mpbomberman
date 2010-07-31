@@ -2,7 +2,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import org.amse.bomberman.server.net.tcpimpl.Notificator;
+import org.amse.bomberman.server.net.tcpimpl.GlobalNotificator;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,11 +17,11 @@ import org.amse.bomberman.util.ProtocolConstants;
  */
 public class GameStorage implements GameChangeListener {
     private final List<Game> games = new LinkedList<Game>();
-    private final Notificator notificator;
+    private final GlobalNotificator notificator;
 
 
     public GameStorage(IServer server) {
-        this.notificator = new Notificator(server);
+        this.notificator = new GlobalNotificator(server);
         this.notificator.start();
     }
 

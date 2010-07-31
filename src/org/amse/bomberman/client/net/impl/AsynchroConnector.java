@@ -18,7 +18,7 @@ import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.util.Constants.Command;
+import org.amse.bomberman.util.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.ProtocolConstants;
 
@@ -83,7 +83,7 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestLeaveGame() throws NetException {
-        sendRequest("" + Command.LEAVE_GAME.getValue());
+        sendRequest("" + Command.LEAVE.getValue());
     }
 
     public void requestCreateGame(String gameName, String mapName, int maxPl)
@@ -134,7 +134,7 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestGameInfo() throws NetException {
-        sendRequest("" + Command.GET_MY_GAME_INFO.getValue());
+        sendRequest("" + Command.GET_GAME_INFO.getValue());
     }
 
     public void sendChatMessage(String message) throws NetException {

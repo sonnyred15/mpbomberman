@@ -8,7 +8,7 @@ package org.amse.bomberman.server.gameinit;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.bot.Bot;
-import org.amse.bomberman.server.gameinit.control.Controller;
+import org.amse.bomberman.server.net.tcpimpl.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
@@ -463,7 +463,7 @@ public class Game {
      */
     public void notifyGameSessions(String message) {
         for (Controller controller : controllers) {
-            controller.getSession().notifyClient(message);
+            controller.getSession().sendAnswer(message);
         }
     }
 
@@ -474,7 +474,7 @@ public class Game {
      */
     public void notifyGameSessions(List<String> messages) {
         for (Controller controller : controllers) {
-            controller.getSession().notifyClient(messages);
+            controller.getSession().sendAnswer(messages);
         }
     }
 

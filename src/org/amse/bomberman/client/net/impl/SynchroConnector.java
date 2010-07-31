@@ -15,17 +15,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JPanel;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.client.view.bomberwizard.Panel3;
-import org.amse.bomberman.client.net.RequestResultListener;
-import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Constants.Command;
+import org.amse.bomberman.util.Command;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.ProtocolConstants;
 
@@ -66,7 +62,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestLeaveGame() throws NetException {
-        List<String> answer = queryAnswer("" + Command.LEAVE_GAME.getValue());
+        List<String> answer = queryAnswer("" + Command.LEAVE.getValue());
         System.out.println(answer.get(0));
         // not essential, can be deleted. Use for stop timers faster.
         if (answer.get(0).equals("Disconnected.")) {
@@ -168,7 +164,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestGameInfo() throws NetException {
-        List<String> list = queryAnswer("" + Command.GET_MY_GAME_INFO.getValue());
+        List<String> list = queryAnswer("" + Command.GET_GAME_INFO.getValue());
         list.add(0, ProtocolConstants.CAPTION_GAME_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }

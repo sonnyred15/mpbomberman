@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 import org.amse.bomberman.server.gameinit.GameStorage;
-import org.amse.bomberman.server.gameinit.control.Controller;
+import org.amse.bomberman.server.net.tcpimpl.Controller;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
