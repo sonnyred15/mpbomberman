@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *

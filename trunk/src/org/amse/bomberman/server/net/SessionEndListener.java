@@ -13,7 +13,7 @@ public interface SessionEndListener {
 
     /**
      * Tells to server that session thread was ended so it can be removed.
-     * @param endedSession
+     * @param endedSession session that ended.
      */
     void sessionTerminated(ISession endedSession);
 }

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.Stringalize;
 
 /**

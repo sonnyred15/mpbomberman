@@ -24,7 +24,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *

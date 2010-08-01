@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.server.net;
+package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author Kirilchuk V.E
  */
-public interface CommandExecutor {
+public interface RequestExecutor {
 
     // commands
     void sendGames();

@@ -9,7 +9,7 @@ import java.util.List;
 import org.amse.bomberman.server.gameinit.control.GameChangeListener;
 import org.amse.bomberman.server.net.IServer;
 import org.amse.bomberman.server.net.ISession;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *

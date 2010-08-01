@@ -2,21 +2,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.util;
-
-import org.amse.bomberman.server.net.CommandExecutor;
-import org.amse.bomberman.server.net.ISession;
+package org.amse.bomberman.protocol;
 
 /**
  *
  * @author Kirilchuk V.E
  */
-public enum Command {
+public enum RequestCommand { //TODO it is better to do interface-subclasses implementation. not enum!
 
     GET_GAMES(0){// "0"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGames();
         }
 
@@ -24,7 +21,7 @@ public enum Command {
     CREATE_GAME(1) {// "1 gameName mapName maxPlayers playerName"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryCreateGame(args);
         }
 
@@ -32,7 +29,7 @@ public enum Command {
     JOIN_GAME(2) {//"2 gameID botName"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryJoinGame(args);
         }
 
@@ -40,7 +37,7 @@ public enum Command {
     DO_MOVE(3) {//"3 direction"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryDoMove(args);
         }
 
@@ -48,7 +45,7 @@ public enum Command {
     GET_GAME_MAP_INFO(4) {// "4"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGameMapInfo();
         }
 
@@ -56,7 +53,7 @@ public enum Command {
     START_GAME(5) {// "5"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryStartGame();
         }
 
@@ -64,7 +61,7 @@ public enum Command {
     LEAVE(6) { // "6"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryLeave();
         }
 
@@ -72,7 +69,7 @@ public enum Command {
     PLACE_BOMB(7) { // "7"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryPlaceBomb();
         }
 
@@ -80,7 +77,7 @@ public enum Command {
     DOWNLOAD_GAME_MAP(8) {// "8 mapName"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendDownloadingGameMap(args);
         }
 
@@ -88,7 +85,7 @@ public enum Command {
     GET_GAME_STATUS(9) {// "9"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGameStatus();
         }
 
@@ -96,7 +93,7 @@ public enum Command {
     GET_GAME_MAPS_LIST(10) {// "10"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGameMapsList();
         }
 
@@ -104,7 +101,7 @@ public enum Command {
     ADD_BOT_TO_GAME(11) {// "11 gameID botName"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryAddBot(args);
         }
 
@@ -112,7 +109,7 @@ public enum Command {
     GET_GAME_INFO(12) {// "12"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGameInfo();
         }
 
@@ -120,7 +117,7 @@ public enum Command {
     CHAT_ADD_MSG(13) { // "13 message"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.addMessageToChat(args);
         }
 
@@ -128,7 +125,7 @@ public enum Command {
     CHAT_GET_NEW_MSGS(14) {// "14"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.getNewMessagesFromChat();
         }
 
@@ -136,7 +133,7 @@ public enum Command {
     REMOVE_BOT_FROM_GAME(15) {// "15"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.tryRemoveBot();
         }
 
@@ -144,7 +141,7 @@ public enum Command {
     GET_GAME_PLAYERS_STATS(16) {// "16"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.sendGamePlayersStats();
         }
 
@@ -152,7 +149,7 @@ public enum Command {
     SET_CLIENT_NAME(17) {// "17 name"
 
         @Override
-        public void execute(CommandExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, String[] args) {
             executor.setClientName(args);
         }
 
@@ -160,7 +157,7 @@ public enum Command {
     //
     private final int value;
 
-    private Command(int value) {
+    private RequestCommand(int value) {
         this.value = value;
     }
 
@@ -168,7 +165,7 @@ public enum Command {
         return this.value;
     }
 
-    public static Command valueOf(int command) {
+    public static RequestCommand valueOf(int command) {
         switch (command) {
             case 0:
                 return GET_GAMES;
@@ -212,5 +209,5 @@ public enum Command {
         }
     }
 
-    public abstract void execute(CommandExecutor executor, String[] args);
+    public abstract void execute(RequestExecutor executor, String[] args);
 }

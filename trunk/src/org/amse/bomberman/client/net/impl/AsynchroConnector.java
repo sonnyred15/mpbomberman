@@ -18,9 +18,9 @@ import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.util.Command;
+import org.amse.bomberman.protocol.RequestCommand;
 import org.amse.bomberman.util.Constants.Direction;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -79,17 +79,17 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestGamesList() throws NetException {
-        sendRequest("" + Command.GET_GAMES.getValue());
+        sendRequest("" + RequestCommand.GET_GAMES.getValue());
     }
 
     public void requestLeaveGame() throws NetException {
-        sendRequest("" + Command.LEAVE.getValue());
+        sendRequest("" + RequestCommand.LEAVE.getValue());
     }
 
     public void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException {
 
-        sendRequest("" + Command.CREATE_GAME.getValue() +
+        sendRequest("" + RequestCommand.CREATE_GAME.getValue() +
                 split + gameName +
                 split + mapName +
                 split + maxPl +
@@ -105,49 +105,49 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestStartGame() throws NetException {
-        sendRequest("" + Command.START_GAME.getValue());
+        sendRequest("" + RequestCommand.START_GAME.getValue());
     }
 
     public void requestGameMap() throws NetException {
-        sendRequest("" + Command.GET_GAME_MAP_INFO.getValue());
+        sendRequest("" + RequestCommand.GET_GAME_MAP_INFO.getValue());
     }
 
     public void requestPlantBomb() throws NetException {
-        sendRequest("" + Command.PLACE_BOMB.getValue());
+        sendRequest("" + RequestCommand.PLACE_BOMB.getValue());
     }
 
     public void requestJoinBotIntoGame() throws NetException {
         Random r = new Random();
-        sendRequest("" + Command.ADD_BOT_TO_GAME.getValue() + split +
+        sendRequest("" + RequestCommand.ADD_BOT_TO_GAME.getValue() + split +
                 SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length - 1)]);
     }
     public void requestRemoveBotFromGame() throws NetException {
-        sendRequest("" + Command.REMOVE_BOT_FROM_GAME.getValue());
+        sendRequest("" + RequestCommand.REMOVE_BOT_FROM_GAME.getValue());
     }
 
     public void requestGameMapsList() throws NetException {
-        sendRequest("" + Command.GET_GAME_MAPS_LIST.getValue());
+        sendRequest("" + RequestCommand.GET_GAME_MAPS_LIST.getValue());
     }
 
     public void requestIsGameStarted() throws NetException {
-        sendRequest("" + Command.GET_GAME_STATUS.getValue());
+        sendRequest("" + RequestCommand.GET_GAME_STATUS.getValue());
     }
 
     public void requestGameInfo() throws NetException {
-        sendRequest("" + Command.GET_GAME_INFO.getValue());
+        sendRequest("" + RequestCommand.GET_GAME_INFO.getValue());
     }
 
     public void sendChatMessage(String message) throws NetException {
-        sendRequest("" + Command.CHAT_ADD_MSG.getValue() + split + message);
+        sendRequest("" + RequestCommand.CHAT_ADD_MSG.getValue() + split + message);
     }
 
     public void requestNewChatMessages() throws NetException {
-        sendRequest("" + Command.CHAT_GET_NEW_MSGS.getValue());
+        sendRequest("" + RequestCommand.CHAT_GET_NEW_MSGS.getValue());
     }
 
     public void requestDownloadGameMap(String gameMapName) throws NetException {
         sendRequest(
-                "" + Command.DOWNLOAD_GAME_MAP.getValue() + split + gameMapName);
+                "" + RequestCommand.DOWNLOAD_GAME_MAP.getValue() + split + gameMapName);
     }
 
     private class ServerListen implements Runnable {
@@ -163,7 +163,7 @@ public class AsynchroConnector implements IConnector {
                 List<String> message = new ArrayList<String>();
                 while (!Thread.interrupted() && (oneLine = in.readLine()) != null) {
                     if (oneLine.length() == 0) {
-                        SwingUtilities.invokeLater(new InvokationServerCommand(message));
+                        SwingUtilities.invokeLater(new InvokationServerRequestCommand(message));
                         message = new ArrayList<String>();
                         continue;
                     }
@@ -215,10 +215,10 @@ public class AsynchroConnector implements IConnector {
             }
         }
 
-        private class InvokationServerCommand implements Runnable {
+        private class InvokationServerRequestCommand implements Runnable {
             List<String> message;
 
-            public InvokationServerCommand(List<String> message) {
+            public InvokationServerRequestCommand(List<String> message) {
                 this.message = message;
             }
 

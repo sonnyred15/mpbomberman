@@ -7,7 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.interpretator.*;
 
 //~--- JDK imports ------------------------------------------------------------
