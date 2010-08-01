@@ -5,10 +5,13 @@
  */
 package org.amse.bomberman.server.net;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.amse.bomberman.server.gameinit.GameStorage;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.List;
-import org.amse.bomberman.server.gameinit.GameStorage;
 
 /**
  * Interface that represents session between client side and server side
@@ -21,38 +24,50 @@ import org.amse.bomberman.server.gameinit.GameStorage;
 public interface ISession {
 
     /**
-     * Method in which session must listen request`s from client.
+     * Method in which session must listen 
+     * request`s from client and process them.
      */
-    void run();
+    void run();    // method from Thread
 
     /**
-     * Must terminate session.
+     * Must somehow terminate session. After terminate session can`t be reused.
      */
-    void terminateSession();    
+    void terminateSession();
+
     /**
-     * Tells session to start receiving requests and answer on them and to do
-     * all needed for that things.
+     * Tells session to start receiving requests and process them.
      */
     void start();    // method from Thread
 
     /**
      * Sends list of strings to client.
-     * Each string must be sended as new line.
-     * @param messages
+     * @param messages lines of strings to send to client.
      */
     void sendAnswer(List<String> messages);
 
     /**
      * Sends simple one-string message to client.
-     * @param message
+     * @param message string to send to client.
      */
     void sendAnswer(String message);
 
+    /**
+     * Returns GameStorage where games are storing.
+     * @see GameStorage
+     * @return game storage.
+     */
     GameStorage getGameStorage();
-    
-    CommandExecutor getCommandExecutor();
 
+    /**
+     * Returns the id of this session.
+     * In fact it is not always unique...
+     * @return pseudo-unique id of session.
+     */
     int getID();
 
+    /**
+     * Returns if current session must terminate.
+     * @return true if session must terminate, false - otherwise.
+     */
     boolean isMustEnd();
 }

@@ -15,7 +15,7 @@ import org.amse.bomberman.server.gameinit.imodel.IModel;
 import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Pair;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 //~--- JDK imports ------------------------------------------------------------
 

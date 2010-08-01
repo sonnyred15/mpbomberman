@@ -21,9 +21,9 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Command;
+import org.amse.bomberman.protocol.RequestCommand;
 import org.amse.bomberman.util.Constants.Direction;
-import org.amse.bomberman.util.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -62,7 +62,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestLeaveGame() throws NetException {
-        List<String> answer = queryAnswer("" + Command.LEAVE.getValue());
+        List<String> answer = queryAnswer("" + RequestCommand.LEAVE.getValue());
         System.out.println(answer.get(0));
         // not essential, can be deleted. Use for stop timers faster.
         if (answer.get(0).equals("Disconnected.")) {
@@ -73,7 +73,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestGamesList() throws NetException {
-        List<String> games = queryAnswer("" + Command.GET_GAMES.getValue());
+        List<String> games = queryAnswer("" + RequestCommand.GET_GAMES.getValue());
         for (String string : games) {
             System.out.println(string);
         }
@@ -83,7 +83,7 @@ public class SynchroConnector implements IConnector {
 
     public void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException {
-        List<String> answer = queryAnswer("" + Command.CREATE_GAME.getValue() +
+        List<String> answer = queryAnswer("" + RequestCommand.CREATE_GAME.getValue() +
                 " " + gameName + " " + mapName + " " + maxPl + " "
                 + Model.getInstance().getPlayerName());
         if (answer.get(0).equals("Game created.")) {
@@ -111,7 +111,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestStartGame() throws NetException {
-        List<String> list = queryAnswer("" + Command.START_GAME.getValue());
+        List<String> list = queryAnswer("" + RequestCommand.START_GAME.getValue());
         System.out.println(list);
         // start timer for updating map of game
         if (list.get(0).equals("Game started.") && !Model.getInstance().isStarted()) {
@@ -122,13 +122,13 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestGameMap() throws NetException {
-        List<String> gameMap = queryAnswer("" + Command.GET_GAME_MAP_INFO.getValue());
+        List<String> gameMap = queryAnswer("" + RequestCommand.GET_GAME_MAP_INFO.getValue());
         gameMap.add(0, ProtocolConstants.CAPTION_GAME_MAP_INFO);
         Controller.getInstance().receivedRequestResult(gameMap);
     }
 
     public void requestPlantBomb() throws NetException {
-        List<String> list = queryAnswer("" + Command.PLACE_BOMB.getValue());
+        List<String> list = queryAnswer("" + RequestCommand.PLACE_BOMB.getValue());
         list.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
@@ -136,25 +136,25 @@ public class SynchroConnector implements IConnector {
     public void requestJoinBotIntoGame() throws NetException {
         Random r = new Random();
         List<String> list = queryAnswer("" +
-                Command.ADD_BOT_TO_GAME.getValue()+" "
+                RequestCommand.ADD_BOT_TO_GAME.getValue()+" "
                 + botNames[r.nextInt(botNames.length-1)]);
         list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
     public void requestRemoveBotFromGame() throws NetException {
-        List<String> list = queryAnswer("" + Command.REMOVE_BOT_FROM_GAME.getValue());
+        List<String> list = queryAnswer("" + RequestCommand.REMOVE_BOT_FROM_GAME.getValue());
         list.add(0, ProtocolConstants.CAPTION_REMOVE_BOT_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
 
     public void requestGameMapsList() throws NetException {
-        List<String> gameMaps = queryAnswer("" + Command.GET_GAME_MAPS_LIST.getValue());
+        List<String> gameMaps = queryAnswer("" + RequestCommand.GET_GAME_MAPS_LIST.getValue());
         gameMaps.add(0, ProtocolConstants.CAPTION_GAME_MAPS_LIST);
         Controller.getInstance().receivedRequestResult(gameMaps);
     }
 
     public void requestIsGameStarted() throws NetException {
-        List<String> list = queryAnswer("" + Command.GET_GAME_STATUS.getValue());
+        List<String> list = queryAnswer("" + RequestCommand.GET_GAME_STATUS.getValue());
         // does it work??? for start updating not a host.
         if (list.get(0).equals("started.") && !Model.getInstance().isStarted()) {
             this.beginGameUpdating();
@@ -164,26 +164,26 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestGameInfo() throws NetException {
-        List<String> list = queryAnswer("" + Command.GET_GAME_INFO.getValue());
+        List<String> list = queryAnswer("" + RequestCommand.GET_GAME_INFO.getValue());
         list.add(0, ProtocolConstants.CAPTION_GAME_INFO);
         Controller.getInstance().receivedRequestResult(list);
     }
 
     public void sendChatMessage(String message) throws NetException {
-        List<String> answer = queryAnswer("" + Command.CHAT_ADD_MSG.getValue() +
+        List<String> answer = queryAnswer("" + RequestCommand.CHAT_ADD_MSG.getValue() +
                 " " + message);
         answer.add(0, ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
     public void requestNewChatMessages() throws NetException {
-        List<String> answer = queryAnswer("" + Command.CHAT_GET_NEW_MSGS.getValue());
+        List<String> answer = queryAnswer("" + RequestCommand.CHAT_GET_NEW_MSGS.getValue());
         answer.add(0, ProtocolConstants.CAPTION_GET_CHAT_MSGS);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
     public void requestDownloadGameMap(String gameMapName) throws NetException {
-        List<String> answer = queryAnswer("" + Command.DOWNLOAD_GAME_MAP + " " + gameMapName);
+        List<String> answer = queryAnswer("" + RequestCommand.DOWNLOAD_GAME_MAP + " " + gameMapName);
         answer.add(0, ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP);
         Controller.getInstance().receivedRequestResult(answer);
     }

@@ -1,11 +1,11 @@
-package org.amse.bomberman.util;
+package org.amse.bomberman.protocol;
 
 /**
  *
  * @author Kirilchuk V.E.
  * @author Mikhail Korovkin
  */
-public class ProtocolConstants {
+public class ProtocolConstants { //TODO JAVADOC THIS PLEASE!
 
     public static final String CAPTION_GAMES_LIST = "Games list.";
     public static final String CAPTION_CREATE_GAME = "Create game info.";
