@@ -7,14 +7,15 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.GameStorage;
-import org.amse.bomberman.server.net.ISession;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.RequestCommand;
 import org.amse.bomberman.protocol.RequestExecutor;
+import org.amse.bomberman.protocol.ResponseCreator;
+
+import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ILog;
-import org.amse.bomberman.protocol.ProtocolConstants;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -38,7 +39,7 @@ import java.net.SocketTimeoutException;
  * @author Kirilchuk V.E.
  */
 public abstract class AbstractSession extends Thread implements ISession {
-    private final ResponseCreator protocol = new ResponseCreator();
+    private static final ResponseCreator protocol = new ResponseCreator();
 
     /** Client socket of this session. It can`t be null. */
     protected final Socket clientSocket;
@@ -61,7 +62,7 @@ public abstract class AbstractSession extends Thread implements ISession {
      * @param sessionID session id. In fact it can be not unique.
      * @param log currently not used.
      */
-    public AbstractSession(Socket clientSocket, GameStorage gameStorage, int sessionID, ILog log) {
+    public AbstractSession(Socket clientSocket, GameStorage gameStorage, int sessionID) {
         assert (clientSocket != null);
         assert (gameStorage != null);
 
@@ -94,10 +95,9 @@ public abstract class AbstractSession extends Thread implements ISession {
         try {
             in = this.initReader();
 
-            String clientQueryLine = null;
-
             System.out.println("Session: waiting queries from client...");
-            this.readAndProcess(in, clientQueryLine);
+
+            this.cyclicReadAndProcess(in);
         } catch (SocketTimeoutException ex) {
             System.out.println("Session: terminated by socket timeout. " + ex.getMessage());
         } catch (IOException ex) {
@@ -108,7 +108,9 @@ public abstract class AbstractSession extends Thread implements ISession {
     }
 
     /* Main part. Read and process request */
-    private void readAndProcess(BufferedReader in, String clientQueryLine) throws IOException {
+    private void cyclicReadAndProcess(BufferedReader in) throws IOException {
+        String clientQueryLine = null;
+
         while ( !this.mustEnd) {
             clientQueryLine = in.readLine();    // throws IOException
 
@@ -159,10 +161,19 @@ public abstract class AbstractSession extends Thread implements ISession {
     }
 
     /**
-     * Method description
+     * This method must provide terminating of session.
+     * Call on already terminated session can cause error or exception,
+     * it depends on actual realization. After terminate session can`t be reused
+     * and it`s thread must be in TERMINATED_STATE.
+     * <p>By default, the second call on this method
+     * will lead to RuntimeException.
      */
     @Override
     public void terminateSession() {
+        if (this.mustEnd) {
+            throw new RuntimeException("Session must be terminated only once!");
+        }
+
         this.mustEnd = true;
 
         try {
@@ -197,21 +208,17 @@ public abstract class AbstractSession extends Thread implements ISession {
             int command = Integer.parseInt(queryArgs[0]);
 
             cmd = RequestCommand.valueOf(command);    // throws IllegalArgumentException
+
+            cmd.execute(this.getRequestExecutor(), queryArgs);
         } catch (NumberFormatException ex) {
             sendAnswer(protocol.wrongQuery());
             System.out.println("Session: answerOnCommand error. " + "Wrong first part of query. "
                                + "Wrong query from client. " + ex.getMessage());
-
-            return;
         } catch (IllegalArgumentException ex) {
             sendAnswer(protocol.wrongQuery("Not supported command."));
             System.out.println("Session: answerOnCommand error. "
                                + "Non supported command int from client. " + ex.getMessage());
-
-            return;
         }
-
-        cmd.execute(this.getRequestExecutor(), queryArgs);
     }
 
     /**
@@ -233,7 +240,19 @@ public abstract class AbstractSession extends Thread implements ISession {
         return sessionID;
     }
 
+    /**
+     * This method will be called before the session terminates.
+     * It response for closing <b>additional</b> resources.
+     * Note that, socket in this term is <b>not</b> an additional resource!
+     *
+     * <p> In this method good to remove this session from other places
+     * that stores references on it, close logs etc..
+     */
     protected abstract void freeResources();
 
+    /**
+     * Return object that will execute protocol commands.
+     * @return object that will execute protocol commands.
+     */
     protected abstract RequestExecutor getRequestExecutor();
 }

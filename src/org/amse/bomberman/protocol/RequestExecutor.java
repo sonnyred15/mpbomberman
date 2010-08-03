@@ -7,14 +7,6 @@ package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.util.Constants.Direction;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-
 /**
  *
  * @author Kirilchuk V.E
@@ -50,7 +42,7 @@ public interface RequestExecutor {
 
     void addMessageToChat(String[] args);
 
-    void getNewMessagesFromChat();
+    void sendNewMessagesFromChat();
 
     void tryRemoveBot();
 

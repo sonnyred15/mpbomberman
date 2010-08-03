@@ -68,7 +68,7 @@ public class SynchroConnector implements IConnector {
         if (answer.get(0).equals("Disconnected.")) {
             stopUpdating();
         }
-        answer.add(0, ProtocolConstants.CAPTION_LEAVE_GAME_INFO);
+        answer.add(0, ProtocolConstants.CAPTION_LEAVE_GAME_RESULT);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
@@ -89,7 +89,7 @@ public class SynchroConnector implements IConnector {
         if (answer.get(0).equals("Game created.")) {
             beginPanel3Updating();
         }
-        answer.add(0, ProtocolConstants.CAPTION_CREATE_GAME);
+        answer.add(0, ProtocolConstants.CAPTION_CREATE_GAME_RESULT);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
@@ -100,13 +100,13 @@ public class SynchroConnector implements IConnector {
         if (list.get(0).equals("Joined.")) {
             beginPanel3Updating();
         }
-        list.add(0, ProtocolConstants.CAPTION_JOIN_GAME);
+        list.add(0, ProtocolConstants.CAPTION_JOIN_GAME_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
 
     public void requestDoMove(Direction dir) throws NetException {
         List<String> list = queryAnswer("3 " + dir.getValue());
-        list.add(0, ProtocolConstants.CAPTION_DO_MOVE);
+        list.add(0, ProtocolConstants.CAPTION_DO_MOVE_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
 
@@ -117,7 +117,7 @@ public class SynchroConnector implements IConnector {
         if (list.get(0).equals("Game started.") && !Model.getInstance().isStarted()) {
             this.beginGameUpdating();
         }
-        list.add(0, ProtocolConstants.CAPTION_START_GAME_INFO);
+        list.add(0, ProtocolConstants.CAPTION_START_GAME_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
 
@@ -129,7 +129,7 @@ public class SynchroConnector implements IConnector {
 
     public void requestPlantBomb() throws NetException {
         List<String> list = queryAnswer("" + RequestCommand.PLACE_BOMB.getValue());
-        list.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_INFO);
+        list.add(0, ProtocolConstants.CAPTION_PLACE_BOMB_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
 
@@ -138,12 +138,12 @@ public class SynchroConnector implements IConnector {
         List<String> list = queryAnswer("" +
                 RequestCommand.ADD_BOT_TO_GAME.getValue()+" "
                 + botNames[r.nextInt(botNames.length-1)]);
-        list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_INFO);
+        list.add(0, ProtocolConstants.CAPTION_JOIN_BOT_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
     public void requestRemoveBotFromGame() throws NetException {
         List<String> list = queryAnswer("" + RequestCommand.REMOVE_BOT_FROM_GAME.getValue());
-        list.add(0, ProtocolConstants.CAPTION_REMOVE_BOT_INFO);
+        list.add(0, ProtocolConstants.CAPTION_REMOVE_BOT_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
 
@@ -159,7 +159,7 @@ public class SynchroConnector implements IConnector {
         if (list.get(0).equals("started.") && !Model.getInstance().isStarted()) {
             this.beginGameUpdating();
         }
-        list.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
+        list.add(0, ProtocolConstants.CAPTION_GAME_STATUS);
         Controller.getInstance().receivedRequestResult(list);
     }
 
@@ -172,13 +172,13 @@ public class SynchroConnector implements IConnector {
     public void sendChatMessage(String message) throws NetException {
         List<String> answer = queryAnswer("" + RequestCommand.CHAT_ADD_MSG.getValue() +
                 " " + message);
-        answer.add(0, ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO);
+        answer.add(0, ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT);
         Controller.getInstance().receivedRequestResult(answer);
     }
 
     public void requestNewChatMessages() throws NetException {
         List<String> answer = queryAnswer("" + RequestCommand.CHAT_GET_NEW_MSGS.getValue());
-        answer.add(0, ProtocolConstants.CAPTION_GET_CHAT_MSGS);
+        answer.add(0, ProtocolConstants.CAPTION_NEW_CHAT_MSGS);
         Controller.getInstance().receivedRequestResult(answer);
     }
 

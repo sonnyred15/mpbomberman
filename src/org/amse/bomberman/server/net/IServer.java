@@ -5,12 +5,15 @@
  */
 package org.amse.bomberman.server.net;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.amse.bomberman.server.gameinit.GameStorage;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
 
 import java.util.List;
-import org.amse.bomberman.server.gameinit.GameStorage;
 
 /**
  * Interface that represents server.
@@ -54,10 +57,4 @@ public interface IServer extends SessionEndListener {
      * @return list of sessions on this server.
      */
     List<ISession> getSessions();
-
-    /**
-     * Write some message to server log.
-     * @param message message to add to server log.
-     */
-    void writeToLog(String message);
 }

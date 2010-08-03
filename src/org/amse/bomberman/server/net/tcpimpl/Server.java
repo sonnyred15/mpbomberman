@@ -30,7 +30,6 @@ import org.amse.bomberman.server.gameinit.GameStorage;
  * @author Kirilchuk V.E.
  */
 public class Server implements IServer {
-    private ILog log = new ConsoleLog();//TODO make fabric for this.
     private final int            port;
 
     //    
@@ -108,16 +107,7 @@ public class Server implements IServer {
         this.sessions.remove(endedSession);
         this.sessionCounter--;
 
-        writeToLog("Server: session removed.");
-    }
-
-    @Override
-    public void writeToLog(String message) {
-        if ((log == null) || log.isClosed()) {
-            System.out.println(message);
-        } else {
-            log.println(message);
-        }
+        System.out.println("Server: session removed.");
     }
 
     private class SocketListen implements Runnable {
@@ -131,10 +121,10 @@ public class Server implements IServer {
         public void run() {
             try {
                 while (!isShutdowned()) {
-                    writeToLog("Server: waiting for a new client...");
+                    System.out.println("Server: waiting for a new client...");
                     Socket clientSocket = serverSocket.accept();
 
-                    writeToLog("Server: client connected. " +
+                    System.out.println("Server: client connected. " +
                                "Starting new session thread...");
                     sessionCounter++;
 
@@ -142,32 +132,31 @@ public class Server implements IServer {
                     ISession newSession = new AsynchroSession(this.server,
                                                      clientSocket,
                                                      gameStorage,
-                                                     sessionCounter,
-                                                     this.server.log);
+                                                     sessionCounter);
 
                     //
                     sessions.add(newSession);
                     newSession.start();
                 }
             } catch (SocketTimeoutException ex) {    // never happen in current realization
-                writeToLog("Server: run warning. " + ex.getMessage());
+                System.out.println("Server: run warning. " + ex.getMessage());
             } catch (IOException ex) {    // if an I/O error occurs when waiting for a connection.
                 if (ex.getMessage().equalsIgnoreCase("Socket closed")) {
-                    writeToLog("Server: " + ex.getMessage());    // server socket closed
+                    System.out.println("Server: " + ex.getMessage());    // server socket closed
                 } else {
-                    writeToLog("Server: error. " + ex.getMessage());    // else exception
+                    System.err.println("Server: error. " + ex.getMessage());    // else exception
                 }
             }
 
             //
-            writeToLog("Server: listening(run) thread come to end. Freeing resources.");
+            System.out.println("Server: listening(run) thread come to end. Freeing resources.");
             freeResources();
         }
 
         private void freeResources() {
             //Terminating all sessions
             for (ISession session : sessions) {
-                writeToLog("Server: interrupting session " + session.getID() + "...");
+                System.out.println("Server: interrupting session " + session.getID() + "...");
                 session.terminateSession();
             }
             sessionCounter = 0;
@@ -177,17 +166,6 @@ public class Server implements IServer {
                 server.gameStorage.clearGames();
                 server.gameStorage = null;
             }
-
-            //Closing log
-            if (server.log != null) {
-                try {
-                    server.log.close();
-                } catch (IOException ex) {
-                    System.err.println("Server: freeing resources warning. "
-                            + "Can`t save log." + ex.getMessage());
-                }
-            }
-
         }
     }
 
@@ -220,17 +198,13 @@ public class Server implements IServer {
                         server.listeningThread = null;
                     }                  
                 } catch (IOException ex) {
-                    server.writeToLog("Server: stop error. " + ex.getMessage());
-
-                    throw ex;
-                } catch (SecurityException ex) {
-                    server.writeToLog("Server: stop error. " + ex.getMessage());
+                    System.err.println("Server: stop error. " + ex.getMessage());
 
                     throw ex;
                 }
 
                 server.stateControl = StateControl.SHUTDOWNED;
-                server.writeToLog("Server: shutdowned.");
+                System.out.println("Server: shutdowned.");
             }
         },
         SHUTDOWNED() {
@@ -238,24 +212,19 @@ public class Server implements IServer {
             @Override
             public void start(Server server) throws IOException {
                 try {
-                    server.log = new ConsoleLog();//TODO this is HARDCODE! Refactor!
                     server.serverSocket = new ServerSocket(server.port, 0);    // throws IOExeption,SecurityException
                     server.listeningThread =
                             new Thread(server.new SocketListen(server));                    
                     server.gameStorage = new GameStorage(server);
                 } catch (IOException ex) {
-                    server.writeToLog("Server: start error. " + ex.getMessage());
-
-                    throw ex;
-                } catch (SecurityException ex) {
-                    server.writeToLog("Server: start error. " + ex.getMessage());
+                    System.err.println("Server: start error. " + ex.getMessage());
 
                     throw ex;
                 }
 
                 server.stateControl = StateControl.STARTED;
                 server.listeningThread.start();
-                server.writeToLog("Server: started.");
+                System.out.println("Server: started.");
             }
 
             @Override
