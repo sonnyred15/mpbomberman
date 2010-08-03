@@ -7,8 +7,9 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.GameStorage;
 import org.amse.bomberman.protocol.RequestExecutor;
+
+import org.amse.bomberman.server.gameinit.GameStorage;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.ILog;
 
@@ -44,8 +45,8 @@ public class AsynchroSession extends AbstractSession {
      * @param log
      */
     public AsynchroSession(SessionEndListener endListener, Socket clientSocket,
-                           GameStorage gameStorage, int sessionID, ILog log) {
-        super(clientSocket, gameStorage, sessionID, log);
+                           GameStorage gameStorage, int sessionID) {
+        super(clientSocket, gameStorage, sessionID);
 
         this.endListener = endListener;
         this.controller  = new Controller(this);
@@ -68,13 +69,8 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
-    /**
-     * Method
-     *
-     * @return
-     */
     @Override
-    public RequestExecutor getRequestExecutor() {
+    protected RequestExecutor getRequestExecutor() {
         return controller;
     }
 

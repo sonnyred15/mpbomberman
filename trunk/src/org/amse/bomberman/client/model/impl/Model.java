@@ -85,7 +85,7 @@ public class Model implements IModel, RequestResultListener{
             } else {
                 escapeGame();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_DO_MOVE)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_DO_MOVE_RESULT)) {
             if (list.get(0).equals("false")) {
                 //System.out.println("You try to do move uncorrectly.");
             } else {
@@ -93,11 +93,11 @@ public class Model implements IModel, RequestResultListener{
                     escapeGame();
                 }
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_PLACE_BOMB_INFO)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_PLACE_BOMB_RESULT)) {
             if (!list.get(0).equals("Ok.")) {
                 escapeGame();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_RESULT)) {
             if (list.get(0).equals("Disconnected.")) {
                 escapeGame();
             } else {
@@ -107,12 +107,12 @@ public class Model implements IModel, RequestResultListener{
             JOptionPane.showMessageDialog(null, "Host is escaped from game!\n"
                        , "Game ended.", JOptionPane.INFORMATION_MESSAGE);
             escapeGame();
-        } else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_NEW_CHAT_MSGS)) {
             if (!list.get(0).equals("No new messages.")) {
                 history.addAll(list);
                 this.updateListeners();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_GAME_ENDED)) {
+        } else if (command.equals(ProtocolConstants.CAPTION_GAME_END_RESULTS)) {
             Controller.getInstance().showResults(list);
         }
     }

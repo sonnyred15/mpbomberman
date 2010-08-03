@@ -126,7 +126,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
 
         @Override
         public void execute(RequestExecutor executor, String[] args) {
-            executor.getNewMessagesFromChat();
+            executor.sendNewMessagesFromChat();
         }
 
     },

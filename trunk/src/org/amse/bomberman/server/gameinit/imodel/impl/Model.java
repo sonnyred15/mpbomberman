@@ -392,7 +392,7 @@ public class Model implements IModel, DieListener {
             }
         }
         List<String> stats = Stringalize.playersStats(this.players);
-        stats.add(0, ProtocolConstants.CAPTION_GAME_ENDED);
+        stats.add(0, ProtocolConstants.CAPTION_GAME_END_RESULTS);
         this.game.notifyGameSessions(stats);
     }
 

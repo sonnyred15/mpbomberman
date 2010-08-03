@@ -18,7 +18,7 @@ import java.util.List;
  * of application. ISession is responsable for work with client request`s,
  * for answer`s on this requests and so on..
  *
- * <p>Supposed that inherited class will extend Thread!!!
+ * <p><b>Supposed that implementing class will extend Thread!!!</b>
  * @author Kirilchuk V.E
  */
 public interface ISession {

@@ -257,7 +257,7 @@ public class ResponseCreator {
     public List<String> sendGameStatus(Game game) {
         List<String> messages = new ArrayList<String>();
 
-        messages.add(0, ProtocolConstants.CAPTION_GAME_STATUS_INFO);
+        messages.add(0, ProtocolConstants.CAPTION_GAME_STATUS);
         messages.add(Stringalize.gameStartStatus(game));
 
         return messages;
@@ -312,7 +312,7 @@ public class ResponseCreator {
     public List<String> sendPlayersStats(Game game) {
         List<String> messages = new ArrayList<String>();
 
-        messages.add(0, ProtocolConstants.CAPTION_GET_MY_GAME_PLAYERS_STATS);
+        messages.add(0, ProtocolConstants.CAPTION_GAME_PLAYERS_STATS);
         messages.addAll(Stringalize.playersStats(game.getCurrentPlayers()));
 
         return messages;

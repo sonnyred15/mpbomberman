@@ -49,7 +49,7 @@ public class AsynchroChat {
     public void addMessage(String message) {
         List<String> forClients = new ArrayList<String>();
 
-        forClients.add(ProtocolConstants.CAPTION_GET_CHAT_MSGS);
+        forClients.add(ProtocolConstants.CAPTION_NEW_CHAT_MSGS);
         forClients.add(message);
         this.game.notifyGameSessions(forClients);
     }

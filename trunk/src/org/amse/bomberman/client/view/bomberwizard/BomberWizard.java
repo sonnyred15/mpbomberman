@@ -66,19 +66,19 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_CREATE_GAME_RESULT)) {
             if (!list.get(0).equals("Game created.")) {
                 JOptionPane.showMessageDialog(this, "Can not create game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_GAME)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_GAME_RESULT)) {
             if (!list.get(0).equals("Joined.")) {
                 JOptionPane.showMessageDialog(this, "Can not join to the game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_START_GAME_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_START_GAME_RESULT)) {
             if (list.get(0).equals("Game started.")) {
                 if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
@@ -102,7 +102,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_GAME_STATUS)) {
             if (list.get(0).equals("started.")) {
                 if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
@@ -112,13 +112,13 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_RESULT)) {
             if (!list.get(0).equals("Disconnected.")) {
                 JOptionPane.showMessageDialog(this, "Can not leave game.\n"
                        + list.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_JOIN_BOT_RESULT)) {
             if (current instanceof Panel3) {
                 if (!list.get(0).equals("Bot added.")) {
                     JOptionPane.showMessageDialog(this, "Can not join bot.\n"
@@ -127,7 +127,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_REMOVE_BOT_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_REMOVE_BOT_RESULT)) {
             if (current instanceof Panel3) {
                 if (!list.get(0).equals("Bot removed.")) {
                     JOptionPane.showMessageDialog(this, "Can not remove bot.\n"
@@ -136,13 +136,13 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_GET_CHAT_MSGS)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_NEW_CHAT_MSGS)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
             }
             return;
-        }else if (command.equals(ProtocolConstants.CAPTION_SEND_CHAT_MSG_INFO)) {
+        }else if (command.equals(ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT)) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(list);
