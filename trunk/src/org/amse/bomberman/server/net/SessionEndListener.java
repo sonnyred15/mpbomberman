@@ -12,7 +12,7 @@ package org.amse.bomberman.server.net;
 public interface SessionEndListener {
 
     /**
-     * Tells to server that session thread was ended so it can be removed.
+     * Tells to listener that session thread was ended so it can be removed.
      * @param endedSession session that ended.
      */
     void sessionTerminated(ISession endedSession);
