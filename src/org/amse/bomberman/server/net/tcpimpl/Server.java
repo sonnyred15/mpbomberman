@@ -9,8 +9,6 @@ package org.amse.bomberman.server.net.tcpimpl;
 
 import org.amse.bomberman.server.net.*;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.ILog;
-import org.amse.bomberman.util.impl.ConsoleLog;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -19,10 +17,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Collections;
+import java.util.Comparator;
 
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.amse.bomberman.server.gameinit.GameStorage;
 
 /**
@@ -34,13 +35,28 @@ public class Server implements IServer {
 
     //    
     private volatile StateControl stateControl = StateControl.SHUTDOWNED;
+
     //
     private ServerSocket         serverSocket;
     private GameStorage          gameStorage;    
     private Thread               listeningThread;
-    private final List<ISession> sessions =
-                                         new CopyOnWriteArrayList<ISession>();
-    private int                  sessionCounter = 0;    // need to generate name of log files.
+
+    //
+    private final Comparator<ISession> comparator = new Comparator<ISession>() {
+
+        public int compare(ISession ses1, ISession ses2) {
+            int id1 = ses1.getID();
+            int id2 = ses2.getID();
+
+            return id1 - id2;
+        }
+
+    };
+    private final Set<ISession> sessions =
+            new ConcurrentSkipListSet<ISession>(comparator);
+
+    //
+    private int sessionCounter = 0;    // need to generate unique ID`s for sessions.
 
     /**
      * Constructor with default port.
@@ -60,8 +76,7 @@ public class Server implements IServer {
     }
 
     /**
-     * Starts listening thread where ServerSocket.accept() method is using.
-     *
+     * {@inheritDoc}
      */
     @Override
     public synchronized void start() throws IOException,
@@ -70,38 +85,54 @@ public class Server implements IServer {
     }
 
     /**
-     * Closing server socket and ending listening thread and clients threads
-     * by calling interrupt()
+     * Closing server socket and ending listening thread and clients threads.
+     * Freeing resources: clearing games on game storage,
+     * reseting counter and so on.
      * @throws java.io.IOException if an error occurs when closing socket.
      * @throws IllegalStateException if we are trying to shutdown not raised server.
      */
     @Override
-    public synchronized void shutdown()
-                                    throws IOException,
-                                           IllegalStateException,
-                                           SecurityException {
+    public synchronized void shutdown() throws IOException,
+                                               IllegalStateException,
+                                               SecurityException {
         this.stateControl.shutdown(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isShutdowned() {
-        return (this.stateControl==StateControl.SHUTDOWNED);
+        return (this.stateControl == StateControl.SHUTDOWNED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getPort() {
         return this.port;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<ISession> getSessions() {
+    public Set<ISession> getSessions() {
         return this.sessions;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public GameStorage getGameStorage() {
         return gameStorage;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sessionTerminated(ISession endedSession) {
         this.sessions.remove(endedSession);

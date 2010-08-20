@@ -15,7 +15,6 @@ import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.gameinit.GameStorage;
 import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.ILog;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -38,8 +37,8 @@ import java.net.SocketTimeoutException;
  * @see RequestExecutor
  * @author Kirilchuk V.E.
  */
-public abstract class AbstractSession extends Thread implements ISession {
-    private static final ResponseCreator protocol = new ResponseCreator();
+public abstract class AbstractThreadSession extends Thread implements ISession {
+    private final ResponseCreator protocol = new ResponseCreator();
 
     /** Client socket of this session. It can`t be null. */
     protected final Socket clientSocket;
@@ -62,7 +61,7 @@ public abstract class AbstractSession extends Thread implements ISession {
      * @param sessionID session id. In fact it can be not unique.
      * @param log currently not used.
      */
-    public AbstractSession(Socket clientSocket, GameStorage gameStorage, int sessionID) {
+    public AbstractThreadSession(Socket clientSocket, GameStorage gameStorage, int sessionID) {
         assert (clientSocket != null);
         assert (gameStorage != null);
 
@@ -122,6 +121,44 @@ public abstract class AbstractSession extends Thread implements ISession {
         }
     }
 
+    /**
+     * Processing query. Maybe sending response - <b>it depends</b> on realization
+     * of RequestExecutor and actual realization of <i>sendAnswer(...)</i> method.
+     *
+     * @see RequestExecutor
+     * @param query request to process.
+     */
+    protected void process(String query) { //TODO refactor this somehow
+        System.out.println("Session: query received. query=" + query);
+
+        if (query.length() == 0) {
+            sendAnswer(protocol.emptyQueryError());
+            System.out.println("Session: answerOnCommand warning. "
+                               + "Empty query received. Error on client side.");
+
+            return;
+        }
+
+        RequestCommand cmd       = null;
+        String[]       queryArgs = query.split(ProtocolConstants.SPLIT_SYMBOL);
+
+        try {
+            int command = Integer.parseInt(queryArgs[0]);
+
+            cmd = RequestCommand.valueOf(command);    // throws IllegalArgumentException
+
+            cmd.execute(this.getRequestExecutor(), queryArgs);
+        } catch (NumberFormatException ex) {
+            sendAnswer(protocol.wrongQuery());
+            System.out.println("Session: answerOnCommand error. " + "Wrong first part of query. "
+                               + "Wrong query from client. " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            sendAnswer(protocol.wrongQuery("Not supported command."));
+            System.out.println("Session: answerOnCommand error. "
+                               + "Non supported command int from client. " + ex.getMessage());
+        }
+    }
+
     private BufferedReader initReader() throws IOException, UnsupportedEncodingException {
         BufferedReader    in;
         InputStream       is  = this.clientSocket.getInputStream();
@@ -170,54 +207,16 @@ public abstract class AbstractSession extends Thread implements ISession {
      */
     @Override
     public void terminateSession() {
-        if (this.mustEnd) {
-            throw new RuntimeException("Session must be terminated only once!");
-        }
+        assert (!this.mustEnd) : "Session must be terminated only once!";
 
+        //setting to true
         this.mustEnd = true;
 
         try {
+            //force blocking io to unblock
             this.clientSocket.shutdownInput();
         } catch (IOException ex) {
             System.err.println("Session: terminateSession error. " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Processing query. Maybe sending response - <b>it depends</b> on realization
-     * of RequestExecutor and actual realization of <i>sendAnswer(...)</i> method.
-     *
-     * @see RequestExecutor
-     * @param query request to process.
-     */
-    protected void process(String query) {
-        System.out.println("Session: query received. query=" + query);
-
-        if (query.length() == 0) {
-            sendAnswer(protocol.emptyQueryError());
-            System.out.println("Session: answerOnCommand warning. "
-                               + "Empty query received. Error on client side.");
-
-            return;
-        }
-
-        RequestCommand cmd       = null;
-        String[]       queryArgs = query.split(ProtocolConstants.SPLIT_SYMBOL);
-
-        try {
-            int command = Integer.parseInt(queryArgs[0]);
-
-            cmd = RequestCommand.valueOf(command);    // throws IllegalArgumentException
-
-            cmd.execute(this.getRequestExecutor(), queryArgs);
-        } catch (NumberFormatException ex) {
-            sendAnswer(protocol.wrongQuery());
-            System.out.println("Session: answerOnCommand error. " + "Wrong first part of query. "
-                               + "Wrong query from client. " + ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            sendAnswer(protocol.wrongQuery("Not supported command."));
-            System.out.println("Session: answerOnCommand error. "
-                               + "Non supported command int from client. " + ex.getMessage());
         }
     }
 

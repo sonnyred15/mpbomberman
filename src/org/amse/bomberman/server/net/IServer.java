@@ -13,7 +13,7 @@ import org.amse.bomberman.server.gameinit.GameStorage;
 
 import java.io.IOException;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface that represents server.
@@ -50,11 +50,16 @@ public interface IServer extends SessionEndListener {
      */
     int getPort();
 
+    /**
+     * Returns game storage for this server.
+     * @return game storage for this server.
+     */
     GameStorage getGameStorage();
 
     /**
-     * Returns list of sessions on this server.
-     * @return list of sessions on this server.
+     * Returns set of sessions on this server.
+     * Usually it is <b>umodifiyable set</b>.
+     * @return set of sessions on this server.
      */
-    List<ISession> getSessions();
+    Set<ISession> getSessions();
 }

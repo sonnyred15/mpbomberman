@@ -14,6 +14,7 @@ import org.amse.bomberman.server.net.ISession;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -21,14 +22,14 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Kirilchuk V.E.
  */
-public class GlobalNotificator extends Thread {
+public class GlobalNotificator extends Thread { //TODO bad concurency
     private final BlockingQueue<String> queue;
     private final IServer       server;
 
     public GlobalNotificator(IServer server) {
         super("Global notificator");
         this.server = server;
-        this.queue  = new ArrayBlockingQueue<String>(5);
+        this.queue  = new ArrayBlockingQueue<String>(5); //fixed by number of different global messages.
         this.setDaemon(true);
     }
 
@@ -41,16 +42,18 @@ public class GlobalNotificator extends Thread {
 
                 // get all messages into list
                 messages.clear();
-                queue.drainTo(messages);
+                synchronized(queue) {
+                    queue.drainTo(messages);
+                }
 
                 // notifying all sessions
-                List<ISession> sesions = this.server.getSessions();
+                Set<ISession> sesions = this.server.getSessions();
 
                 for (ISession ses : sesions) {
                     if(messages.size()==0) {
                         break;
                     }
-                    ses.sendAnswer(messages); //not ses.notifyClient cause notifyClient already asynchronous.
+                    ses.sendAnswer(messages); //this will add message to sending queue.
                 }
 
                 // sleeping at least for 1 second
@@ -68,11 +71,13 @@ public class GlobalNotificator extends Thread {
      * @param message to send.
      */
     public void addToQueue(String message) {
-        if(queue.contains(message)){ //not need to duplicate global messages.
-            return;
-        }
+        synchronized (queue) {
+            if (queue.contains(message)) { //not need to duplicate global messages.
+                return;
+            }
 
-        //if message is new then try to add it to queue.
-        this.queue.offer(message);    // actually can return boolean
+            //if message is new then try to add it to queue.
+            this.queue.offer(message);    // actually can return boolean
+        }
     }
 }

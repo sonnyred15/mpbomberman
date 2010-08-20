@@ -18,17 +18,10 @@ import java.util.List;
  * of application. ISession is responsable for work with client request`s,
  * for answer`s on this requests and so on..
  *
- * <p><b>Supposed that implementing class will extend Thread!!!</b>
  * @author Kirilchuk V.E
  */
 public interface ISession {
-
-    /**
-     * Method in which session must listen 
-     * request`s from client and process them.
-     */
-    void run();    // method from Thread
-
+    
     /**
      * Must somehow terminate session. After terminate session can`t be reused.
      */
@@ -37,7 +30,7 @@ public interface ISession {
     /**
      * Tells session to start receiving requests and process them.
      */
-    void start();    // method from Thread
+    void start();
 
     /**
      * Sends list of strings to client.
@@ -60,8 +53,9 @@ public interface ISession {
 
     /**
      * Returns the id of this session.
-     * In fact it is not always unique...
-     * @return pseudo-unique id of session.
+     *
+     * <p> Note that if int will overflow, id would be not unique.
+     * @return unique id of session.
      */
     int getID();
 

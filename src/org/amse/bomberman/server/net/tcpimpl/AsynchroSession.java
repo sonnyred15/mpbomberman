@@ -11,7 +11,6 @@ import org.amse.bomberman.protocol.RequestExecutor;
 
 import org.amse.bomberman.server.gameinit.GameStorage;
 import org.amse.bomberman.server.net.SessionEndListener;
-import org.amse.bomberman.util.ILog;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -30,9 +29,9 @@ import java.util.List;
  *
  * @author Kirilchuk V.E.
  */
-public class AsynchroSession extends AbstractSession {
+public class AsynchroSession extends AbstractThreadSession {
     private final Controller         controller;
-    private final SingleNotificator  notificator;
+    private final AsynchroSender sender;
     private final SessionEndListener endListener;
 
     /**
@@ -51,14 +50,14 @@ public class AsynchroSession extends AbstractSession {
         this.endListener = endListener;
         this.controller  = new Controller(this);
         this.mustEnd     = false;
-        this.notificator = new SingleNotificator(this);
+        this.sender      = new AsynchroSender(this, clientSocket);
 
-        this.notificator.start();
+        this.sender.start();
     }
 
     @Override
     protected void freeResources() {
-        if (this.controller != null) {
+        if (this.controller != null) { //Is al these checks are realy need?
             if (this.controller.getMyGame() != null) {    // without this check controller will print error.
                 this.controller.tryLeave();
             }
@@ -69,72 +68,31 @@ public class AsynchroSession extends AbstractSession {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected RequestExecutor getRequestExecutor() {
         return controller;
     }
 
     /**
-     * Method
-     *
-     * @param shortAnswer
+     * Asynchronously sending message to client.
+     * 
+     * @param message message to send to client.
      */
     @Override
-    public void sendAnswer(String shortAnswer) {    // TODO in asychro session answers must be asynchronous...
-        BufferedWriter out = null;
-
-        try {
-            out = initWriter();
-
-            System.out.println("Session: sending answer...");
-            out.write(shortAnswer);
-            out.newLine();
-            out.write("");    // TODO magic code...
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            System.err.println("Session: sendAnswer error. " + ex.getMessage());
-        }
+    public void sendAnswer(String message) {
+        this.sender.addToQueue(message);
     }
 
     /**
-     * Send strings from linesToSend to client.
-     * @param linesToSend lines to send.
+     * Asynchronously sending multiline message to client.
      *
-     * @throws IllegalArgumentException
+     * @param message message to send to client.
      */
     @Override
-    public void sendAnswer(List<String> linesToSend) throws IllegalArgumentException {
-        assert (linesToSend != null);
-        assert (linesToSend.size() > 0);
-
-        BufferedWriter out = null;
-
-        try {
-            out = initWriter();
-
-            System.out.println("Session: sending answer...");
-
-            for (String string : linesToSend) {
-                out.write(string);
-                out.newLine();
-            }
-
-            out.write("");    // TODO magic code...
-            out.newLine();
-            out.flush();
-        } catch (IOException ex) {
-            System.err.println("Session: sendAnswer error. " + ex.getMessage());
-        }
-    }
-
-    private BufferedWriter initWriter() throws UnsupportedEncodingException, IOException {
-        BufferedWriter     out;
-        OutputStream       os  = this.clientSocket.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-
-        out = new BufferedWriter(osw);
-
-        return out;
+    public void sendAnswer(List<String> message) {
+        this.sender.addToQueue(message);
     }
 }
