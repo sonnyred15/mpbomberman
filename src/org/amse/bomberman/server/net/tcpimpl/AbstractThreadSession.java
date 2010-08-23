@@ -78,6 +78,7 @@ public abstract class AbstractThreadSession extends Thread implements ISession {
      *
      * @return true if session must terminate, false - otherwise.
      */
+    @Override
     public boolean isMustEnd() {
         return this.mustEnd;
     }
@@ -226,6 +227,7 @@ public abstract class AbstractThreadSession extends Thread implements ISession {
      * @see GameStorage
      * @return game storage of this session.
      */
+    @Override
     public GameStorage getGameStorage() {
         return this.gameStorage;
     }
@@ -235,6 +237,7 @@ public abstract class AbstractThreadSession extends Thread implements ISession {
      *
      * @return pseudo-unique id for this session.
      */
+    @Override
     public int getID() {
         return sessionID;
     }

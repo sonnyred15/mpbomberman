@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.tcpimpl;
+package org.amse.bomberman.server.net.tcpimpl.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -14,34 +14,33 @@ import org.amse.bomberman.server.net.SessionEndListener;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-
-import java.io.UnsupportedEncodingException;
-
 import java.net.Socket;
 
 import java.util.List;
+import org.amse.bomberman.server.net.tcpimpl.AbstractThreadSession;
+import org.amse.bomberman.server.net.tcpimpl.Controller;
 
 /**
- *
+ * This class represents asynchronous session between client and server
+ * which process client requests.
+ * 
  * @author Kirilchuk V.E.
  */
 public class AsynchroSession extends AbstractThreadSession {
     private final Controller         controller;
-    private final AsynchroSender sender;
+    private final AsynchroSender     sender;
     private final SessionEndListener endListener;
 
     /**
-     * Constructs
+     * Constructs asynchro session. This session can send messages to client
+     * asynchronously and even send some messages without any requests
+     * from client side. However, client must support asynchronous
+     * receivers to work with this session.
      *
-     * @param endListener
-     * @param clientSocket
-     * @param gameStorage
-     * @param sessionID
-     * @param log
+     * @param endListener listener of session end.
+     * @param clientSocket socket of client of this session.
+     * @param gameStorage game storage for this session.
+     * @param sessionID unique id of this session.
      */
     public AsynchroSession(SessionEndListener endListener, Socket clientSocket,
                            GameStorage gameStorage, int sessionID) {
@@ -55,6 +54,13 @@ public class AsynchroSession extends AbstractThreadSession {
         this.sender.start();
     }
 
+    /**
+     * Freeing additional resources of this
+     * session: if client was in game, then leave from game plus notifying
+     * endListener about end.
+     *
+     * @see SessionEndListener
+     */
     @Override
     protected void freeResources() {
         if (this.controller != null) { //Is al these checks are realy need?
