@@ -2,14 +2,14 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import org.amse.bomberman.server.net.tcpimpl.GlobalNotificator;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.amse.bomberman.server.gameinit.control.GameChangeListener;
 import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.ISession;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.server.net.tcpimpl.asynchro.GlobalNotificator;
 
 /**
  *

@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.tcpimpl;
+package org.amse.bomberman.server.net.tcpimpl.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -19,6 +19,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * Class that represents clients notificator about
+ * global messages - messages that must be sended to <b>all</b> server
+ * clients.
  *
  * @author Kirilchuk V.E.
  */
@@ -26,6 +29,11 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
     private final BlockingQueue<String> queue;
     private final IServer       server;
 
+    /**
+     * Constructs global notificator object.
+     *
+     * @param server server from which set of sessions to notify will be get.
+     */
     public GlobalNotificator(IServer server) {
         super("Global notificator");
         this.server = server;
@@ -67,7 +75,9 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
     }
 
     /**
+     * Adds message to notificator queue.
      * Ignore message if there is too much messages in queue.
+     *
      * @param message to send.
      */
     public void addToQueue(String message) {
