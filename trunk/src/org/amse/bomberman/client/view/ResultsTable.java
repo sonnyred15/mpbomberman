@@ -3,6 +3,7 @@ package org.amse.bomberman.client.view;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -56,8 +57,8 @@ public class ResultsTable extends JTable {
             data = new Object[results.size()][columnNames.length];
             String[] buf;
             for (int i = 0; i < data.length; i++) {
-                buf = results.get(i).split(" ");
-                if (buf.length != 3) {
+                buf = results.get(i).split(ProtocolConstants.SPLIT_SYMBOL);
+                if (buf.length != 4) {
                     throw new IllegalArgumentException("Wrong format of game results:"
                             + results.toString());
                 }
@@ -65,7 +66,7 @@ public class ResultsTable extends JTable {
                 data[i][1] = buf[0];
                 data[i][2] = buf[1];
                 data[i][3] = buf[2];
-                //data[i][4] = buf[3];
+                data[i][4] = buf[3];
             }
         }
 
