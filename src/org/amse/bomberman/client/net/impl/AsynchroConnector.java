@@ -151,7 +151,7 @@ public class AsynchroConnector implements IConnector {
     }
 
     public void requestSetPlayerName(String playerName) throws NetException {
-        sendRequest("" + ProtocolConstants.CAPTION_SET_CLIENT_NAME + split + playerName);
+        sendRequest("" + RequestCommand.SET_CLIENT_NAME.getValue() + split + playerName);
     }
 
     private class ServerListen implements Runnable {

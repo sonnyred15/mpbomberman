@@ -897,7 +897,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
                     ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Wrong number of arguments."));
         } else {
-            this.clientName = args[2];
+            this.clientName = args[1];
             this.session.sendAnswer(protocol.ok(
                     ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Name was set."));

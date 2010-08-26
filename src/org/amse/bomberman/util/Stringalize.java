@@ -53,10 +53,12 @@ public final class Stringalize {
         for (Player player : players) {
             str = new StringBuilder();
             str.append(player.getNickName());
-            str.append(' ');
-            str.append(player.getPoints());
-            str.append(' ');
+            str.append(ProtocolConstants.SPLIT_SYMBOL);
+            str.append(player.getKills());
+            str.append(ProtocolConstants.SPLIT_SYMBOL);
             str.append(player.getDeaths());
+            str.append(ProtocolConstants.SPLIT_SYMBOL);
+            str.append(player.getPoints());
             result.add(str.toString());
         }
         

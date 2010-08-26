@@ -87,16 +87,21 @@ public class GameJFrame extends JFrame implements IView{
             if (lives <= 0) {
                 if (!dead) {
                     dead = true;
-                    livesLabel.setEnabled(false);
-                    bombsLabel.setEnabled(false);
-                    radiusLabel.setEnabled(false);
-                    this.removeKeyListener(listener);
+                    stopGame();
                     JOptionPane.showMessageDialog(this, "You are dead!!!"
                             , "Death", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }
     }
+
+    public void stopGame() {
+        livesLabel.setEnabled(false);
+        bombsLabel.setEnabled(false);
+        radiusLabel.setEnabled(false);
+        this.removeKeyListener(listener);
+    }
+
     private void initComponents() {
         this.setSize(width, height);
 
@@ -145,9 +150,11 @@ public class GameJFrame extends JFrame implements IView{
         this.addKeyListener(listener);
         this.setJMenuBar(new GameJMenuBar());
     }
+
     private void updateResults() {
         this.resultsTable.update(Model.getInstance().getResults());
     }
+
     private void updateBonusPanels() {
         int lives = Model.getInstance().getPlayerLives();
         int bombs = Model.getInstance().getPlayerBombs();
@@ -162,6 +169,7 @@ public class GameJFrame extends JFrame implements IView{
             radiusLabel.update(radius);
         }
     }
+
     private void updateHistory() {
         List<String> history = Model.getInstance().getHistory();
         StringBuilder sb = new StringBuilder();
@@ -174,6 +182,7 @@ public class GameJFrame extends JFrame implements IView{
         }
         infoTA.setText(sb.toString());
     }
+
     private JTextArea createInfoTA() {
         infoTA = new JTextArea();
         infoTA.setFocusable(false);
@@ -183,6 +192,7 @@ public class GameJFrame extends JFrame implements IView{
         infoTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 12));
         return infoTA;
     }
+
     private class BonusLabel extends JLabel {
         private ImageIcon image;
         private int count;
