@@ -35,4 +35,5 @@ public interface IConnector {
     void requestGameInfo() throws NetException;
     void sendChatMessage(String message) throws NetException;
     void requestNewChatMessages() throws NetException;
+    void requestSetPlayerName(String playerName) throws NetException;
 }

@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.view.gamejframe;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
@@ -22,10 +21,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
-
+import org.amse.bomberman.client.view.ResultsTable;
 
 /**
  *
@@ -36,6 +34,7 @@ public class GameJFrame extends JFrame implements IView{
     private BonusLabel livesLabel;
     private BonusLabel bombsLabel;
     private BonusLabel radiusLabel;
+    private ResultsTable resultsTable;
     private JTextArea infoTA;
 
     private GameJFrameListener listener;
@@ -43,8 +42,9 @@ public class GameJFrame extends JFrame implements IView{
 
     private boolean isFirstInit = true;
 
-    private int width = 500;
-    private int height = 640;
+    private int width = 800;
+    private int height = 600;
+    private final int infoTextWidth = 250;
 
     private static final String LIFE_ICON_PATH = "org/amse/bomberman/client/icons/heart-48.png";
     private static final String B_RADIUS_ICON_PATH = "org/amse/bomberman/client/icons/b_radius-48.png";
@@ -61,7 +61,6 @@ public class GameJFrame extends JFrame implements IView{
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 100);
         
-
         this.setResizable(true);
         this.setVisible(true);
     }
@@ -72,9 +71,9 @@ public class GameJFrame extends JFrame implements IView{
             Controller.getInstance().leaveGame();
         } else {
             if (isFirstInit) {
-                 int mapSize = Model.getInstance().getMap().getSize();
+                int mapSize = Model.getInstance().getMap().getSize();
                 if (mapSize < GamePanel.DEFAULT_RANGE) {
-                    width = mapSize*GamePanel.CELL_SIZE + 20;
+                    width = mapSize*GamePanel.CELL_SIZE + 50 + infoTextWidth;
                     height = mapSize*GamePanel.CELL_SIZE + 160;
                 }
                 this.initComponents();
@@ -83,42 +82,61 @@ public class GameJFrame extends JFrame implements IView{
             gamePanel.update();
             updateBonusPanels();
             updateHistory();
+            updateResults();
             int lives = model.getPlayerLives();
             if (lives <= 0) {
                 if (!dead) {
                     dead = true;
-                    JOptionPane.showMessageDialog(this, "You are dead!!!"
-                            , "Death", JOptionPane.INFORMATION_MESSAGE);
-                    this.removeKeyListener(listener);
                     livesLabel.setEnabled(false);
                     bombsLabel.setEnabled(false);
                     radiusLabel.setEnabled(false);
+                    this.removeKeyListener(listener);
+                    JOptionPane.showMessageDialog(this, "You are dead!!!"
+                            , "Death", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }
     }
     private void initComponents() {
         this.setSize(width, height);
-        //this.setMinimumSize(new Dimension(width / 2, height / 2));
 
         gamePanel = new GamePanel();
         livesLabel = new BonusLabel(ICON_BONUS_LIFE, 0);
         bombsLabel = new BonusLabel(ICON_BONUS_B_COUNT, 0);
         radiusLabel = new BonusLabel(ICON_BONUS_B_RADIUS, 0);
+        resultsTable = new ResultsTable();
         listener = new GameJFrameListener();
+        // TODO sizes???
+        //resultsPanel.setPreferredSize(new Dimension(infoTextWidth, height - 150));
 
         Box bonusBox = Box.createHorizontalBox();
         bonusBox.add(livesLabel);
-        bonusBox.add(Box.createHorizontalStrut(30));
+        bonusBox.add(Box.createHorizontalStrut(15));
         bonusBox.add(bombsLabel);
-        bonusBox.add(Box.createHorizontalStrut(30));
+        bonusBox.add(Box.createHorizontalStrut(15));
         bonusBox.add(radiusLabel);
 
-        Box mainBox = Box.createVerticalBox();
-        mainBox.add(bonusBox);
-        mainBox.add(gamePanel);
-        mainBox.add(new JSeparator(JSeparator.VERTICAL));
-        mainBox.add(this.createInfoPanel());
+        Box rightBox = Box.createVerticalBox();
+        rightBox.add(Box.createVerticalStrut(42)); // !!!
+        JScrollPane jsp = new JScrollPane(resultsTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp.setPreferredSize(new Dimension(infoTextWidth, height / 3));
+        rightBox.add(jsp);
+        rightBox.add(Box.createVerticalGlue());
+        JScrollPane jsp2 = new JScrollPane(createInfoTA(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+                , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp2.setPreferredSize(new Dimension(infoTextWidth, height / 3));
+        rightBox.add(jsp2);
+
+        Box leftBox = Box.createVerticalBox();
+        leftBox.add(bonusBox);
+        leftBox.add(Box.createVerticalStrut(10));
+        leftBox.add(gamePanel);
+
+        Box mainBox = Box.createHorizontalBox();
+        mainBox.add(leftBox);
+        mainBox.add(Box.createHorizontalStrut(10));
+        mainBox.add(rightBox);
 
         Container c = getContentPane();
         c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -126,6 +144,9 @@ public class GameJFrame extends JFrame implements IView{
 
         this.addKeyListener(listener);
         this.setJMenuBar(new GameJMenuBar());
+    }
+    private void updateResults() {
+        this.resultsTable.update(Model.getInstance().getResults());
     }
     private void updateBonusPanels() {
         int lives = Model.getInstance().getPlayerLives();
@@ -146,28 +167,21 @@ public class GameJFrame extends JFrame implements IView{
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < history.size(); i ++) {
             if (history.size() - i < 4 ) {
+                sb.append("-");
                 sb.append(history.get(i));
                 sb.append("\n");
             }
         }
         infoTA.setText(sb.toString());
     }
-    private JPanel createInfoPanel() {
-        JPanel infoPanel = new JPanel();
-
+    private JTextArea createInfoTA() {
         infoTA = new JTextArea();
-        infoTA.setPreferredSize(new Dimension(width - 50, 40));
         infoTA.setFocusable(false);
         infoTA.setEditable(false);
         infoTA.setLineWrap(true);
         infoTA.setForeground(Color.RED);
-        infoTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 10));
-
-        JScrollPane scrollTA = new JScrollPane(infoTA);
-
-        infoPanel.add(scrollTA);
-
-        return infoPanel;
+        infoTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 12));
+        return infoTA;
     }
     private class BonusLabel extends JLabel {
         private ImageIcon image;
@@ -175,28 +189,30 @@ public class GameJFrame extends JFrame implements IView{
 
         private final Color bg = new Color(238,238,238);
 
-        private JLabel label;
         private final int size = 32;
 
         private BonusLabel(ImageIcon icon, int firstCount) {
             image = new ImageIcon(getScaledImage(icon.getImage(),size,size,bg));
 
-            label = new JLabel("x" + firstCount, image, JLabel.CENTER);
-            Container c = getContentPane();
-            c.add(label);
+            this.setIcon(image);
+            this.setText("x" + firstCount);
+            this.setVisible(true);
         }
+
         private void update(int newCount) {
             if (newCount != count) {
                 count = newCount;
-                label.setText("x" + newCount);
+                this.setText("x" + newCount);
             }
         }
+
         private int getCount() {
             return count;
         }
+
         @Override
         public void setEnabled(boolean b) {
-            label.setEnabled(b);
+            super.setEnabled(b);
             //this.setBackground(bg);
         }
     }

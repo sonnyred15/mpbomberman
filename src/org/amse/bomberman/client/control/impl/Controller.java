@@ -18,7 +18,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.view.ResultsJDialog;
 
 
 /**
@@ -34,7 +33,6 @@ public class Controller implements IController{
     private JFrame gameJFrame = null;
 
     private boolean isAsynchro;
-
 
     private Controller(boolean isAsynchro) {
         this.isAsynchro = isAsynchro;
@@ -104,14 +102,7 @@ public class Controller implements IController{
             System.out.println("Game is already leaved or closed.");
         }
     }
-    public void showResults(List<String> results) {
-        ResultsJDialog rjd = new ResultsJDialog(gameJFrame,results);
-        try {
-            this.requestLeaveGame();
-        } catch (NetException ex) {
-            this.lostConnection(ex.getMessage());
-        }
-    }
+    
     public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
     }
@@ -190,6 +181,10 @@ public class Controller implements IController{
 
     public void requestDownloadMap(String gameMapName) throws NetException {
         this.connector.requestDownloadGameMap(gameMapName);
+    }
+
+    public void requestSetPlayerName(String playerName) throws NetException {
+        this.connector.requestSetPlayerName(playerName);
     }
 
     public void receivedRequestResult(List<String> requestResult) {

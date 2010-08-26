@@ -22,8 +22,9 @@ public class Model implements IModel, RequestResultListener{
     private IPlayer player = Player.getInstance();
     private List<IView> listener = new ArrayList<IView>();
     private List<Cell> changes = new ArrayList<Cell>();
-    private volatile boolean isStarted = false;
     private List<String> history = new ArrayList<String>();
+    private List<String> results = new ArrayList<String>();
+    private volatile boolean isStarted = false;
 
     private Model() {
     }
@@ -113,7 +114,8 @@ public class Model implements IModel, RequestResultListener{
                 this.updateListeners();
             }
         } else if (command.equals(ProtocolConstants.CAPTION_GAME_END_RESULTS)) {
-            Controller.getInstance().showResults(list);
+            results = list;
+            updateListeners();
         }
     }
     public BombMap getMap() {
@@ -124,6 +126,9 @@ public class Model implements IModel, RequestResultListener{
     }
     public List<String> getHistory() {
         return history;
+    }
+    public List<String> getResults() {
+        return results;
     }
     public void addListener(IView view) {
         listener.add(view);
@@ -174,10 +179,11 @@ public class Model implements IModel, RequestResultListener{
     }
     private synchronized void escapeGame() {
         isStarted = false;
-        map = null;
-        changes.clear();
         updateListeners();
+        map = null;
         listener.clear();
+        changes.clear();
+        results.clear();
         history.clear();
     }
 }

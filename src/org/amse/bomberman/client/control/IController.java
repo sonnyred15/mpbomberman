@@ -35,10 +35,10 @@ public interface IController {
     public void requestSendChatMessage(String message) throws NetException;
     public void requestNewChatMessages() throws NetException;
     public void requestDownloadMap(String gameMapName) throws NetException;
+    public void requestSetPlayerName(String playerName) throws NetException;
     public void receivedRequestResult(List<String> requestResult) throws NetException;
-    
+
     public void lostConnection(String message);
     public void startGame();
     public void leaveGame();
-    public void showResults(List<String> results);
 }
