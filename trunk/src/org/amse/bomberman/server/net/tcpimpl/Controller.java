@@ -894,12 +894,12 @@ public class Controller implements RequestExecutor, GameEndedListener {
         if (args.length != 2) {
             System.out.println("Session: setClientName warning. Canceled. Wrong query.");
             this.session.sendAnswer(protocol.wrongQuery(
-                    ProtocolConstants.CAPTION_SET_CLIENT_NAME_RESULT,
+                    ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Wrong number of arguments."));
         } else {
             this.clientName = args[2];
             this.session.sendAnswer(protocol.ok(
-                    ProtocolConstants.CAPTION_SET_CLIENT_NAME_RESULT,
+                    ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Name was set."));
         }
     }

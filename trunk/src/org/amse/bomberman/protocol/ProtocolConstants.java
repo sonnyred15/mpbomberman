@@ -68,7 +68,7 @@ public class ProtocolConstants {
     public static final String CAPTION_GAME_END_RESULTS = "Game ended players stats.";
 
     /** Caption for message with result of "set client name" request. */
-    public static final String CAPTION_SET_CLIENT_NAME_RESULT = "Set client name info.";
+    public static final String CAPTION_SET_CLIENT_NAME = "Set client name info.";
 
     /** Message for client about kick from game. */
     public static final String MESSAGE_GAME_KICK = "You were kicked from the game.";

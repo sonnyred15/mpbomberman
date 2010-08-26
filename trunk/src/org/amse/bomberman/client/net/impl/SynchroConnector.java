@@ -84,7 +84,9 @@ public class SynchroConnector implements IConnector {
     public void requestCreateGame(String gameName, String mapName, int maxPl)
             throws NetException {
         List<String> answer = queryAnswer("" + RequestCommand.CREATE_GAME.getValue() +
-                " " + gameName + " " + mapName + " " + maxPl + " "
+                ProtocolConstants.SPLIT_SYMBOL + gameName + ProtocolConstants.SPLIT_SYMBOL
+                + mapName + ProtocolConstants.SPLIT_SYMBOL + maxPl
+                + ProtocolConstants.SPLIT_SYMBOL
                 + Model.getInstance().getPlayerName());
         if (answer.get(0).equals("Game created.")) {
             beginPanel3Updating();
@@ -94,7 +96,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestJoinGame(int gameID) throws NetException {
-        List<String> list = queryAnswer("2 " + gameID + " " 
+        List<String> list = queryAnswer("2" + ProtocolConstants.SPLIT_SYMBOL + gameID + ProtocolConstants.SPLIT_SYMBOL
                 + Model.getInstance().getPlayerName());
         System.out.println(list.get(0));
         if (list.get(0).equals("Joined.")) {
@@ -105,7 +107,7 @@ public class SynchroConnector implements IConnector {
     }
 
     public void requestDoMove(Direction dir) throws NetException {
-        List<String> list = queryAnswer("3 " + dir.getValue());
+        List<String> list = queryAnswer("3" + ProtocolConstants.SPLIT_SYMBOL + dir.getValue());
         list.add(0, ProtocolConstants.CAPTION_DO_MOVE_RESULT);
         Controller.getInstance().receivedRequestResult(list);
     }
@@ -171,7 +173,7 @@ public class SynchroConnector implements IConnector {
 
     public void sendChatMessage(String message) throws NetException {
         List<String> answer = queryAnswer("" + RequestCommand.CHAT_ADD_MSG.getValue() +
-                " " + message);
+                ProtocolConstants.SPLIT_SYMBOL + message);
         answer.add(0, ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT);
         Controller.getInstance().receivedRequestResult(answer);
     }
@@ -237,6 +239,13 @@ public class SynchroConnector implements IConnector {
             timer.purge();
             timer = null;
         }
+    }
+
+    public void requestSetPlayerName(String playerName) throws NetException {
+        List<String> answer = queryAnswer("" + ProtocolConstants.CAPTION_SET_CLIENT_NAME
+                + ProtocolConstants.SPLIT_SYMBOL + playerName);
+        answer.add(0, ProtocolConstants.CAPTION_SET_CLIENT_NAME);
+        Controller.getInstance().receivedRequestResult(answer);
     }
     private class GameTimerTask extends TimerTask{
         @Override

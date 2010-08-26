@@ -150,6 +150,10 @@ public class AsynchroConnector implements IConnector {
                 "" + RequestCommand.DOWNLOAD_GAME_MAP.getValue() + split + gameMapName);
     }
 
+    public void requestSetPlayerName(String playerName) throws NetException {
+        sendRequest("" + ProtocolConstants.CAPTION_SET_CLIENT_NAME + split + playerName);
+    }
+
     private class ServerListen implements Runnable {
 
         public void run() {

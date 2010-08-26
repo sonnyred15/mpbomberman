@@ -25,6 +25,7 @@ public class PanelDescriptor1 extends PanelDescriptor{
         try {
             Controller.getInstance().connect(panel.getIPAddress(), panel.getPort());
             Model.getInstance().setPlayerName(panel.getPlayerName());
+            Controller.getInstance().requestSetPlayerName(Model.getInstance().getPlayerName());
             return true;
         } catch (UnknownHostException ex) {
             JOptionPane.showMessageDialog(this.getWizard(), "Can not connect to the server.\n"
