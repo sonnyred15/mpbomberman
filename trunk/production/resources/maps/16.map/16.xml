@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<map name="16.map" maxPlayers="6" dimension="16">
+    <description>
+	    Info about map must be here. =)
+    </description>
+
+    <field>
+        <row>1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>6 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0</row>
+        <row>4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</row>
+        <row>-2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 0 -2 3</row>
+    </field>
+
+    <icons>
+        <wall file="woodenWall"/>
+    </icons>
+</map>
