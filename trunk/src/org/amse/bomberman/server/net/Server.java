@@ -21,7 +21,7 @@ import java.util.Set;
  * for them. Additionally server knows about games created by server`s clients.
  * @author Kirilchuk V.E.
  */
-public interface IServer extends SessionEndListener {
+public interface Server extends SessionEndListener {
 
     /**
      * Raise server on it`s port.
@@ -36,13 +36,13 @@ public interface IServer extends SessionEndListener {
      * @throws IOException if any IO errors occurs while shutdowning server.
      * @throws IllegalStateException if server was already shutdowned.
      */
-    void shutdown() throws IOException, IllegalStateException;
+    void stop() throws IOException, IllegalStateException;
 
     /**
      * Checks if server is shutdowned.
      * @return true if server is shutdowned, false otherwise.
      */
-    boolean isShutdowned();
+    boolean isStopped();
 
     /**
      * Returns port of this server.
@@ -61,5 +61,5 @@ public interface IServer extends SessionEndListener {
      * Usually it is <b>umodifiyable set</b>.
      * @return set of sessions on this server.
      */
-    Set<ISession> getSessions();
+    Set<Session> getSessions();
 }

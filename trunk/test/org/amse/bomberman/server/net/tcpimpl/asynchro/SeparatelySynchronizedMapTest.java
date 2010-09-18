@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.asynchro;
 
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.SeparatelySynchronizedMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.junit.Before;
@@ -17,7 +18,7 @@ import static org.junit.Assert.*;
  */
 public class SeparatelySynchronizedMapTest {
 
-    SeparatelySynchronizedMap<Integer, Integer> map;
+    private SeparatelySynchronizedMap<Integer, Integer> map;
     private int initSize = 100;
 
     @Before
@@ -48,7 +49,7 @@ public class SeparatelySynchronizedMapTest {
     @Test
     public void testEntrySet() {
         Set<Entry<Integer, Integer>> entrySet = map.entrySet();
-        assertTrue(entrySet.size() == 0);
+        assertTrue(entrySet.isEmpty());
         assertFalse(entrySet.iterator().hasNext());
         assertTrue(entrySet.isEmpty());
 
@@ -70,7 +71,7 @@ public class SeparatelySynchronizedMapTest {
             assertTrue(entry.getValue().equals(i+1));
             i++;
         }
-        assertEquals((int)initSize, i);
+        assertEquals(initSize, i);
     }
 
     @Test

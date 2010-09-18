@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.Server;
 
 /**
  * Class that represents ServerInfo JFrame. ServerInfo JFrame shows
@@ -40,7 +40,7 @@ public class ServerInfo extends JFrame {
     private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
 
     //
-    private IServer         server;
+    private Server         server;
     private final JTextArea log                 = new JTextArea();
     private final JLabel    labelUnstartedGames = new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
     private final JLabel    labelStartedGames   = new JLabel(STARTED_GAMES_LABEL_TEXT);
@@ -93,17 +93,17 @@ public class ServerInfo extends JFrame {
         }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 
-    public void setServer(IServer server) {
+    public void setServer(Server server) {
         this.server = server;
     }
 
     private void update() {
         if (server != null) {
-            this.labelShutdowned.setText(this.SHUTDOWNED_LABEL_TEXT + this.server.isShutdowned());
+            this.labelShutdowned.setText(this.SHUTDOWNED_LABEL_TEXT + this.server.isStopped());
             this.labelPort.setText(this.PORT_LABEL_TEXT + this.server.getPort());
             this.labelClients.setText(this.CLIENTS_LABEL_TEXT + this.server.getSessions().size());
 
-            if(!server.isShutdowned()) {
+            if(!server.isStopped()) {
                 List<Game> games = server.getGameStorage().getGamesList();
                 int started = 0;
                 int unstarted = 0;

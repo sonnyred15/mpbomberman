@@ -7,8 +7,8 @@ package org.amse.bomberman.server.view;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.net.IServer;
-import org.amse.bomberman.server.net.tcpimpl.Server;
+import org.amse.bomberman.server.net.Server;
+import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
 
@@ -45,7 +45,7 @@ public class ServerFrame extends JFrame {
     private final JLabel         portLabel      = new JLabel("Server Port");    
     private final AbstractButton btnStatus      = new JButton("Status");
     private final AbstractButton btnControl     = new JButton(BTN_TEXT_RAISE);
-    private IServer              server;
+    private Server              server;
 
     //
     private final JFormattedTextField portField
@@ -108,7 +108,7 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new Server(port);//TODO mb make fabric?            
+            server = new TcpServer(port);//TODO mb make fabric?
             server.start();
             infoFrame.setServer(server);
             btnStatus.setEnabled(true);
@@ -126,7 +126,7 @@ public class ServerFrame extends JFrame {
 
     private void downServer() {
         try {
-            server.shutdown();
+            server.stop();
             btnStatus.setEnabled(false);
             btnControl.setText(BTN_TEXT_RAISE);
         } catch (IOException ex) {              // Server loggs IOErrors and throw them again.

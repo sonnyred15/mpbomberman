@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author Kirilchuk V.E
  */
-public interface ISession {
+public interface Session {
     
     /**
      * Must somehow terminate session. After terminate session can`t be reused.
@@ -54,10 +54,10 @@ public interface ISession {
     /**
      * Returns the id of this session.
      *
-     * <p> Note that if int will overflow, id would be not unique.
+     * <p> Note that if id type overflow, id would be not unique.
      * @return unique id of session.
      */
-    int getID();
+    long getID();
 
     /**
      * Returns if current session must terminate.
