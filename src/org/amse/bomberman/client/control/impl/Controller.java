@@ -3,7 +3,6 @@ package org.amse.bomberman.client.control.impl;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
-import org.amse.bomberman.client.net.impl.SynchroConnector;
 import org.amse.bomberman.client.control.IController;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
@@ -33,22 +32,16 @@ public class Controller implements IController {
     private RequestResultListener receiveResultListener;
     private final RequestCreator protocol = new RequestCreator();
     private JFrame gameJFrame = null;
-    private boolean isAsynchro;
 
-    private Controller(boolean isAsynchro) {
-        this.isAsynchro = isAsynchro;
-        if(connector == null) {
-            if(isAsynchro) {
-                connector = AsynchroConnector.getInstance();
-            } else {
-                connector = SynchroConnector.getInstance();
-            }
+    private Controller() {
+        if (connector == null) {
+            connector = AsynchroConnector.getInstance();
         }
     }
 
     public static IController getInstance() {
         if(controller == null) {
-            controller = (IController) new Controller(true);
+            controller = new Controller();
         }
         return controller;
     }
