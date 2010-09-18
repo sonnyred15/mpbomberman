@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.Collections;
 import org.amse.bomberman.server.gameinit.bot.Bot;
 import org.amse.bomberman.server.net.tcpimpl.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
@@ -176,7 +177,11 @@ public class Game {
         }
 
         boolean moved = false;
-        moved = model.tryDoMove(this.model.getPlayer(playerID), direction);
+        Player player = this.model.getPlayer(playerID);
+        if(player == null) { //TODO this is a hack for problems with valid id`s...
+            return false;
+        }
+        moved = model.tryDoMove(player, direction);
 
         if (moved) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);
@@ -190,7 +195,7 @@ public class Game {
      * @return list of controllers that joined to this game.
      */
     public Set<Controller> getControllers() {
-        return controllers;
+        return Collections.unmodifiableSet(controllers);
     }
 
     /**
@@ -422,7 +427,11 @@ public class Game {
         }
 
         boolean placed = false;
-        placed = this.model.tryPlaceBomb(this.model.getPlayer(playerID));
+        Player player = this.model.getPlayer(playerID);
+        if(player == null) { //TODO this is a hack for problems with valid id`s...
+            return false;
+        }
+        placed = this.model.tryPlaceBomb(player);
 
         if (placed) {
             notifyGameSessions(ProtocolConstants.UPDATE_GAME_MAP);//TODO model must notify about this

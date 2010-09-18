@@ -1,7 +1,9 @@
 package org.amse.bomberman.client.net.impl;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,15 +14,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.Controller;
-import org.amse.bomberman.client.model.impl.Model;
-import org.amse.bomberman.protocol.RequestCommand;
-import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  *
@@ -31,7 +30,6 @@ public class AsynchroConnector implements IConnector {
 
     private Socket socket;
     private static IConnector connector = null;
-    private static final char split = ProtocolConstants.SPLIT_SYMBOL.charAt(0);
 
     private AsynchroConnector() {
     }
@@ -62,96 +60,41 @@ public class AsynchroConnector implements IConnector {
         }
     }
 
-    private synchronized void sendRequest(String request) throws NetException {
-        BufferedWriter out = null;
+//    public synchronized void sendRequest(String request) throws NetException {
+//        BufferedWriter out = null;
+//        try {
+//            OutputStream os = this.socket.getOutputStream();
+//            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+//            out = new BufferedWriter(osw);
+//
+//            out.write(request);
+//            out.newLine();
+//            out.flush();
+//        } catch (IOException ex) {
+//            System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
+//            throw new NetException();
+//        }
+//    }
+    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {
+        DataOutputStream out = null;
         try {
-            OutputStream os = this.socket.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-            out = new BufferedWriter(osw);
+            OutputStream os = this.socket.getOutputStream();            
+            out = new DataOutputStream(new BufferedOutputStream(os));
 
-            out.write(request);
-            out.newLine();
+            //
+            out.writeInt(request.getMessageId());
+            List<String> data = request.getData();
+            int size = data.size();
+            out.writeInt(size);
+            for(String string : data) {
+                out.writeUTF(string);
+            }
+            //
             out.flush();
         } catch (IOException ex) {
             System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
             throw new NetException();
         }
-    }
-
-    public void requestGamesList() throws NetException {
-        sendRequest("" + RequestCommand.GET_GAMES.getValue());
-    }
-
-    public void requestLeaveGame() throws NetException {
-        sendRequest("" + RequestCommand.LEAVE.getValue());
-    }
-
-    public void requestCreateGame(String gameName, String mapName, int maxPl)
-            throws NetException {
-
-        sendRequest("" + RequestCommand.CREATE_GAME.getValue() +
-                split + gameName +
-                split + mapName +
-                split + maxPl +
-                split + Model.getInstance().getPlayerName());
-    }
-
-    public void requestJoinGame(int gameID) throws NetException {
-        sendRequest("2" + split + gameID + split + Model.getInstance().getPlayerName());
-    }
-
-    public void requestDoMove(Direction dir) throws NetException {
-        sendRequest("3" + split + dir.getValue());
-    }
-
-    public void requestStartGame() throws NetException {
-        sendRequest("" + RequestCommand.START_GAME.getValue());
-    }
-
-    public void requestGameMap() throws NetException {
-        sendRequest("" + RequestCommand.GET_GAME_MAP_INFO.getValue());
-    }
-
-    public void requestPlantBomb() throws NetException {
-        sendRequest("" + RequestCommand.PLACE_BOMB.getValue());
-    }
-
-    public void requestJoinBotIntoGame() throws NetException {
-        Random r = new Random();
-        sendRequest("" + RequestCommand.ADD_BOT_TO_GAME.getValue() + split +
-                SynchroConnector.botNames[r.nextInt(SynchroConnector.botNames.length - 1)]);
-    }
-    public void requestRemoveBotFromGame() throws NetException {
-        sendRequest("" + RequestCommand.REMOVE_BOT_FROM_GAME.getValue());
-    }
-
-    public void requestGameMapsList() throws NetException {
-        sendRequest("" + RequestCommand.GET_GAME_MAPS_LIST.getValue());
-    }
-
-    public void requestIsGameStarted() throws NetException {
-        sendRequest("" + RequestCommand.GET_GAME_STATUS.getValue());
-    }
-
-    public void requestGameInfo() throws NetException {
-        sendRequest("" + RequestCommand.GET_GAME_INFO.getValue());
-    }
-
-    public void sendChatMessage(String message) throws NetException {
-        sendRequest("" + RequestCommand.CHAT_ADD_MSG.getValue() + split + message);
-    }
-
-    public void requestNewChatMessages() throws NetException {
-        sendRequest("" + RequestCommand.CHAT_GET_NEW_MSGS.getValue());
-    }
-
-    public void requestDownloadGameMap(String gameMapName) throws NetException {
-        sendRequest(
-                "" + RequestCommand.DOWNLOAD_GAME_MAP.getValue() + split + gameMapName);
-    }
-
-    public void requestSetPlayerName(String playerName) throws NetException {
-        sendRequest("" + RequestCommand.SET_CLIENT_NAME.getValue() + split + playerName);
     }
 
     private class ServerListen implements Runnable {

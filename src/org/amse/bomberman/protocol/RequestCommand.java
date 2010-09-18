@@ -4,6 +4,8 @@
  */
 package org.amse.bomberman.protocol;
 
+import java.util.List;
+
 /**
  *
  * @author Kirilchuk V.E
@@ -13,7 +15,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAMES(0){// "0"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException {
             executor.sendGames();
         }
 
@@ -21,7 +23,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     CREATE_GAME(1) {// "1 gameName mapName maxPlayers playerName"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryCreateGame(args);
         }
 
@@ -29,7 +31,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     JOIN_GAME(2) {//"2 gameID botName"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryJoinGame(args);
         }
 
@@ -37,7 +39,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     DO_MOVE(3) {//"3 direction"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryDoMove(args);
         }
 
@@ -45,7 +47,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAME_MAP_INFO(4) {// "4"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendGameMapInfo();
         }
 
@@ -53,7 +55,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     START_GAME(5) {// "5"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryStartGame();
         }
 
@@ -61,7 +63,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     LEAVE(6) { // "6"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryLeave();
         }
 
@@ -69,7 +71,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     PLACE_BOMB(7) { // "7"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryPlaceBomb();
         }
 
@@ -77,7 +79,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     DOWNLOAD_GAME_MAP(8) {// "8 mapName"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendDownloadingGameMap(args);
         }
 
@@ -85,7 +87,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAME_STATUS(9) {// "9"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendGameStatus();
         }
 
@@ -93,7 +95,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAME_MAPS_LIST(10) {// "10"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendGameMapsList();
         }
 
@@ -101,7 +103,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     ADD_BOT_TO_GAME(11) {// "11 gameID botName"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryAddBot(args);
         }
 
@@ -109,7 +111,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAME_INFO(12) {// "12"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendGameInfo();
         }
 
@@ -117,7 +119,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     CHAT_ADD_MSG(13) { // "13 message"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.addMessageToChat(args);
         }
 
@@ -125,7 +127,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     CHAT_GET_NEW_MSGS(14) {// "14"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendNewMessagesFromChat();
         }
 
@@ -133,7 +135,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     REMOVE_BOT_FROM_GAME(15) {// "15"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.tryRemoveBot();
         }
 
@@ -141,7 +143,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     GET_GAME_PLAYERS_STATS(16) {// "16"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
             executor.sendGamePlayersStats();
         }
 
@@ -149,7 +151,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
     SET_CLIENT_NAME(17) {// "17 name"
 
         @Override
-        public void execute(RequestExecutor executor, String[] args) {
+        public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException {
             executor.setClientName(args);
         }
 
@@ -209,5 +211,5 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
     }
 
-    public abstract void execute(RequestExecutor executor, String[] args);
+    public abstract void execute(RequestExecutor executor, List<String> args) throws InvalidDataException;
 }

@@ -3,17 +3,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
+package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro; 
 
 //~--- non-JDK imports --------------------------------------------------------
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.RequestCommand;
 import org.amse.bomberman.protocol.RequestExecutor;
 
@@ -23,8 +24,11 @@ import org.amse.bomberman.server.net.SessionEndListener;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.net.Socket;
+import java.util.ArrayList;
 
 import java.util.List;
+import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
 import org.amse.bomberman.server.net.tcpimpl.Controller;
@@ -135,22 +139,49 @@ public class AsynchroThreadSession extends AbstractSession {
      * @see RequestExecutor
      * @param query request to process.
      */
-    protected void process(String query) {
-        //TODO refactor this somehow
-        System.out.println("Session: query received. query=" + query);
-        if(query.length() == 0) {
-            sendAnswer(protocol.emptyQueryError());
-            System.out.println(
-                    "Session: answerOnCommand warning. "
-                    + "Empty query received. Error on client side.");
+//    protected void process(String query) {
+//        //TODO refactor this somehow
+//        System.out.println("Session: query received. query=" + query);
+//        if(query.length() == 0) {
+//            sendAnswer(protocol.emptyQueryError());
+//            System.out.println(
+//                    "Session: answerOnCommand warning. "
+//                    + "Empty query received. Error on client side.");
+//            return;
+//        }
+//        RequestCommand cmd = null;
+//        String[] queryArgs = query.split(ProtocolConstants.SPLIT_SYMBOL);
+//        try {
+//            int command = Integer.parseInt(queryArgs[0]);
+//            cmd = RequestCommand.valueOf(command); // throws IllegalArgumentException
+//            cmd.execute(this.getRequestExecutor(), queryArgs);
+//        } catch (NumberFormatException ex) {
+//            sendAnswer(protocol.wrongQuery());
+//            System.out.println("Session: answerOnCommand error. "
+//                    + "Wrong first part of query. "
+//                    + "Wrong query from client. " + ex.getMessage());
+//        } catch (IllegalArgumentException ex) {
+//            sendAnswer(protocol.wrongQuery("Not supported command."));
+//            System.out.println("Session: answerOnCommand error. "
+//                    + "Non supported command int from client. "
+//                    + ex.getMessage());
+//        }
+//    }
+    
+    protected void process(ProtocolMessage<Integer, String> message) {
+        System.out.println("Session: message received.");
+        if(message.isBroken()) {
+            sendAnswer(protocol.wrongQuery("Broken message."));
+            System.out.println("Session: answerOnCommand warning. " +
+                     "Broken message. Error on client side.");
             return;
         }
+
         RequestCommand cmd = null;
-        String[] queryArgs = query.split(ProtocolConstants.SPLIT_SYMBOL);
         try {
-            int command = Integer.parseInt(queryArgs[0]);
-            cmd = RequestCommand.valueOf(command); // throws IllegalArgumentException
-            cmd.execute(this.getRequestExecutor(), queryArgs);
+            int commandId = message.getMessageId();                                                                       
+            cmd = RequestCommand.valueOf(commandId); // throws IllegalArgumentException
+            cmd.execute(this.getRequestExecutor(), message.getData()); 
         } catch (NumberFormatException ex) {
             sendAnswer(protocol.wrongQuery());
             System.out.println("Session: answerOnCommand error. "
@@ -161,12 +192,14 @@ public class AsynchroThreadSession extends AbstractSession {
             System.out.println("Session: answerOnCommand error. "
                     + "Non supported command int from client. "
                     + ex.getMessage());
+        } catch (InvalidDataException ex) {
+            sendAnswer(protocol.wrongQuery(ex.getMessage()));
         }
     }
 
     private class SessionThread extends Thread {
 
-        private BufferedReader in = null;
+        private DataInputStream in = null;
 
         /**
          * Method in which session gets requests from client and process them.
@@ -189,14 +222,14 @@ public class AsynchroThreadSession extends AbstractSession {
             }
         }
 
-        private BufferedReader initReader() throws IOException,
+        private DataInputStream initReader() throws IOException,
                                                    UnsupportedEncodingException {
             InputStream is = clientSocket.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-            return new BufferedReader(isr);
+            //InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+            return new DataInputStream(new BufferedInputStream(is));
         }
 
-        private void finallyBlock(BufferedReader in) {
+        private void finallyBlock(Closeable in) {
             System.out.println("Session: freeing resources.");
             try {
                 if(in != null) {
@@ -214,14 +247,31 @@ public class AsynchroThreadSession extends AbstractSession {
             System.out.println("Session: terminated.");
         }
 
-        private void cyclicReadAndProcess(BufferedReader in) throws IOException {
-            String clientQueryLine = null;
+//        private void cyclicReadAndProcess(BufferedReader in) throws IOException {
+//            String clientQueryLine = null;
+//            while(!mustEnd) {
+//                clientQueryLine = in.readLine(); // throws IOException
+//                if(clientQueryLine == null) { // EOF (client is OFF.)
+//                    break;
+//                }
+//                process(clientQueryLine); // here query can`t be null!
+//            }
+//        }
+
+        private void cyclicReadAndProcess(DataInputStream in) throws EOFException, IOException {            
             while(!mustEnd) {
-                clientQueryLine = in.readLine(); // throws IOException
-                if(clientQueryLine == null) { // EOF (client is OFF.)
-                    break;
+
+                ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+                int messageId = in.readInt();
+                int dataCount = in.readInt();
+                List<String> data = new ArrayList<String>(dataCount); //TODO what if dataCount < 0  !?!?
+                for(int i = 0; i < dataCount; ++i) {
+                    data.add(in.readUTF());
                 }
-                process(clientQueryLine); // here query can`t be null!
+                message.setMessageId(messageId);
+                message.setData(data);
+
+                process(message);
             }
         }
 
@@ -231,7 +281,6 @@ public class AsynchroThreadSession extends AbstractSession {
             } catch (SocketException ex) {
                 System.err.println("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
             }
-        }
-
+        }                
     }
 }

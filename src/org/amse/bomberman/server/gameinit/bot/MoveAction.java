@@ -14,7 +14,7 @@ import org.amse.bomberman.util.Constants.Direction;
  * Class that represents move action for bot.
  * @author Kirilchuk V.E.
  */
-public class MoveAction implements IAction {
+public class MoveAction implements Action {
     private Bot       bot;
     private Direction direction;
 

@@ -18,8 +18,10 @@ import org.amse.bomberman.util.Creator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 
 import java.util.List;
+import org.amse.bomberman.protocol.InvalidDataException;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.protocol.RequestExecutor;
@@ -34,7 +36,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     private final ResponseCreator protocol = new ResponseCreator();
     private final MyTimer    timer = new MyTimer(System.currentTimeMillis());
     //    
-    private final Session  session;
+    private final Session   session;
     private Game            game;
     private int             playerID;
     private String          clientName = "Default_name";
@@ -51,7 +53,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     public void sendGames() {
         List<Game> games = this.session.getGameStorage().getGamesList();
 
-        if (games.size() == 0) {
+        if (games.isEmpty()) {
             System.out.println("Session: sendGames info. No unstarted games finded.");
             this.session.sendAnswer(protocol.noUnstartedGames());
         } else {
@@ -59,7 +61,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
         }
     }
 
-    public void tryCreateGame(String[] args) {// "1 gameName mapName maxPlayers playerName"
+    public void tryCreateGame(List<String> args) throws InvalidDataException {// "1 gameName mapName maxPlayers playerName"
         if (this.game != null) {//TODO maybe make private method from this?
             System.out.println("Session: createGame warning. Client tryed to create game, canceled. Already in other game.");
             this.session.sendAnswer(protocol.notOK(
@@ -68,37 +70,37 @@ public class Controller implements RequestExecutor, GameEndedListener {
             return;
         }
 
-        if (args.length != 5) { // if we getted command with wrong number of args
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Wrong command parameters. Error on client side.");
-            this.session.sendAnswer(protocol.wrongQuery (
-                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
-                    "Wrong number of arguments."));
-
-            return;
+        if (args.size() != 4) { // if we getted command with wrong number of args
+//            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
+//                    + "Wrong command parameters. Error on client side.");
+//            this.session.sendAnswer(protocol.wrongQuery (
+//                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
+//                    "Wrong number of arguments."));
+//
+//            return;
+            throw new InvalidDataException("Wrong arguments num.");
         }
 
         //here all is OK
-        String gameName = args[1];
-        String mapName = args[2];
-        String playerName = args[4];
-
-        if (playerName.length() > 10) { //TODO must be utilities function
-            playerName = playerName.substring(0, 10);
-        }
+        Iterator<String> iterator = args.iterator();
+        String gameName = iterator.next();
+        String mapName = iterator.next();
 
         int maxPlayers = -1;
         try {
-            maxPlayers = Integer.parseInt(args[3]);
+            maxPlayers = Integer.parseInt(iterator.next());
         } catch (NumberFormatException ex) {
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Wrong command parameters. Error on client side. "
-                    + ex.getMessage());
-            this.session.sendAnswer(protocol.wrongQuery (
-                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
-                    "MaxPlayers argument must be integer."));
-            return;
+//            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
+//                    + "Wrong command parameters. Error on client side. "
+//                    + ex.getMessage());
+//            this.session.sendAnswer(protocol.wrongQuery (
+//                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
+//                    "MaxPlayers argument must be integer."));
+//            return;
+            throw new InvalidDataException("Max players param must be int");
         }
+        String playerName = iterator.next();
+        playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
         try {
             this.tryCreateGame(mapName, gameName, maxPlayers);//overloaded private function
@@ -108,20 +110,21 @@ public class Controller implements RequestExecutor, GameEndedListener {
 
             return;
         } catch (FileNotFoundException ex) {
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Map wasn`t founded on server." + " Map=" + mapName);
-            this.session.sendAnswer(protocol.notOK(
-                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
-                    "No such map on server."));
-
-            return;
+//            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
+//                    + "Map wasn`t founded on server." + " Map=" + mapName);
+//            this.session.sendAnswer(protocol.notOK(
+//                    ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
+//                    "No such map on server."));
+//
+//            return;
+            throw new InvalidDataException("No such map on server.");
         } catch (IOException ex) {
             System.err.println("Session: createGame error while loadimg map. "
                     + " Map=" + mapName + " " + ex.getMessage());
             this.session.sendAnswer(protocol.notOK(
                     ProtocolConstants.CAPTION_CREATE_GAME_RESULT,
                     "Error on server side, while loading map."));
-            return;
+            return; //TODO GAMEEXCEPTION
         }
     }
 
@@ -151,7 +154,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.game.addGameEndedListener(this);
     }
 
-    public void tryJoinGame(String[] args) {// "2" "gameID" "playerName"
+    public void tryJoinGame(List<String> args) {// "2" "gameID" "playerName"
         if (this.game != null) {
             System.out.println("Session: tryJoinGame warning. Client tryed to join game, canceled. Already in other game.");
             this.session.sendAnswer(protocol.notOK(
@@ -160,7 +163,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
             return;
         }
 
-        if(args.length!=3){
+        if(args.size() != 2){
             System.out.println("Session: joinGame error. Wrong command parameters. Error on client side.");
             this.session.sendAnswer(protocol.wrongQuery (
                     ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
@@ -170,14 +173,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
 
         //here all is OK
         int gameID = 0;
-        String playerName = args[2];
-
-        if (playerName.length() > 10) { // TODO must be util function
-            playerName = playerName.substring(0, 10);
-        }
-
+        Iterator<String> iterator = args.iterator();
         try {
-                gameID = Integer.parseInt(args[1]);
+                gameID = Integer.parseInt(iterator.next());
            } catch (NumberFormatException ex) {
                 System.out.println("Session: joinGame error. " +
                                    "Wrong command parameters. " +
@@ -188,6 +186,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                     "GameID argument must be integer."));
             return;
         }
+
+        String playerName = iterator.next();
+        playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
         // all is ok
         CommandResult joinResult = this.tryJoinGame(gameID);
@@ -300,7 +301,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
         return joinResult;
     }
 
-    public void tryDoMove(String[] args) {
+    public void tryDoMove(List<String> args) {
         if (this.game == null) {
             System.out.println("Session: doMove warning. " +
                        "Client tryed to move, canceled. " +
@@ -323,9 +324,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
         }
 
-        if (args.length != 2) {
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Wrong command parameters. Error on client side.");
+        if (args.size() != 1) {
+            System.out.println("Session: doMove warning. Client tryed to move, canceled. "
+                    + "Wrong number of parameters. Error on client side.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_DO_MOVE_RESULT,
                     "Wrong number of arguments."));
@@ -335,18 +336,17 @@ public class Controller implements RequestExecutor, GameEndedListener {
 
         int     dir   = 0;
         boolean moved = false;
-
+        Iterator<String> iterator = args.iterator();
         try {
-            dir = Integer.parseInt(args[1]);    // throws NumberFormatException
+            dir = Integer.parseInt(iterator.next());    // throws NumberFormatException
 
             Direction direction = Direction.fromInt(dir);    // throws IllegalArgumentException
 
             moved = this.tryDoMove(direction);
         } catch (NumberFormatException ex) {
             System.out.println("Session: doMove error. "
-                    + "Unsupported direction(not int). "
-                    + "Error on client side." + " direction="
-                    + args[1] + ex.getMessage());
+                    + "Unsupported direction(not int). ");
+                    
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_DO_MOVE_RESULT,
                     "Wrong move value."));
@@ -354,9 +354,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
             return;
         } catch (IllegalArgumentException ex) {
             System.out.println("Session: doMove error. "
-                    + "Unsupported direction. "
-                    + "Error on client side." + " direction="
-                    + args[1] + ex.getMessage());
+                    + "Unsupported direction. ");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_DO_MOVE_RESULT,
                     "Wrong move value."));
@@ -539,18 +537,19 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.game.tryPlaceBomb(this.playerID);
     }
 
-    public void sendDownloadingGameMap(String[] args) {
-        if (args.length != 2) {
+    public void sendDownloadingGameMap(List<String> args) {
+        if (args.size() != 2) {
             System.out.println("Session: sendDownloadingGameMap warning. " +
                                "Wrong number of args. Error on client side.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP,
                     "Wrong number of arguments."));
 
-            return;
+            return; 
         }
 
-        String  gameMapName = args[1] + ".map";
+        Iterator<String> iterator = args.iterator();
+        String  gameMapName = iterator.next() + ".map";
         this.session.sendAnswer(protocol.downloadGameMap(gameMapName));
     }
 
@@ -570,8 +569,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.session.sendAnswer(protocol.sendGameMapsList());
     }
 
-    public void tryAddBot(String[] args) {
-        if (args.length != 2) {
+    public void tryAddBot(List<String> args) {
+        if (args.size() != 1) {
             System.out.println("Session: tryAddBot warning. Not enough arguments. Cancelled.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
@@ -580,7 +579,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
             return;
         }
 
-        String botName = args[1];
+        Iterator<String> iterator = args.iterator();
+        String botName = iterator.next();
         CommandResult joinBotResult = this.tryAddBotIntoMyGame(botName);
 
         switch (joinBotResult) {
@@ -701,8 +701,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.session.sendAnswer(protocol.sendGameInfo(this));
     }
 
-    public void addMessageToChat(String[] args) { //TODO not sending any response!!!
-        if (args.length < 2) {
+    public void addMessageToChat(List<String> args) {
+        if (args.isEmpty()) {
             System.out.println("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT,
@@ -722,9 +722,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
         }
 
         StringBuilder chatMessage = new StringBuilder(); //TODO must be util method
-
-        for (int i = 1; i < args.length; ++i) {
-            chatMessage.append(args[i] + " ");
+        for(String string : args) {
+            chatMessage.append(string + " ");
         }
 
         System.out.println("Session: client added message to game chat. message=" +
@@ -890,14 +889,15 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.session.sendAnswer(protocol.sendPlayersStats(game));
     }
 
-    public void setClientName(String[] args) {// "17 name"
-        if (args.length != 2) {
+    public void setClientName(List<String> args) {// "17 name"
+        if (args.size() != 1) {
             System.out.println("Session: setClientName warning. Canceled. Wrong query.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Wrong number of arguments."));
         } else {
-            this.clientName = args[1];
+            Iterator<String> iterator = args.iterator();
+            this.clientName = iterator.next();
             this.session.sendAnswer(protocol.ok(
                     ProtocolConstants.CAPTION_SET_CLIENT_NAME,
                     "Name was set."));
@@ -976,6 +976,14 @@ public class Controller implements RequestExecutor, GameEndedListener {
 
         public void setStartTime(long time) {
             this.startTime = time;
+        }
+    }
+
+    private String cutLength(String string, int maxLength) {
+        if(string.length() > maxLength) {
+            return string.substring(0, maxLength);
+        } else {
+            return string;
         }
     }
 }

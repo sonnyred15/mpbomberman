@@ -16,7 +16,7 @@ import org.amse.bomberman.util.Constants.Direction;
  * <code>Constants.GAME_STEP_TIME</code>.
  * @author Kirilchuk V.E.
  */
-public class PlaceAndMoveAction implements IAction {
+public class PlaceAndMoveAction implements Action {
     private Bot       bot;
     private Direction direction;
 

@@ -80,7 +80,7 @@ public class Bot extends Player
         public void run() {
             while (isAlive() && !gameEnded) {
                 try {
-                    IAction action = strategy.thinkAction(this.bot, model);
+                    Action action = strategy.thinkAction(this.bot, model);
                     //TODO this is hack fix of problem when bot make move after death.
                     if(isAlive()) {
                         action.executeAction(game);

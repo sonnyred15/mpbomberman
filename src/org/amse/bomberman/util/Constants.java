@@ -24,6 +24,7 @@ public final class Constants {
     public static final int MAP_BONUS_BOMB_RADIUS = -11;
     
     public static final int MAX_PLAYERS  = 15;//1..15
+    public static final int MAX_PLAYER_NAME_LENGTH  = 10;
     
     public static final long GAME_STEP_TIME = 45L;
     public static final long BOMB_TIMER_VALUE = 200L*10;

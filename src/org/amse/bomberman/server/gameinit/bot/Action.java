@@ -13,7 +13,7 @@ import org.amse.bomberman.server.gameinit.Game;
  * Interface for bot actions.
  * @author Kirilchuk V.E
  */
-public interface IAction {
+public interface Action {
 
     /**
      * Executing action in specified game.
