@@ -35,7 +35,7 @@ public class RandomMoveBotStrategy extends BotStrategy {
      * @return new move action.
      */
     @Override
-    public IAction thinkAction(Bot bot, IModel model) {
+    public Action thinkAction(Bot bot, IModel model) {
         if (bot.getPosition().equals(this.target) || (target == null)) {
             target = findNewTarget(model);
         }

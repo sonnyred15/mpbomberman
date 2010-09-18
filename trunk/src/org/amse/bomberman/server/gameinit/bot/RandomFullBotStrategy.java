@@ -39,7 +39,7 @@ public class RandomFullBotStrategy extends BotStrategy {
      * @return new place bomb and move or just move action.
      */
     @Override
-    public IAction thinkAction(Bot bot, IModel model) {
+    public Action thinkAction(Bot bot, IModel model) {
         if (bot.getPosition().equals(this.target) || (target == null)) {
             target = findNewTarget(model);
         }

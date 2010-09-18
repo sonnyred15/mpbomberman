@@ -90,7 +90,7 @@ public abstract class BotStrategy {
      * @param model model that owns this bot.
      * @return action for bot to do.
      */
-    public abstract IAction thinkAction(Bot bot, IModel model);
+    public abstract Action thinkAction(Bot bot, IModel model);
 
     private int[][] cloneField(final int[][] mapArray) {
         int[][] result = new int[mapArray.length][mapArray.length];

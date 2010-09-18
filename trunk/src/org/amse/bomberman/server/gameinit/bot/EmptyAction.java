@@ -13,7 +13,7 @@ import org.amse.bomberman.server.gameinit.Game;
  * Class that represents empty action for bot.
  * @author Kirilchuk V.E.
  */
-public class EmptyAction implements IAction {
+public class EmptyAction implements Action {
 
     /**
      * Method from IAction interface.

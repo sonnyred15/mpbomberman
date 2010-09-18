@@ -7,6 +7,9 @@ package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.List;
+
+
 /**
  *
  * @author Kirilchuk V.E
@@ -14,39 +17,39 @@ package org.amse.bomberman.protocol;
 public interface RequestExecutor {
 
     // commands
-    void sendGames();
+    void sendGames() throws InvalidDataException ;
 
-    void tryCreateGame(String[] args);
+    void tryCreateGame(List<String> args) throws InvalidDataException ;
 
-    void tryJoinGame(String[] args);
+    void tryJoinGame(List<String> args) throws InvalidDataException ;
 
-    void tryDoMove(String[] args);
+    void tryDoMove(List<String> args) throws InvalidDataException ;
 
-    void sendGameMapInfo();
+    void sendGameMapInfo() throws InvalidDataException ;
 
-    void tryStartGame();
+    void tryStartGame() throws InvalidDataException ;
 
-    void tryLeave();
+    void tryLeave() throws InvalidDataException ;
 
-    void tryPlaceBomb();
+    void tryPlaceBomb() throws InvalidDataException ;
 
-    void sendDownloadingGameMap(String[] args);
+    void sendDownloadingGameMap(List<String> args) throws InvalidDataException ;
 
-    void sendGameStatus();
+    void sendGameStatus() throws InvalidDataException ;
 
-    void sendGameMapsList();
+    void sendGameMapsList() throws InvalidDataException ;
 
-    void tryAddBot(String[] args);
+    void tryAddBot(List<String> args) throws InvalidDataException ;
 
-    void sendGameInfo();
+    void sendGameInfo() throws InvalidDataException ;
 
-    void addMessageToChat(String[] args);
+    void addMessageToChat(List<String> args) throws InvalidDataException ;
 
-    void sendNewMessagesFromChat();
+    void sendNewMessagesFromChat() throws InvalidDataException ;
 
-    void tryRemoveBot();
+    void tryRemoveBot() throws InvalidDataException ;
 
-    void sendGamePlayersStats();
+    void sendGamePlayersStats() throws InvalidDataException ;
 
-    void setClientName(String[] args);
+    void setClientName(List<String> args) throws InvalidDataException ;
 }

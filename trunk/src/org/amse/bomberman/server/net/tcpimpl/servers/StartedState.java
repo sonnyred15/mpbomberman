@@ -45,7 +45,7 @@ class StartedState implements ServerState {
                 server.setListeningThread(null);
             }
 
-            //TODO terminate SESSIONS!!!!!11
+            //sessions terminating in freeResources method.
         } catch (IOException ex) {
             System.err.println("Server: stop error. " + ex.getMessage());
 

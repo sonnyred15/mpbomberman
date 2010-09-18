@@ -12,6 +12,9 @@ import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
+import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.RequestCreator;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -19,44 +22,43 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-
 /**
  *
  * @author Mikhail Korovkin
  */
-public class Controller implements IController{
+public class Controller implements IController {
 
     private IConnector connector = null;
     private static IController controller = null;
     private RequestResultListener receiveResultListener;
-
+    private final RequestCreator protocol = new RequestCreator();
     private JFrame gameJFrame = null;
-
     private boolean isAsynchro;
 
     private Controller(boolean isAsynchro) {
         this.isAsynchro = isAsynchro;
-        if (connector == null) {
-            if (isAsynchro) {
+        if(connector == null) {
+            if(isAsynchro) {
                 connector = AsynchroConnector.getInstance();
             } else {
                 connector = SynchroConnector.getInstance();
             }
         }
     }
+
     public static IController getInstance() {
-        if (controller == null) {
-            controller = (IController)new Controller(true);
+        if(controller == null) {
+            controller = (IController) new Controller(true);
         }
         return controller;
     }
 
     public void lostConnection(String exception) {
-        if (this.receiveResultListener instanceof Wizard) {
-            Wizard wizard = (Wizard)this.receiveResultListener;
+        if(this.receiveResultListener instanceof Wizard) {
+            Wizard wizard = (Wizard) this.receiveResultListener;
             System.out.println(exception);
             JOptionPane.showMessageDialog(wizard, exception, "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                                          JOptionPane.ERROR_MESSAGE);
 
             wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
             this.setReceiveInfoListener(receiveResultListener);
@@ -64,7 +66,8 @@ public class Controller implements IController{
         } else {
             System.out.println(exception);
             JOptionPane.showMessageDialog(gameJFrame,
-                    exception, "Error", JOptionPane.ERROR_MESSAGE);
+                                          exception, "Error",
+                                          JOptionPane.ERROR_MESSAGE);
             gameJFrame.dispose();
             gameJFrame = null;
             Model.getInstance().setStart(false);
@@ -74,11 +77,13 @@ public class Controller implements IController{
             wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
         }
     }
+
     public void startGame() {
-        if (receiveResultListener instanceof Wizard) {
+        if(receiveResultListener instanceof Wizard) {
             Wizard wizard = (Wizard) receiveResultListener;
             wizard.dispose();
-            this.setReceiveInfoListener((RequestResultListener) Model.getInstance());
+            this.setReceiveInfoListener(
+                    (RequestResultListener) Model.getInstance());
             GameJFrame jframe = new GameJFrame();
             Model.getInstance().addListener(jframe);
             gameJFrame = jframe;
@@ -91,8 +96,9 @@ public class Controller implements IController{
             System.out.println("Game is already started or closed.");
         }
     }
+
     public void leaveGame() {
-        if (!(receiveResultListener instanceof Wizard)) {
+        if(!(receiveResultListener instanceof Wizard)) {
             gameJFrame.dispose();
             Model.getInstance().removeListeners();
             BomberWizard wizard = new BomberWizard();
@@ -102,13 +108,14 @@ public class Controller implements IController{
             System.out.println("Game is already leaved or closed.");
         }
     }
-    
-    public void setReceiveInfoListener(RequestResultListener receiveResultListener) {
+
+    public void setReceiveInfoListener(
+            RequestResultListener receiveResultListener) {
         this.receiveResultListener = receiveResultListener;
     }
 
     public void connect(InetAddress serverIP, int serverPort)
-            throws UnknownHostException,NumberFormatException,IOException {
+            throws UnknownHostException, NumberFormatException, IOException {
         this.connector.сonnect(serverIP, serverPort);
     }
 
@@ -117,82 +124,89 @@ public class Controller implements IController{
     }
 
     public void requestGamesList() throws NetException {
-        this.connector.requestGamesList();
+        sendRequest(protocol.requestGamesList());
     }
 
-    public void requestCreateGame(String gameName, String mapName, int maxPlayers)
+    public void requestCreateGame(String gameName, String mapName,
+                                  int maxPlayers)
             throws NetException {
-        this.connector.requestCreateGame(gameName, mapName, maxPlayers);
+        sendRequest(protocol.requestCreateGame(gameName,
+                                               mapName,
+                                               maxPlayers));
     }
 
     public void requestLeaveGame() throws NetException {
-        this.connector.requestLeaveGame();
+        sendRequest(protocol.requestLeaveGame());
     }
 
     public void requestJoinGame(int gameID) throws NetException {
-        this.connector.requestJoinGame(gameID);
+        sendRequest(protocol.requestJoinGame(gameID));
     }
 
     public void requestDoMove(Direction dir) throws NetException {
-        this.connector.requestDoMove(dir);
+        sendRequest(protocol.requestDoMove(dir));
     }
 
     public void requestStartGame() throws NetException {
-        this.connector.requestStartGame();
-        /*if (!isAsynchro) {
-            ((SynchroConnector)connector).beginGameUpdating();
-        }*/
+        sendRequest(protocol.requestStartGame());
     }
 
     public void requestGameMap() throws NetException {
-        this.connector.requestGameMap();
+        sendRequest(protocol.requestGameMap());
     }
 
     public void requestPlantBomb() throws NetException {
-        this.connector.requestPlantBomb();
+        sendRequest(protocol.requestPlantBomb());
     }
 
     public void requestJoinBotIntoGame() throws NetException {
-        this.connector.requestJoinBotIntoGame();
+        sendRequest(protocol.requestJoinBotIntoGame());
     }
+
     public void requestRemoveBotFromGame() throws NetException {
-        this.connector.requestRemoveBotFromGame();
+        sendRequest(protocol.requestRemoveBotFromGame());
     }
 
     public void requestMapsList() throws NetException {
-        this.connector.requestGameMapsList();
+        sendRequest(protocol.requestGameMapsList());
     }
 
     public void requestIsGameStarted() throws NetException {
-        this.connector.requestIsGameStarted();
+        sendRequest(protocol.requestIsGameStarted());
     }
 
     public void requestGameInfo() throws NetException {
-        this.connector.requestGameInfo();
+        sendRequest(protocol.requestGameInfo());
     }
 
     public void requestSendChatMessage(String message) throws NetException {
-        this.connector.sendChatMessage(message);
+        sendRequest(protocol.requestAddChatMessage(message));
     }
 
     public void requestNewChatMessages() throws NetException {
-        this.connector.requestNewChatMessages();
+        sendRequest(protocol.requestNewChatMessages());
     }
 
     public void requestDownloadMap(String gameMapName) throws NetException {
-        this.connector.requestDownloadGameMap(gameMapName);
+        sendRequest(protocol.requestDownloadGameMap(gameMapName));
     }
 
     public void requestSetPlayerName(String playerName) throws NetException {
-        this.connector.requestSetPlayerName(playerName);
+        sendRequest(protocol.requestSetPlayerName(playerName));
     }
 
     public void receivedRequestResult(List<String> requestResult) {
-        if (this.receiveResultListener != null) {
+        if(this.receiveResultListener != null) {
             this.receiveResultListener.received(requestResult);
         } else {
-            Creator.createErrorDialog(null, "Error", "No listener for " +
-                    "received info.");
+            Creator.createErrorDialog(null, "Error", "No listener for "
+                    + "received info.");
         }
     }
+
+    private void sendRequest(ProtocolMessage<Integer, String> message) throws
+            NetException {
+        this.connector.sendRequest(message);
+    }
+
 }
