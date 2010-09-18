@@ -10,7 +10,7 @@ package org.amse.bomberman.server.net.tcpimpl;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.imodel.Player;
-import org.amse.bomberman.server.net.ISession;
+import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 
@@ -34,7 +34,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     private final ResponseCreator protocol = new ResponseCreator();
     private final MyTimer    timer = new MyTimer(System.currentTimeMillis());
     //    
-    private final ISession  session;
+    private final Session  session;
     private Game            game;
     private int             playerID;
     private String          clientName = "Default_name";
@@ -44,7 +44,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * @param sessionServer server of session that owns this controller.
      * @param session owner of this controller.
      */
-    public Controller(ISession session) {
+    public Controller(Session session) {
         this.session = session;
     }
 
@@ -959,7 +959,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
         return playerID;
     }
 
-    public ISession getSession() {
+    public Session getSession() {
         return session;
     }
 

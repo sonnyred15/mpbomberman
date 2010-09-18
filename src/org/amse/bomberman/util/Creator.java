@@ -9,7 +9,7 @@ package org.amse.bomberman.util;
 
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.gameinit.GameMap;
-import org.amse.bomberman.server.net.IServer;
+import org.amse.bomberman.server.net.Server;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -45,7 +45,7 @@ public class Creator {
         String[]     gameMaps = createGameMapsListFromDirectory();
         List<String> result   = new ArrayList<String>();
 
-        for (String string : gameMaps) {
+        for (String string : gameMaps) {// TODO game maps can be null...
             result.add(string);
         }
 
