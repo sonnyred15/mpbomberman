@@ -1,0 +1,104 @@
+mpbomberman game protocol (plz maximize window)
+
+Currently "query-answer" protocol is used.
+
+Server supportes 15 commands from Client:
+
+Description      |FullSyntax query|AnswerDescription| syntax of answer if all is ok
+--------------------------------------------------------------------------------------------------------------------
+GET_GAMES        |0               | Unstarted games | "gameID gameN mN.map curPlrs maxPlrs" each game on next line.|
+CREATE_GAME      |1 gN mN mP      | Confirm         | "Game created."                                              |
+JOIN_GAME        |2 gameID playerN| Confirm         | "Joined."                                                    |
+DO_MOVE          |3 direction"    | true false      | "true"                                                       |
+GET_MAP_ARRAY    |4               | map+expl+plInfo | *watch (mapArray)                                            |
+START_GAME       |5               | Confirm         | "Game started."                                              |
+LEAVE_GAME       |6               | Confirm         | "Disconnected.                                               |
+PLACE_BOMB       |7               | Confirm         | "Ok."                                                        |
+DOWNLOAD_MAP     |8 mapName       | map             | *like mapArray but ONLY map ints. Without expl and plInfo.   |
+GET_GAME_STATUS  |9               | status          | "started" or "not started"                                   |
+GET_MAPS_LIST    |10              | maps list       | "mapName.map" each map on next line.                         |
+ADD_BOT_TO_GAME  |11 gameID botN  | Confirm         | "Bot added."                                                 |
+GET_MY_GAME_INFO |12              | gameInfo        | *watch (gameInfo)                                            |
+CHAT_ADD_MSG     |13 message      | messages        | new chat messages.                                           |
+CHAT_GET_NEW_MSGS|14              | messages        | new chat messages.                                           |
+-------------------------------------------------------------------------------------------------------------------
+where gN,gameN,gameName is game name.
+      mN,mapN,mapName   is map name(must exist on server) WITHOUT .map!
+      mP,maxPlayers     is maxPlayers - value between 1 and map.maxPlayers inclusive.
+                           On other values just map.MaxPlayers will be used.
+      
+      gameID            is id of game that can be getted from GET_GAMES command.
+      playerN           is name of player.
+      direction         is value between 0 and 3 inclusive (0 - DOWN; 1 - LEFT; 2 - UP; 3 - RIGHT)
+
+      mapArray - sending map in next format. Each line is String to be parsed.
+             int   - dimension of map on one line
+             int int int ... int      -ints of map. Each line of map on next line
+             int int int ... int
+             ...................
+             int int int ... int       
+             int   - ammount of explosion squares. If no explosion squares here would be zero!!!
+             intX intY         
+             ...          - coordinates of explosion squares
+             intX intY              
+             int   - always equals 1!!!
+             playerX playerY playerNick playerLives playerBombes playerMaxBombes 
+
+      expl              is explosions, coordinates of them.
+      plInfo            is player info (playerX playerY playerNick playerLives playerBombes playerMaxBombes)
+      botN              is botName
+      message           is message
+
+      gameInfo - sending map in next format. Each line is String to be parsed.
+             boolean   - is you owner(creator) of this game
+             int       - number of players in game
+             String
+             ...       - nickNames of this players
+             String
+
+Now answers if all is not ok:
+
+(0) "No unstarted games finded." - if no unstarted games finded.
+
+(1) "Wrong command parameters. Error on client side." - if mP param can not be parsed by Integer.parseInt.
+    "No such map on server." - if no map with such name was founded on server 
+    "Error on server side, while loading map." - if server for some reasones cant create map
+
+(2) "Wrong command parameters. Error on client side. gameID must be int."  -if gameID param can not be parsed by Integer.parseInt. 
+    "Wrong query. Error on client side." - if command syntax is wrong.
+    "Leave another game first." - if you are already in other game.
+    "Game is full. Try to join later." - if game is full and you cannot join.
+    "Game was  already started." - if game was already started.
+    "No such game." - if no game with such ID exist on server.
+
+(3) "false" - if you send illegal move or unsupported int for move or moving too fast...
+    "Not joined to any game." - if you are not joined to any game.
+
+(4) "You are not joined to any game. Error." - if you are not joined to any game.
+
+(5) "Not owner of game." - if you are not owner and cant start the game.
+    "Game is already started." - if game was already started.
+    "Not joined to any game." - if you are not joined to any game and trying to start game.
+
+(6) "Not joined to any game." - if you are not joined to any game and trying to disconnect
+
+(7) "Not joined to any game." - if you are not joined to any game
+
+(8) @see (1) but except "Wrong command parametres. Error on..." -> "Wrong query. Not enough arguments"
+
+(9) "Not joined to any game." - if you are not joined to any game an trying to get game status
+
+(10) "No maps on server was founded."
+
+(11) "Wrong command parameters. Error on client side. gameID must be int."
+     "Wrong query. Error on client side." - if query does not have correct and enough arguments.
+     "Game is full. Try to add bot later." - if game is full and bot can not be joined.
+     "Game was already started."- if game was already started and bot can not be joined.
+     "No such game." - if game have benn already removed from server or gameID was wrong.
+
+(12) "Not joined to any game." - if you are not joined to any game and trying to get gameInfo
+
+(13) "Not joined to any game." - if you are not joined to any game and trying to get add message to chat
+     "Wrong query. Not enough arguments" - if you client didn`t send message argument.
+
+(14) "Not joined to any game." - if you are not joined to any game and trying to get new chat messages
