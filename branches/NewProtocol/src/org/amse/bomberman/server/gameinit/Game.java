@@ -9,7 +9,7 @@ package org.amse.bomberman.server.gameinit;
 
 import java.util.Collections;
 import org.amse.bomberman.server.gameinit.bot.Bot;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameinit.control.GameEndedListener;
 import org.amse.bomberman.server.gameinit.control.GameStartedListener;
 import org.amse.bomberman.server.gameinit.imodel.IModel;
@@ -83,7 +83,7 @@ public class Game {
             this.maxPlayers = gameMapMaxPlayers;
         }
 
-        this.chat = new AsynchroChat(this);
+        this.chat = new AsynchroChat();
         this.model = ModelFactory.createModel(this, gameMap);
 
         //
@@ -153,13 +153,12 @@ public class Game {
      * @param message message to add in chat.
      */
     public void addMessageToChat(Player player, String message) {
-        this.chat.addMessage(player.getNickName(), message);
-        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
+//        this.chat.addMessage(player.getNickName(), message, controllers);
+//        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
     }
 
     public void addMessageToChat(String message) {
-        this.chat.addMessage(message);
-        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
+        this.chat.addMessage(message, controllers);
     }
 
     /**
@@ -261,24 +260,15 @@ public class Game {
     }
 
     /**
-     * Return list of new messages from chat. See SynchroChat class to view
-     * what will be sended if there is no new messages.
-     * @see SynchroChat
-     * @param playerID ID of player that requests his new messages.
-     * @return list of new messages from chat.
-     * @deprecated Dead code. In current asynchro realization always sends
-     * "No new messages". Need only cause documented in protocol.
-     */
-    public List<String> getNewMessagesFromChat(int playerID) {
-        return this.chat.getNewMessages(playerID);
-    }
-
-    /**
      * Returns the reference to Controller that is the owner of this game.
      * @return the reference to Controller that is the owner of this game.
      */
     public Controller getOwner() {
         return owner;
+    }
+
+    public boolean isGameOwner(Controller controller) {
+        return this.owner == controller;
     }
 
     /**
@@ -322,7 +312,7 @@ public class Game {
 
         synchronized (this) {
             if (this.model.getCurrentPlayersNum() < this.maxPlayers) {
-                String name = controller.getName();
+                String name = controller.getClientNickName();
                 playerID = this.model.addPlayer(name);
                 this.controllers.add(controller);
 
@@ -471,9 +461,9 @@ public class Game {
      * @param message message to send to clients.
      */
     public void notifyGameSessions(String message) {
-        for (Controller controller : controllers) {
-            controller.getSession().sendAnswer(message);
-        }
+//        for (Controller controller : controllers) {
+//            controller.getSession().sendAnswer(message);
+//        }
     }
 
     /**
@@ -482,9 +472,9 @@ public class Game {
      * @param message message to send to clients.
      */
     public void notifyGameSessions(List<String> messages) {
-        for (Controller controller : controllers) {
-            controller.getSession().sendAnswer(messages);
-        }
+//        for (Controller controller : controllers) {
+//            controller.getSession().sendAnswer(messages);
+//        }
     }
 
     /**
@@ -499,9 +489,5 @@ public class Game {
         this.gameChangeListener.gameEnded(this);
 
         notifyGameSessions(ProtocolConstants.MESSAGE_GAME_KICK);
-    }
-
-    public Lobby createLobby() {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

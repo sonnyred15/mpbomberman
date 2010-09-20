@@ -97,4 +97,10 @@ public class ProtocolConstants {
 
     public static final int GAMES_LIST_MESSAGE_ID = 2;
 
+    public static final int JOIN_GAME_MESSAGE_ID = 3;
+
+    public static final int CHAT_MESSAGE_ID = 4;
+
+    public static final int DO_MOVE_MESSAGE_ID = 5;
+
 }

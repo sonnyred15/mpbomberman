@@ -4,15 +4,15 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.IOUtilities;
 
@@ -22,13 +22,13 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class AsynchroSender {
 
-    private final SeparatelySynchronizedMap<String, List<String>> messagesMap =
-            new SeparatelySynchronizedMap<String, List<String>>(24);
+    private final SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>> messagesMap =
+            new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(24);
     //
-    private final Session session;
+    private final Session session; //TODO maybe use observer for session terminate instead of reference and check mustEnd?
     private final Socket clientSocket;
     private final Thread senderThread;
-    private BufferedWriter out;
+    private DataOutputStream out;
 
     public AsynchroSender(Session session, Socket clientSocket) {
         this.session = session;
@@ -44,33 +44,13 @@ public class AsynchroSender {
         this.senderThread.start();
     }
 
-    private BufferedWriter initWriter() throws IOException {
-        OutputStream os = this.clientSocket.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        return new BufferedWriter(osw);
+    private DataOutputStream initWriter() throws IOException {
+        OutputStream os = this.clientSocket.getOutputStream();        
+        return new DataOutputStream(new BufferedOutputStream(os));
     }
 
-    /**
-     * Ignore message if there is too much messages in queue.
-     * @param message to send.
-     */
-    public void addToQueue(String message) {
-        List<String> list = new ArrayList<String>(1);
-        list.add(message);
-        addToQueue(message, list);
-    }
-
-    /**
-     * Ignore message if there is too much messages in queue.
-     * @param message to send.
-     */
-    public void addToQueue(List<String> message) {
-        String caption = message.get(0);
-        addToQueue(caption, message);
-    }
-
-    private void addToQueue(String key, List<String> value) {
-        messagesMap.put(key, value);
+    public void addToQueue(ProtocolMessage<Integer, String> message) {
+        messagesMap.put(message.getMessageId(), message);
     }
 
     private class SenderThread extends Thread {
@@ -82,12 +62,12 @@ public class AsynchroSender {
         @Override
         public void run() {
             System.out.println(super.getName() + " thread started.");
-            Set<Entry<String, List<String>>> entrySet = messagesMap.entrySet();
+            Set<Entry<Integer, ProtocolMessage<Integer, String>>> entrySet = messagesMap.entrySet();
             try {
                 while(!session.isMustEnd()) {
                     try {
-                        for(Entry<String, List<String>> entry : entrySet) {
-                            List<String> toSend = entry.setValue(null);
+                        for(Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
+                            ProtocolMessage<Integer, String> toSend = entry.setValue(null);
                             if(toSend != null) {
                                 this.send(toSend);
                             }
@@ -110,22 +90,22 @@ public class AsynchroSender {
          *
          * @throws IllegalArgumentException
          */
-        private void send(List<String> linesToSend) {
-            if(linesToSend == null || linesToSend.isEmpty()) {
+        private void send(ProtocolMessage<Integer, String> response) {//TODO do send fast!
+            if(response.isBroken()) {
                 throw new IllegalArgumentException(
-                        "Null or empty argument not supported.");
+                        "Broken response. Message id or message data are null.");
             }
 
             try {
                 System.out.println(super.getName() + " sending answer...");
 
-                for(String string : linesToSend) {
-                    out.write(string);
-                    out.newLine();
+                out.writeInt(response.getMessageId());
+                List<String> data = response.getData();
+                int size = data.size();
+                out.writeInt(size);
+                for(String string : data) {
+                    out.writeUTF(string);
                 }
-
-                out.write("");    // TODO magic code...
-                out.newLine();
                 out.flush();
             } catch (IOException ex) {
                 System.err.println(super.getName() + " sendAnswer error. "

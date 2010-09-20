@@ -9,7 +9,7 @@ package org.amse.bomberman.util;
 
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameinit.imodel.Player;
 
 //~--- JDK imports ------------------------------------------------------------

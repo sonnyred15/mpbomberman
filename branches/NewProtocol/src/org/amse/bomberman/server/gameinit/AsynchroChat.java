@@ -7,28 +7,27 @@ package org.amse.bomberman.server.gameinit;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.interpretator.*;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.text.ParseException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 
 /**
  * Class that represents lobby chat. And ingame kill info.
  * @author Kirilchuk V.E.
  */
 public class AsynchroChat {
-    private final Map<Variable, Constant> vars = new HashMap<Variable, Constant>();
-    private final Game                    game; //TODO hardcore hardcode
+    private final Map<Variable, Constant> vars = new HashMap<Variable, Constant>();    
+    private final ResponseCreator protocol = new ResponseCreator();
 
-    public AsynchroChat(Game game) { //TODO hardcore hardcode
-        this.game = game; //TODO hardcore hardcode
+    public AsynchroChat() {
     }
 
     /**
@@ -39,20 +38,23 @@ public class AsynchroChat {
      * @param playerName nickName of player that added message.
      * @param message message to add to chat.
      */
-    public void addMessage(String playerName, String message) {
-        addMessage(playerName + ": " + message);
-
-        //Super mind will try to parse command and answer or ignore.
-        superMindAnswer(message);
+    public void addMessage(String message, Set<Controller> subscribers) {
+        for(Controller subscriber : subscribers) {
+            subscriber.notify(protocol.chatMessage(message));
+        }
+//        addMessage(playerName + ": " + message);
+        
+//        Super mind will try to parse command and answer or ignore.
+//        superMindAnswer(message, subscribers);
     }
 
-    public void addMessage(String message) {
-        List<String> forClients = new ArrayList<String>();
-
-        forClients.add(ProtocolConstants.CAPTION_NEW_CHAT_MSGS);
-        forClients.add(message);
-        this.game.notifyGameSessions(forClients);//TODO hardcore hardcode
-    }
+//    public void addMessage(String message) {
+//        List<String> forClients = new ArrayList<String>();
+//
+//        forClients.add(ProtocolConstants.CAPTION_NEW_CHAT_MSGS);
+//        forClients.add(message);
+//        this.game.notifyGameSessions(forClients);
+//    }
 
     private void superMindAnswer(String text) {
         String        idName = null;
@@ -87,17 +89,17 @@ public class AsynchroChat {
                 vars.put(new Variable(idName), new Constant(value));
 
                 // Adding identificator name in the beggining of result
-                res.append(idName + " := ");
+                res.append(idName).append(" := ");
             } else {    // if it was just Expression
 
                 // Adding text then equals and then value of expression.
-                res.append(text + " = ");
+                res.append(text).append(" = ");
             }
 
             res.append(buff);
 
             // adding to chat
-            addMessage("SuperMind: " + res.toString());
+//            addMessage("SuperMind: " + res.toString());
         } catch (ArithmeticException ex) {
             System.err.println("Chat: addMessage warning. " +
                               "SuperMind got arithmetic exception."
@@ -113,22 +115,7 @@ public class AsynchroChat {
         }
     }
 
-    /**
-     * Always returns "No new messages."
-     * @param chatID id of player that wants to get new messages.
-     * @return list of messages or list with only item - "No new messages."
-     * @deprecated not used. Dead code. But still here
-     * cause described in protocol.
-     */
-    public List<String> getNewMessages(int chatID) {
-        List<String> result = new ArrayList<String>();
-
-        result.add("No new messages.");
-
-        return result;
-    }
-
-    private static String getIdentificatorName(String input) throws ParseException {
+    private String getIdentificatorName(String input) throws ParseException {
         LexAnalyzer la = new LexAnalyzer(input);
 
         // Must be two lexems:

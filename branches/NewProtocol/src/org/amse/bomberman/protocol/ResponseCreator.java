@@ -9,7 +9,7 @@ package org.amse.bomberman.protocol;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.Stringalize;
 
@@ -404,4 +404,17 @@ public class ResponseCreator {
 
         return message;
     }
+
+    public ProtocolMessage<Integer, String> chatMessage(String chatMessage) {
+        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+        message.setMessageId(ProtocolConstants.CHAT_MESSAGE_ID);
+
+        List<String> data = new ArrayList<String>(1);
+        data.add(chatMessage);
+
+        message.setData(data);
+
+        return message;
+    }
+
 }

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.amse.bomberman.server.net.tcpimpl;
+package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
 /**
  *

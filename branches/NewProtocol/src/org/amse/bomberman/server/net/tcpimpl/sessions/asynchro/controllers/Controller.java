@@ -1,23 +1,19 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.tcpimpl;
+package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 //~--- non-JDK imports --------------------------------------------------------
-
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.GameMap;
 import org.amse.bomberman.server.gameinit.imodel.Player;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Constants.Direction;
-import org.amse.bomberman.util.Creator;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Iterator;
 
 import java.util.List;
@@ -27,23 +23,24 @@ import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.protocol.RequestExecutor;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.server.gameinit.renameme.ClientState;
-import org.amse.bomberman.server.gameinit.renameme.NotJoinedState;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.CommandResult;
 
 /**
  * Class that represents net controller of ingame player.
  * @author Kirilchuk V.E.
  */
 public class Controller implements RequestExecutor, GameEndedListener {
+
     private final ResponseCreator protocol = new ResponseCreator();
-    private final MyTimer    timer = new MyTimer(System.currentTimeMillis());
     //
     private volatile ClientState state = new NotJoinedState(this);
     //
-    private final Session   session;
-    private Game            game;
-    private int             playerID;
-    private String          clientName = "Default_name";
+    private final Session session;
+    private Game game;
+    private int playerID;
+    private String clientName = "Default_name";
 
     /**
      * Constructor of controller.
@@ -57,7 +54,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     public void sendGames() {
         List<Game> games = this.session.getGameStorage().getGamesList();
 
-        if (games.isEmpty()) {
+        if(games.isEmpty()) {
             System.out.println("Session: sendGames info. No unstarted games finded.");
             this.session.send(protocol.noUnstartedGames2());
         } else {
@@ -66,11 +63,11 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void tryCreateGame(List<String> args) throws InvalidDataException {// "1 gameName mapName maxPlayers playerName"
-        if (args.size() != 4) { // if we getted command with wrong number of args
+        if(args.size() != 4) { // if we getted command with wrong number of args
             System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
                     + "Wrong command parameters. Error on client side.");
             throw new InvalidDataException(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
-                    "Wrong arguments num.");
+                                           "Wrong number of arguments.");
         }
 
         //here all is OK
@@ -86,7 +83,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
                     + "Wrong command parameters. Error on client side. "
                     + ex.getMessage());
             throw new InvalidDataException(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
-                    "Max players param must be int");
+                                           "Max players param must be int");
         }
 
         String playerName = iterator.next();//TODO whitespace name!?!?!?!
@@ -95,275 +92,72 @@ public class Controller implements RequestExecutor, GameEndedListener {
         this.session.send(state.createGame(gameMapName, gameName, maxPlayers));
     }
 
-    /**
-     * Creates game. Add it to server. Setting session as owner of the game
-     * and tryJoin owner into game.
-     * <p>
-     * If owner was in other game and tryes to create game
-     * then this method will disconnect him from previous game, cause only one
-     * game for client is supported.
-     * <p>
-     * Additionally setting this controller as GameEndedListener.
-     * @see GameEndedListener
-     * @see Game
-     * @see GameMap
-     * @param gameMapName name of gameMap to create.
-     * @param gameName name of game to create.
-     * @param maxPlayers maxPlayers parameter of game.
-     * @throws FileNotFoundException if no gameMap with such name was finded.
-     * @throws IOException if IO errors occurs while creating gameMap.
-     */
-    private void tryCreateGame(String gameMapName, String gameName,
-                              int maxPlayers) throws FileNotFoundException,
-                                                     IOException {
-        this.game = Creator.createGame(this.session.getGameStorage(), this, 
-                                       gameMapName, gameName, maxPlayers);
-        this.game.addGameEndedListener(this);
-    }
-
-    public void tryJoinGame(List<String> args) {// "2" "gameID" "playerName"
-        if (this.game != null) {
-            System.out.println("Session: tryJoinGame warning. Client tryed to join game, canceled. Already in other game.");
-            this.session.sendAnswer(protocol.notOK(
-                    ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                    "Leave another game first"));
-            return;
-        }
-
-        if(args.size() != 2){
+    public void tryJoinGame(List<String> args) throws InvalidDataException {// "2" "gameID" "playerName"
+        if(args.size() != 2) {
             System.out.println("Session: joinGame error. Wrong command parameters. Error on client side.");
-            this.session.sendAnswer(protocol.wrongQuery (
-                    ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                    "Wrong number of arguments."));
-            return;
+            throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
+                                           "Wrong number of arguments.");
         }
 
         //here all is OK
         int gameID = 0;
         Iterator<String> iterator = args.iterator();
         try {
-                gameID = Integer.parseInt(iterator.next());
-           } catch (NumberFormatException ex) {
-                System.out.println("Session: joinGame error. " +
-                                   "Wrong command parameters. " +
-                                   "Error on client side. gameID must be int. " +
-                                   ex.getMessage());
-            this.session.sendAnswer(protocol.wrongQuery (
-                    ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                    "GameID argument must be integer."));
-            return;
+            gameID = Integer.parseInt(iterator.next());
+        } catch (NumberFormatException ex) {
+            System.out.println("Session: joinGame error. "
+                    + "Wrong command parameters. "
+                    + "Error on client side. gameID must be int. "
+                    + ex.getMessage());
+            throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
+                                           "Game id param must be int.");
         }
 
         String playerName = iterator.next();
         playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
-        // all is ok
-        CommandResult joinResult = this.tryJoinGame(gameID);
-
-        switch (joinResult) {
-            case NO_SUCH_UNSTARTED_GAME : {
-
-                // if no unstarted gameParams with such gameID finded
-                System.out.println("Session: client tryed to join gameID=" + gameID +
-                                  " ,canceled." + " No such game on server.");
-                this.session.sendAnswer(protocol.notOK(
-                        ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                        "No such game."));
-
-                return;
-            }
-
-            case GAME_IS_ALREADY_STARTED : {
-
-                // if gameParams with such gameID already started
-                System.out.println("Session: joinGame warning. Client tryed to join gameID=" +
-                           gameID + " ,canceled." +
-                           " Game is already started. ");
-                this.session.sendAnswer(protocol.notOK(
-                        ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                        "Game was already started."));
-
-                return;
-            }
-
-            case GAME_IS_FULL : {
-
-                System.out.println("Session: joinGame warning. Client tryed to join to full game, canceled.");
-                this.session.sendAnswer(protocol.notOK(
-                        ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                        "Game is full. Try to join later."));
-
-                return;
-            }
-
-            case RESULT_SUCCESS : {
-
-                System.out.println("Session: client joined to game." + " GameID=" +
-                           gameID + " Player=" + playerName);
-                this.session.sendAnswer(protocol.ok(
-                        ProtocolConstants.CAPTION_JOIN_GAME_RESULT,
-                        "Joined."));
-
-                return;
-            }
-
-            default: {
-                assert false;
-            }
-        }
-
+        this.session.send(state.joinGame(gameID));
     }
 
-    /**
-     * Tryes to join controller into game with specified nick name.
-     * @param gameID ID of game to join in.
-     * @param playerName nick name of player.
-     * @return integer value that have next meanings
-     * <p>
-     * Controller.NO_SUCH_UNSTARTED_GAME - if there is no unstarted game
-     * with such ID.
-     * <p>
-     * Controller.GAME_IS_ALREADY_STARTED - if game was already started
-     * and you can not join.
-     * <p>
-     * Controller.GAME_IS_FULL - if game is full
-     * and you can not join.
-     * <p>
-     * Controller.RESULT_SUCCESS - if you was joined.
-     */
-    private CommandResult tryJoinGame(int gameID) {
-        if (this.game != null) {    // if not correct client can create multiple games
-                                    // we just disconnect him from first game!
-            game.leaveFromGame(this);
-        }
-
-        Game gameToJoin = this.session.getGameStorage().getGame(gameID);
-        CommandResult  joinResult = CommandResult.NO_SUCH_UNSTARTED_GAME;
-
-        if (gameToJoin != null) {
-            joinResult = CommandResult.GAME_IS_FULL;
-
-            if (!gameToJoin.isFull()) {
-                joinResult = CommandResult.GAME_IS_ALREADY_STARTED;
-
-                if (!gameToJoin.isStarted()) {
-                    this.playerID = gameToJoin.tryJoin(this);
-                    this.game = gameToJoin;
-
-                    assert this.playerID != (-1);
-
-                    joinResult = CommandResult.RESULT_SUCCESS;
-                    this.game.addGameEndedListener(this);
-
-                    if (this.playerID == -1) {
-                        joinResult = CommandResult.GAME_IS_FULL;    // TODO must never happen if synchronization is ok.
-                    } else {
-                        joinResult = CommandResult.RESULT_SUCCESS;
-                        this.game.addGameEndedListener(this);
-                    }
-                }
-            }
-        }
-
-        return joinResult;
-    }
-
-    public void tryDoMove(List<String> args) {
-        if (this.game == null) {
-            System.out.println("Session: doMove warning. " +
-                       "Client tryed to move, canceled. " +
-                       "Not joined to any game.");
-            this.session.sendAnswer(protocol.notJoined(
-                    ProtocolConstants.CAPTION_DO_MOVE_RESULT));
-
-            return;
-        }
-
-        if (timer.getDiff() < Constants.GAME_STEP_TIME) {
-                System.out.println("Session: doMove warning. " +
-                           "Client tryed to move, canceled. " +
-                           "Moves allowed only every " +
-                           Constants.GAME_STEP_TIME + "ms.");
-                this.session.sendAnswer(protocol.ok( //TODO it must not be ok =)
-                        ProtocolConstants.CAPTION_DO_MOVE_RESULT,
-                        "false"));
-
-                return;
-        }
-
-        if (args.size() != 1) {
+    public void tryDoMove(List<String> args) throws InvalidDataException {
+        if(args.size() != 1) {
             System.out.println("Session: doMove warning. Client tryed to move, canceled. "
                     + "Wrong number of parameters. Error on client side.");
-            this.session.sendAnswer(protocol.wrongQuery(
-                    ProtocolConstants.CAPTION_DO_MOVE_RESULT,
-                    "Wrong number of arguments."));
-
-            return;
+            throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
+                                           "Wrong number of arguments.");
         }
 
-        int     dir   = 0;
-        boolean moved = false;
         Iterator<String> iterator = args.iterator();
+        Direction direction = null;
         try {
-            dir = Integer.parseInt(iterator.next());    // throws NumberFormatException
-
-            Direction direction = Direction.fromInt(dir);    // throws IllegalArgumentException
-
-            moved = this.tryDoMove(direction);
+            int dir = Integer.parseInt(iterator.next());    // throws NumberFormatException
+            direction = Direction.fromInt(dir);    // throws IllegalArgumentException
         } catch (NumberFormatException ex) {
             System.out.println("Session: doMove error. "
                     + "Unsupported direction(not int). ");
-                    
-            this.session.sendAnswer(protocol.wrongQuery(
-                    ProtocolConstants.CAPTION_DO_MOVE_RESULT,
-                    "Wrong move value."));
 
-            return;
+            throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
+                                           "Direction of move must be integer.");
         } catch (IllegalArgumentException ex) {
             System.out.println("Session: doMove error. "
                     + "Unsupported direction. ");
-            this.session.sendAnswer(protocol.wrongQuery(
-                    ProtocolConstants.CAPTION_DO_MOVE_RESULT,
-                    "Wrong move value."));
 
-            return;
+            throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
+                                           "Unsupported direction value.");
         }
 
-        if (moved) {
-            timer.setStartTime(System.currentTimeMillis());
-        }
-
-        this.session.sendAnswer(protocol.ok(
-                ProtocolConstants.CAPTION_DO_MOVE_RESULT,
-                ""+moved));
-    }
-
-    /**
-     * Tryes to move controller`s player in defined direction
-     * in controller`s game. If player was not joined to
-     * any game move will be ignored.
-     * @param dir move direction
-     * @return true if player was moved, false otherwise.
-     */
-    private boolean tryDoMove(Direction dir) {
-        if (game == null) { //TODO in what situations this can happen?
-            System.err.println("Controller: tryDoMove warning. "
-                    + "Client not joined to any game. DoMove ignored.");
-            return false;
-        }
-
-        return this.game.tryDoMove(this.playerID, dir);
+        this.session.send(state.doMove(direction));
     }
 
     public void sendGameMapInfo() {
-        if (game == null) {
+        if(game == null) {
             System.out.println("Session: sendMapArray warning. Canceled. Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(ProtocolConstants.CAPTION_GAME_MAP_INFO));
 
             return;
         }
 
-        if (!game.isStarted()) {
+        if(!game.isStarted()) {
             System.out.println("Session: sendMapArray warning. Canceled. Game is not started.");
             this.session.sendAnswer(protocol.notOK(
                     ProtocolConstants.CAPTION_GAME_MAP_INFO,
@@ -375,19 +169,19 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void tryStartGame() {
-        if (game == null) {
-            System.out.println("Session: client tryed to start game, canceled. " +
-                               "Not joined to any game.");
+        if(game == null) {
+            System.out.println("Session: client tryed to start game, canceled. "
+                    + "Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(
                     ProtocolConstants.CAPTION_START_GAME_RESULT));
 
             return;
         }
 
-        if (game.isStarted()) {
-            System.out.println("Session: startGame warning. " +
-                               "Client tryed to start started game. " +
-                               "Canceled.");
+        if(game.isStarted()) {
+            System.out.println("Session: startGame warning. "
+                    + "Client tryed to start started game. "
+                    + "Canceled.");
             this.session.sendAnswer(protocol.notOK(
                     ProtocolConstants.CAPTION_START_GAME_RESULT,
                     "Game is already started."));
@@ -397,7 +191,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
 
         boolean success = this.tryStartGame2();
 
-        if (success) {
+        if(success) {
             System.out.println("Session: started game. " + "(gameName="
                     + this.game.getName() + ")");
             this.session.sendAnswer(protocol.ok(
@@ -424,19 +218,19 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * @return true if game was started, false otherwise.
      */
     private boolean tryStartGame2() {
-        if(game==null){
-            System.err.println("Controller: tryStartGame warning. " +
-                    "Client not joined to any game. StartGame ignored.");
+        if(game == null) {
+            System.err.println("Controller: tryStartGame warning. "
+                    + "Client not joined to any game. StartGame ignored.");
             return false;
         }
         return this.game.tryStartGame(this);
     }
 
     public void tryLeave() {
-        if (this.game == null) {
-            System.out.println("Session: tryLeave warning. " +
-                       "Client tryed to leave, canceled. " +
-                       "Not joined to any game.");
+        if(this.game == null) {
+            System.out.println("Session: tryLeave warning. "
+                    + "Client tryed to leave, canceled. "
+                    + "Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(
                     ProtocolConstants.CAPTION_LEAVE_GAME_RESULT));
 
@@ -459,9 +253,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * If client was not joined to any game, this method do nothing.
      */
     private void tryLeave2() {//TODO maybe make return type boolean and say to client about error?
-        if (game == null) { //TODO in what situations this can happen?
-            System.err.println("Controller: tryLeaveGame warning. " +
-                    "Client not joined to any game. Leave ignored.");
+        if(game == null) { //TODO in what situations this can happen?
+            System.err.println("Controller: tryLeaveGame warning. "
+                    + "Client not joined to any game. Leave ignored.");
         } else {
             this.game.removeGameEndedListener(this);
             this.game.leaveFromGame(this);
@@ -470,14 +264,14 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void tryPlaceBomb() {
-        if (game == null) {
+        if(game == null) {
             System.out.println("Session: tryPlaceBomb warning. Canceled. Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(ProtocolConstants.CAPTION_PLACE_BOMB_RESULT));
 
             return;
         }
 
-        if (!game.isStarted()) {
+        if(!game.isStarted()) {
             System.out.println("Session: place bomb warning. Cancelled, Game is not started.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_PLACE_BOMB_RESULT,
@@ -494,9 +288,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * If client is not joined to any game then placing bomb will be ignored.
      */
     private void tryPlaceBomb2() {
-        if (game == null) { //TODO it is already checked in tryPlaceBomb! Is it really need?
-            System.err.println("Controller: tryPlaceBomb warning. " +
-                    "Client not joined to any game. PlaceBomb ignored.");
+        if(game == null) { //TODO it is already checked in tryPlaceBomb! Is it really need?
+            System.err.println("Controller: tryPlaceBomb warning. "
+                    + "Client not joined to any game. PlaceBomb ignored.");
             return;
         }
 
@@ -505,23 +299,23 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void sendDownloadingGameMap(List<String> args) {
-        if (args.size() != 2) {
-            System.out.println("Session: sendDownloadingGameMap warning. " +
-                               "Wrong number of args. Error on client side.");
+        if(args.size() != 2) {
+            System.out.println("Session: sendDownloadingGameMap warning. "
+                    + "Wrong number of args. Error on client side.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_DOWNLOAD_GAME_MAP,
                     "Wrong number of arguments."));
 
-            return; 
+            return;
         }
 
         Iterator<String> iterator = args.iterator();
-        String  gameMapName = iterator.next() + ".map";
+        String gameMapName = iterator.next() + ".map";
         this.session.sendAnswer(protocol.downloadGameMap(gameMapName));
     }
 
     public void sendGameStatus() {
-        if (game == null) {
+        if(game == null) {
             System.out.println("Session: sendGameStatus warning. Canceled. Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(ProtocolConstants.CAPTION_GAME_STATUS));
 
@@ -537,7 +331,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void tryAddBot(List<String> args) {
-        if (args.size() != 1) {
+        if(args.size() != 1) {
             System.out.println("Session: tryAddBot warning. Not enough arguments. Cancelled.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
@@ -550,23 +344,23 @@ public class Controller implements RequestExecutor, GameEndedListener {
         String botName = iterator.next();
         CommandResult joinBotResult = this.tryAddBotIntoMyGame(botName);
 
-        switch (joinBotResult) {
-            case NOT_JOINED : {
-                System.out.println("Session: addBot warning. " +
-                                   "Tryed to add bot to game, canceled. " +
-                                   "Not joined to any game.");
+        switch(joinBotResult) {
+            case NOT_JOINED: {
+                System.out.println("Session: addBot warning. "
+                        + "Tryed to add bot to game, canceled. "
+                        + "Not joined to any game.");
                 this.session.sendAnswer(protocol.notJoined(
                         ProtocolConstants.CAPTION_JOIN_BOT_RESULT));
 
                 return;
             }
 
-            case NOT_OWNER_OF_GAME : {
+            case NOT_OWNER_OF_GAME: {
 
                 // if not owner of game
-                System.out.println("Session: addBot warning. " +
-                                   "Tryed to add bot to game, canceled. " +
-                                   "Not owner of the game.");
+                System.out.println("Session: addBot warning. "
+                        + "Tryed to add bot to game, canceled. "
+                        + "Not owner of the game.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
                         "Not owner of game."));
@@ -574,9 +368,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case GAME_IS_FULL : {
-                System.out.println("Session: addBot warning. " +
-                                   "Tryed to add bot, canceled. Game is full.");
+            case GAME_IS_FULL: {
+                System.out.println("Session: addBot warning. "
+                        + "Tryed to add bot, canceled. Game is full.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
                         "Game is full. Try to add bot later."));
@@ -584,12 +378,12 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case GAME_IS_ALREADY_STARTED : {
+            case GAME_IS_ALREADY_STARTED: {
 
                 // if game.isStarted() true
-                System.out.println("Session: addbot warning. " +
-                           "Tryed to add bot to game ,canceled." +
-                           " Game is already started.");
+                System.out.println("Session: addbot warning. "
+                        + "Tryed to add bot to game ,canceled."
+                        + " Game is already started.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
                         "Game was already started."));
@@ -597,9 +391,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case RESULT_SUCCESS : {
-                System.out.println("Session: added bot to game." +
-                                   this.game.getName());
+            case RESULT_SUCCESS: {
+                System.out.println("Session: added bot to game."
+                        + this.game.getName());
                 this.session.sendAnswer(protocol.ok(
                         ProtocolConstants.CAPTION_JOIN_BOT_RESULT,
                         "Bot added."));
@@ -607,9 +401,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            default : {
-                assert false : "Session: addbot error. Default block in switch " +
-                               "statement. Error on server side.";
+            default: {
+                assert false : "Session: addbot error. Default block in switch "
+                        + "statement. Error on server side.";
             }
         }
     }
@@ -635,16 +429,16 @@ public class Controller implements RequestExecutor, GameEndedListener {
     private CommandResult tryAddBotIntoMyGame(String botName) {
         CommandResult joinResult = CommandResult.NOT_JOINED;
 
-        if (this.game != null) {
+        if(this.game != null) {
             joinResult = CommandResult.GAME_IS_FULL;
 
-            if (!this.game.isFull()) {
+            if(!this.game.isFull()) {
                 joinResult = CommandResult.GAME_IS_ALREADY_STARTED;
 
-                if (!this.game.isStarted()) {
+                if(!this.game.isStarted()) {
                     Player bot = this.game.tryAddBot(botName, this);
 
-                    if (bot == null) {
+                    if(bot == null) {
                         joinResult = CommandResult.NOT_OWNER_OF_GAME;
                     } else {
                         joinResult = CommandResult.RESULT_SUCCESS;
@@ -657,7 +451,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void sendGameInfo() {
-        if (game == null) {
+        if(game == null) {
             System.out.println("Session: sendGameInfo warning. Client tryed to get game info, canceled. Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(ProtocolConstants.CAPTION_GAME_INFO));
 
@@ -669,7 +463,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void addMessageToChat(List<String> args) {
-        if (args.isEmpty()) {
+        if(args.isEmpty()) {
             System.out.println("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT,
@@ -678,10 +472,10 @@ public class Controller implements RequestExecutor, GameEndedListener {
             return;
         }
 
-        if (game == null) {
-            System.out.println("Session: addMessageToChat warning. " +
-                               "Client tryed to add message, canceled. " +
-                               "Not joined to any game.");
+        if(game == null) {
+            System.out.println("Session: addMessageToChat warning. "
+                    + "Client tryed to add message, canceled. "
+                    + "Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(
                     ProtocolConstants.CAPTION_ADD_CHAT_MSG_RESULT));
 
@@ -693,8 +487,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
             chatMessage.append(string + " ");
         }
 
-        System.out.println("Session: client added message to game chat. message=" +
-                           chatMessage.toString());
+        System.out.println("Session: client added message to game chat. message="
+                + chatMessage.toString());
         this.addMessageToChat(chatMessage.toString());
     }
 
@@ -704,9 +498,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * @param message message to add in chat.
      */
     private void addMessageToChat(String message) {
-        if (game == null) {
-            System.err.println("Controller: addMessageToChat warning. " +
-                    "Client not joined to any game. Message ignored.");
+        if(game == null) {
+            System.err.println("Controller: addMessageToChat warning. "
+                    + "Client not joined to any game. Message ignored.");
             return;
         }
 
@@ -714,7 +508,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void sendNewMessagesFromChat() {
-        if (game == null) {
+        if(game == null) {
             System.out.println("Session: getNewMessagesFromChat warning. Client tryed to get messages, canceled. Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(ProtocolConstants.CAPTION_NEW_CHAT_MSGS));
 
@@ -730,21 +524,21 @@ public class Controller implements RequestExecutor, GameEndedListener {
     public void tryRemoveBot() {
         CommandResult removeResult = this.tryRemoveBot2();
 
-        switch (removeResult) {
-            case NOT_JOINED : {
-                System.out.println("Session: removeBot warning. " +
-                           "Tryed to remove bot from game, canceled." +
-                           " Not joined to any game.");
+        switch(removeResult) {
+            case NOT_JOINED: {
+                System.out.println("Session: removeBot warning. "
+                        + "Tryed to remove bot from game, canceled."
+                        + " Not joined to any game.");
                 this.session.sendAnswer(protocol.notJoined(
                         ProtocolConstants.CAPTION_REMOVE_BOT_RESULT));
 
                 return;
             }
 
-            case NOT_OWNER_OF_GAME : {
-                System.out.println("Session: removeBot warning. " +
-                           "Tryed to remove bot from game, canceled." +
-                           " Not owner of the game.");
+            case NOT_OWNER_OF_GAME: {
+                System.out.println("Session: removeBot warning. "
+                        + "Tryed to remove bot from game, canceled."
+                        + " Not owner of the game.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_REMOVE_BOT_RESULT,
                         "Not owner of game."));
@@ -752,10 +546,10 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case GAME_IS_ALREADY_STARTED : {
-                System.out.println("Session: removeBot warning. " +
-                           "Tryed to remove bot from game ,canceled. " +
-                           "Game is already started.");
+            case GAME_IS_ALREADY_STARTED: {
+                System.out.println("Session: removeBot warning. "
+                        + "Tryed to remove bot from game ,canceled. "
+                        + "Game is already started.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_REMOVE_BOT_RESULT,
                         "Game was already started."));
@@ -763,10 +557,10 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case NO_SUCH_BOT : {
-                System.out.println("Session: removeBot warning. " +
-                           "Tryed to remove bot from game, canceled." +
-                           "No bot to remove.");
+            case NO_SUCH_BOT: {
+                System.out.println("Session: removeBot warning. "
+                        + "Tryed to remove bot from game, canceled."
+                        + "No bot to remove.");
                 this.session.sendAnswer(protocol.notOK(
                         ProtocolConstants.CAPTION_REMOVE_BOT_RESULT,
                         "No bot to remove."));
@@ -774,9 +568,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            case RESULT_SUCCESS : {
-                System.out.println("Session: removed bot from game." +
-                                   game.getName());
+            case RESULT_SUCCESS: {
+                System.out.println("Session: removed bot from game."
+                        + game.getName());
                 this.session.sendAnswer(protocol.ok(
                         ProtocolConstants.CAPTION_REMOVE_BOT_RESULT,
                         "Bot removed."));
@@ -784,9 +578,9 @@ public class Controller implements RequestExecutor, GameEndedListener {
                 return;
             }
 
-            default : {
-                assert false : "Session: removeBot error. Default block in switch " +
-                           "statement. Error on server side.";
+            default: {
+                assert false : "Session: removeBot error. Default block in switch "
+                        + "statement. Error on server side.";
             }
         }
     }
@@ -812,17 +606,17 @@ public class Controller implements RequestExecutor, GameEndedListener {
     private CommandResult tryRemoveBot2() {
         CommandResult removeResult = CommandResult.NOT_JOINED;
 
-        if (this.game != null) {
+        if(this.game != null) {
             removeResult = CommandResult.GAME_IS_ALREADY_STARTED;
 
-            if (!this.game.isStarted()) {
+            if(!this.game.isStarted()) {
                 removeResult = CommandResult.NOT_OWNER_OF_GAME;
 
-                if (this.game.getOwner() == this) {
+                if(this.game.getOwner() == this) {
                     boolean removed = this.game.tryRemoveLastBot();
-                    if(removed){
+                    if(removed) {
                         removeResult = CommandResult.RESULT_SUCCESS;
-                    }else{
+                    } else {
                         removeResult = CommandResult.NO_SUCH_BOT;
                     }
                 }
@@ -833,18 +627,18 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void sendGamePlayersStats() {
-        if (game == null) {
-            System.out.println("Session: sendGamePlayersStats warning. Canceled. " +
-                               "Not joined to any game.");
+        if(game == null) {
+            System.out.println("Session: sendGamePlayersStats warning. Canceled. "
+                    + "Not joined to any game.");
             this.session.sendAnswer(protocol.notJoined(
                     ProtocolConstants.CAPTION_GAME_PLAYERS_STATS));
 
             return;
         }
 
-        if (!game.isStarted()) {
-            System.out.println("Session: sendGamePlayersStats warning. Canceled. " +
-                           "Game is not started.");
+        if(!game.isStarted()) {
+            System.out.println("Session: sendGamePlayersStats warning. Canceled. "
+                    + "Game is not started.");
             this.session.sendAnswer(protocol.notOK(
                     ProtocolConstants.CAPTION_GAME_PLAYERS_STATS,
                     "Game is not started. You can`t get stats."));
@@ -857,7 +651,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
     }
 
     public void setClientName(List<String> args) {// "17 name"
-        if (args.size() != 1) {
+        if(args.size() != 1) {
             System.out.println("Session: setClientName warning. Canceled. Wrong query.");
             this.session.sendAnswer(protocol.wrongQuery(
                     ProtocolConstants.CAPTION_SET_CLIENT_NAME,
@@ -898,7 +692,7 @@ public class Controller implements RequestExecutor, GameEndedListener {
      * Returns name of client.
      * @return name of client.
      */
-    public String getName() {
+    public String getClientNickName() {
         return clientName;
     }
 
@@ -930,20 +724,8 @@ public class Controller implements RequestExecutor, GameEndedListener {
         return session;
     }
 
-    private class MyTimer {
-        private long startTime;
-
-        public MyTimer(long startTime) {
-            this.startTime = startTime;
-        }
-
-        public long getDiff() {
-            return System.currentTimeMillis() - this.startTime;
-        }
-
-        public void setStartTime(long time) {
-            this.startTime = time;
-        }
+    public void notify(ProtocolMessage<Integer, String> message) {
+        this.session.send(message);
     }
 
     private String cutLength(String string, int maxLength) {
@@ -961,4 +743,5 @@ public class Controller implements RequestExecutor, GameEndedListener {
     public void setState(ClientState state) {//TODO synchronization?
         this.state = state;
     }
+
 }

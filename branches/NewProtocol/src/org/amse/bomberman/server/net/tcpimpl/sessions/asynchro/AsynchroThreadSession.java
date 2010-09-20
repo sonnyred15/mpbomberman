@@ -31,7 +31,7 @@ import org.amse.bomberman.protocol.InvalidDataException;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.util.Constants;
 
 /**
@@ -85,21 +85,7 @@ public class AsynchroThreadSession extends AbstractSession {
         return controller;
     }
 
-    /**
-     * Asynchronously sending message to client.
-     * 
-     * @param message message to send to client.
-     */
-    public void sendAnswer(String message) {
-        this.sender.addToQueue(message);
-    }
-
-    /**
-     * Asynchronously sending multiline message to client.
-     *
-     * @param message message to send to client.
-     */
-    public void sendAnswer(List<String> message) {
+    public void send(ProtocolMessage<Integer, String> message) {
         this.sender.addToQueue(message);
     }
 

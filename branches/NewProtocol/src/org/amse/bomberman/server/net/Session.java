@@ -37,19 +37,7 @@ public interface Session {
      * Sends list of strings to client.
      * @param messages lines of strings to send to client.
      */
-    void sendAnswer(List<String> messages);
-
-    /**
-     * Sends list of strings to client.
-     * @param messages lines of strings to send to client.
-     */
     void send(ProtocolMessage<Integer, String> message);
-
-    /**
-     * Sends simple one-string message to client.
-     * @param message string to send to client.
-     */
-    void sendAnswer(String message);
 
     /**
      * Returns GameStorage where games are storing.

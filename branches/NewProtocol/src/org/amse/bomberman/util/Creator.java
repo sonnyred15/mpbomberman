@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 import org.amse.bomberman.server.gameinit.GameStorage;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
@@ -92,7 +92,7 @@ public class Creator {
      * @throws FileNotFoundException if gameMap with defined name was not finded.
      * @throws IOException if IO errors occurs while creating gameMap.
      */
-    public static Game createGame(GameStorage gameStorage,
+    public static Game createGame(GameStorage gameStorage, //TODO game storage can create games..and it can use pool of maps!!!
                                    Controller controller,
                                    String gameMapName,
                                    String gameName,
