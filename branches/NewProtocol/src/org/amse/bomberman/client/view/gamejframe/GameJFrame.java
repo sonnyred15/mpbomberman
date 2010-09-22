@@ -4,7 +4,7 @@ import java.awt.Color;
 import org.amse.bomberman.client.model.IModel;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.view.IView;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -68,7 +68,7 @@ public class GameJFrame extends JFrame implements IView{
     public synchronized void update() {
         IModel model = Model.getInstance();
         if (!model.isStarted()) {
-            Controller.getInstance().leaveGame();
+            ControllerImpl.getInstance().leaveGame();
         } else {
             if (isFirstInit) {
                 int mapSize = Model.getInstance().getMap().getSize();

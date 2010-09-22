@@ -7,6 +7,7 @@ package org.amse.bomberman.server.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
 import org.amse.bomberman.server.gameinit.GameStorage;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -31,7 +32,7 @@ public interface Session {
     /**
      * Tells session to start receiving requests and process them.
      */
-    void start();
+    void start() throws IOException;
 
     /**
      * Sends list of strings to client.

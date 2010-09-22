@@ -3,7 +3,7 @@ package org.amse.bomberman.client.control.impl;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
-import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
@@ -25,23 +25,23 @@ import javax.swing.JOptionPane;
  *
  * @author Mikhail Korovkin
  */
-public class Controller implements IController {
+public class ControllerImpl implements Controller {
 
     private IConnector connector = null;
-    private static IController controller = null;
+    private static Controller controller = null;
     private RequestResultListener receiveResultListener;
     private final RequestCreator protocol = new RequestCreator();
     private JFrame gameJFrame = null;
 
-    private Controller() {
+    private ControllerImpl() {
         if (connector == null) {
             connector = AsynchroConnector.getInstance();
         }
     }
 
-    public static IController getInstance() {
+    public static Controller getInstance() {
         if(controller == null) {
-            controller = new Controller();
+            controller = new ControllerImpl();
         }
         return controller;
     }
@@ -113,7 +113,12 @@ public class Controller implements IController {
     }
 
     public void disconnect() {
-        this.connector.disconnect();
+        try {
+            this.connector.sendRequest(protocol.requestServerDisconnect());
+            this.connector.closeConnection();
+        } catch (NetException ex) {
+            //ignore
+        }
     }
 
     public void requestGamesList() throws NetException {
@@ -149,7 +154,7 @@ public class Controller implements IController {
     }
 
     public void requestPlantBomb() throws NetException {
-        sendRequest(protocol.requestPlantBomb());
+        sendRequest(protocol.requestPlaceBomb());
     }
 
     public void requestJoinBotIntoGame() throws NetException {
@@ -185,7 +190,7 @@ public class Controller implements IController {
     }
 
     public void requestSetPlayerName(String playerName) throws NetException {
-        sendRequest(protocol.requestSetPlayerName(playerName));
+        sendRequest(protocol.requestSetClientName(playerName));
     }
 
     public void receivedRequestResult(List<String> requestResult) {

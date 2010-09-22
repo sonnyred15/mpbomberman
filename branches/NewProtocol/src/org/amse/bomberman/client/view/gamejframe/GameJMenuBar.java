@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.gamejframe;
 
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
@@ -30,7 +30,7 @@ public class GameJMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Model.getInstance().removeListeners();
                 try {
-                    Controller.getInstance().requestLeaveGame();
+                    ControllerImpl.getInstance().requestLeaveGame();
                 } catch (NetException ex) {
                     System.out.println(ex);
                 }
@@ -50,9 +50,9 @@ public class GameJMenuBar extends JMenuBar {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestLeaveGame();
+                ControllerImpl.getInstance().requestLeaveGame();
             } catch (NetException ex) {
-                Controller.getInstance().lostConnection(ex.getMessage());
+                ControllerImpl.getInstance().lostConnection(ex.getMessage());
                 /*JOptionPane.showMessageDialog(parent,
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 parent.dispose();

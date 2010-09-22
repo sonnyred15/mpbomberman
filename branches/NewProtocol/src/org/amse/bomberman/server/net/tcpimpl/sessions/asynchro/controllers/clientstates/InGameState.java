@@ -39,7 +39,7 @@ public class InGameState extends AbstractClientState {
                     + "Moves allowed only every "
                     + Constants.GAME_STEP_TIME + "ms.");
 
-            return protocol.notOK2( //TODO it must not be ok =)
+            return protocol.notOk( //TODO it must not be ok =)
                     ProtocolConstants.DO_MOVE_MESSAGE_ID,
                     "false");
         }
@@ -50,7 +50,7 @@ public class InGameState extends AbstractClientState {
             timer.setStartTime(System.currentTimeMillis());
         }
 
-        return protocol.ok2(ProtocolConstants.DO_MOVE_MESSAGE_ID,
+        return protocol.ok(ProtocolConstants.DO_MOVE_MESSAGE_ID,
                             String.valueOf(moved));
     }
 
@@ -58,34 +58,34 @@ public class InGameState extends AbstractClientState {
     public ProtocolMessage<Integer, String> getGameMapInfo() {
         if(!this.game.isStarted()) {
             
-            return(protocol.notOK2(
+            return(protocol.notOk(
                     ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID,
                     "Game is not started. You can`t get full game field info."));
         }
 
         List<String> data = protocol.getConverter().convertFieldExplPlayer(game, playerId);//TODO must be different commands...
-        return(protocol.gameMapInfo2(data));
+        return(protocol.gameMapInfo(data));
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGamePlayersStats() {
-        return protocol.sendPlayersStats2(game);
+        return protocol.sendPlayersStats(game);
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameStatus() {
-        return protocol.sendGameStatus2(game);
+        return protocol.sendGameStatus(game);
     }
     
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo2(game, controller);
+        return protocol.sendGameInfo(game, controller);
     }
 
     @Override
     public ProtocolMessage<Integer, String> placeBomb() {
        this.game.tryPlaceBomb(playerId);
-       return protocol.ok2(ProtocolConstants.PLACE_BOMB_MESSAGE_ID,
+       return protocol.ok(ProtocolConstants.PLACE_BOMB_MESSAGE_ID,
                "Placed.");
     }
 
@@ -94,7 +94,7 @@ public class InGameState extends AbstractClientState {
         this.game.leaveFromGame(controller);
         this.game.leaveFromGame(controller);
         this.controller.setState(new NotJoinedState(controller));
-        return protocol.ok2(ProtocolConstants.LEAVE_MESSAGE_ID,
+        return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                 "Disconnected.");
     }
     private class MyTimer {

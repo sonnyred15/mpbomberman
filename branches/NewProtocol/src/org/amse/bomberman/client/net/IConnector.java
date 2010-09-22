@@ -18,7 +18,7 @@ public interface IConnector {
     void сonnect(InetAddress address, int port) throws UnknownHostException,
                                                        IOException;
 
-    void disconnect();
+    void closeConnection();
 
     void sendRequest(ProtocolMessage<Integer, String> message) throws
             NetException;

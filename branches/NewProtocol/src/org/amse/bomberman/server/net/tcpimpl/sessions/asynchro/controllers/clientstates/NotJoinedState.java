@@ -56,18 +56,18 @@ public class NotJoinedState extends AbstractClientState {
 
             controller.setState(new InLobbyState(controller, game, 1));
 
-            return protocol.ok2(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
+            return protocol.ok(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                                 "Game created.");
         } catch (FileNotFoundException ex) {
             System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
                     + "Map wasn`t founded on server." + " Map=" + gameMapName);
-            return protocol.notOK2(
+            return protocol.notOk(
                     ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                     "No such map on server.");
         } catch (IOException ex) {
             System.err.println("Session: createGame error while loadimg map. "
                     + " Map=" + gameMapName + " " + ex.getMessage());
-            return protocol.notOK2(
+            return protocol.notOk(
                     ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                     "Error on server side, while loading map.");
         }
@@ -83,7 +83,7 @@ public class NotJoinedState extends AbstractClientState {
                 // if no unstarted gameParams with such gameID finded
                 System.out.println("Session: client tryed to join gameID=" + gameID
                         + " ,canceled." + " No such game on server.");
-                return (protocol.notOK2(
+                return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                         "No such game."));
 
@@ -95,7 +95,7 @@ public class NotJoinedState extends AbstractClientState {
                 System.out.println("Session: joinGame warning. Client tryed to join gameID="
                         + gameID + " ,canceled."
                         + " Game is already started. ");
-                return (protocol.notOK2(
+                return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                         "Game was already started."));
             }
@@ -104,7 +104,7 @@ public class NotJoinedState extends AbstractClientState {
 
                 System.out.println(
                         "Session: joinGame warning. Client tryed to join to full game, canceled.");
-                return (protocol.notOK2(
+                return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                         "Game is full. Try to join later."));
 
@@ -114,7 +114,7 @@ public class NotJoinedState extends AbstractClientState {
 
                 System.out.println("Session: client joined to game." + " GameID="
                         + gameID + " Player=" + controller.getClientNickName());
-                return (protocol.notOK2(
+                return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                         "Joined."));
             }

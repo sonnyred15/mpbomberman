@@ -1,7 +1,9 @@
 package org.amse.bomberman.client.net.impl;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +17,10 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.util.IOUtilities;
 
 /**
  *
@@ -25,9 +28,12 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class AsynchroConnector implements IConnector {
+    private static IConnector connector = null;
 
     private Socket socket;
-    private static IConnector connector = null;
+    private Thread inputThread;
+    private DataOutputStream out = null;
+    private DataInputStream in = null;
 
     private AsynchroConnector() {
     }
@@ -39,50 +45,47 @@ public class AsynchroConnector implements IConnector {
         return connector;
     }
 
-    public void сonnect(InetAddress address, int port) throws
+    public synchronized void сonnect(InetAddress address, int port) throws
             UnknownHostException, IOException, IllegalArgumentException {
 
         this.socket = new Socket(address, port);
-        Thread t = new Thread(new ServerListen());
-        t.setDaemon(true);
-        t.start();
+        out = initOut();
+        in = initIn();
+
+        inputThread = new Thread(new ServerListen());
+        inputThread.setDaemon(true);
+        inputThread.start();
     }
 
-    public void disconnect() {
-        if (socket != null) {
-            try {
-                this.socket.close();
-            } catch (IOException ex) {
-                System.out.println(ex);
+    private DataOutputStream initOut() throws IOException {
+        OutputStream os = this.socket.getOutputStream();
+        return new DataOutputStream(new BufferedOutputStream(os));
+    }
+
+    private DataInputStream initIn() throws IOException {
+        InputStream is = socket.getInputStream();
+        return new DataInputStream(new BufferedInputStream(is));
+    }
+
+    public synchronized void closeConnection() {
+        try {
+            inputThread.interrupt();
+            IOUtilities.close(out);
+            if(socket != null && !socket.isClosed()) {
+                socket.close();
             }
+        } catch (IOException ex) {
+            System.err.println("Session: terminating error. IOException "
+                    + "while closing resourses. " + ex.getMessage());
         }
     }
 
-//    public synchronized void sendRequest(String request) throws NetException {
-//        BufferedWriter out = null;
-//        try {
-//            OutputStream os = this.socket.getOutputStream();
-//            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-//            out = new BufferedWriter(osw);
-//
-//            out.write(request);
-//            out.newLine();
-//            out.flush();
-//        } catch (IOException ex) {
-//            System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
-//            throw new NetException();
-//        }
-//    }
-    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {
-        DataOutputStream out = null;
+    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {        
         try {
-            OutputStream os = this.socket.getOutputStream();            
-            out = new DataOutputStream(new BufferedOutputStream(os));
-
-            //
-            out.writeInt(request.getMessageId());
             List<String> data = request.getData();
             int size = data.size();
+
+            out.writeInt(request.getMessageId());
             out.writeInt(size);
             for(String string : data) {
                 out.writeUTF(string);
@@ -92,83 +95,88 @@ public class AsynchroConnector implements IConnector {
         } catch (IOException ex) {
             System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
             throw new NetException();
+        } finally {
+            closeConnection();
         }
     }
 
     private class ServerListen implements Runnable {
-
+                
         public void run() {
-            BufferedReader in = null;
             try {
-                InputStream is = socket.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-                in = new BufferedReader(isr);
-
-                String oneLine = null;
-                List<String> message = new ArrayList<String>();
-                while (!Thread.interrupted() && (oneLine = in.readLine()) != null) {
-                    if (oneLine.length() == 0) {
-                        SwingUtilities.invokeLater(new InvokationServerRequestCommand(message));
-                        message = new ArrayList<String>();
-                        continue;
+                while (!Thread.interrupted()) {
+                    ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+                    int messageId = in.readInt();
+                    if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
+                        break;
                     }
-                    message.add(oneLine);
+
+                    message.setMessageId(messageId);
+
+                    int size = in.readInt();
+                    List<String> data = new ArrayList<String>(size);
+                    for (int i = 0; i < size; i++) {
+                        data.add(in.readUTF());
+                    }
+
+                    SwingUtilities.invokeLater(new InvokationCommand(message));
                 }
 
             } catch (IOException ex) {
-                System.out.println("ServerListen: run error. " + ex.getMessage());
-            }
-
-            System.out.println("ServerListen: run ended.");
-            try {
-                socket.close();
-            } catch (IOException ex) {
-                System.out.println(ex);
-            }
-        }
-
-        private void processServerMessage(List<String> message) {
-            String firstLine = message.get(0);
-            /* for debugging */
-            System.out.println("GETTED SERVER MESSAGE:");
-            for (String string : message) {
-                System.out.println(string);
-            }
-            /*--------------*/
-            try {
-                if (firstLine.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    Controller.getInstance().requestNewChatMessages();
-                } else if (firstLine.equals(
-                        ProtocolConstants.UPDATE_GAMES_LIST)) {
-                    Controller.getInstance().requestGamesList();
-                } else if (firstLine.equals(
-                        ProtocolConstants.UPDATE_GAME_INFO)) {
-                    Controller.getInstance().requestGameInfo();
-                } else if (firstLine.equals(
-                        ProtocolConstants.UPDATE_GAME_MAP)) {
-                    Controller.getInstance().requestGameMap();
-                } else if (firstLine.equals(
-                        ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    Controller.getInstance().requestNewChatMessages();
-                } else {
-                    Controller.getInstance().receivedRequestResult(message);
-                }
-            } catch (NetException ex) {
-                //TODO
                 ex.printStackTrace();
-                System.out.println("aaa");
+                System.out.println("ServerListen: run error. " + ex.getMessage());
+            } finally {
+                IOUtilities.close(in);
             }
+
+            System.out.println("ServerListen: run ended.");            
         }
 
-        private class InvokationServerRequestCommand implements Runnable {
-            List<String> message;
+        private class InvokationCommand implements Runnable {
 
-            public InvokationServerRequestCommand(List<String> message) {
+            ProtocolMessage<Integer, String> message;
+
+            public InvokationCommand(ProtocolMessage<Integer, String> message) {
                 this.message = message;
             }
 
             public void run() {
-                processServerMessage(message);
+                processServerMessage();
+            }
+
+            private void processServerMessage() {
+                int messageId = message.getMessageId();
+
+                /* for debugging */
+                // TODO USE LOGGER!
+                /*--------------*/
+                try {
+                    if(messageId == ProtocolConstants.NOTIFICATION_MESSAGE_ID) {
+                        List<String> notifications = message.getData();
+                        for (String string : notifications) {
+                            processNotification(string);
+                        }
+                    } else {
+                        ControllerImpl.getInstance().receivedRequestResult(message);
+                    }
+                } catch (NetException ex) {
+                    //TODO what to do with it?
+                    ex.printStackTrace();
+                }
+            }
+
+            private void processNotification(String string) throws NetException {
+                if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
+                    ControllerImpl.getInstance().requestNewChatMessages();
+                } else if (string.equals(ProtocolConstants.UPDATE_GAMES_LIST)) {
+                    ControllerImpl.getInstance().requestGamesList();
+                } else if (string.equals(ProtocolConstants.UPDATE_GAME_INFO)) {
+                    ControllerImpl.getInstance().requestGameInfo();
+                } else if (string.equals(ProtocolConstants.UPDATE_GAME_MAP)) {
+                    ControllerImpl.getInstance().requestGameMap();
+                } else if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
+                    ControllerImpl.getInstance().requestNewChatMessages();
+                }
             }
         }
     }

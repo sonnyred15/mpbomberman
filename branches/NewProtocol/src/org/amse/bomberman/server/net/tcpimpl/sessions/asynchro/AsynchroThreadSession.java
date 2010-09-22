@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
@@ -44,11 +45,14 @@ public class AsynchroThreadSession extends AbstractSession {
 
     private final ResponseCreator protocol = new ResponseCreator();
     private final Controller controller;
-    private final AsynchroSender sender;
-    private final SessionEndListener endListener;
     /** GameStorage for this session. */
     private final GameStorage gameStorage;
-    private final Thread sessionThread;
+    private final SessionEndListener endListener;
+    //
+    private Thread sessionThread;
+    private AsynchroSender sender;
+    //
+    private DataInputStream in = null;
 
     /**
      * Constructs asynchro session. This session can send messages to client
@@ -69,13 +73,20 @@ public class AsynchroThreadSession extends AbstractSession {
         this.endListener = endListener; //TODO move listeners support to AbstractSession
         this.gameStorage = gameStorage;
         this.controller = new Controller(this);
+
+    }
+
+    public void start() throws IOException {
         this.sender = new AsynchroSender(this, clientSocket);
         this.sessionThread = new SessionThread();
         this.sessionThread.setDaemon(true);
+        in = initReader();
+        this.sessionThread.start();
     }
 
-    public void start() {
-        this.sessionThread.start();
+    private DataInputStream initReader() throws IOException {
+        InputStream is = clientSocket.getInputStream();
+        return new DataInputStream(new BufferedInputStream(is));
     }
 
     /**
@@ -127,12 +138,6 @@ public class AsynchroThreadSession extends AbstractSession {
      */   
     protected void process(ProtocolMessage<Integer, String> message) {
         System.out.println("Session: message received.");
-        if(message.isBroken()) {
-            send(protocol.notOK2(1000, "Broken message.")); //TODO caption for 1000
-            System.out.println("Session: answerOnCommand warning. " +
-                     "Broken message. Error on client side.");
-            return;
-        }
 
         RequestCommand cmd = null;
         try {
@@ -140,18 +145,18 @@ public class AsynchroThreadSession extends AbstractSession {
             cmd = RequestCommand.valueOf(commandId); // throws IllegalArgumentException
             cmd.execute(this.getRequestExecutor(), message.getData()); 
         } catch (IllegalArgumentException ex) {
-            send(protocol.notOK2(1000,"Not supported command."));//TODO caption for 1000
+            send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
+                    "Not supported command."));//TODO caption for 1000
             System.out.println("Session: answerOnCommand error. "
                     + "Non supported command int from client. "
                     + ex.getMessage());
         } catch (InvalidDataException ex) {
-            send(protocol.notOK2(1000, ex.getMessage()));
+            send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
+                    ex.getMessage()));
         }
     }
 
     private class SessionThread extends Thread {
-
-        private DataInputStream in = null;
 
         /**
          * Method in which session gets requests from client and process them.
@@ -161,7 +166,7 @@ public class AsynchroThreadSession extends AbstractSession {
             setClientSocketTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);
             try {
                 sender.start();
-                in = this.initReader();
+                
                 System.out.println("Session: waiting queries from client...");
                 cyclicReadAndProcess(in);
             } catch (SocketTimeoutException ex) {
@@ -170,23 +175,15 @@ public class AsynchroThreadSession extends AbstractSession {
             } catch (IOException ex) {
                 System.err.println("Session: run error. " + ex.getMessage());
             } finally {
-                this.finallyBlock(in);
+                this.closeConnection(in);
             }
         }
 
-        private DataInputStream initReader() throws IOException,
-                                                   UnsupportedEncodingException {
-            InputStream is = clientSocket.getInputStream();
-            //InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-            return new DataInputStream(new BufferedInputStream(is));
-        }
-
-        private void finallyBlock(Closeable in) {
+        private void closeConnection(Closeable in) {
             System.out.println("Session: freeing resources.");
             try {
                 if(in != null) {
                     in.close(); // this will close socket too...
-                    assert clientSocket.isClosed();
                 } else {
                     clientSocket.close();
                 }
@@ -204,6 +201,10 @@ public class AsynchroThreadSession extends AbstractSession {
 
                 ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
                 int messageId = in.readInt();
+                if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
+                    break;
+                }
+
                 int dataCount = in.readInt();
                 List<String> data = new ArrayList<String>(dataCount); //TODO what if dataCount < 0  !?!?
                 for(int i = 0; i < dataCount; ++i) {

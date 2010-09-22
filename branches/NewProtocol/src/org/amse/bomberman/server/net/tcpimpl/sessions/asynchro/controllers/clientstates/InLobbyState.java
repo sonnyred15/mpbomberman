@@ -37,7 +37,7 @@ public class InLobbyState extends AbstractClientState {
                 System.out.println("Session: addBot warning. "
                         + "Tryed to add bot to game, canceled. "
                         + "Not owner of the game.");
-                return protocol.notOK2(
+                return protocol.notOk(
                         ProtocolConstants.ADD_BOT_MESSAGE_ID,
                         "Not owner of game.");
             }
@@ -45,7 +45,7 @@ public class InLobbyState extends AbstractClientState {
             case GAME_IS_FULL: {
                 System.out.println("Session: addBot warning. "
                         + "Tryed to add bot, canceled. Game is full.");
-                return protocol.notOK2(
+                return protocol.notOk(
                         ProtocolConstants.ADD_BOT_MESSAGE_ID,
                         "Game is full. Try to add bot later.");
             }
@@ -56,7 +56,7 @@ public class InLobbyState extends AbstractClientState {
                 System.out.println("Session: addbot warning. "
                         + "Tryed to add bot to game ,canceled."
                         + " Game is already started.");
-                return protocol.notOK2(
+                return protocol.notOk(
                         ProtocolConstants.ADD_BOT_MESSAGE_ID,
                         "Game was already started.");
             }
@@ -64,7 +64,7 @@ public class InLobbyState extends AbstractClientState {
             case RESULT_SUCCESS: {
                 System.out.println("Session: added bot to game."
                         + this.game.getName());
-                return protocol.ok2(
+                return protocol.ok(
                         ProtocolConstants.ADD_BOT_MESSAGE_ID,
                         "Bot added.");
             }
@@ -122,7 +122,7 @@ public class InLobbyState extends AbstractClientState {
     @Override
     public ProtocolMessage<Integer, String> addMessageToChat(String message) {
         this.game.addMessageToChat(message);
-        return protocol.ok2(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
+        return protocol.ok(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
                 "Added.");
     }
 
@@ -134,14 +134,14 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo2(game, controller);
+        return protocol.sendGameInfo(game, controller);
     }
 
     @Override
     public ProtocolMessage<Integer, String> startGame() {
         if(game.isStarted()) {
             System.out.println("Session: sendMapArray warning. Canceled. Game is already started.");
-            return protocol.notOK2(ProtocolConstants.START_GAME_MESSAGE_ID,
+            return protocol.notOk(ProtocolConstants.START_GAME_MESSAGE_ID,
                                    "Game is already started.");
         }
 
@@ -154,20 +154,20 @@ public class InLobbyState extends AbstractClientState {
                 controller.setState(new InGameState(controller, game, playerId));//TODO BIG illegal players id.
             }
 
-            return protocol.ok2(ProtocolConstants.START_GAME_MESSAGE_ID,
+            return protocol.ok(ProtocolConstants.START_GAME_MESSAGE_ID,
                                 "Game started.");
         } else {
             System.out.println("Session: startGame warning. "
                     + "Client tryed to start game, canceled. "
                     + "Not an owner.");
-            return protocol.ok2(ProtocolConstants.START_GAME_MESSAGE_ID,
+            return protocol.ok(ProtocolConstants.START_GAME_MESSAGE_ID,
                                 "Not owner of game.");
         }
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameStatus() {
-        return protocol.sendGameStatus2(game);
+        return protocol.sendGameStatus(game);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class InLobbyState extends AbstractClientState {
         this.game.leaveFromGame(controller);
         this.game.leaveFromGame(controller);
         this.controller.setState(new NotJoinedState(controller));
-        return protocol.ok2(ProtocolConstants.LEAVE_MESSAGE_ID,
+        return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                             "Disconnected.");
     }
 

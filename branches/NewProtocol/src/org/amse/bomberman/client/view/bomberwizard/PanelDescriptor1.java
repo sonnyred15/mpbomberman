@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import java.io.IOException;
@@ -23,9 +23,9 @@ public class PanelDescriptor1 extends PanelDescriptor{
     public boolean goNext() {
         Panel1 panel = (Panel1)this.getPanel();
         try {
-            Controller.getInstance().connect(panel.getIPAddress(), panel.getPort());
+            ControllerImpl.getInstance().connect(panel.getIPAddress(), panel.getPort());
             Model.getInstance().setPlayerName(panel.getPlayerName());
-            Controller.getInstance().requestSetPlayerName(Model.getInstance().getPlayerName());
+            ControllerImpl.getInstance().requestSetPlayerName(Model.getInstance().getPlayerName());
             return true;
         } catch (UnknownHostException ex) {
             JOptionPane.showMessageDialog(this.getWizard(), "Can not connect to the server.\n"

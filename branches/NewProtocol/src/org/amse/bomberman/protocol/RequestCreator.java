@@ -20,7 +20,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestGamesList() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.GET_GAMES.getValue());
+        request.setMessageId(ProtocolConstants.GAMES_LIST_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -30,7 +30,7 @@ public class RequestCreator {
                                                               String mapName,
                                                               int maxPl) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.CREATE_GAME.getValue());
+        request.setMessageId(ProtocolConstants.CREATE_GAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(4);
         data.add(gameName);
@@ -45,7 +45,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestLeaveGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.LEAVE.getValue());
+        request.setMessageId(ProtocolConstants.LEAVE_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -53,7 +53,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestJoinGame(int gameId) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.JOIN_GAME.getValue());
+        request.setMessageId(ProtocolConstants.JOIN_GAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(2);
         data.add("" + gameId);
@@ -66,7 +66,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestDoMove(Direction dir) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.DO_MOVE.getValue());
+        request.setMessageId(ProtocolConstants.DO_MOVE_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add("" + dir.getValue());
@@ -78,7 +78,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestStartGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.START_GAME.getValue());
+        request.setMessageId(ProtocolConstants.START_GAME_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -86,15 +86,15 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestGameMap() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.GET_GAME_MAP_INFO.getValue());
+        request.setMessageId(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
     }
 
-    public ProtocolMessage<Integer, String> requestPlantBomb() {
+    public ProtocolMessage<Integer, String> requestPlaceBomb() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.PLACE_BOMB.getValue());
+        request.setMessageId(ProtocolConstants.PLACE_BOMB_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -102,7 +102,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestJoinBotIntoGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.ADD_BOT_TO_GAME.getValue());
+        request.setMessageId(ProtocolConstants.ADD_BOT_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add("BOT_NAME");//TODO do bot name utility method!!!
@@ -114,7 +114,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestRemoveBotFromGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.REMOVE_BOT_FROM_GAME.getValue());
+        request.setMessageId(ProtocolConstants.REMOVE_BOT_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -122,7 +122,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestGameMapsList() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.GET_GAME_MAPS_LIST.getValue());
+        request.setMessageId(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -130,7 +130,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestIsGameStarted() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.GET_GAME_STATUS.getValue());
+        request.setMessageId(ProtocolConstants.GAME_STATUS_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -138,7 +138,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestGameInfo() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.GET_GAME_INFO.getValue());
+        request.setMessageId(ProtocolConstants.GAME_INFO_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -147,7 +147,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestAddChatMessage(String message) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.CHAT_ADD_MSG.getValue());
+        request.setMessageId(ProtocolConstants.CHAT_ADD_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add(message);
@@ -159,7 +159,7 @@ public class RequestCreator {
     
     public ProtocolMessage<Integer, String> requestNewChatMessages() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.CHAT_GET_NEW_MSGS.getValue());
+        request.setMessageId(ProtocolConstants.CHAT_GET_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -167,7 +167,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestDownloadGameMap(String gameMapName) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.DOWNLOAD_GAME_MAP.getValue());
+        request.setMessageId(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add(gameMapName);
@@ -177,14 +177,23 @@ public class RequestCreator {
         return request;
     }
 
-    public ProtocolMessage<Integer, String> requestSetPlayerName(String playerName) {
+    public ProtocolMessage<Integer, String> requestSetClientName(String playerName) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(RequestCommand.SET_CLIENT_NAME.getValue());
+        request.setMessageId(ProtocolConstants.CLIENT_NAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add(playerName);
 
         request.setData(data);
+
+        return request;
+    }
+
+    public ProtocolMessage<Integer, String> requestServerDisconnect() {
+        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
+        request.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+
+        request.setData(emptyList);
 
         return request;
     }

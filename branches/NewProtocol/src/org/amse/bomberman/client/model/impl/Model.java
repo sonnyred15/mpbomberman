@@ -3,7 +3,7 @@ package org.amse.bomberman.client.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.IConnector;
 import org.amse.bomberman.client.view.IView;

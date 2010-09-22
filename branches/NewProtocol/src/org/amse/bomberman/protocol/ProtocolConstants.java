@@ -69,7 +69,7 @@ public class ProtocolConstants {
 
     /** Caption for message with result of "set client name" request. */
     public static final String CAPTION_SET_CLIENT_NAME = "Set client name info.";
-
+    //////////////////////////////////////////////////////////////////////////////////
     /** Message for client about kick from game. */
     public static final String MESSAGE_GAME_KICK = "You were kicked from the game.";
 
@@ -91,6 +91,7 @@ public class ProtocolConstants {
     /** Split symbol that must be used in protocol between args. */
     public static final String SPLIT_SYMBOL = "/";
 
+
     private ProtocolConstants() {}
 
     public static final int CREATE_GAME_MESSAGE_ID = 1;
@@ -99,7 +100,7 @@ public class ProtocolConstants {
 
     public static final int JOIN_GAME_MESSAGE_ID = 3;
 
-    public static final int CHAT_MESSAGE_ID = 4;
+    public static final int CHAT_ADD_MESSAGE_ID = 4;
 
     public static final int DO_MOVE_MESSAGE_ID = 5;
 
@@ -127,6 +128,14 @@ public class ProtocolConstants {
 
     public static final int CLIENT_NAME_MESSAGE_ID = 17;
 
-    public static final int NOTIFY_MESSAGES_MESSAGE_ID = 18;
+    public static final int NOTIFICATION_MESSAGE_ID = 18;
+
+    public static final int DISCONNECT_MESSAGE_ID = 100500;
+
+    public static final int INVALID_REQUEST_MESSAGE_ID = 1000;
+    
+    public static final int REMOVE_BOT_MESSAGE_ID = 2000;
+    
+    public static final int CHAT_GET_MESSAGE_ID = 3000;
 
 }

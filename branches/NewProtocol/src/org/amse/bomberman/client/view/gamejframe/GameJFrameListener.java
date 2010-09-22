@@ -1,8 +1,8 @@
 package org.amse.bomberman.client.view.gamejframe;
 
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.util.Constants.Direction;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -16,7 +16,7 @@ public class GameJFrameListener implements KeyListener{
     }
 
     public void keyPressed(KeyEvent e) {
-        IController controller = Controller.getInstance();
+        Controller controller = ControllerImpl.getInstance();
         try {
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT: {
@@ -43,7 +43,7 @@ public class GameJFrameListener implements KeyListener{
                     return;
             }
         } catch (NetException ex) {
-            Controller.getInstance().lostConnection(ex.getMessage());
+            ControllerImpl.getInstance().lostConnection(ex.getMessage());
         }
     }
 

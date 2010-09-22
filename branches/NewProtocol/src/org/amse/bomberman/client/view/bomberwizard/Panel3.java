@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
@@ -206,7 +206,7 @@ public class Panel3 extends JPanel {
                             String message = getMessage();
 
                             if (message.length() > 0) {
-                                Controller.getInstance().requestSendChatMessage(message);
+                                ControllerImpl.getInstance().requestSendChatMessage(message);
                             }
                         } catch (NetException ex) {
 
@@ -328,7 +328,7 @@ public class Panel3 extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestJoinBotIntoGame();
+                ControllerImpl.getInstance().requestJoinBotIntoGame();
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
@@ -347,7 +347,7 @@ public class Panel3 extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestRemoveBotFromGame();
+                ControllerImpl.getInstance().requestRemoveBotFromGame();
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
@@ -370,7 +370,7 @@ public class Panel3 extends JPanel {
                 String message = getMessage();
 
                 if (message.length() > 0) {
-                    Controller.getInstance().requestSendChatMessage(message);
+                    ControllerImpl.getInstance().requestSendChatMessage(message);
                 }
             } catch (NetException ex) {
 

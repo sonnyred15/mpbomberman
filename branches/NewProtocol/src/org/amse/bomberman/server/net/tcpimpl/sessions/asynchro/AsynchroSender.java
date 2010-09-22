@@ -90,7 +90,7 @@ public class AsynchroSender {
          *
          * @throws IllegalArgumentException
          */
-        private void send(ProtocolMessage<Integer, String> response) {//TODO do send fast!
+        private void send(ProtocolMessage<Integer, String> response) {
             if(response.isBroken()) {
                 throw new IllegalArgumentException(
                         "Broken response. Message id or message data are null.");
@@ -99,14 +99,16 @@ public class AsynchroSender {
             try {
                 System.out.println(super.getName() + " sending answer...");
 
-                out.writeInt(response.getMessageId());
                 List<String> data = response.getData();
                 int size = data.size();
+
+                out.writeInt(response.getMessageId());
                 out.writeInt(size);
                 for(String string : data) {
                     out.writeUTF(string);
                 }
                 out.flush();
+
             } catch (IOException ex) {
                 System.err.println(super.getName() + " sendAnswer error. "
                         + ex.getMessage());

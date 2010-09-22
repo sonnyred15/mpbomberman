@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.net.NetException;
 
 /**
@@ -19,19 +19,19 @@ public class PanelDescriptor3 extends PanelDescriptor {
         try {
             Panel3 panel3 = (Panel3) this.getPanel();
             panel3.clean();
-            Controller.getInstance().requestGameInfo();
+            ControllerImpl.getInstance().requestGameInfo();
         } catch (NetException ex) {
-            Controller.getInstance().lostConnection(ex.getMessage());
+            ControllerImpl.getInstance().lostConnection(ex.getMessage());
         }
     }
 
     @Override
     public boolean goBack() {
         try {
-            Controller.getInstance().requestLeaveGame();
+            ControllerImpl.getInstance().requestLeaveGame();
             return true;
         } catch (NetException ex) {
-            Controller.getInstance().lostConnection(ex.getMessage());
+            ControllerImpl.getInstance().lostConnection(ex.getMessage());
             return false;
         }
     }

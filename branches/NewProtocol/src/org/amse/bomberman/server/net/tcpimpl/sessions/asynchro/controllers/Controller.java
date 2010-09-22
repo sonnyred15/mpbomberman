@@ -51,9 +51,9 @@ public class Controller implements RequestExecutor {
 
         if(games.isEmpty()) {
             System.out.println("Session: sendGames info. No unstarted games finded.");
-            this.session.send(protocol.noUnstartedGames2());//TODO converter must do it
+            this.session.send(protocol.noUnstartedGames());//TODO converter must do it
         } else {
-            this.session.send(protocol.unstartedGamesList2(games));//TODO converter must do it
+            this.session.send(protocol.unstartedGamesList(games));//TODO converter must do it
         }
     }
 
@@ -172,7 +172,7 @@ public class Controller implements RequestExecutor {
         Iterator<String> iterator = args.iterator();
         String gameMapName = iterator.next() + ".map"; //TODO change this on client and server
 
-        this.session.send(protocol.downloadGameMap2(gameMapName));
+        this.session.send(protocol.downloadGameMap(gameMapName));
     }
 
     public void sendGameStatus() {
@@ -181,7 +181,7 @@ public class Controller implements RequestExecutor {
     }
 
     public void sendGameMapsList() {
-        this.session.send(protocol.sendGameMapsList2());//TODO converter must do it
+        this.session.send(protocol.sendGameMapsList());//TODO converter must do it
     }
 
     public void tryAddBot(List<String> args) throws InvalidDataException {
@@ -233,7 +233,7 @@ public class Controller implements RequestExecutor {
         } else {
             Iterator<String> iterator = args.iterator();
             this.clientName = iterator.next();
-            this.session.send(protocol.ok2(
+            this.session.send(protocol.ok(
                     ProtocolConstants.CLIENT_NAME_MESSAGE_ID,
                     "Name was set."));
         }

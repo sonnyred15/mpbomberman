@@ -3,7 +3,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.net.RequestResultListener;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.protocol.ProtocolConstants;
@@ -31,7 +31,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         this.addPanelDescriptor(new PanelDescriptor3(this, IDENTIFIER3));
         this.setCurrentJPanel(IDENTIFIER1);
 
-        Controller.getInstance().setReceiveInfoListener(this);
+        ControllerImpl.getInstance().setReceiveInfoListener(this);
         this.setVisible(true);
     }
 
@@ -154,9 +154,9 @@ public class BomberWizard extends Wizard implements RequestResultListener {
     @Override
     public void finish() {
         try {
-            Controller.getInstance().requestStartGame();
+            ControllerImpl.getInstance().requestStartGame();
         } catch (NetException ex) {
-            Controller.getInstance().lostConnection(ex.getMessage());
+            ControllerImpl.getInstance().lostConnection(ex.getMessage());
             /*System.out.println(ex);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
@@ -174,7 +174,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         } else if (event.equals(EVENT_JOIN)) {
             this.goNext();
         } else if (event.equals(EVENT_DISCONNECT)) {
-            Controller.getInstance().lostConnection(e.getMessage());
+            ControllerImpl.getInstance().lostConnection(e.getMessage());
             /*JOptionPane.showMessageDialog(this, a.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
             this.setCurrentJPanel(IDENTIFIER1);*/
@@ -183,6 +183,6 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         }
     }
     private void startGame() {
-        Controller.getInstance().startGame();
+        ControllerImpl.getInstance().startGame();
     }
 }
