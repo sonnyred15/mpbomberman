@@ -38,7 +38,6 @@ public class Player implements MoveableObject {
     protected int maxBombs    = Constants.PLAYER_DEFAULT_MAX_BOMBS;
     protected int explRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
 
-
     //
     private Pair               position; //TODO maybe must be volatile?
     private volatile PlayerState state = PlayerState.NORMAL;
@@ -199,22 +198,13 @@ public class Player implements MoveableObject {
     public int getSettedBombsNum() {
         return this.settedBombs;
     }
-
-    /**
-     * Returns info about player state in next format:
-     * <p> positionX positionY nickName lives bombs maxBombs
-     * @return info about player state.
-     */
-    public String getInfo() {
-        String ret = this.position.getX() + " " +
-                     this.position.getY() + " " +
-                     this.nickName + " " +
-                     this.lives + " " +
-                     this.settedBombs + " " +
-                     this.maxBombs + " " +
-                     this.explRadius;
-
-        return ret;
+    
+    public int getLives() {
+        return lives;
+    }
+    
+    public int getMaxBombs() {
+        return maxBombs;
     }
 
     public int getKills() {

@@ -152,7 +152,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException {
-            executor.setClientName(args);
+            executor.setClientNickName(args);
         }
 
     };

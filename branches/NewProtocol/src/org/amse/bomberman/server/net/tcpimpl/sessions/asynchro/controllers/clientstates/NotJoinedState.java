@@ -52,9 +52,9 @@ public class NotJoinedState extends AbstractClientState {
             Game game = Creator.createGame(controller.getSession()
                     .getGameStorage(), controller, gameMapName, gameName, maxPlayers);
 
-            game.addGameEndedListener(controller);
+            //game.addGameEndedListener(controller);//TODO BIG
 
-            controller.setState(new InLobbyState(controller, game));
+            controller.setState(new InLobbyState(controller, game, 1));
 
             return protocol.ok2(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                                 "Game created.");
@@ -161,9 +161,10 @@ public class NotJoinedState extends AbstractClientState {
                         int playerID = gameToJoin.tryJoin(controller);
                         assert playerID > 0; //must be ok if synchronization is ok.
 
-                        gameToJoin.addGameEndedListener(controller);
-                        controller.setState(new InGameState(controller,
-                                                            gameToJoin));
+                        //gameToJoin.addGameEndedListener(controller); //TODO BIG
+                        controller.setState(new InLobbyState(controller,
+                                                            gameToJoin,
+                                                            playerID));
                         joinResult = CommandResult.RESULT_SUCCESS;
                     }
                 }

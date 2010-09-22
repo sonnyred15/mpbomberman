@@ -25,7 +25,7 @@ public interface ClientState {
 
     ProtocolMessage<Integer, String> getGameInfo();
 
-    ProtocolMessage<Integer, String> getGameMapInfo(Game game);
+    ProtocolMessage<Integer, String> getGameMapInfo();
 
     ProtocolMessage<Integer, String> getGamePlayersStats();
 

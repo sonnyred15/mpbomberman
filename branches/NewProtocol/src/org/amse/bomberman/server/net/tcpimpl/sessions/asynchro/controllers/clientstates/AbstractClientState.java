@@ -4,10 +4,8 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.ResponseCreator;
-import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -36,7 +34,7 @@ public abstract class AbstractClientState implements ClientState {
         return protocol.illegalState("do move", stateName);
     }
 
-    public ProtocolMessage<Integer, String> getGameMapInfo(Game game) {
+    public ProtocolMessage<Integer, String> getGameMapInfo() {
         return protocol.illegalState("get game map info", stateName);
     }
 

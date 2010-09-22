@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
+import java.util.List;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameinit.Game;
@@ -21,11 +22,13 @@ public class InGameState extends AbstractClientState {
     private static final String STATE_NAME = "Game";
     final Controller controller;
     final Game game;
+    final int playerId;
 
-    public InGameState(Controller controller, Game game) {
+    public InGameState(Controller controller, Game game, int playerId) {
         super(STATE_NAME);
         this.controller = controller;
         this.game = game;
+        this.playerId = playerId;
     }
 
     @Override
@@ -41,7 +44,7 @@ public class InGameState extends AbstractClientState {
                     "false");
         }
 
-        boolean moved = this.game.tryDoMove(this.controller.getID(), dir);
+        boolean moved = this.game.tryDoMove(playerId, dir);
 
         if(moved) {
             timer.setStartTime(System.currentTimeMillis());
@@ -52,30 +55,48 @@ public class InGameState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGameMapInfo(Game game) {
-        return super.getGameMapInfo(game);
+    public ProtocolMessage<Integer, String> getGameMapInfo() {
+        if(!this.game.isStarted()) {
+            
+            return(protocol.notOK2(
+                    ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID,
+                    "Game is not started. You can`t get full game field info."));
+        }
+
+        List<String> data = protocol.getConverter().convertFieldExplPlayer(game, playerId);//TODO must be different commands...
+        return(protocol.gameMapInfo2(data));
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGamePlayersStats() {
-        return super.getGamePlayersStats();
+        return protocol.sendPlayersStats2(game);
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameStatus() {
-        return super.getGameStatus();
+        return protocol.sendGameStatus2(game);
     }
-
+    
     @Override
-    public ProtocolMessage<Integer, String> leave() {
-        return super.leave();
+    public ProtocolMessage<Integer, String> getGameInfo() {
+        return protocol.sendGameInfo2(game, controller);
     }
 
     @Override
     public ProtocolMessage<Integer, String> placeBomb() {
-        return super.placeBomb();
+       this.game.tryPlaceBomb(playerId);
+       return protocol.ok2(ProtocolConstants.PLACE_BOMB_MESSAGE_ID,
+               "Placed.");
     }
 
+    public ProtocolMessage<Integer, String> leave() {
+        //this.game.removeGameEndedListener(controller); //TODO BIG
+        this.game.leaveFromGame(controller);
+        this.game.leaveFromGame(controller);
+        this.controller.setState(new NotJoinedState(controller));
+        return protocol.ok2(ProtocolConstants.LEAVE_MESSAGE_ID,
+                "Disconnected.");
+    }
     private class MyTimer {
 
         private long startTime;

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.amse.bomberman.protocol;
 
 import java.util.Collections;
@@ -14,8 +9,9 @@ import java.util.List;
  */
 public class ProtocolMessage<Identificator, DataType> {
 
-    private Identificator messageId;
-    private List<? extends DataType> data;
+    private Identificator messageId = null;
+    private List<? extends DataType> data = null;
+    private boolean error = false;
 
     public List<DataType> getData() {
         return Collections.unmodifiableList(data);
@@ -31,6 +27,14 @@ public class ProtocolMessage<Identificator, DataType> {
 
     public void setMessageId(Identificator messageId) {
         this.messageId = messageId;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
     }
 
     public boolean isBroken() {

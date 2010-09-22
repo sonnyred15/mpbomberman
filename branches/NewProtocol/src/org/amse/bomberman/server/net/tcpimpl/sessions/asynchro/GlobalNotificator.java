@@ -1,12 +1,11 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.amse.bomberman.server.net.Server;
 import org.amse.bomberman.server.net.Session;
 
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import org.amse.bomberman.protocol.ResponseCreator;
 
 /**
  * Class that represents clients notificator about
@@ -26,8 +26,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Kirilchuk V.E.
  */
 public class GlobalNotificator extends Thread { //TODO bad concurency
+
+    private final ResponseCreator protocol = new ResponseCreator(); //TODO inject from session
     private final BlockingQueue<String> queue;
-    private final Server       server;
+    private final Server server;
 
     /**
      * Constructs global notificator object.
@@ -37,7 +39,7 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
     public GlobalNotificator(Server server) {
         super("Global notificator");
         this.server = server;
-        this.queue  = new ArrayBlockingQueue<String>(5); //fixed by number of different global messages.
+        this.queue = new ArrayBlockingQueue<String>(5); //fixed by number of different global messages.
         this.setDaemon(true);
     }
 
@@ -45,7 +47,7 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
     public void run() {
         System.out.println("Global notificator thread started.");
         List<String> messages = new ArrayList<String>();
-        while (!server.isStopped()) {
+        while(!server.isStopped()) {
             try {
 
                 // get all messages into list
@@ -57,11 +59,11 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
                 // notifying all sessions
                 Set<Session> sesions = this.server.getSessions();
 
-                for (Session ses : sesions) {
-                    if(messages.size()==0) {
+                for(Session session : sesions) {
+                    if(messages.isEmpty()) {
                         break;
                     }
-                    ses.sendAnswer(messages); //this will add message to sending queue.
+                    session.send(protocol.notifyMessages(messages)); //this will add message to sending queue.
                 }
 
                 // sleeping at least for 1 second
@@ -81,8 +83,8 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
      * @param message to send.
      */
     public void addToQueue(String message) {
-        synchronized (queue) {
-            if (queue.contains(message)) { //not need to duplicate global messages.
+        synchronized(queue) {
+            if(queue.contains(message)) { //not need to duplicate global messages.
                 return;
             }
 
@@ -90,4 +92,5 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
             this.queue.offer(message);    // actually can return boolean
         }
     }
+
 }

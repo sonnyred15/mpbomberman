@@ -40,7 +40,7 @@ public class AsynchroChat {
      */
     public void addMessage(String message, Set<Controller> subscribers) {
         for(Controller subscriber : subscribers) {
-            subscriber.notify(protocol.chatMessage(message));
+            subscriber.sendToClient(protocol.chatMessage(message));
         }
 //        addMessage(playerName + ": " + message);
         

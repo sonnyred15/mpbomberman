@@ -3,11 +3,10 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.util;
+package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameinit.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameinit.imodel.Player;
@@ -19,16 +18,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
+import org.amse.bomberman.util.Pair;
 
 /**
  * Utility class.
  * Main appointment to make String r List of Strings from something.
  * @author Kirilchuk V.E
  */
-public final class Stringalize {
-    private Stringalize() {}
+public class ConverterToString implements Converter<String> {
 
-    public static List<String> playersStats(final List<Player> playersList) {
+    public List<String> convertPlayersStats(final List<Player> playersList) {
         List<Player> players = new ArrayList<Player>(playersList);
 
         Collections.sort(players, new Comparator<Player>() {
@@ -49,17 +50,11 @@ public final class Stringalize {
         });
 
         List<String> result = new ArrayList<String>();
-        StringBuilder str = null;
-        for (Player player : players) {
-            str = new StringBuilder();
-            str.append(player.getNickName());
-            str.append(ProtocolConstants.SPLIT_SYMBOL);
-            str.append(player.getKills());
-            str.append(ProtocolConstants.SPLIT_SYMBOL);
-            str.append(player.getDeaths());
-            str.append(ProtocolConstants.SPLIT_SYMBOL);
-            str.append(player.getPoints());
-            result.add(str.toString());
+        for (Player player : players) {           
+            result.add(player.getNickName());
+            result.add(String.valueOf(player.getKills()));
+            result.add(String.valueOf(player.getDeaths()));
+            result.add(String.valueOf(player.getPoints()));
         }
         
         return result;
@@ -74,16 +69,16 @@ public final class Stringalize {
      * @param expl explosions to stringazize.
      * @return list of explosions as list of strings.
      */
-    public static List<String> explosions(List<Pair> expl) {    // CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
-        List<String> lst = new ArrayList<String>();
+    public List<String> convertExplosions(List<Pair> expl) {    // CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
+        List<String> result = new ArrayList<String>();
 
-        lst.add("" + expl.size());
+        result.add(String.valueOf(expl.size()));
 
         for (Pair pair : expl) {
-            lst.add(pair.getX() + " " + pair.getY());
+            result.add(pair.getX() + " " + pair.getY());
         }
 
-        return lst;
+        return result;
     }
 
     /**
@@ -94,7 +89,7 @@ public final class Stringalize {
      * @param gameID ID of game.
      * @return string of game parameters.
      */
-    public static String gameParams(Game game, int gameID) {
+    public String convertGameParams(Game game, int gameID) {
         StringBuilder result = new StringBuilder();
 
         result.append(gameID);
@@ -122,34 +117,33 @@ public final class Stringalize {
      * @param controller represent client to get info for.
      * @return string of some game parameters for client.
      */
-    public static List<String> gameInfoForClient(Controller controller) {
-        List<String> lst  = new ArrayList<String>();
-        Game         game = controller.getMyGame();
+    public List<String> convertGameInfo(Game game, Controller controller) {
+        List<String> result  = new ArrayList<String>();
 
         if (controller == game.getOwner()) {
-            lst.add("true");
+            result.add("true");
         } else {
-            lst.add("false");
+            result.add("false");
         }
 
-        lst.add("" + game.getMaxPlayers());
+        result.add(String.valueOf(game.getMaxPlayers()));
 
         List<Player> players = game.getCurrentPlayers();
 
-        lst.add("" + players.size());
+        result.add(String.valueOf(players.size()));
 
         for (Player player1 : players) {
-            lst.add(player1.getNickName());
+            result.add(player1.getNickName());
         }
 
-        return lst;
+        return result;
     }
 
     /**
      * Returns list of string - names of availible gameMaps.
      * @return list of string - names of availible gameMaps.
      */
-    public static List<String> gameMapsList() {
+    public List<String> convertGameMapsList() {
         return Creator.createGameMapsList();
     }
 
@@ -158,7 +152,7 @@ public final class Stringalize {
      * @param game game to get status from.
      * @return "started" if game started, "not started" otherwise.
      */
-    public static String gameStartStatus(Game game) {    // TODO started not started bad decision make true false.
+    public String convertGameStartStatus(Game game) {    // TODO started not started bad decision make true false.
         if (game.isStarted()) {
             return "started.";
         } else {
@@ -179,7 +173,7 @@ public final class Stringalize {
      * @param gameMapField field to make list of strings from.
      * @return gameMapField as list of strings.
      */
-    public static List<String> field(int[][] gameMapField) {    // CHECK < THIS!!!// WHATS ABOUT field SYNCHRONIZATION?
+    public List<String> convertField(int[][] gameMapField) {    // CHECK < THIS!!!// WHATS ABOUT field SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
 
         lst.add("" + gameMapField.length);
@@ -216,10 +210,10 @@ public final class Stringalize {
      * @param game game to get field and exloions from.
      * @return list of strings of gameMapField and explosions
      */
-    public static List<String> fieldAndExplosionsInfo(Game game) {
-        List<String> result = Stringalize.field(game.getGameField());
+    public List<String> convertFieldAndExplosions(Game game) {
+        List<String> result = convertField(game.getGameField());
 
-        result.addAll(Stringalize.explosions(game.getExplosionSquares()));
+        result.addAll(convertExplosions(game.getExplosionSquares()));
 
         return result;
     }
@@ -246,17 +240,17 @@ public final class Stringalize {
      * @param player player to get info from.
      * @return list of strings of gameMapField and explosions
      */
-    public static List<String> fieldExplPlayerInfo(Game game, Player player) {
+    public List<String> convertFieldExplPlayer(Game game, int playerID) {
         int[][]      field             = game.getGameField();
         List<Player> players           = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 
-        stringalizedField.add("" + field.length);
+        stringalizedField.add(String.valueOf((field.length)));
 
         for (int i = 0; i < field.length; ++i) {
             StringBuilder buff = new StringBuilder();
 
-            for (int j = 0; j < field.length; j++) {
+            for (int j = 0; j < field.length; ++j) {
                 int n = field[i][j];
 
                 if (n == Constants.MAP_BOMB) {
@@ -265,21 +259,22 @@ public final class Stringalize {
                         int y = pl.getPosition().getY();
 
                         if ((x == i) && (y == j) && pl.isAlive()) {
-                            n += 100 + pl.getID();
+                            n = (n + 100 + pl.getID()); //player and bomb in one cell
                         }
                     }
                 }
 
                 buff.append(n);
-                buff.append(" ");
+                buff.append(" ");//TODO not need for last n in row
             }
 
             stringalizedField.add(buff.toString());
         }
 
-        stringalizedField.addAll(Stringalize.explosions(game.getExplosionSquares()));
-        stringalizedField.add("" + 1);
-        stringalizedField.add(Stringalize.playerInfo(player));
+        stringalizedField.addAll(convertExplosions(game.getExplosionSquares()));
+        
+        Player player = game.getPlayer(playerID); //TODO if playerID was incorrect.
+        stringalizedField.addAll(convertPlayerInfo(player));
 
         return stringalizedField;
     }
@@ -291,8 +286,19 @@ public final class Stringalize {
      * @param player player to get info from.
      * @return players info.
      */
-    public static String playerInfo(Player player) {    // CHECK < THIS!!!//
-        return player.getInfo();
+    public List<String> convertPlayerInfo(Player player) {
+        List<String> result = new ArrayList<String>();
+
+        Pair position = player.getPosition();
+        result.add(String.valueOf(position.getX()));
+        result.add(String.valueOf(position.getY()));
+        result.add(player.getNickName());
+        result.add(String.valueOf(player.getLives()));
+        result.add(String.valueOf(player.getSettedBombsNum()));
+        result.add(String.valueOf(player.getMaxBombs()));
+        result.add(String.valueOf(player.getRadius()));
+
+        return result;
     }
 
     /**
@@ -302,7 +308,7 @@ public final class Stringalize {
      *  @param allGames started and unstarted games.
      *  @return list of strings - unstarted games strings.
      */
-    public static List<String> unstartedGames(List<Game> allGames) {
+    public List<String> convertUnstartedGames(List<Game> allGames) {
         List<String> unstartedGames = new ArrayList<String>();
 
         if (allGames != null) {
@@ -313,7 +319,7 @@ public final class Stringalize {
 
                 // send only games that are not started!!!
                 if (!game.isStarted()) {
-                    unstartedGames.add(Stringalize.gameParams(game, i));
+                    unstartedGames.add(convertGameParams(game, i));
                 }
             }
         }

@@ -103,4 +103,30 @@ public class ProtocolConstants {
 
     public static final int DO_MOVE_MESSAGE_ID = 5;
 
+    public static final int GAME_MAP_INFO_MESSAGE_ID = 6;
+
+    public static final int START_GAME_MESSAGE_ID = 7;
+
+    public static final int LEAVE_MESSAGE_ID = 8;
+
+    public static final int PLACE_BOMB_MESSAGE_ID = 9;
+
+    public static final int DOWNLOAD_GAME_MAP_MESSAGE_ID = 10;
+
+    public static final int GAME_STATUS_MESSAGE_ID = 11;
+
+    public static final int GAME_MAPS_LIST_MESSAGE_ID = 12;
+
+    public static final int ADD_BOT_MESSAGE_ID = 13;
+
+    public static final int GAME_INFO_MESSAGE_ID = 14;
+    
+    public static final int CHAT_ADD_RESULT_MESSAGE_ID = 15;
+
+    public static final int PLAYERS_STATS_MESSAGE_ID = 16;
+
+    public static final int CLIENT_NAME_MESSAGE_ID = 17;
+
+    public static final int NOTIFY_MESSAGES_MESSAGE_ID = 18;
+
 }

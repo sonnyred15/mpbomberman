@@ -108,9 +108,9 @@ public class AsynchroThreadSession extends AbstractSession {
      */
     private void freeResources() {
         if(this.controller != null) { //Do all these checks realy need?
-            if(this.controller.getMyGame() != null) {    // without this check controller will print error.
+            //if(this.controller.getMyGame() != null) {    // without this check controller will print error.
                 this.controller.tryLeave();
-            }
+            //}
         }
 
         if(this.endListener != null) {
@@ -128,7 +128,7 @@ public class AsynchroThreadSession extends AbstractSession {
     protected void process(ProtocolMessage<Integer, String> message) {
         System.out.println("Session: message received.");
         if(message.isBroken()) {
-            sendAnswer(protocol.wrongQuery("Broken message."));
+            send(protocol.notOK2(1000, "Broken message.")); //TODO caption for 1000
             System.out.println("Session: answerOnCommand warning. " +
                      "Broken message. Error on client side.");
             return;
@@ -139,18 +139,13 @@ public class AsynchroThreadSession extends AbstractSession {
             int commandId = message.getMessageId();                                                                       
             cmd = RequestCommand.valueOf(commandId); // throws IllegalArgumentException
             cmd.execute(this.getRequestExecutor(), message.getData()); 
-        } catch (NumberFormatException ex) {
-            sendAnswer(protocol.wrongQuery());
-            System.out.println("Session: answerOnCommand error. "
-                    + "Wrong first part of query. "
-                    + "Wrong query from client. " + ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            sendAnswer(protocol.wrongQuery("Not supported command."));
+            send(protocol.notOK2(1000,"Not supported command."));//TODO caption for 1000
             System.out.println("Session: answerOnCommand error. "
                     + "Non supported command int from client. "
                     + ex.getMessage());
         } catch (InvalidDataException ex) {
-            sendAnswer(protocol.wrongQuery(ex.getMessage()));
+            send(protocol.notOK2(1000, ex.getMessage()));
         }
     }
 

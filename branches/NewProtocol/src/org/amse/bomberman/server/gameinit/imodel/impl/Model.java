@@ -28,7 +28,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.util.Stringalize;
 
 /**
  * Model that is responsable for game rules and responsable for connection
@@ -391,9 +390,9 @@ public class Model implements IModel, DieListener {
                 player.changePoints(+3);
             }
         }
-        List<String> stats = Stringalize.playersStats(this.players);
-        stats.add(0, ProtocolConstants.CAPTION_GAME_END_RESULTS);
-        this.game.notifyGameSessions(stats);
+//        List<String> stats = ConverterToString.convertPlayersStats(this.players); //TODO BIG
+//        stats.add(0, ProtocolConstants.CAPTION_GAME_END_RESULTS);
+//        this.game.notifyGameSessions(stats);
     }
 
     /**

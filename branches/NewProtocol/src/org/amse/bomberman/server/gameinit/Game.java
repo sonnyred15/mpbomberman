@@ -93,9 +93,9 @@ public class Game {
             new CopyOnWriteArraySet<GameStartedListener>();
 
         //
-        int playerID = this.tryJoin(owner);
+        int playerID = this.tryJoin(owner); 
         assert (playerID > 0); //if owner can`t autojoin it is very strange problem...
-        owner.setPlayerID(playerID);
+        //owner.setPlayerID(playerID); TODO BIG
 
         //
         this.started = false;
@@ -110,7 +110,7 @@ public class Game {
      * @return Null if controller is not owner or maxpPlayers reached.
      * Otherwise returns Bot wrapped by Player.
      */
-    public Player tryAddBot(String name, Controller controller) {
+    public Player tryAddBot(Controller controller, String name) {
         if (controller != this.owner) {
             return null;
         }
@@ -335,7 +335,7 @@ public class Game {
      */
     public void leaveFromGame(Controller controller) {
         this.controllers.remove(controller);
-        this.model.removePlayer(controller.getID());// not notifying
+        //this.model.removePlayer(controller.getID());// not notifying //TODO BIG ids...
 
         if (!this.started) {
             this.gameChangeListener.parametersChanged(this);

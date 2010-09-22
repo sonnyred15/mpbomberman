@@ -51,5 +51,5 @@ public interface RequestExecutor {
 
     void sendGamePlayersStats() throws InvalidDataException ;
 
-    void setClientName(List<String> args) throws InvalidDataException ;
+    void setClientNickName(List<String> args) throws InvalidDataException ;
 }
