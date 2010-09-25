@@ -7,9 +7,9 @@ package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
-import org.amse.bomberman.server.gameinit.imodel.Player;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.Pair;
@@ -29,13 +30,13 @@ import org.amse.bomberman.util.Pair;
  */
 public class ConverterToString implements Converter<String> {
 
-    public List<String> convertPlayersStats(final List<Player> playersList) {
-        List<Player> players = new ArrayList<Player>(playersList);
+    public List<String> convertPlayersStats(final List<ModelPlayer> playersList) {
+        List<ModelPlayer> players = new ArrayList<ModelPlayer>(playersList);
 
-        Collections.sort(players, new Comparator<Player>() {
+        Collections.sort(players, new Comparator<ModelPlayer>() {
 
             @Override
-            public int compare(Player player1, Player player2) {
+            public int compare(ModelPlayer player1, ModelPlayer player2) {
                 int points1 = player1.getPoints();
                 int points2 = player2.getPoints();
 
@@ -50,7 +51,7 @@ public class ConverterToString implements Converter<String> {
         });
 
         List<String> result = new ArrayList<String>();
-        for (Player player : players) {           
+        for (ModelPlayer player : players) {
             result.add(player.getNickName());
             result.add(String.valueOf(player.getKills()));
             result.add(String.valueOf(player.getDeaths()));
@@ -114,13 +115,13 @@ public class ConverterToString implements Converter<String> {
      * true if this client is owner of this game, false otherwise.
      * <p>
      * To playerInfo watch playerInfo method.
-     * @param controller represent client to get info for.
+     * @param player represent client to get info for.
      * @return string of some game parameters for client.
      */
-    public List<String> convertGameInfo(Game game, Controller controller) {
+    public List<String> convertGameInfo(Game game, GamePlayer player) {
         List<String> result  = new ArrayList<String>();
 
-        if (controller == game.getOwner()) {
+        if (game.isGameOwner(player)) {
             result.add("true");
         } else {
             result.add("false");
@@ -128,11 +129,11 @@ public class ConverterToString implements Converter<String> {
 
         result.add(String.valueOf(game.getMaxPlayers()));
 
-        List<Player> players = game.getCurrentPlayers();
+        List<ModelPlayer> players = game.getCurrentPlayers();
 
         result.add(String.valueOf(players.size()));
 
-        for (Player player1 : players) {
+        for (ModelPlayer player1 : players) {
             result.add(player1.getNickName());
         }
 
@@ -242,7 +243,7 @@ public class ConverterToString implements Converter<String> {
      */
     public List<String> convertFieldExplPlayer(Game game, int playerID) {
         int[][]      field             = game.getGameField();
-        List<Player> players           = game.getCurrentPlayers();
+        List<ModelPlayer> players           = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 
         stringalizedField.add(String.valueOf((field.length)));
@@ -254,7 +255,7 @@ public class ConverterToString implements Converter<String> {
                 int n = field[i][j];
 
                 if (n == Constants.MAP_BOMB) {
-                    for (Player pl : players) {
+                    for (ModelPlayer pl : players) {
                         int x = pl.getPosition().getX();
                         int y = pl.getPosition().getY();
 
@@ -273,7 +274,7 @@ public class ConverterToString implements Converter<String> {
 
         stringalizedField.addAll(convertExplosions(game.getExplosionSquares()));
         
-        Player player = game.getPlayer(playerID); //TODO if playerID was incorrect.
+        ModelPlayer player = game.getPlayer(playerID); //TODO if playerID was incorrect.
         stringalizedField.addAll(convertPlayerInfo(player));
 
         return stringalizedField;
@@ -286,7 +287,7 @@ public class ConverterToString implements Converter<String> {
      * @param player player to get info from.
      * @return players info.
      */
-    public List<String> convertPlayerInfo(Player player) {
+    public List<String> convertPlayerInfo(ModelPlayer player) {
         List<String> result = new ArrayList<String>();
 
         Pair position = player.getPosition();

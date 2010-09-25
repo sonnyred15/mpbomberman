@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.control.impl;
 
-import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
 import org.amse.bomberman.client.control.Controller;
@@ -27,9 +27,9 @@ import javax.swing.JOptionPane;
  */
 public class ControllerImpl implements Controller {
 
-    private IConnector connector = null;
+    private Connector connector = null;
     private static Controller controller = null;
-    private RequestResultListener receiveResultListener;
+    private RequestResultListener responseListener;
     private final RequestCreator protocol = new RequestCreator();
     private JFrame gameJFrame = null;
 
@@ -47,14 +47,14 @@ public class ControllerImpl implements Controller {
     }
 
     public void lostConnection(String exception) {
-        if(this.receiveResultListener instanceof Wizard) {
-            Wizard wizard = (Wizard) this.receiveResultListener;
+        if(this.responseListener instanceof Wizard) {
+            Wizard wizard = (Wizard) this.responseListener;
             System.out.println(exception);
             JOptionPane.showMessageDialog(wizard, exception, "Error",
                                           JOptionPane.ERROR_MESSAGE);
 
             wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
-            this.setReceiveInfoListener(receiveResultListener);
+            this.setReceiveInfoListener(responseListener);
             gameJFrame = null;
         } else {
             System.out.println(exception);
@@ -72,8 +72,8 @@ public class ControllerImpl implements Controller {
     }
 
     public void startGame() {
-        if(receiveResultListener instanceof Wizard) {
-            Wizard wizard = (Wizard) receiveResultListener;
+        if(responseListener instanceof Wizard) {
+            Wizard wizard = (Wizard) responseListener;
             wizard.dispose();
             this.setReceiveInfoListener(
                     (RequestResultListener) Model.getInstance());
@@ -91,7 +91,7 @@ public class ControllerImpl implements Controller {
     }
 
     public void leaveGame() {
-        if(!(receiveResultListener instanceof Wizard)) {
+        if(!(responseListener instanceof Wizard)) {
             gameJFrame.dispose();
             Model.getInstance().removeListeners();
             BomberWizard wizard = new BomberWizard();
@@ -104,7 +104,7 @@ public class ControllerImpl implements Controller {
 
     public void setReceiveInfoListener(
             RequestResultListener receiveResultListener) {
-        this.receiveResultListener = receiveResultListener;
+        this.responseListener = receiveResultListener;
     }
 
     public void connect(InetAddress serverIP, int serverPort)
@@ -193,9 +193,15 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestSetClientName(playerName));
     }
 
-    public void receivedRequestResult(List<String> requestResult) {
-        if(this.receiveResultListener != null) {
-            this.receiveResultListener.received(requestResult);
+    //Actually, controller must know about models that need some result.
+    //After receive controller must parse result, and set data to proper model.
+    //And concrete model must notify View listener about changes,
+    //after that, View must self take info from model. That is the MVC.
+    //...Difference betwenn current realization is that listener must not parse
+    //response themselfs. They don`t need to know about ProtocolMessage at all!!
+    public void receivedRequestResult(ProtocolMessage<Integer, String> response) {
+        if(this.responseListener != null) {
+            this.responseListener.received(response);
         } else {
             Creator.createErrorDialog(null, "Error", "No listener for "
                     + "received info.");

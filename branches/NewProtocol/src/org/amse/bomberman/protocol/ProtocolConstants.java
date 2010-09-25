@@ -92,6 +92,7 @@ public class ProtocolConstants {
     public static final String SPLIT_SYMBOL = "/";
 
 
+
     private ProtocolConstants() {}
 
     public static final int CREATE_GAME_MESSAGE_ID = 1;
@@ -118,7 +119,7 @@ public class ProtocolConstants {
 
     public static final int GAME_MAPS_LIST_MESSAGE_ID = 12;
 
-    public static final int ADD_BOT_MESSAGE_ID = 13;
+    public static final int BOT_ADD_MESSAGE_ID = 13;
 
     public static final int GAME_INFO_MESSAGE_ID = 14;
     
@@ -126,7 +127,7 @@ public class ProtocolConstants {
 
     public static final int PLAYERS_STATS_MESSAGE_ID = 16;
 
-    public static final int CLIENT_NAME_MESSAGE_ID = 17;
+    public static final int SET_NAME_MESSAGE_ID = 17;
 
     public static final int NOTIFICATION_MESSAGE_ID = 18;
 
@@ -134,8 +135,10 @@ public class ProtocolConstants {
 
     public static final int INVALID_REQUEST_MESSAGE_ID = 1000;
     
-    public static final int REMOVE_BOT_MESSAGE_ID = 2000;
+    public static final int BOT_REMOVE_MESSAGE_ID = 2000;
     
     public static final int CHAT_GET_MESSAGE_ID = 3000;
+
+    public static int END_RESULTS_MESSAGE_ID = 4000;
 
 }

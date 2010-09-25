@@ -7,7 +7,7 @@ package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 //~--- non-JDK imports --------------------------------------------------------
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Constants.Direction;
 
@@ -21,6 +21,7 @@ import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.protocol.RequestExecutor;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
 
@@ -31,12 +32,12 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
 public class Controller implements RequestExecutor {
 
     private final ResponseCreator protocol = new ResponseCreator();
+    private final NetGamePlayer player = new NetGamePlayer(this);
     //
     private volatile ClientState state = new NotJoinedState(this);
     //
     private final Session session;
-    private String clientName = "Default_name";
-
+    
     /**
      * Constructor of controller.
      * @param sessionServer server of session that owns this controller.
@@ -51,9 +52,9 @@ public class Controller implements RequestExecutor {
 
         if(games.isEmpty()) {
             System.out.println("Session: sendGames info. No unstarted games finded.");
-            this.session.send(protocol.noUnstartedGames());//TODO converter must do it
+            sendToClient(protocol.noUnstartedGames());//TODO converter must do it
         } else {
-            this.session.send(protocol.unstartedGamesList(games));//TODO converter must do it
+            sendToClient(protocol.unstartedGamesList(games));//TODO converter must do it
         }
     }
 
@@ -84,7 +85,7 @@ public class Controller implements RequestExecutor {
         String playerName = iterator.next();//TODO whitespace name!?!?!?!
         playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
-        this.session.send(state.createGame(gameMapName, gameName, maxPlayers));
+        sendToClient(state.createGame(gameMapName, gameName, maxPlayers));
     }
 
     public void tryJoinGame(List<String> args) throws InvalidDataException {// "2" "gameID" "playerName"
@@ -111,7 +112,7 @@ public class Controller implements RequestExecutor {
         String playerName = iterator.next();
         playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
-        this.session.send(state.joinGame(gameID));
+        sendToClient(state.joinGame(gameID));
     }
 
     public void tryDoMove(List<String> args) throws InvalidDataException {
@@ -141,23 +142,23 @@ public class Controller implements RequestExecutor {
                                            "Unsupported direction value.");
         }
 
-        this.session.send(state.doMove(direction));
+        sendToClient(state.doMove(direction));
     }
 
     public void sendGameMapInfo() {
-        this.session.send(state.getGameMapInfo());
+        sendToClient(state.getGameMapInfo());
     }
 
     public void tryStartGame() {
-        this.session.send(state.startGame());
+        sendToClient(state.startGame());
     }
 
     public void tryLeave() {
-        this.session.send(state.leave());
+        sendToClient(state.leave());
     }
 
     public void tryPlaceBomb() {
-        this.session.send(state.placeBomb());
+        sendToClient(state.placeBomb());
     }
 
     public void sendDownloadingGameMap(List<String> args) throws
@@ -172,34 +173,34 @@ public class Controller implements RequestExecutor {
         Iterator<String> iterator = args.iterator();
         String gameMapName = iterator.next() + ".map"; //TODO change this on client and server
 
-        this.session.send(protocol.downloadGameMap(gameMapName));
+        sendToClient(protocol.downloadGameMap(gameMapName));
     }
 
     public void sendGameStatus() {
         System.out.println("Session: sended game status to client.");
-        this.session.send(state.getGameStatus());
+        sendToClient(state.getGameStatus());
     }
 
     public void sendGameMapsList() {
-        this.session.send(protocol.sendGameMapsList());//TODO converter must do it
+        sendToClient(protocol.sendGameMapsList());//TODO converter must do it
     }
 
     public void tryAddBot(List<String> args) throws InvalidDataException {
         if(args.size() != 1) {
             System.out.println("Session: tryAddBot warning. Not enough arguments. Cancelled.");
-            throw new InvalidDataException(ProtocolConstants.ADD_BOT_MESSAGE_ID,
+            throw new InvalidDataException(ProtocolConstants.BOT_ADD_MESSAGE_ID,
                                            "Not enough arguments.");
         }
 
         Iterator<String> iterator = args.iterator();
         String botName = iterator.next(); //TODO what`s about incorrect name.
 
-        this.session.send(state.addBot(botName));
+        sendToClient(state.addBot(botName));
     }
 
     public void sendGameInfo() {
         System.out.println("Session: sended gameInfo to client.");
-        this.session.send(state.getGameInfo());
+        sendToClient(state.getGameInfo());
     }
 
     public void addMessageToChat(List<String> args) throws InvalidDataException {
@@ -210,41 +211,34 @@ public class Controller implements RequestExecutor {
                                            "Not enough arguments.");
         }
 
-        this.session.send(protocol.chatMessage(args.get(0)));
+        sendToClient(protocol.chatMessage(args.get(0)));
     }
 
     public void sendNewMessagesFromChat() {
-        this.session.send(state.getNewMessagesFromChat()); //BIG TODO NOT WORKS
+        sendToClient(state.getNewMessagesFromChat()); //BIG TODO NOT WORKS
     }
 
     public void tryRemoveBot() {
-        this.session.send(state.removeBot()); //BIG TODO NOT WORK
+        sendToClient(state.removeBot()); //BIG TODO NOT WORK
     }
 
     public void sendGamePlayersStats() {        
         System.out.println("Session: sended gamePlayersStats to client.");
-        this.session.send(state.getGamePlayersStats());
+        sendToClient(state.getGamePlayersStats());
     }
 
     public void setClientNickName(List<String> args) throws InvalidDataException {// "17 name"
         if(args.size() != 1) {
-            throw new InvalidDataException(ProtocolConstants.CLIENT_NAME_MESSAGE_ID,
+            throw new InvalidDataException(ProtocolConstants.SET_NAME_MESSAGE_ID,
                     "Wrong number of arguments.");
         } else {
             Iterator<String> iterator = args.iterator();
-            this.clientName = iterator.next();
-            this.session.send(protocol.ok(
-                    ProtocolConstants.CLIENT_NAME_MESSAGE_ID,
+            String name = iterator.next();
+            this.player.setNickName(name);
+            sendToClient(protocol.ok(
+                    ProtocolConstants.SET_NAME_MESSAGE_ID,
                     "Name was set."));
         }
-    }
-
-    /**
-     * Returns name of client.
-     * @return name of client.
-     */
-    public String getClientNickName() {
-        return clientName;
     }
 
     public Session getSession() {
@@ -267,7 +261,11 @@ public class Controller implements RequestExecutor {
         return state;
     }
 
-    public synchronized void setState(ClientState state) {//TODO synchronization?
+    public synchronized void setState(ClientState state) {
         this.state = state;
+    }
+
+    public NetGamePlayer getGamePlayer() {
+        return player;
     }
 }

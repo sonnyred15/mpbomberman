@@ -7,7 +7,7 @@ package org.amse.bomberman.server.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 //~--- JDK imports ------------------------------------------------------------
 

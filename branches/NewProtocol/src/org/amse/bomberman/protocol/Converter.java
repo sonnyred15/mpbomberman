@@ -6,9 +6,9 @@
 package org.amse.bomberman.protocol;
 
 import java.util.List;
-import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.imodel.Player;
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
+import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.GamePlayer;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.util.Pair;
 
 /**
@@ -99,7 +99,7 @@ public interface Converter<T> {
      * @param controller represent client to get info for.
      * @return string of some game parameters for client.
      */
-    List<T> convertGameInfo(Game game, Controller controller);
+    List<T> convertGameInfo(Game game, GamePlayer player);
 
     /**
      * Returns list of string - names of availible gameMaps.
@@ -131,9 +131,9 @@ public interface Converter<T> {
      * @param player player to get info from.
      * @return players info.
      */
-    List<T> convertPlayerInfo(Player player);
+    List<T> convertPlayerInfo(ModelPlayer player);
 
-    List<T> convertPlayersStats(final List<Player> playersList);
+    List<T> convertPlayersStats(final List<ModelPlayer> playersList);
 
     /**
      * List of strings - unstarted games strings in next format:

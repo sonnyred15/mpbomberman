@@ -7,8 +7,10 @@ package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clie
 import java.util.List;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.NetGamePlayer;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 
@@ -22,17 +24,15 @@ public class InGameState extends AbstractClientState {
     private static final String STATE_NAME = "Game";
     final Controller controller;
     final Game game;
-    final int playerId;
 
-    public InGameState(Controller controller, Game game, int playerId) {
+    public InGameState(Controller controller, Game game) {
         super(STATE_NAME);
         this.controller = controller;
         this.game = game;
-        this.playerId = playerId;
     }
 
     @Override
-    public ProtocolMessage<Integer, String> doMove(Direction dir) {
+    public ProtocolMessage<Integer, String> doMove(Direction direction) {
         if(timer.getDiff() < Constants.GAME_STEP_TIME) {
             System.out.println("Session: doMove warning. "
                     + "Client tryed to move, canceled. "
@@ -44,7 +44,8 @@ public class InGameState extends AbstractClientState {
                     "false");
         }
 
-        boolean moved = this.game.tryDoMove(playerId, dir);
+        boolean moved = this.game.tryDoMove(controller
+                .getGamePlayer().getPlayerId(), direction);
 
         if(moved) {
             timer.setStartTime(System.currentTimeMillis());
@@ -63,7 +64,9 @@ public class InGameState extends AbstractClientState {
                     "Game is not started. You can`t get full game field info."));
         }
 
-        List<String> data = protocol.getConverter().convertFieldExplPlayer(game, playerId);//TODO must be different commands...
+        List<String> data = protocol.getConverter().convertFieldExplPlayer(game,
+                controller.getGamePlayer().getPlayerId());//TODO must be different commands...
+        
         return(protocol.gameMapInfo(data));
     }
 
@@ -79,24 +82,27 @@ public class InGameState extends AbstractClientState {
     
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo(game, controller);
+        return protocol.sendGameInfo(game, controller.getGamePlayer());
     }
 
     @Override
     public ProtocolMessage<Integer, String> placeBomb() {
-       this.game.tryPlaceBomb(playerId);
+       this.game.tryPlaceBomb(controller.getGamePlayer().getPlayerId());
        return protocol.ok(ProtocolConstants.PLACE_BOMB_MESSAGE_ID,
                "Placed.");
     }
 
+    @Override
     public ProtocolMessage<Integer, String> leave() {
-        //this.game.removeGameEndedListener(controller); //TODO BIG
-        this.game.leaveFromGame(controller);
-        this.game.leaveFromGame(controller);
+        NetGamePlayer player = controller.getGamePlayer();
+        this.game.removeGameChangeListener(player);
+        this.game.leaveFromGame(player);
         this.controller.setState(new NotJoinedState(controller));
+        player.resetId();
         return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                 "Disconnected.");
     }
+    
     private class MyTimer {
 
         private long startTime;

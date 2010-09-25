@@ -3,7 +3,7 @@ package org.amse.bomberman.client;
 //~--- non-JDK imports --------------------------------------------------------
 
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
 import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
@@ -31,9 +31,9 @@ public class Main {
     }
 
     private static class ShutdowHook extends Thread {
-    private final IConnector connector;
+    private final Connector connector;
 
-        public ShutdowHook(IConnector connector) {
+        public ShutdowHook(Connector connector) {
             this.connector = connector;
         }
 

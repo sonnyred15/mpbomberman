@@ -6,8 +6,10 @@ package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clie
 
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.NetGamePlayer;
 
 /**
  *
@@ -18,13 +20,11 @@ public class InLobbyState extends AbstractClientState {
     private static final String STATE_NAME = "Lobby";
     private final Controller controller;
     private final Game game;
-    private final int playerId;
 
-    public InLobbyState(Controller controller, Game game, int playerId) {
+    public InLobbyState(Controller controller, Game game) {
         super(STATE_NAME);
         this.controller = controller;
         this.game = game;
-        this.playerId = playerId;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class InLobbyState extends AbstractClientState {
                         + "Tryed to add bot to game, canceled. "
                         + "Not owner of the game.");
                 return protocol.notOk(
-                        ProtocolConstants.ADD_BOT_MESSAGE_ID,
+                        ProtocolConstants.BOT_ADD_MESSAGE_ID,
                         "Not owner of game.");
             }
 
@@ -46,7 +46,7 @@ public class InLobbyState extends AbstractClientState {
                 System.out.println("Session: addBot warning. "
                         + "Tryed to add bot, canceled. Game is full.");
                 return protocol.notOk(
-                        ProtocolConstants.ADD_BOT_MESSAGE_ID,
+                        ProtocolConstants.BOT_ADD_MESSAGE_ID,
                         "Game is full. Try to add bot later.");
             }
 
@@ -57,7 +57,7 @@ public class InLobbyState extends AbstractClientState {
                         + "Tryed to add bot to game ,canceled."
                         + " Game is already started.");
                 return protocol.notOk(
-                        ProtocolConstants.ADD_BOT_MESSAGE_ID,
+                        ProtocolConstants.BOT_ADD_MESSAGE_ID,
                         "Game was already started.");
             }
 
@@ -65,7 +65,7 @@ public class InLobbyState extends AbstractClientState {
                 System.out.println("Session: added bot to game."
                         + this.game.getName());
                 return protocol.ok(
-                        ProtocolConstants.ADD_BOT_MESSAGE_ID,
+                        ProtocolConstants.BOT_ADD_MESSAGE_ID,
                         "Bot added.");
             }
 
@@ -97,14 +97,14 @@ public class InLobbyState extends AbstractClientState {
     private CommandResult tryAddBotIntoGame(String botName) {
         CommandResult joinResult = CommandResult.NOT_OWNER_OF_GAME;
 
-        if(this.game.isGameOwner(controller)) {
+        if(this.game.isGameOwner(controller.getGamePlayer())) {
             synchronized(game) {
                 joinResult = CommandResult.GAME_IS_FULL;
                 if(!this.game.isFull()) {
                     joinResult = CommandResult.GAME_IS_ALREADY_STARTED;
 
                     if(!this.game.isStarted()) {
-                        this.game.tryAddBot(controller, botName); //TODO swap args
+//                        this.game.tryAddBot(controller, botName); //TODO BIG
                         joinResult = CommandResult.RESULT_SUCCESS;
                     }
                 }
@@ -115,7 +115,7 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> removeBot() {
-        //BIG TODO
+        //TODO BIG
         return super.removeBot();
     }
 
@@ -128,13 +128,13 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> getNewMessagesFromChat() {
-        //TODO
+        //TODO BIG
         return super.getNewMessagesFromChat();
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo(game, controller);
+        return protocol.sendGameInfo(game, controller.getGamePlayer());
     }
 
     @Override
@@ -145,22 +145,18 @@ public class InLobbyState extends AbstractClientState {
                                    "Game is already started.");
         }
 
-        boolean success = game.tryStartGame(controller);
+        boolean success = game.tryStartGame(controller.getGamePlayer());
 
         if(success) {
             System.out.println("Session: started game. " + "(gameName="
                     + this.game.getName() + ")");
-            for(Controller controller : game.getControllers()) {
-                controller.setState(new InGameState(controller, game, playerId));//TODO BIG illegal players id.
-            }
-
             return protocol.ok(ProtocolConstants.START_GAME_MESSAGE_ID,
                                 "Game started.");
         } else {
             System.out.println("Session: startGame warning. "
                     + "Client tryed to start game, canceled. "
                     + "Not an owner.");
-            return protocol.ok(ProtocolConstants.START_GAME_MESSAGE_ID,
+            return protocol.notOk(ProtocolConstants.START_GAME_MESSAGE_ID,
                                 "Not owner of game.");
         }
     }
@@ -172,10 +168,12 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> leave() {
-        //this.game.removeGameEndedListener(controller);//TODO BIG
-        this.game.leaveFromGame(controller);
-        this.game.leaveFromGame(controller);
+        NetGamePlayer gamePlayer = this.controller.getGamePlayer();
+        this.game.removeGameChangeListener(gamePlayer);
+        this.game.leaveFromGame(gamePlayer);
+        gamePlayer.resetId();
         this.controller.setState(new NotJoinedState(controller));
+
         return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                             "Disconnected.");
     }

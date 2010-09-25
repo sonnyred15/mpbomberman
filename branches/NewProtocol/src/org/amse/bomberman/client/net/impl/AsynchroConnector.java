@@ -15,7 +15,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.protocol.ProtocolConstants;
@@ -27,8 +27,8 @@ import org.amse.bomberman.util.IOUtilities;
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
-public class AsynchroConnector implements IConnector {
-    private static IConnector connector = null;
+public class AsynchroConnector implements Connector {
+    private static Connector connector = null;
 
     private Socket socket;
     private Thread inputThread;
@@ -38,7 +38,7 @@ public class AsynchroConnector implements IConnector {
     private AsynchroConnector() {
     }
 
-    public static IConnector getInstance() {
+    public static Connector getInstance() {
         if (connector == null) {
             connector = new AsynchroConnector();
         }

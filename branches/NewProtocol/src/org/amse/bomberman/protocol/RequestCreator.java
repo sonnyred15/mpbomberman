@@ -102,7 +102,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestJoinBotIntoGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.ADD_BOT_MESSAGE_ID);
+        request.setMessageId(ProtocolConstants.BOT_ADD_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add("BOT_NAME");//TODO do bot name utility method!!!
@@ -114,7 +114,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestRemoveBotFromGame() {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.REMOVE_BOT_MESSAGE_ID);
+        request.setMessageId(ProtocolConstants.BOT_REMOVE_MESSAGE_ID);
         request.setData(emptyList);
 
         return request;
@@ -179,7 +179,7 @@ public class RequestCreator {
 
     public ProtocolMessage<Integer, String> requestSetClientName(String playerName) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.CLIENT_NAME_MESSAGE_ID);
+        request.setMessageId(ProtocolConstants.SET_NAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
         data.add(playerName);

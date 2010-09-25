@@ -20,7 +20,7 @@ import java.util.Comparator;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 /**
  *

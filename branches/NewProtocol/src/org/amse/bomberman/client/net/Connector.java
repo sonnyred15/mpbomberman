@@ -13,7 +13,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E
  */
-public interface IConnector {
+public interface Connector {
 
     void сonnect(InetAddress address, int port) throws UnknownHostException,
                                                        IOException;

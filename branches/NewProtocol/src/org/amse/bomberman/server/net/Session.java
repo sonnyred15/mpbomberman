@@ -8,7 +8,7 @@ package org.amse.bomberman.server.net;
 //~--- non-JDK imports --------------------------------------------------------
 
 import java.io.IOException;
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 //~--- JDK imports ------------------------------------------------------------
 

@@ -8,8 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
+import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.NetGamePlayer;
 import org.amse.bomberman.util.Creator;
 
 /**
@@ -49,12 +51,13 @@ public class NotJoinedState extends AbstractClientState {
                                                        String gameName,
                                                        int maxPlayers) {
         try {
-            Game game = Creator.createGame(controller.getSession()
-                    .getGameStorage(), controller, gameMapName, gameName, maxPlayers);
+            NetGamePlayer creator = controller.getGamePlayer();
 
-            //game.addGameEndedListener(controller);//TODO BIG
+            Game game = controller.getSession().getGameStorage()
+                    .createGame(creator, gameMapName, gameName, maxPlayers);
+            game.addGameChangeListener(creator);
 
-            controller.setState(new InLobbyState(controller, game, 1));
+            controller.setState(new InLobbyState(controller, game));
 
             return protocol.ok(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                                 "Game created.");
@@ -112,8 +115,6 @@ public class NotJoinedState extends AbstractClientState {
 
             case RESULT_SUCCESS: {
 
-                System.out.println("Session: client joined to game." + " GameID="
-                        + gameID + " Player=" + controller.getClientNickName());
                 return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                         "Joined."));
@@ -158,13 +159,13 @@ public class NotJoinedState extends AbstractClientState {
                     joinResult = CommandResult.GAME_IS_ALREADY_STARTED;
 
                     if(!gameToJoin.isStarted()) {
-                        int playerID = gameToJoin.tryJoin(controller);
-                        assert playerID > 0; //must be ok if synchronization is ok.
+                        NetGamePlayer player = controller.getGamePlayer();
+                        int playerID = gameToJoin.tryJoin(player);
+                        player.setPlayerId(playerID);
+                        gameToJoin.addGameChangeListener(player);
 
-                        //gameToJoin.addGameEndedListener(controller); //TODO BIG
                         controller.setState(new InLobbyState(controller,
-                                                            gameToJoin,
-                                                            playerID));
+                                                             gameToJoin));
                         joinResult = CommandResult.RESULT_SUCCESS;
                     }
                 }
@@ -172,5 +173,4 @@ public class NotJoinedState extends AbstractClientState {
         }
         return joinResult;
     }
-
 }

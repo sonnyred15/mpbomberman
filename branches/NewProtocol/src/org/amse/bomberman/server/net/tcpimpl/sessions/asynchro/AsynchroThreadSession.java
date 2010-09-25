@@ -18,7 +18,7 @@ import java.net.SocketTimeoutException;
 import org.amse.bomberman.protocol.RequestCommand;
 import org.amse.bomberman.protocol.RequestExecutor;
 
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 import org.amse.bomberman.server.net.SessionEndListener;
 
 //~--- JDK imports ------------------------------------------------------------

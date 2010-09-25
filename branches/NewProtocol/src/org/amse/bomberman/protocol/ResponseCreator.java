@@ -2,7 +2,7 @@ package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Game;
+import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.util.Creator;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 
 /**
@@ -248,12 +249,12 @@ public class ResponseCreator {
      * @return message to send to client
      * that contains game info.
      */
-    public ProtocolMessage<Integer, String> sendGameInfo(Game game, Controller controller) {
+    public ProtocolMessage<Integer, String> sendGameInfo(Game game, GamePlayer player) {
         ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
         message.setMessageId(ProtocolConstants.GAME_INFO_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>();
-        data.addAll(converter.convertGameInfo(game, controller));
+        data.addAll(converter.convertGameInfo(game, player));
 
         message.setData(data);
 

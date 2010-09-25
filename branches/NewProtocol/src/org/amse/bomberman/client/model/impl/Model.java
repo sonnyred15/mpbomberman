@@ -5,10 +5,11 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.model.*;
-import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.impl.Parser;
 
 /**
@@ -17,7 +18,7 @@ import org.amse.bomberman.util.impl.Parser;
  */
 public class Model implements IModel, RequestResultListener{
     private static IModel model= null;
-    private IConnector connector;
+    private Connector connector;
     private BombMap map;
     private IPlayer player = Player.getInstance();
     private List<IView> listener = new ArrayList<IView>();
@@ -76,45 +77,45 @@ public class Model implements IModel, RequestResultListener{
         updateListeners();
     }
 
-    public synchronized void received(List<String> list) {
-        String command = list.get(0);
-        list.remove(0);
-        if (command.equals(ProtocolConstants.CAPTION_GAME_MAP_INFO)) {
-            if (!list.get(0).equals("Not joined to any game.")) {
+    public synchronized void received(ProtocolMessage<Integer, String> response) {
+        int messageId = response.getMessageId();
+        List<String> data = response.getData();
+        if (messageId == ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID) {
+            if (!data.get(0).equals("Not joined to any game.")) {
                 Parser parser = new Parser();
-                this.setMap(parser.parse(list));
+                this.setMap(parser.parse(data));
             } else {
                 escapeGame();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_DO_MOVE_RESULT)) {
-            if (list.get(0).equals("false")) {
+        } else if (messageId == ProtocolConstants.DO_MOVE_MESSAGE_ID) {
+            if (data.get(0).equals("false")) {
                 //System.out.println("You try to do move uncorrectly.");
             } else {
-                if (list.get(0).equals("Not joined to any game.")) {
+                if (data.get(0).equals("Not joined to any game.")) {
                     escapeGame();
                 }
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_PLACE_BOMB_RESULT)) {
-            if (!list.get(0).equals("Ok.")) {
+        } else if (messageId == ProtocolConstants.PLACE_BOMB_MESSAGE_ID) {
+            if (!data.get(0).equals("Ok.")) {
                 escapeGame();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_LEAVE_GAME_RESULT)) {
-            if (list.get(0).equals("Disconnected.")) {
+        } else if (messageId == ProtocolConstants.LEAVE_MESSAGE_ID) {
+            if (data.get(0).equals("Disconnected.")) {
                 escapeGame();
-            } else {
-                // TO DO
             }
-        } else if (command.equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
-            JOptionPane.showMessageDialog(null, "Host is escaped from game!\n"
+        } else if (messageId == ProtocolConstants.NOTIFICATION_MESSAGE_ID) {
+            if (data.get(0).equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
+                JOptionPane.showMessageDialog(null, "Host is escaped from game!\n"
                        , "Game ended.", JOptionPane.INFORMATION_MESSAGE);
-            escapeGame();
-        } else if (command.equals(ProtocolConstants.CAPTION_NEW_CHAT_MSGS)) {
-            if (!list.get(0).equals("No new messages.")) {
-                history.addAll(list);
+                escapeGame();
+            }
+        } else if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {
+            if (!data.get(0).equals("No new messages.")) {
+                history.addAll(data);
                 this.updateListeners();
             }
-        } else if (command.equals(ProtocolConstants.CAPTION_GAME_END_RESULTS)) {
-            results = list;
+        } else if (messageId == ProtocolConstants.END_RESULTS_MESSAGE_ID) {
+            results = data;
             updateListeners();
         }
     }
