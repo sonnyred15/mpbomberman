@@ -61,11 +61,13 @@ public class TcpServer implements Server {
 
     /**
      * Main constructor that creating Server object with port param.
-     * @param port Free port number. Port must be between 0 and 65535, inclusive.
-     * '0' for random free port. 0 is not reccomended cause clients must know
-     * actual port number to connect.
+     * @param port Free port number. Port must be between 1 and 65535, inclusive.
+     * 
      */
     public TcpServer(int port) {
+        if (port < 1 || port > 65535) {
+            throw new IllegalArgumentException();
+        }
         this.port = port;
     }
 
@@ -100,7 +102,7 @@ public class TcpServer implements Server {
      * {@inheritDoc}
      */
     public int getPort() {
-        return this.port;
+        return port;
     }
 
     /**

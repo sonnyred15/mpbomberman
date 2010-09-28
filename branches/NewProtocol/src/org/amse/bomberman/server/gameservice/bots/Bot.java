@@ -54,7 +54,7 @@ public class Bot extends ModelPlayer
     public void gameTerminated(Game gameThatEnded) {
         this.gameEnded = true;
 //        this.game.removeGameStartedListener(this);
-        this.game.removeGameEndedListener(this);
+//        this.game.removeGameEndedListener(this);
 //        this.game.tryRemoveBotFromGame(this); //TODO BIG
         System.out.println("Bot removed.");
     }
@@ -70,6 +70,14 @@ public class Bot extends ModelPlayer
 
     public void parametersChanged(Game game) {
         // TODO BIG
+    }
+
+    public void newChatMessage(String message) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void fieldChanged() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private class BotRun implements Runnable {

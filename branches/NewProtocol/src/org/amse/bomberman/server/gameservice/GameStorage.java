@@ -45,7 +45,13 @@ public class GameStorage implements GameChangeListener {
                            String GameName, int maxPlayers) 
                            throws FileNotFoundException, IOException {
         File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
-        String name = gameMapName.substring(0, gameMapName.indexOf(".map"));
+
+        int extensionIndex = gameMapName.indexOf(".map");
+        if(extensionIndex == -1) {
+            throw new FileNotFoundException("GameMap name must have .map extension.");
+        }
+
+        String name = gameMapName.substring(0, extensionIndex);
         f = new File(f.getPath() + File.separatorChar +
                      gameMapName + File.separatorChar + name + ".xml");
 

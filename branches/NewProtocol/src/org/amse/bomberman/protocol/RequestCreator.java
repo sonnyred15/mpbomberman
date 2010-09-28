@@ -27,16 +27,15 @@ public class RequestCreator {
     }
 
     public ProtocolMessage<Integer, String> requestCreateGame(String gameName,
-                                                              String mapName,
+                                                              String gameMapName,
                                                               int maxPl) {
         ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
         request.setMessageId(ProtocolConstants.CREATE_GAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(4);
         data.add(gameName);
-        data.add(mapName);
-        data.add("" + maxPl);
-        data.add(Model.getInstance().getPlayerName());
+        data.add(gameMapName);
+        data.add(String.valueOf(maxPl));
 
         request.setData(data);
 
@@ -56,7 +55,7 @@ public class RequestCreator {
         request.setMessageId(ProtocolConstants.JOIN_GAME_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(2);
-        data.add("" + gameId);
+        data.add(String.valueOf(gameId));
         data.add(Model.getInstance().getPlayerName());
 
         request.setData(data);

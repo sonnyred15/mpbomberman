@@ -12,7 +12,7 @@ import java.util.List;
  */
 public enum RequestCommand { //TODO it is better to do interface-subclasses implementation. not enum!
 
-    GET_GAMES(0){// "0"
+    GET_GAMES(ProtocolConstants.GAMES_LIST_MESSAGE_ID){// "0"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException {
@@ -20,7 +20,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    CREATE_GAME(1) {// "1 gameName mapName maxPlayers playerName"
+    CREATE_GAME(ProtocolConstants.CREATE_GAME_MESSAGE_ID) {// "1 gameName mapName maxPlayers"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -28,7 +28,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    JOIN_GAME(2) {//"2 gameID botName"
+    JOIN_GAME(ProtocolConstants.JOIN_GAME_MESSAGE_ID) {//"2 gameID botName"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -36,7 +36,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    DO_MOVE(3) {//"3 direction"
+    DO_MOVE(ProtocolConstants.DO_MOVE_MESSAGE_ID) {//"3 direction"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -44,7 +44,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    GET_GAME_MAP_INFO(4) {// "4"
+    GET_GAME_MAP_INFO(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID) {// "4"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -52,7 +52,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    START_GAME(5) {// "5"
+    START_GAME(ProtocolConstants.START_GAME_MESSAGE_ID) {// "5"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -60,7 +60,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    LEAVE(6) { // "6"
+    LEAVE(ProtocolConstants.LEAVE_MESSAGE_ID) { // "6"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -68,7 +68,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    PLACE_BOMB(7) { // "7"
+    PLACE_BOMB(ProtocolConstants.PLACE_BOMB_MESSAGE_ID) { // "7"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -76,7 +76,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    DOWNLOAD_GAME_MAP(8) {// "8 mapName"
+    DOWNLOAD_GAME_MAP(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID) {// "8 mapName"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -84,7 +84,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    GET_GAME_STATUS(9) {// "9"
+    GET_GAME_STATUS(ProtocolConstants.GAME_STATUS_MESSAGE_ID) {// "9"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -92,7 +92,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    GET_GAME_MAPS_LIST(10) {// "10"
+    GET_GAME_MAPS_LIST(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID) {// "10"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -100,7 +100,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    ADD_BOT_TO_GAME(11) {// "11 gameID botName"
+    ADD_BOT_TO_GAME(ProtocolConstants.BOT_ADD_MESSAGE_ID) {// "11 gameID botName"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -108,7 +108,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    GET_GAME_INFO(12) {// "12"
+    GET_GAME_INFO(ProtocolConstants.GAME_INFO_MESSAGE_ID) {// "12"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -116,7 +116,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    CHAT_ADD_MSG(13) { // "13 message"
+    CHAT_ADD_MSG(ProtocolConstants.CHAT_ADD_MESSAGE_ID) { // "13 message"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -124,7 +124,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    CHAT_GET_NEW_MSGS(14) {// "14"
+    CHAT_GET_NEW_MSGS(ProtocolConstants.CHAT_GET_MESSAGE_ID) {// "14"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -132,7 +132,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    REMOVE_BOT_FROM_GAME(15) {// "15"
+    REMOVE_BOT_FROM_GAME(ProtocolConstants.BOT_REMOVE_MESSAGE_ID) {// "15"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -140,7 +140,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    GET_GAME_PLAYERS_STATS(16) {// "16"
+    GET_GAME_PLAYERS_STATS(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID) {// "16"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
@@ -148,7 +148,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    SET_CLIENT_NAME(17) {// "17 name"
+    SET_CLIENT_NAME(ProtocolConstants.SET_NAME_MESSAGE_ID) {// "17 name"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException {
@@ -169,41 +169,41 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
 
     public static RequestCommand valueOf(int command) {
         switch (command) {
-            case 0:
+            case ProtocolConstants.GAMES_LIST_MESSAGE_ID:
                 return GET_GAMES;
-            case 1:
+            case ProtocolConstants.CREATE_GAME_MESSAGE_ID:
                 return CREATE_GAME;
-            case 2:
+            case ProtocolConstants.JOIN_GAME_MESSAGE_ID:
                 return JOIN_GAME;
-            case 3:
+            case ProtocolConstants.DO_MOVE_MESSAGE_ID:
                 return DO_MOVE;
-            case 4:
+            case ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID:
                 return GET_GAME_MAP_INFO;
-            case 5:
+            case ProtocolConstants.START_GAME_MESSAGE_ID:
                 return START_GAME;
-            case 6:
+            case ProtocolConstants.LEAVE_MESSAGE_ID:
                 return LEAVE;
-            case 7:
+            case ProtocolConstants.PLACE_BOMB_MESSAGE_ID:
                 return PLACE_BOMB;
-            case 8:
+            case ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID:
                 return DOWNLOAD_GAME_MAP;
-            case 9:
+            case ProtocolConstants.GAME_STATUS_MESSAGE_ID:
                 return GET_GAME_STATUS;
-            case 10:
+            case ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID:
                 return GET_GAME_MAPS_LIST;
-            case 11:
+            case ProtocolConstants.BOT_ADD_MESSAGE_ID:
                 return ADD_BOT_TO_GAME;
-            case 12:
+            case ProtocolConstants.GAME_INFO_MESSAGE_ID:
                 return GET_GAME_INFO;
-            case 13:
+            case ProtocolConstants.CHAT_ADD_MESSAGE_ID:
                 return CHAT_ADD_MSG;
-            case 14:
+            case ProtocolConstants.CHAT_GET_MESSAGE_ID:
                 return CHAT_GET_NEW_MSGS;
-            case 15:
+            case ProtocolConstants.BOT_REMOVE_MESSAGE_ID:
                 return REMOVE_BOT_FROM_GAME;
-            case 16:
+            case ProtocolConstants.PLAYERS_STATS_MESSAGE_ID:
                 return GET_GAME_PLAYERS_STATS;
-            case 17:
+            case ProtocolConstants.SET_NAME_MESSAGE_ID:
                 return SET_CLIENT_NAME;
             default:
                 throw new IllegalArgumentException("Wrong argument "

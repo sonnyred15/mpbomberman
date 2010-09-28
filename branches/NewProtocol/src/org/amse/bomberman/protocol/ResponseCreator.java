@@ -40,7 +40,8 @@ public class ResponseCreator {
         message.setMessageId(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID);
 
         List<String> data = new ArrayList<String>(1);
-        data.add("Can`t " + action + "in '" + stateName + "' state.");
+        data.add("Can`t " + action + " in '" + stateName + "' state.");
+        
         message.setData(data);
 
         return message;
@@ -63,6 +64,8 @@ public class ResponseCreator {
         List<String> data = new ArrayList<String>(1);
         data.add(msg);
 
+        message.setData(data);
+
         return message;
     }
 
@@ -82,6 +85,8 @@ public class ResponseCreator {
 
         List<String> data = new ArrayList<String>(1);
         data.add(msg);
+
+        message.setData(data);
 
         return message;
     }
@@ -227,15 +232,17 @@ public class ResponseCreator {
         ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
         message.setMessageId(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID);
 
-        List<String> data = converter.convertGameMapsList();
+        List<String> data = converter.convertGameMapsList();//TODO must NEVER return null but returns
 
-        if ((data == null) || (data.isEmpty())) {
+        if (data.isEmpty()) {
             System.out.println("Session: sendMapsList error. No maps founded on server.");
             data.add("No maps on server was founded.");
         } else {
             System.out.println("Session: sended maps list to client. Maps count="
                                + (data.size() - 1));
         }
+
+        message.setData(data);
 
         return message;
     }

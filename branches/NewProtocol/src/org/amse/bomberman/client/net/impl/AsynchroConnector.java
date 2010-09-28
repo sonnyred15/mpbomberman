@@ -83,11 +83,17 @@ public class AsynchroConnector implements Connector {
     public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {        
         try {
             List<String> data = request.getData();
+            if (data == null) {
+                throw new IllegalArgumentException("Data can`t be null.");
+            }
             int size = data.size();
 
             out.writeInt(request.getMessageId());
             out.writeInt(size);
             for(String string : data) {
+                if (string == null) {
+                    throw new IllegalArgumentException("Strings in data can`t be null.");
+                }
                 out.writeUTF(string);
             }
             //
@@ -95,8 +101,6 @@ public class AsynchroConnector implements Connector {
         } catch (IOException ex) {
             System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
             throw new NetException();
-        } finally {
-            closeConnection();
         }
     }
 
@@ -118,6 +122,7 @@ public class AsynchroConnector implements Connector {
                     for (int i = 0; i < size; i++) {
                         data.add(in.readUTF());
                     }
+                    message.setData(data);
 
                     SwingUtilities.invokeLater(new InvokationCommand(message));
                 }

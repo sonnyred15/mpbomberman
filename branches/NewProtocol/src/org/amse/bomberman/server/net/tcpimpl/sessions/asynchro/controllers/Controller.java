@@ -58,8 +58,8 @@ public class Controller implements RequestExecutor {
         }
     }
 
-    public void tryCreateGame(List<String> args) throws InvalidDataException {// "1 gameName mapName maxPlayers playerName"
-        if(args.size() != 4) { // if we getted command with wrong number of args
+    public void tryCreateGame(List<String> args) throws InvalidDataException {// gameName mapName maxPlayers
+        if(args.size() != 3) { // if we getted command with wrong number of args
             System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
                     + "Wrong command parameters. Error on client side.");
             throw new InvalidDataException(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
@@ -82,13 +82,10 @@ public class Controller implements RequestExecutor {
                                            "Max players param must be int");
         }
 
-        String playerName = iterator.next();//TODO whitespace name!?!?!?!
-        playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
-
         sendToClient(state.createGame(gameMapName, gameName, maxPlayers));
     }
 
-    public void tryJoinGame(List<String> args) throws InvalidDataException {// "2" "gameID" "playerName"
+    public void tryJoinGame(List<String> args) throws InvalidDataException {//gameID playerName
         if(args.size() != 2) {
             System.out.println("Session: joinGame error. Wrong command parameters. Error on client side.");
             throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
@@ -211,7 +208,7 @@ public class Controller implements RequestExecutor {
                                            "Not enough arguments.");
         }
 
-        sendToClient(protocol.chatMessage(args.get(0)));
+        sendToClient(protocol.chatMessage(args.get(0)));//TODO WORKS WRONG!!
     }
 
     public void sendNewMessagesFromChat() {

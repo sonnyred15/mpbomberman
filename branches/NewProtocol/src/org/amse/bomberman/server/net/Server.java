@@ -45,8 +45,10 @@ public interface Server extends SessionEndListener {
     boolean isStopped();
 
     /**
-     * Returns port of this server.
-     * @return port of this server.
+     * Returns the port number on which this socket is listening.
+     * 
+     * @returns: the port number to which this socket is listening
+     * or -1 if the socket is not bound yet.
      */
     int getPort();
 

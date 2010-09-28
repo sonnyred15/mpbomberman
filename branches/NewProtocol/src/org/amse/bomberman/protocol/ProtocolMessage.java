@@ -14,7 +14,9 @@ public class ProtocolMessage<Identificator, DataType> {
     private boolean error = false;
 
     public List<DataType> getData() {
-        return Collections.unmodifiableList(data);
+        return (data != null 
+                ? Collections.unmodifiableList(data)
+                : null);
     }
 
     public void setData(List<? extends DataType> data) {

@@ -146,7 +146,7 @@ public class AsynchroThreadSession extends AbstractSession {
             cmd.execute(this.getRequestExecutor(), message.getData()); 
         } catch (IllegalArgumentException ex) {
             send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
-                    "Not supported command."));//TODO caption for 1000
+                    "Not supported command."));
             System.out.println("Session: answerOnCommand error. "
                     + "Non supported command int from client. "
                     + ex.getMessage());
