@@ -12,7 +12,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.amse.bomberman.server.gameservice.GamePlayer;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.Pair;
@@ -24,32 +28,32 @@ import org.amse.bomberman.util.Pair;
  */
 public class ConverterToString implements Converter<String> {
 
-    public List<String> convertPlayersStats(final List<ModelPlayer> playersList) {
-        List<ModelPlayer> players = new ArrayList<ModelPlayer>(playersList);
+    public List<String> convertPlayersStats(StatsTable stats) {
+        Set<Entry<ModelPlayer, StatsTable.Stat>> set
+                = stats.getStats().entrySet();
 
-        Collections.sort(players, new Comparator<ModelPlayer>() {
+        List<Entry<ModelPlayer, StatsTable.Stat>> list = new
+                ArrayList<Entry<ModelPlayer, StatsTable.Stat>>(set);
 
-            @Override
-            public int compare(ModelPlayer player1, ModelPlayer player2) {
-                int points1 = player1.getPoints();
-                int points2 = player2.getPoints();
+        Collections.sort(list,
+                new Comparator<Entry<ModelPlayer, StatsTable.Stat>>() {
 
-                if (points1 == points2) {
-                    return 0;
-                } else if (points1 > points2) {
-                    return -1;
-                } else {
-                    return 1;
-                }
+            public int compare(Entry<ModelPlayer, Stat> e1,
+                               Entry<ModelPlayer, Stat> e2) {
+                int points1 = e1.getValue().getPoints();
+                int points2 = e2.getValue().getPoints();
+
+                return points1 - points2;
             }
         });
 
         List<String> result = new ArrayList<String>();
-        for (ModelPlayer player : players) {
-            result.add(player.getNickName());
-            result.add(String.valueOf(player.getKills()));
-            result.add(String.valueOf(player.getDeaths()));
-            result.add(String.valueOf(player.getPoints()));
+        for (Entry<ModelPlayer, StatsTable.Stat> entry : list) {
+            result.add(entry.getKey().getNickName());
+            Stat stat = entry.getValue();
+            result.add(String.valueOf(stat.getKills()));
+            result.add(String.valueOf(stat.getDeaths()));
+            result.add(String.valueOf(stat.getPoints()));
         }
         
         return result;
@@ -89,7 +93,7 @@ public class ConverterToString implements Converter<String> {
 
         result.append(gameID);
         result.append(ProtocolConstants.SPLIT_SYMBOL);
-        result.append(game.getName());
+        result.append(game.getGameName());
         result.append(ProtocolConstants.SPLIT_SYMBOL);
         result.append(game.getGameMapName());
         result.append(ProtocolConstants.SPLIT_SYMBOL);
@@ -304,19 +308,22 @@ public class ConverterToString implements Converter<String> {
      *  @return list of strings - unstarted games strings.
      */
     public List<String> convertUnstartedGames(List<Game> allGames) {
+        if (allGames == null) {
+            throw new IllegalArgumentException("Argument can`t be null.");
+        }
+
         List<String> unstartedGames = new ArrayList<String>();
 
-        if (allGames != null) {
-            Iterator<Game> it = allGames.iterator();
+        Iterator<Game> it = allGames.iterator();
 
-            for (int i = 0; it.hasNext(); ++i) {
-                Game game = it.next();
+        for (int i = 0; it.hasNext(); ++i) { //TODO what if allGames will change concurrently?
+            Game game = it.next();
 
-                // send only games that are not started!!!
-                if (!game.isStarted()) {
-                    unstartedGames.add(convertGameParams(game, i));
-                }
+            // send only games that are not started!!!
+            if (!game.isStarted()) {
+                unstartedGames.add(convertGameParams(game, i));
             }
+
         }
 
         return unstartedGames;

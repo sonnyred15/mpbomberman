@@ -11,6 +11,7 @@ import org.amse.bomberman.server.gameservice.models.impl.Bomb;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.GameMap;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Pair;
 
@@ -148,4 +149,6 @@ public interface Model {
      * @return true if bomb was placed, false otherwise.
      */
     boolean tryPlaceBomb(ModelPlayer player);
+
+    StatsTable getStatsTable();
 }

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import org.amse.bomberman.server.gameservice.models.ModelListener;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
 
 /**
  * Model that is responsable for game rules and responsable for connection
@@ -36,10 +38,13 @@ public class DefaultModel implements Model, DieListener {
     private final List<Bomb>                  bombs;
     private final List<Pair>                  explosionSquares;
     private final List<Integer>               freeIDs;
-    private final Game                        game;
+    private final List<ModelListener>         listeners;
     private final GameMap                     gameMap;
     private final List<ModelPlayer>           players;
+    private StatsTable                        stats;
     private boolean                           ended;
+
+    private int maxPlayersToEnd;
 
     /**
      * Constructor of Model.
@@ -48,28 +53,31 @@ public class DefaultModel implements Model, DieListener {
      */
     public DefaultModel(GameMap gameMap, Game game) {
         this.gameMap = gameMap;
-        this.game = game;
+
+        this.listeners = new CopyOnWriteArrayList<ModelListener>();
         this.bombs = new CopyOnWriteArrayList<Bomb>();
         this.players = new CopyOnWriteArrayList<ModelPlayer>();
-        this.ended = false;
 
-        Integer[] freeIDArray = new Integer[this.game.getMaxPlayers()];
+        Integer[] freeIDArray = new Integer[game.getMaxPlayers()];
 
         for (int i = 0; i < freeIDArray.length; ++i) {
-            freeIDArray[i] = i + 1;//cause players indexes are from 1 to ..
+            freeIDArray[i] = i + 1;//cause players id`s are from 1 to ..
         }
 
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
+        
+        this.ended = false;
+        this.listeners.add(game);
     }
 
     @Override
-    public void addExplosions(List<Pair> explSq) {
+    public void addExplosions(List<Pair> explosions) {
         if(this.ended){
             return;
         }
-        this.explosionSquares.addAll(explSq);
-        this.game.fieldChanged();
+        this.explosionSquares.addAll(explosions);
+        notifyListenersFieldChange();
     }
 
     @Override
@@ -99,7 +107,7 @@ public class DefaultModel implements Model, DieListener {
             this.gameMap.setSquare(bomb.getPosition(), Constants.MAP_EMPTY);
         }
 
-        this.game.fieldChanged();
+        notifyListenersFieldChange();
     }
 
     @Override
@@ -127,7 +135,7 @@ public class DefaultModel implements Model, DieListener {
                 aliveCount++;
             }
         }
-        if (aliveCount <= 1 && !this.ended) {
+        if (aliveCount <= maxPlayersToEnd && !this.ended) {
             this.end();
         }
     }
@@ -175,16 +183,15 @@ public class DefaultModel implements Model, DieListener {
     public boolean isExplosion(Pair coords) {
         return this.explosionSquares.contains(coords);
     }
-
-    //TODO rewrite this casuistic logic
+    
     private boolean isMoveToReserved(Pair pair) {    // note that on explosions isEmpty = true!!!
         int x = pair.getX();
         int y = pair.getY();
 
-        boolean isFree = this.gameMap.isEmpty(x, y)
-                         || this.gameMap.isBonus(x, y);
+        boolean reserved = !(this.gameMap.isEmpty(x, y)
+                          || this.gameMap.isBonus(x, y));
 
-        return !isFree;
+        return reserved;
     }
 
     private boolean isOutMove(Pair pair) {
@@ -241,16 +248,11 @@ public class DefaultModel implements Model, DieListener {
 
         // if object is making move to explosion zone.
         if (isExplosion(newPosition)) {
-            if(objectToMove instanceof ModelPlayer) {
-                String name = ((ModelPlayer)objectToMove).getNickName();
-                this.game.addMessageToChat("Ouch, " + name +
-                                           " just rushed into the fire.");
-            }
             objectToMove.bombed();
         }
     }
 
-    private Pair newPosition(Pair curPos, Direction direction) {    // whats about catch illegalArgumentException???
+    private Pair newPosition(Pair curPos, Direction direction) {
 
         switch (direction) {
             case DOWN : {
@@ -270,8 +272,7 @@ public class DefaultModel implements Model, DieListener {
             }
 
             default : {
-                throw new IllegalArgumentException("Default block " +
-                        "in switch(ENUM). Error in code.");
+                throw new AssertionError("Unsupported direction.");
             }
         }
     }
@@ -287,22 +288,24 @@ public class DefaultModel implements Model, DieListener {
 
     @Override
     public void playerBombed(ModelPlayer atacker, ModelPlayer victim) {
-        this.game.addMessageToChat(/*"Bomb of " + */atacker.getNickName() +
-                                   " damaged " + victim.getNickName());
+        Stat atackerStat = stats.getStats().get(atacker);
+        Stat victimStat = stats.getStats().get(victim);
+
         if (atacker != victim) {
-            atacker.damagedSomeone();     //TODO clear such damn hardcoded code
-            atacker.changePoints(+1);
+            atackerStat.increaseKills();
+            victimStat.increaseDeaths();
+        } else {//suicide
+            atackerStat.increaseSuicides();
         }
-        victim.bombed();
-        victim.changePoints(-1);
+
+        victim.bombed();        
     }
 
     @Override
     public void playerDied(ModelPlayer player) {
         this.gameMap.removePlayer(player.getID());
-        this.game.fieldChanged();
-        this.game.addMessageToChat("Oh, no. " + player.getNickName() +
-                                   " was cruelly killed.");
+
+        notifyListenersFieldChange();
     }
 
     /**
@@ -330,7 +333,7 @@ public class DefaultModel implements Model, DieListener {
             this.explosionSquares.remove(pair);
         }
 
-        this.game.fieldChanged();
+        notifyListenersFieldChange();
     }
 
     @Override
@@ -338,10 +341,10 @@ public class DefaultModel implements Model, DieListener {
         for (ModelPlayer player : players) {
             if (player.getID() == playerID) {
                 this.players.remove(player);
-                this.freeIDs.add(playerID);
-                if(this.game.isStarted()){
-                    this.gameMap.removePlayer(playerID);
-                }
+                this.freeIDs.add(playerID); //TODO comment will produce bug fix it
+//                if(this.game.isStarted()){
+//                    this.gameMap.removePlayer(playerID);
+//                }
                 return true;
             }
         }
@@ -351,31 +354,23 @@ public class DefaultModel implements Model, DieListener {
 
     @Override
     public void startup() {
-        this.gameMap.changeMapForCurMaxPlayers(this.players.size());
+        int playersCount = this.players.size();
 
-        int playerX;
-        int playerY;
+        this.gameMap.changeMapForCurMaxPlayers(playersCount);
+        this.maxPlayersToEnd = (playersCount > 1 ? 1 : 0);
+        this.stats = new StatsTable(this.players);
 
         for (ModelPlayer player : players) {
-            playerX = this.gameMap.xCoordOf(player.getID());
-            playerY = this.gameMap.yCoordOf(player.getID());
-
-            Pair playerCoords = new Pair(playerX, playerY);
-
+            Pair playerCoords = this.gameMap.getPlayerPosition(player.getID());
             player.setPosition(playerCoords);
         }
     }
 
     public void end() {
         this.ended = true;
-        for (ModelPlayer player : players) {
-            if(player.isAlive()){
-                player.changePoints(+3);
-            }
+        for (ModelListener listener : listeners) {
+            listener.end();
         }
-//        List<String> stats = ConverterToString.convertPlayersStats(this.players); //TODO BIG
-//        stats.add(0, ProtocolConstants.CAPTION_GAME_END_RESULTS);
-//        this.game.notifyGameSessions(stats);
     }
 
     /**
@@ -456,5 +451,15 @@ public class DefaultModel implements Model, DieListener {
         }
 
         return false;
+    }
+
+    public StatsTable getStatsTable() {
+        return this.stats;
+    }
+
+    private void notifyListenersFieldChange() {
+        for (ModelListener listener : listeners) {
+            listener.fieldChanged();
+        }
     }
 }

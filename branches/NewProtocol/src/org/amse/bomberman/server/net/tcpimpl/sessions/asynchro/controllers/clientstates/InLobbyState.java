@@ -63,7 +63,7 @@ public class InLobbyState extends AbstractClientState {
 
             case RESULT_SUCCESS: {
                 System.out.println("Session: added bot to game."
-                        + this.game.getName());
+                        + this.game.getGameName());
                 return protocol.ok(
                         ProtocolConstants.BOT_ADD_MESSAGE_ID,
                         "Bot added.");
@@ -149,7 +149,7 @@ public class InLobbyState extends AbstractClientState {
 
         if(success) {
             System.out.println("Session: started game. " + "(gameName="
-                    + this.game.getName() + ")");
+                    + this.game.getGameName() + ")");
             return protocol.ok(ProtocolConstants.START_GAME_MESSAGE_ID,
                                 "Game started.");
         } else {

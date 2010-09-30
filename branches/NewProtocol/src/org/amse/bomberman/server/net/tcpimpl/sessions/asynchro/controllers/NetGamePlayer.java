@@ -4,8 +4,6 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.gameservice.Game;
@@ -78,5 +76,13 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
     public void fieldChanged() {
         this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
                     ProtocolConstants.UPDATE_GAME_MAP));
+    }
+
+    public void gameEnded(Game game) {
+        this.controller.sendToClient(protocol.sendGameEnd(game));
+    }
+
+    public void statsChanged(Game game) {
+        this.controller.sendToClient(protocol.sendPlayersStats(game));
     }
 }

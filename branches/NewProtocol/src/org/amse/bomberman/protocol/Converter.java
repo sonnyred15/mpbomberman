@@ -8,6 +8,7 @@ import java.util.List;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.util.Pair;
 
 /**
@@ -34,7 +35,7 @@ public interface Converter<T> {
 
     List<T> convertPlayerInfo(ModelPlayer player);
 
-    List<T> convertPlayersStats(final List<ModelPlayer> playersList);
+    List<T> convertPlayersStats(StatsTable stats);
 
     List<T> convertUnstartedGames(List<Game> allGames);
 }

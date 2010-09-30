@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
  * @author Kirilchuk V.E.
  */
 public class GameStorage implements GameChangeListener {
-    private final List<Game> games = new LinkedList<Game>();
+    private final List<Game> games = new LinkedList<Game>(); //TODO whats about synchronization?
     private final GlobalNotificator notificator;
 
 
@@ -138,6 +138,14 @@ public class GameStorage implements GameChangeListener {
     }
 
     public void fieldChanged() {
+        //ignore again =)
+    }
+
+    public void gameEnded(Game game) {
+        //ignore again =)
+    }
+
+    public void statsChanged(Game game) {
         //ignore again =)
     }
 }

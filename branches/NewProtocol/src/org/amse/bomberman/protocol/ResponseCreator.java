@@ -71,12 +71,10 @@ public class ResponseCreator {
     public ProtocolMessage<Integer, String> unstartedGamesList(List<Game> games) {
         int messageId = ProtocolConstants.GAMES_LIST_MESSAGE_ID;
 
-        List<String> data = null;
-        if (games.isEmpty()) {
+        List<String> data = converter.convertUnstartedGames(games);
+        if (data.isEmpty()) {
             return singleMessage(messageId, "No unstarted games finded.");
         } else {
-            data = new ArrayList<String>(games.size());
-            data.addAll(converter.convertUnstartedGames(games));
             return message(messageId, data);
         }
     }
@@ -201,9 +199,17 @@ public class ResponseCreator {
     public ProtocolMessage<Integer, String> sendPlayersStats(Game game) {
         List<String> data = new ArrayList<String>();
 
-        data.addAll(converter.convertPlayersStats(game.getCurrentPlayers()));
+        data.addAll(converter.convertPlayersStats(game.getPlayersStats()));
 
         return message(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID, data);
+    }
+
+    public ProtocolMessage<Integer, String> sendGameEnd(Game game) {
+        List<String> data = new ArrayList<String>();
+
+        data.addAll(converter.convertPlayersStats(game.getPlayersStats()));
+
+        return message(ProtocolConstants.END_RESULTS_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> notifyMessages(List<String> data) {

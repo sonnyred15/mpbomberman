@@ -1,5 +1,6 @@
 package org.amse.bomberman.client.view;
 
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -9,6 +10,7 @@ import org.amse.bomberman.protocol.ProtocolConstants;
  *
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class ResultsTable extends JTable {
 
     public ResultsTable() {
@@ -44,6 +46,7 @@ public class ResultsTable extends JTable {
         ((ResultsTableModel) this.getModel()).setResults(results);
     }
 
+    @SuppressWarnings("serial")
     private class ResultsTableModel extends AbstractTableModel {
 
         String[] columnNames = {"№", "Name", "Kills", "Deaths", "Frags"};
@@ -54,19 +57,19 @@ public class ResultsTable extends JTable {
         }
 
         public void setResults(List<String> results) {
-            data = new Object[results.size()][columnNames.length];
-            String[] buf;
-            for (int i = 0; i < data.length; i++) {
-                buf = results.get(i).split(ProtocolConstants.SPLIT_SYMBOL);
-                if (buf.length != 4) {
+            data = new Object[results.size()/4][columnNames.length];
+            Iterator<String> iterator = results.iterator();
+            for (int i = 0; i < data.length; i++) {                
+                if (!iterator.hasNext()) {
                     throw new IllegalArgumentException("Wrong format of game results:"
                             + results.toString());
                 }
+
                 data[i][0] = i + 1;
-                data[i][1] = buf[0];
-                data[i][2] = buf[1];
-                data[i][3] = buf[2];
-                data[i][4] = buf[3];
+                data[i][1] = iterator.next();
+                data[i][2] = iterator.next();
+                data[i][3] = iterator.next();
+                data[i][4] = iterator.next();
             }
         }
 

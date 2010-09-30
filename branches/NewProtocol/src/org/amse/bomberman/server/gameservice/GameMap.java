@@ -40,7 +40,9 @@ public final class GameMap {
      * @param maxPlayers
      */
     public GameMap(String gameMapName, int[][] field, int dimension, int maxPlayers) {
-        assert (field.length==field[0].length);
+        if(field.length != field[0].length) {
+            throw new IllegalArgumentException("Field must be square.");
+        }
         this.gameMapName = gameMapName;
         this.field = field;
         this.dimension = dimension;
@@ -362,27 +364,15 @@ public final class GameMap {
         return counter;
     }
 
-    public int xCoordOf(int playerId) {
+    public Pair getPlayerPosition(int playerId) {
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field.length; j++) {
                 if (field[i][j] == playerId) {
-                    return i;
+                    return new Pair(i, j);
                 }
             }
         }
 
-        return 0;
-    }
-
-    public int yCoordOf(int playerId) {
-        for (int i = 0; i < field.length; i++) {
-            for (int j = 0; j < field.length; j++) {
-                if (field[i][j] == playerId) {
-                    return j;
-                }
-            }
-        }
-
-        return 0;
+        return null;
     }
 }

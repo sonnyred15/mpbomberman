@@ -86,15 +86,14 @@ public class Model implements IModel, RequestResultListener{
                 escapeGame();
             }
         } else if (messageId == ProtocolConstants.DO_MOVE_MESSAGE_ID) {
-            if (data.get(0).equals("false")) {
-                //System.out.println("You try to do move uncorrectly.");
+            if (data.get(0).equals("false")) {                
             } else {
                 if (data.get(0).equals("Not joined to any game.")) {
                     escapeGame();
                 }
             }
         } else if (messageId == ProtocolConstants.PLACE_BOMB_MESSAGE_ID) {
-            if (!data.get(0).equals("Ok.")) {
+            if (!data.get(0).equals("Placed.")) {
                 escapeGame();
             }
         } else if (messageId == ProtocolConstants.LEAVE_MESSAGE_ID) {

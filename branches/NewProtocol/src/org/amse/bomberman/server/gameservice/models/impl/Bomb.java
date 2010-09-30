@@ -7,9 +7,7 @@ package org.amse.bomberman.server.gameservice.models.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.*;
-import org.amse.bomberman.server.gameservice.models.Model;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Pair;
 
@@ -29,8 +27,8 @@ import org.amse.bomberman.server.gameservice.models.MoveableObject;
 public class Bomb implements MoveableObject {
 
     private boolean                        wasDetonated = false;
-    private final Model                   model;
-    private final ModelPlayer                   owner;
+    private final Model                    model;
+    private final ModelPlayer              owner;
     private final Pair                     position;
     private final int                      radius;
     private final ScheduledExecutorService timer;

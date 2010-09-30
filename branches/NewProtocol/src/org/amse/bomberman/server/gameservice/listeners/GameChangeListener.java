@@ -20,11 +20,15 @@ public interface GameChangeListener {
     void gameStarted(Game game);
 
     /**
-     * Tells that game was ended.
+     * Tells that game was terminated.
      */
     void gameTerminated(Game game);
 
     void newChatMessage(String message);
 
     void fieldChanged();
+
+    void gameEnded(Game game);
+
+    void statsChanged(Game game);
 }

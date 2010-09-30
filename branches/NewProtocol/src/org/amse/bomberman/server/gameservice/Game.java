@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
+import org.amse.bomberman.server.gameservice.models.ModelListener;
 import org.amse.bomberman.server.gameservice.models.ModelFactory;
+import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 
 /**
  * Class that represents Game.
@@ -31,7 +33,7 @@ import org.amse.bomberman.server.gameservice.models.ModelFactory;
  * players controllers and model.
  * @author Kirilchuk V.E.
  */
-public class Game {    
+public class Game implements ModelListener {
     private final String                  gameName;
     
     private final Set<GameChangeListener> gameChangeListeners
@@ -45,7 +47,7 @@ public class Game {
     final AsynchroChat  chat;
     
     GamePlayer          owner; // perhaps owner can change during game
-    volatile boolean    started; //TODO use State pattern
+    volatile boolean    started;
 
     /**
      * Constructor of Game.
@@ -131,109 +133,6 @@ public class Game {
         return moved;
     }
 
-//    /**
-//     * Return list of controllers that joined to this game.
-//     * @return list of controllers that joined to this game.
-//     */
-//    public Set<Controller> getControllers() {
-//        return Collections.unmodifiableSet(gamePlayers);
-//    }
-
-    /**
-     * Return unmodifiableList of all Players that are playing in game including
-     * bots.
-     * @return unmodifiableList of all Players that are playing in game.
-     */
-    public List<ModelPlayer> getCurrentPlayers() {
-        //model must return unmodifiable list by Model contract.
-        return this.model.getPlayersList();
-    }
-
-    /**
-     * Return number of all players in game including bots.
-     * @return number of all players in game including bots.
-     */
-    public int getCurrentPlayersNum() {
-        return this.model.getCurrentPlayersNum();
-    }
-
-    /**
-     * This method is needed, cause model is hidden by private modificator.
-     * But explosions are needed to send them to client, so this method is
-     * just delegation to model of this game.
-     * @return list of explosions.
-     */
-    public List<Pair> getExplosionSquares() {
-        return this.model.getExplosionSquares();
-    }
-
-    /**
-     * This method is needed, cause model is hidden by private modificator.
-     * But field is needed to send it to client, so this method is
-     * just delegation.
-     * @return matrix of game field.
-     */
-    public int[][] getGameField() {
-        return this.model.getGameMap().getField();
-    }
-
-    /**
-     * Return name of gameMap of this game.
-     * @return name of gameMap of this game.
-     */
-    public String getGameMapName() {
-        return this.model.getGameMap().getName();
-    }
-
-    /**
-     * Returns this game maxPlayers.
-     * @return this game maxPlayers.
-     */
-    public int getMaxPlayers() {
-        return this.maxPlayers;
-    }
-
-    /**
-     * Return name of this game.
-     * @return name of this game.
-     */
-    public String getName() {
-        return this.gameName;
-    }
-
-    public GamePlayer getOwner() {
-        return owner;
-    }
-
-    public boolean isGameOwner(GamePlayer player) {
-        return (owner == player);
-    }
-
-    /**
-     * Return the reference to Player that have defined ID.
-     * @param playerID id of player.
-     * @return the reference to Player that have defined ID.
-     */
-    public ModelPlayer getPlayer(int playerID) {
-        return this.model.getPlayer(playerID);
-    }
-
-    /**
-     * Checks if game is full or not.
-     * @return true if game already have maxPlayers joined, false otherwise.
-     */
-    public boolean isFull() { //TODO whats about sync
-        return (this.model.getCurrentPlayersNum() == this.maxPlayers);
-    }
-
-    /**
-     * Checks if game is started.
-     * @return true if game is started, false otherwise.
-     */
-    public boolean isStarted() { 
-        return this.started;
-    }
-
     /**
      * Joins client(controller) into game if it is possible and
      * returns ingame ID.
@@ -291,30 +190,6 @@ public class Game {
     }
 
     /**
-     * Adding listener that listens for game ended event.
-     * @param listener listener.
-     */
-    public void addGameChangeListener(GameChangeListener listener) {
-        this.gameChangeListeners.add(listener);
-    }
-    
-    /**
-     * Removing game end listener from game end listeners list.
-     * @param listener listener to remove.
-     */
-    public void removeGameChangeListener(GameChangeListener listener) {
-        this.gameChangeListeners.remove(listener);
-    }
-
-    /**
-     * Setting the owner of game.
-     * @param owner controller that will be setted as owner of the game.
-     */
-    public void setOwner(GamePlayer player) {
-        this.owner = player;
-    }
-
-    /**
      * Tryes to place bomb. If game is not started returns false.
      * @param playerID ID of player that is trying to place bomb.
      * @return true if bomb was placed, false otherwise.
@@ -334,12 +209,6 @@ public class Game {
         }
 
         return placed;
-    }
-
-    public void fieldChanged() {
-        for (GameChangeListener gameChangeListener : gameChangeListeners) {
-            gameChangeListener.fieldChanged();
-        }
     }
 
     /**
@@ -365,6 +234,129 @@ public class Game {
     }
 
     /**
+     * Adding listener that listens for game ended event.
+     * @param listener listener.
+     */
+    public void addGameChangeListener(GameChangeListener listener) {
+        this.gameChangeListeners.add(listener);
+    }
+
+    /**
+     * Removing game end listener from game end listeners list.
+     * @param listener listener to remove.
+     */
+    public void removeGameChangeListener(GameChangeListener listener) {
+        this.gameChangeListeners.remove(listener);
+    }
+
+    /**
+     * Setting the owner of game.
+     * @param owner controller that will be setted as owner of the game.
+     */
+    public void setOwner(GamePlayer player) {
+        this.owner = player;
+    }
+
+    /**
+     * Return unmodifiableList of all Players that are playing in game including
+     * bots.
+     * @return unmodifiableList of all Players that are playing in game.
+     */
+    public List<ModelPlayer> getCurrentPlayers() {
+        //model must return unmodifiable list by Model contract.
+        return this.model.getPlayersList();
+    }
+
+    /**
+     * Return number of all players in game including bots.
+     * @return number of all players in game including bots.
+     */
+    public int getCurrentPlayersNum() {
+        return this.model.getCurrentPlayersNum();
+    }
+
+    /**
+     * This method is needed, cause model is hidden by private modificator.
+     * But explosions are needed to send them to client, so this method is
+     * just delegation to model of this game.
+     * @return list of explosions.
+     */
+    public List<Pair> getExplosionSquares() {
+        return this.model.getExplosionSquares();
+    }
+
+    /**
+     * This method is needed, cause model is hidden by private modificator.
+     * But field is needed to send it to client, so this method is
+     * just delegation.
+     * @return matrix of game field.
+     */
+    public int[][] getGameField() {
+        return this.model.getGameMap().getField();
+    }
+
+    /**
+     * Return name of gameMap of this game.
+     * @return name of gameMap of this game.
+     */
+    public String getGameMapName() {
+        return this.model.getGameMap().getName();
+    }
+
+    /**
+     * Returns this game maxPlayers.
+     * @return this game maxPlayers.
+     */
+    public int getMaxPlayers() {
+        return this.maxPlayers;
+    }
+
+    public StatsTable getPlayersStats() {
+        return this.model.getStatsTable();
+    }
+
+    /**
+     * Return name of this game.
+     * @return name of this game.
+     */
+    public String getGameName() {
+        return this.gameName;
+    }
+
+    public GamePlayer getOwner() {
+        return owner;
+    }
+
+    public boolean isGameOwner(GamePlayer player) {
+        return (owner == player);
+    }
+
+    /**
+     * Return the reference to Player that have defined ID.
+     * @param playerID id of player.
+     * @return the reference to Player that have defined ID.
+     */
+    public ModelPlayer getPlayer(int playerID) {
+        return this.model.getPlayer(playerID);
+    }
+
+    /**
+     * Checks if game is full or not.
+     * @return true if game already have maxPlayers joined, false otherwise.
+     */
+    public boolean isFull() { //TODO whats about sync
+        return (this.model.getCurrentPlayersNum() == this.maxPlayers);
+    }
+
+    /**
+     * Checks if game is started.
+     * @return true if game is started, false otherwise.
+     */
+    public boolean isStarted() {
+        return this.started;
+    }
+
+    /**
      * Terminates game. Removing all clients from it. Then remove the game from
      * server.
      */
@@ -373,5 +365,23 @@ public class Game {
             listener.gameTerminated(this);
         }
         gameChangeListeners.clear();//!?!?good or bad?
+    }
+
+    public void fieldChanged() {
+        for (GameChangeListener gameChangeListener : gameChangeListeners) {
+            gameChangeListener.fieldChanged();
+        }
+    }
+
+    public void statsChanged() {//TODO
+        for (GameChangeListener listener : gameChangeListeners) {
+            listener.statsChanged(this);
+        }
+    }
+
+    public void end() {
+        for (GameChangeListener listener : gameChangeListeners) {
+            listener.gameEnded(this);
+        }
     }
 }

@@ -26,11 +26,6 @@ public class ModelPlayer implements MoveableObject {
     private final ScheduledExecutorService timer;
 
     //
-    private int deaths = 0;
-    private int kills  = 0;
-    private int points  = 0;
-
-    //
     private int          id = 1;
     private final String nickName;
 
@@ -41,7 +36,7 @@ public class ModelPlayer implements MoveableObject {
     protected int explRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
 
     //
-    private Pair               position; //TODO maybe must be volatile?
+    private Pair                 position; //TODO maybe must be volatile?
     private volatile PlayerState state = PlayerState.NORMAL;
 
     //
@@ -130,10 +125,6 @@ public class ModelPlayer implements MoveableObject {
         this.state.bombed(this);
     }
 
-    public synchronized void damagedSomeone() {//TODO maybe model must calculate all such things?
-        this.kills += 1;
-    }
-
     /**
      * If this method was called, then depending on bonus
      * some player pareametres must increase or change.
@@ -152,10 +143,6 @@ public class ModelPlayer implements MoveableObject {
         if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
             maxBombs--;
         }
-    }
-
-    public synchronized void changePoints(int delta){
-        this.points += delta;
     }
 
     /**
@@ -209,24 +196,33 @@ public class ModelPlayer implements MoveableObject {
         return maxBombs;
     }
 
-    public int getKills() {
-        return kills;
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ModelPlayer other = (ModelPlayer) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
     }
 
-    public int getDeaths() {
-        return deaths;
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + this.id;
+        return hash;
     }
 
-    public int getPoints() { //TODO PLAYER MUST NOT TO HAVE THIS. MOdel must calculate points!
-        return points;
-    }
-
-    static enum PlayerState{
+    private static enum PlayerState{
         NORMAL {
             @Override
             void bombed(ModelPlayer player){
                 player.lives  -= 1;
-                player.deaths += 1;
                 player.decBonuses();
 
                 assert (player.lives >= 0);    // here may be synchronization problem
