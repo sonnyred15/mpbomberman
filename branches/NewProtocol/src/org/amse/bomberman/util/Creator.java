@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JOptionPane;
 
@@ -92,5 +93,31 @@ public class Creator {
         //
         JOptionPane.showMessageDialog(parent, description + "\n" + message,
                                      "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    static String[] botNames =
+    {"Suicider",
+     "Nike",
+     "Adibas",
+     "Gosu",
+     "Idiot",
+     "Gosling",
+     "Gauss",
+     "Lenin",
+     "Stalin",
+     "Steveee",
+     "Patriot",
+     "Slayer",
+     "J2SEBot",
+     "iBot",
+     "I_KILL_YOU",
+     "Ololo",
+     "GoGoGo"
+    };
+    static Random rnd = new Random();
+
+    public static String createBotName() {
+        int id = rnd.nextInt(botNames.length);
+        return botNames[id];
     }
 }

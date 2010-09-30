@@ -5,10 +5,12 @@
 package org.amse.bomberman.protocol;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -16,183 +18,133 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class RequestCreator {
 
-    private final List<String> emptyList = new ArrayList<String>(0);
+    private final List<String> emptyList
+            = Collections.unmodifiableList(new ArrayList<String>(0));
 
     public ProtocolMessage<Integer, String> requestGamesList() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.GAMES_LIST_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.GAMES_LIST_MESSAGE_ID);
     }
 
-    public ProtocolMessage<Integer, String> requestCreateGame(String gameName,
-                                                              String gameMapName,
-                                                              int maxPl) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.CREATE_GAME_MESSAGE_ID);
+    public ProtocolMessage<Integer, String>
+            requestCreateGame(String gameName, String gameMapName, int maxPl) {
 
         List<String> data = new ArrayList<String>(4);
         data.add(gameName);
         data.add(gameMapName);
         data.add(String.valueOf(maxPl));
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.CREATE_GAME_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> requestLeaveGame() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.LEAVE_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.LEAVE_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestJoinGame(int gameId) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.JOIN_GAME_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>(2);
         data.add(String.valueOf(gameId));
         data.add(Model.getInstance().getPlayerName());
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.JOIN_GAME_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> requestDoMove(Direction dir) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.DO_MOVE_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>(1);
         data.add("" + dir.getValue());
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.DO_MOVE_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> requestStartGame() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.START_GAME_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.START_GAME_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestGameMap() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestPlaceBomb() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.PLACE_BOMB_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.PLACE_BOMB_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestJoinBotIntoGame() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.BOT_ADD_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>(1);
-        data.add("BOT_NAME");//TODO do bot name utility method!!!
+        data.add(Creator.createBotName());
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.BOT_ADD_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> requestRemoveBotFromGame() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.BOT_REMOVE_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.BOT_REMOVE_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestGameMapsList() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestIsGameStarted() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.GAME_STATUS_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.GAME_STATUS_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestGameInfo() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.GAME_INFO_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.GAME_INFO_MESSAGE_ID);
     }
 
-
-    public ProtocolMessage<Integer, String> requestAddChatMessage(String message) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.CHAT_ADD_MESSAGE_ID);
+    public ProtocolMessage<Integer, String>
+            requestAddChatMessage(String message) {
 
         List<String> data = new ArrayList<String>(1);
         data.add(message);
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.CHAT_ADD_MESSAGE_ID, data);
     }
-    
+
     public ProtocolMessage<Integer, String> requestNewChatMessages() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.CHAT_GET_MESSAGE_ID);
-        request.setData(emptyList);
-
-        return request;
+        return requestWithEmptyData(ProtocolConstants.CHAT_GET_MESSAGE_ID);
     }
 
-    public ProtocolMessage<Integer, String> requestDownloadGameMap(String gameMapName) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID);
+    public ProtocolMessage<Integer, String>
+            requestDownloadGameMap(String gameMapName) {
 
         List<String> data = new ArrayList<String>(1);
         data.add(gameMapName);
 
-        request.setData(data);
-
-        return request;
+        return request(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID, data);
     }
 
-    public ProtocolMessage<Integer, String> requestSetClientName(String playerName) {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.SET_NAME_MESSAGE_ID);
-
+    public ProtocolMessage<Integer, String>
+            requestSetClientName(String playerName) {
+        
         List<String> data = new ArrayList<String>(1);
         data.add(playerName);
 
-        request.setData(data);
+        return request(ProtocolConstants.SET_NAME_MESSAGE_ID, data);
+    }
+
+    public ProtocolMessage<Integer, String> requestServerDisconnect() {
+        return requestWithEmptyData(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+    }
+
+    private ProtocolMessage<Integer, String>
+            requestWithEmptyData(int messageId) {
+
+        ProtocolMessage<Integer, String> request
+                = new ProtocolMessage<Integer, String>();
+
+        request.setMessageId(messageId);
+        request.setData(emptyList);
 
         return request;
     }
 
-    public ProtocolMessage<Integer, String> requestServerDisconnect() {
-        ProtocolMessage<Integer, String> request = new ProtocolMessage<Integer, String>();
-        request.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+    private ProtocolMessage<Integer, String>
+            request(int messageId, List<String> data) {
 
-        request.setData(emptyList);
+        ProtocolMessage<Integer, String> request
+                = new ProtocolMessage<Integer, String>();
+
+        request.setMessageId(messageId);
+        request.setData(data);
 
         return request;
     }
