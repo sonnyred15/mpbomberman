@@ -13,10 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -25,44 +23,48 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.util.ImageUtilities;
 
 /**
  *
  * @author Mikhail Korovkin
  */
-public class Panel2 extends JPanel{
+@SuppressWarnings("serial")
+public class Panel2 extends JPanel {
+    private static final String BACKGROUND_RESOURCE_NAME = "/org/amse/bomberman/client"
+            + "/view/resources/cover2.png";
+    private Image image;
+
     private final int width = 640;
     private final int height = 480;
+
     private Color foreground = new Color(255, 100, 100);
-
-    private Image image;
-    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
-            "/view/resources/cover2.png";
-    private static final URL BACKGROUND_URL = Panel2.class.getResource(BACKGROUND_PATH);
-
+    
     private JPanel joinPanel;
     private CreateGameJPanel createPanel;
-
     private JTable table;
     private JScrollPane jsp;
-
     private JRadioButton createButton;
     private JRadioButton joinButton;
+
     public static final String CREATE_NAME = "New game";
     public static final String JOIN_NAME = "Join game";
 
-    public Panel2(){
+    public Panel2() {
         this.setSize(width, height);
         initComponents();
-        this.setVisible(true);
         this.initBackgroundImage();
+        this.setVisible(true);
     }
 
     public String getState() {
         if (createButton.isSelected()) {
             return CREATE_NAME;
-        } else return JOIN_NAME;
+        } else {
+            return JOIN_NAME;
+        }
     }
+
     public int getSelectedMaxPl() {
         int result = -1;
         if (table.getSelectedRow() != -1
@@ -74,7 +76,8 @@ public class Panel2 extends JPanel{
             return result;
         }
     }
-    public List<String> getSelectedGame() {
+
+    public List<String> getSelectedGame() {//TODO is really LIST?
         List<String> result = new ArrayList<String>();
         if (table.getSelectedRow() != -1
                 && table.getValueAt(table.getSelectedRow(), 0) != null) {
@@ -88,11 +91,12 @@ public class Panel2 extends JPanel{
         }
     }
 
-    public void setMaps(List<String> maps) {
+    public void setMaps(List<String> maps) { //TODO hardcoded string
         if (!maps.get(0).equals("No maps on server was founded.")) {
             createPanel.setMaps(maps);
         }
     }
+
     public void setGames(List<String> games) {
         MyTableModel tableModel = (MyTableModel) table.getModel();
         tableModel.clear();
@@ -110,12 +114,15 @@ public class Panel2 extends JPanel{
         }
         table.repaint();
     }
+
     public String getMap() {
         return this.createPanel.getMap();
     }
+
     public String getGameName() {
         return this.createPanel.getGameName();
     }
+
     public int getMaxPlayers() {
         return this.createPanel.getMaxPlayers();
     }
@@ -123,7 +130,7 @@ public class Panel2 extends JPanel{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+        if (this.image != null) {//actually image is BufferedImage so drawImage will return true.
             g.drawImage(this.image, 0, 0, null);
         }
     }
@@ -136,11 +143,10 @@ public class Panel2 extends JPanel{
 
         // initialization of MyTable with list of games
         table = new GamesTable();
-        
+
         // JoinPanel
         joinPanel = new JPanel();
-        jsp = new JScrollPane(table, JScrollPane
-                .VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setPreferredSize(new Dimension(width - 150, height - 170));
         joinPanel.add(jsp);
         joinPanel.setOpaque(false);
@@ -166,10 +172,12 @@ public class Panel2 extends JPanel{
         createButton.setSelected(true);
         table.setEnabled(false);
     }
+
     private void initRadioButtons() {
         // create JRadioButtons and set Actions to it
         createButton = new JRadioButton("New game");
-        createButton.addActionListener(new ActionListener(){
+        createButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(false);
                 createPanel.setEnabled(true);
@@ -181,7 +189,8 @@ public class Panel2 extends JPanel{
         createButton.setOpaque(false);
         createButton.setForeground(foreground);
         joinButton = new JRadioButton("Join game");
-        joinButton.addActionListener(new ActionListener(){
+        joinButton.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(true);
                 createPanel.setEnabled(false);
@@ -198,19 +207,19 @@ public class Panel2 extends JPanel{
         selectGroup.add(createButton);
         selectGroup.add(joinButton);
     }
+
     private void initBackgroundImage() {
-        try{
-            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
-            this.image =
-                    this.image.getScaledInstance(this.getWidth(),
-                                                 this.getHeight(),
-                                                 Image.SCALE_SMOOTH);
-        }catch (IOException ex){
+        try {
+            this.image = ImageUtilities.initImage(BACKGROUND_RESOURCE_NAME,
+                                                  this.getWidth(),
+                                                  this.getHeight());
+        } catch (IOException ex) {
             Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
             this.image = null;
         }
     }
 
+    @SuppressWarnings("serial")
     private class GamesTable extends JTable {
 
         public GamesTable() {
@@ -218,6 +227,7 @@ public class Panel2 extends JPanel{
             this.setSizes();
             this.setDoubleClick();
         }
+
         private void setSizes() {
             this.getTableHeader().setReorderingAllowed(false);
             columnModel.getColumn(0).setMaxWidth(40);
@@ -234,6 +244,7 @@ public class Panel2 extends JPanel{
             columnModel.getColumn(3).setResizable(false);
             columnModel.getColumn(4).setResizable(false);
         }
+
         private void setDoubleClick() {
             this.addMouseListener(new MouseAdapter() {
 
@@ -244,14 +255,14 @@ public class Panel2 extends JPanel{
                         if (clicks > 1) {
                             if (getValueAt(getSelectedRow(), 0) != null) {
                                 //-------------------------------------------------
-                                WizardController.throwWizardAction
-                                        (new WizardEvent(BomberWizard.EVENT_JOIN));
+                                WizardController.throwWizardAction(new WizardEvent(BomberWizard.EVENT_JOIN));
                             }
                         }
                     }
                 }
             });
         }
+
         @Override
         public void setEnabled(boolean b) {
             super.setEnabled(b);
@@ -262,39 +273,48 @@ public class Panel2 extends JPanel{
                 this.setForeground(Color.white);
             } else {
                 this.setBackground(Color.white);
-                this.tableHeader.setBackground(new Color(238,238,238));
-                this.getTableHeader().setForeground(new Color(51,51,51));
-                this.setForeground(new Color(51,51,51));
+                this.tableHeader.setBackground(new Color(238, 238, 238));
+                this.getTableHeader().setForeground(new Color(51, 51, 51));
+                this.setForeground(new Color(51, 51, 51));
             }
 
         }
     }
+
+    @SuppressWarnings("serial")
     private class MyTableModel extends AbstractTableModel {
+
         private String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         private Object[][] data = new Object[50][columnNames.length];
 
         public int getRowCount() {
             return data.length;
         }
+
         public int getColumnCount() {
             return columnNames.length;
         }
+
         @Override
         public String getColumnName(int col) {
             return columnNames[col];
         }
+
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
+
         @Override
         public void setValueAt(Object value, int row, int col) {
             data[row][col] = value;
             fireTableCellUpdated(row, col);
         }
+
         public void clear() {
             data = new Object[50][columnNames.length];
         }

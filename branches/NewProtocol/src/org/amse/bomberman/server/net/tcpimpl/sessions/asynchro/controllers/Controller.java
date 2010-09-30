@@ -21,7 +21,6 @@ import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.protocol.RequestExecutor;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
 
@@ -49,13 +48,7 @@ public class Controller implements RequestExecutor {
 
     public void sendGames() {
         List<Game> games = this.session.getGameStorage().getGamesList();
-
-        if(games.isEmpty()) {
-            System.out.println("Session: sendGames info. No unstarted games finded.");
-            sendToClient(protocol.noUnstartedGames());//TODO converter must do it
-        } else {
-            sendToClient(protocol.unstartedGamesList(games));//TODO converter must do it
-        }
+        sendToClient(protocol.unstartedGamesList(games));
     }
 
     public void tryCreateGame(List<String> args) throws InvalidDataException {// gameName mapName maxPlayers

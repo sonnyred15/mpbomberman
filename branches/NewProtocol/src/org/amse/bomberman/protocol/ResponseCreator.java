@@ -1,7 +1,6 @@
 package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.util.Creator;
 
@@ -34,19 +33,6 @@ public class ResponseCreator {
         this.converter = converter;
     }
 
-    public ProtocolMessage<Integer, String> illegalState(String action,
-                                                         String stateName) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID);
-
-        List<String> data = new ArrayList<String>(1);
-        data.add("Can`t " + action + " in '" + stateName + "' state.");
-        
-        message.setData(data);
-
-        return message;
-    }
-
     /**
      * Method that returns "ok" message to send for client
      * with specified protocol caption and
@@ -58,15 +44,7 @@ public class ResponseCreator {
      * @return
      */
     public ProtocolMessage<Integer, String> ok(int messageId, String msg) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(messageId);
-
-        List<String> data = new ArrayList<String>(1);
-        data.add(msg);
-
-        message.setData(data);
-
-        return message;
+        return singleMessage(messageId, msg);
     }
 
     /**
@@ -79,63 +57,32 @@ public class ResponseCreator {
      *
      * @return
      */
-    public ProtocolMessage<Integer, String> notOk(int messageId, String msg) {// TODO  no difference between it and ok(...)
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(messageId);
-
-        List<String> data = new ArrayList<String>(1);
-        data.add(msg);
-
-        message.setData(data);
-
-        return message;
+    public ProtocolMessage<Integer, String> notOk(int messageId, String msg) {
+        return singleMessage(messageId, msg);
     }
 
-    /**
-     * Method that returns "no unstarted games" message to send to cient.
-     *
-     * @return "no unstarted games" message to send to cient.
-     */
-    public ProtocolMessage<Integer, String> noUnstartedGames() {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAMES_LIST_MESSAGE_ID);
+    public ProtocolMessage<Integer, String> illegalState(String action,
+                                                         String stateName) {
+        String message = "Can`t " + action + " in '" + stateName + "' state.";
 
-        List<String> data = new ArrayList<String>(1);
-        data.add("No unstarted games finded.");
-
-        message.setData(data);
-
-        return message;
+        return singleMessage(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID, message);
     }
 
-    /**
-     * Method that returns message with unstarted games list to send to cient.
-     *
-     * @param games list of all games(started and unstarted)
-     * @return message with unstarted games list to send to cient.
-     */
     public ProtocolMessage<Integer, String> unstartedGamesList(List<Game> games) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAMES_LIST_MESSAGE_ID);
+        int messageId = ProtocolConstants.GAMES_LIST_MESSAGE_ID;
 
-        List<String> data = new ArrayList<String>(games.size());
-        data.addAll(converter.convertUnstartedGames(games));
-
-        message.setData(data);
-
-        return message;
+        List<String> data = null;
+        if (games.isEmpty()) {
+            return singleMessage(messageId, "No unstarted games finded.");
+        } else {
+            data = new ArrayList<String>(games.size());
+            data.addAll(converter.convertUnstartedGames(games));
+            return message(messageId, data);
+        }
     }
 
     public ProtocolMessage<Integer, String> chatMessage(String chatMessage) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.CHAT_ADD_MESSAGE_ID);
-
-        List<String> data = new ArrayList<String>(1);
-        data.add(chatMessage);
-
-        message.setData(data);
-
-        return message;
+        return singleMessage(ProtocolConstants.CHAT_ADD_MESSAGE_ID, chatMessage);
     }
 
     /**
@@ -148,12 +95,7 @@ public class ResponseCreator {
      * gameMap info with exlosions and client player status.
      */
     public ProtocolMessage<Integer, String> gameMapInfo(List<String> data) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID);
-
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID, data);
     }
 
     /**
@@ -168,12 +110,9 @@ public class ResponseCreator {
      * contain remark about error.
      */
     public ProtocolMessage<Integer, String> downloadGameMap(String gameMapName) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>();
-        int[][] ret = null;
 
+        int[][] ret = null;
         try {
             ret = Creator.createMapAndGetField(gameMapName);
 
@@ -182,21 +121,19 @@ public class ResponseCreator {
 
         } catch (FileNotFoundException ex) {
             System.out.println("Session: sendMap warning. "
-                               + "Client tryed to download map, canceled. "
-                               + "Map wasn`t founded on server." + " Map=" + gameMapName + " "
-                               + ex.getMessage());
+                    + "Client tryed to download map, canceled. "
+                    + "Map wasn`t founded on server." + " Map=" + gameMapName + " "
+                    + ex.getMessage());
             data.add("No such map on server.");
         } catch (IOException ex) {
             System.out.println("Session: sendMap error. "
-                               + "Client tryed to download map, canceled. "
-                               + "Error on server side while loading map." + " Map=" + gameMapName
-                               + " " + ex.getMessage());
+                    + "Client tryed to download map, canceled. "
+                    + "Error on server side while loading map." + " Map=" + gameMapName
+                    + " " + ex.getMessage());
             data.add("Error on server side, while loading map.");
         }
 
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID, data);
     }
 
     /**
@@ -209,17 +146,11 @@ public class ResponseCreator {
      * that contains game status.
      */
     public ProtocolMessage<Integer, String> sendGameStatus(Game game) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAME_STATUS_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>();
         data.add(converter.convertGameStartStatus(game));
 
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.GAME_STATUS_MESSAGE_ID , data);
     }
-
 
     /**
      * Method that returns message to send to client
@@ -229,9 +160,6 @@ public class ResponseCreator {
      * gameMaps.
      */
     public ProtocolMessage<Integer, String> sendGameMapsList() {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID);
-
         List<String> data = converter.convertGameMapsList();//TODO must NEVER return null but returns
 
         if (data.isEmpty()) {
@@ -239,12 +167,10 @@ public class ResponseCreator {
             data.add("No maps on server was founded.");
         } else {
             System.out.println("Session: sended maps list to client. Maps count="
-                               + (data.size() - 1));
+                    + (data.size() - 1));
         }
 
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.GAME_MAPS_LIST_MESSAGE_ID, data);
     }
 
     /**
@@ -257,15 +183,10 @@ public class ResponseCreator {
      * that contains game info.
      */
     public ProtocolMessage<Integer, String> sendGameInfo(Game game, GamePlayer player) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.GAME_INFO_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>();
         data.addAll(converter.convertGameInfo(game, player));
 
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.GAME_INFO_MESSAGE_ID, data);
     }
 
     /**
@@ -278,28 +199,34 @@ public class ResponseCreator {
      * client game`s players stats.
      */
     public ProtocolMessage<Integer, String> sendPlayersStats(Game game) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID);
-
         List<String> data = new ArrayList<String>();
 
         data.addAll(converter.convertPlayersStats(game.getCurrentPlayers()));
-        
-        message.setData(data);
 
-        return message;
+        return message(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> notifyMessages(List<String> data) {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-        message.setMessageId(ProtocolConstants.NOTIFICATION_MESSAGE_ID);
-
-        message.setData(data);
-
-        return message;
+        return message(ProtocolConstants.NOTIFICATION_MESSAGE_ID, data);
     }
 
     public Converter<String> getConverter() {
         return this.converter;
+    }
+
+    private ProtocolMessage<Integer, String> message(int messageId, List<String> data) {
+        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+        message.setMessageId(messageId);
+
+        message.setData(data);
+
+        return message;
+    }
+
+    private ProtocolMessage<Integer, String> singleMessage(int messageId, String msg) {
+        List<String> data = new ArrayList<String>(1);
+        data.add(msg);
+
+        return message(messageId, data);
     }
 }

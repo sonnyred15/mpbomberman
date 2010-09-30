@@ -35,7 +35,7 @@ public class JoinGameTest {
     }
 
     @Test
-    public void JoinGameTest() throws Exception {
+    public void joinIllegalGameTest() throws Exception {
         ProtocolMessage<Integer, String> request = requestCreator.requestJoinGame(0);
         client.sendRequest(request);
 
@@ -46,5 +46,32 @@ public class JoinGameTest {
         assertEquals(1, data.size());
         String message = response.getData().get(0);
         assertEquals("No such game.", message);
+    }
+
+    @Test
+    public void joinGameTest() throws Exception {
+        server.getGameStorage().createGame(new Utilities.FakeGamePlayer(), "1.map", "game", -1);
+
+        ProtocolMessage<Integer, String> request = requestCreator.requestJoinGame(0);
+        client.sendRequest(request);
+
+        ProtocolMessage<Integer, String> response = client.receiveResult();
+        assertEquals(ProtocolConstants.JOIN_GAME_MESSAGE_ID, (int) response.getMessageId());
+
+        List<String> data = response.getData();
+        assertEquals(1, data.size());
+        String message = response.getData().get(0);
+        assertEquals("Joined.", message);
+
+        request = requestCreator.requestJoinGame(0);
+        client.sendRequest(request);
+
+        response = client.receiveResult();
+        assertEquals(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID, (int) response.getMessageId());
+
+        data = response.getData();
+        assertEquals(1, data.size());
+        message = response.getData().get(0);
+        assertEquals("Can`t join game in 'Lobby' state.", message);
     }
 }

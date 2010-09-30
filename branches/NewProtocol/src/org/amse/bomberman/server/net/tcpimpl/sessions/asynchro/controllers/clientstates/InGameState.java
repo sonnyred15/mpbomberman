@@ -20,7 +20,7 @@ import org.amse.bomberman.util.Constants.Direction;
  */
 public class InGameState extends AbstractClientState {
 
-    private final MyTimer timer = new MyTimer(System.currentTimeMillis());
+    private final MyTimer timer = new MyTimer(0);
     private static final String STATE_NAME = "Game";
     final Controller controller;
     final Game game;

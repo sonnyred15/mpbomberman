@@ -1,14 +1,8 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.protocol;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
 //~--- JDK imports ------------------------------------------------------------

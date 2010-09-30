@@ -32,7 +32,7 @@ public class StartGameTest {
     }
 
     @Test
-    public void startGameTest() throws Exception {
+    public void startGameNotJoinedTest() throws Exception {
         ProtocolMessage<Integer, String> request = requestCreator.requestStartGame();
         client.sendRequest(request);
 

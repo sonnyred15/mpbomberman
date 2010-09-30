@@ -46,8 +46,9 @@ public class Main {
                 connector.sendRequest(exitMessage);
             } catch (Exception ex) {
                 //ignore
+            } finally {
+                connector.closeConnection();
             }
-            connector.closeConnection();
         }
     }
 }

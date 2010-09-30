@@ -69,7 +69,12 @@ public class AsynchroConnector implements Connector {
 
     public synchronized void closeConnection() {
         try {
-            inputThread.interrupt();
+            if(inputThread != null) {
+                inputThread.interrupt();
+                if(socket != null) {
+                    socket.shutdownInput();
+                }
+            }
             IOUtilities.close(out);
             if(socket != null && !socket.isClosed()) {
                 socket.close();

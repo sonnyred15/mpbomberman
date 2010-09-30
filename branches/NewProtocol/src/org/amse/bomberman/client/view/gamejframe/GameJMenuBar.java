@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 /**
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class GameJMenuBar extends JMenuBar {
 
     private JMenu game = new JMenu("Game");
@@ -40,7 +41,8 @@ public class GameJMenuBar extends JMenuBar {
         this.add(game);
     }
 
-    public static class LeaveAction extends AbstractAction {
+    @SuppressWarnings("serial")
+public static class LeaveAction extends AbstractAction {
 
         public LeaveAction() {
             putValue(NAME, "Leave");

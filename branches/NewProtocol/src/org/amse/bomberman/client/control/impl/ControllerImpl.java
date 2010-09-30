@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 /**
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
 public class ControllerImpl implements Controller {
 
@@ -126,8 +127,7 @@ public class ControllerImpl implements Controller {
     }
 
     public void requestCreateGame(String gameName, String mapName,
-                                  int maxPlayers)
-            throws NetException {
+                                  int maxPlayers) throws NetException {
         sendRequest(protocol.requestCreateGame(gameName,
                                                mapName,
                                                maxPlayers));
@@ -193,11 +193,12 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestSetClientName(playerName));
     }
 
+    //TODO REDESIGN PLEASE
     //Actually, controller must know about models that need some result.
     //After receive controller must parse result, and set data to proper model.
     //And concrete model must notify View listener about changes,
     //after that, View must self take info from model. That is the MVC.
-    //...Difference betwenn current realization is that listener must not parse
+    //...Difference between current realization is that listener must not parse
     //response themselfs. They don`t need to know about ProtocolMessage at all!!
     public void receivedRequestResult(ProtocolMessage<Integer, String> response) {
         if(this.responseListener != null) {

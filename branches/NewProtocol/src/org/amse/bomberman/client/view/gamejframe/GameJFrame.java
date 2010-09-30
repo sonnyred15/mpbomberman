@@ -24,12 +24,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.view.ResultsTable;
+import org.amse.bomberman.util.ImageUtilities;
 
 /**
  *
  * @author Mikhail Korovkin
  */
-public class GameJFrame extends JFrame implements IView{
+@SuppressWarnings("serial")
+public class GameJFrame extends JFrame implements IView {
+
     private GamePanel gamePanel;
     private BonusLabel livesLabel;
     private BonusLabel bombsLabel;
@@ -55,12 +58,12 @@ public class GameJFrame extends JFrame implements IView{
             .getClassLoader().getResource(B_RADIUS_ICON_PATH));
     private static ImageIcon ICON_BONUS_B_COUNT = new ImageIcon(Main.class
             .getClassLoader().getResource(B_COUNT_ICON_PATH));
-    
+
     public GameJFrame() {
         super("BomberMan");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocation(400, 100);
-        
+
         this.setResizable(true);
         this.setVisible(true);
     }
@@ -73,8 +76,8 @@ public class GameJFrame extends JFrame implements IView{
             if (isFirstInit) {
                 int mapSize = Model.getInstance().getMap().getSize();
                 if (mapSize < GamePanel.DEFAULT_RANGE) {
-                    width = mapSize*GamePanel.CELL_SIZE + 50 + infoTextWidth;
-                    height = mapSize*GamePanel.CELL_SIZE + 160;
+                    width = mapSize * GamePanel.CELL_SIZE + 50 + infoTextWidth;
+                    height = mapSize * GamePanel.CELL_SIZE + 160;
                 }
                 this.initComponents();
                 isFirstInit = false;
@@ -173,8 +176,8 @@ public class GameJFrame extends JFrame implements IView{
     private void updateHistory() {
         List<String> history = Model.getInstance().getHistory();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < history.size(); i ++) {
-            if (history.size() - i < 4 ) {
+        for (int i = 0; i < history.size(); i++) {
+            if (history.size() - i < 4) {
                 sb.append("-");
                 sb.append(history.get(i));
                 sb.append("\n");
@@ -193,16 +196,16 @@ public class GameJFrame extends JFrame implements IView{
         return infoTA;
     }
 
+    @SuppressWarnings("serial")
     private class BonusLabel extends JLabel {
+
         private ImageIcon image;
         private int count;
-
-        private final Color bg = new Color(238,238,238);
-
+        private final Color bg = new Color(238, 238, 238);
         private final int size = 32;
 
         private BonusLabel(ImageIcon icon, int firstCount) {
-            image = new ImageIcon(getScaledImage(icon.getImage(),size,size,bg));
+            image = new ImageIcon(getScaledImage(icon.getImage(), size, size, bg));
 
             this.setIcon(image);
             this.setText("x" + firstCount);
@@ -226,6 +229,7 @@ public class GameJFrame extends JFrame implements IView{
             //this.setBackground(bg);
         }
     }
+
     /**
      * Resizes an image using a Graphics2D object backed by a BufferedImage.
      * @param srcImg - source image to scale
@@ -234,13 +238,13 @@ public class GameJFrame extends JFrame implements IView{
      * @param background - color for background
      * @return - the new resized image
      */
-    private static Image getScaledImage(Image srcImg, int w, int h, Color background){
-        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2 = resizedImg.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION
-                , RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(srcImg, 0, 0, w, h, background, null);
-        g2.dispose();
-        return resizedImg;
+    private static Image getScaledImage(Image srcImg, int w, int h, Color background) {
+//        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+//        Graphics2D g2 = resizedImg.createGraphics();
+//        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//        g2.drawImage(srcImg, 0, 0, w, h, background, null);
+//        g2.dispose();
+//        return resizedImg;
+        return ImageUtilities.rescaleImage(srcImg, w, h);
     }
 }

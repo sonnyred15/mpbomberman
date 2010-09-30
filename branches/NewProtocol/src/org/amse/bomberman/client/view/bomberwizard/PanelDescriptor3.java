@@ -18,7 +18,7 @@ public class PanelDescriptor3 extends PanelDescriptor {
     public void doBeforeDisplay() {
         try {
             Panel3 panel3 = (Panel3) this.getPanel();
-            panel3.clean();
+            panel3.cleanChatArea();
             ControllerImpl.getInstance().requestGameInfo();
         } catch (NetException ex) {
             ControllerImpl.getInstance().lostConnection(ex.getMessage());

@@ -3,7 +3,6 @@ package org.amse.bomberman.client.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.model.*;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.view.IView;
@@ -14,11 +13,10 @@ import org.amse.bomberman.util.impl.Parser;
 
 /**
  *
- * @author Michail Korovkin
+ * @author Mikhail Korovkin
  */
 public class Model implements IModel, RequestResultListener{
     private static IModel model= null;
-    private Connector connector;
     private BombMap map;
     private IPlayer player = Player.getInstance();
     private List<IView> listener = new ArrayList<IView>();

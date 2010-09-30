@@ -9,6 +9,7 @@ package org.amse.bomberman.protocol;
  * @author chibis
  */
 public class InvalidDataException extends Exception {
+    private static final long serialVersionUID = 1L;
     private final int messageId;
 
     /**

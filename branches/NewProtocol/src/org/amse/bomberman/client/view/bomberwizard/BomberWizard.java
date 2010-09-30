@@ -36,6 +36,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         this.setCurrentJPanel(IDENTIFIER1);
 
         ControllerImpl.getInstance().setReceiveInfoListener(this);
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 

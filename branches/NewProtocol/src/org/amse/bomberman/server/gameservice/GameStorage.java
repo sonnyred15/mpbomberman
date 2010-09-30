@@ -42,8 +42,12 @@ public class GameStorage implements GameChangeListener {
      * @throws IOException if IO errors occurs while creating gameMap.
      */
     public Game createGame(GamePlayer creator, String gameMapName,
-                           String GameName, int maxPlayers) 
+                           String gameName, int maxPlayers)
                            throws FileNotFoundException, IOException {
+        if(creator == null || gameMapName == null || gameName == null) {
+            throw new IllegalArgumentException("Args can`t be null.");
+        }
+
         File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
 
         int extensionIndex = gameMapName.indexOf(".map");
@@ -66,7 +70,7 @@ public class GameStorage implements GameChangeListener {
             throw new IOException("Wrong gameMap xml file." + ex.getMessage());
         }
 
-        Game game = new Game(creator, gameMap, GameName, maxPlayers);
+        Game game = new Game(creator, gameMap, gameName, maxPlayers);
         game.addGameChangeListener(this);
         this.addGame(game);
 
