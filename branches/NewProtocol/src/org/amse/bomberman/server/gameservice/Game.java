@@ -99,12 +99,12 @@ public class Game implements ModelListener {
     /**
      * This method tryes to move player with specified ID with defined direction.
      * <p>Note that if game is not started method will return false.
-     * @param playerID ID of player to move.
+     * @param playerId ID of player to move.
      * @param direction moving direction.
      * @return true if move was done. false if game is not started
      * or move was not done.
      */
-    public boolean tryDoMove(int playerID, Direction direction) {
+    public boolean tryDoMove(int playerId, Direction direction) {
         //all synchronization of such actions as Move, PlaceBomb etc must be provided by Model
         if(!this.started){
             return false;
@@ -112,7 +112,7 @@ public class Game implements ModelListener {
 
         boolean moved = false;
         
-        ModelPlayer player = this.model.getPlayer(playerID);
+        ModelPlayer player = this.model.getPlayer(playerId);
         moved = model.tryDoMove(player, direction);
 
         if (moved) {
@@ -180,7 +180,7 @@ public class Game implements ModelListener {
 
     /**
      * Tryes to place bomb. If game is not started returns false.
-     * @param playerID ID of player that is trying to place bomb.
+     * @param playerId ID of player that is trying to place bomb.
      * @return true if bomb was placed, false otherwise.
      */
     public boolean tryPlaceBomb(int playerID) {
@@ -322,7 +322,7 @@ public class Game implements ModelListener {
 
     /**
      * Return the reference to Player that have defined ID.
-     * @param playerID id of player.
+     * @param playerId id of player.
      * @return the reference to Player that have defined ID.
      */
     public ModelPlayer getPlayer(int playerID) {

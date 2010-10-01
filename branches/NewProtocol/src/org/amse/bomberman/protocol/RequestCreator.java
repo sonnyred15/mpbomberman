@@ -99,7 +99,7 @@ public class RequestCreator {
         return request(ProtocolConstants.CHAT_ADD_MESSAGE_ID, data);
     }
 
-    public ProtocolMessage<Integer, String> requestNewChatMessages() {
+    public ProtocolMessage<Integer, String> requestGetNewChatMessages() {
         return requestWithEmptyData(ProtocolConstants.CHAT_GET_MESSAGE_ID);
     }
 

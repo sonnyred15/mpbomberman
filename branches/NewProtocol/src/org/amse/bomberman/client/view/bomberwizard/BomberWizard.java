@@ -147,13 +147,14 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 panel3.setNewMessages(data);
             }
             return;
-        }else if (messageId == ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID) {
-            if (current instanceof Panel3) {
-                Panel3 panel3 = (Panel3) current;
-                panel3.setNewMessages(data);
-            }
-            return;
         }
+//        else if (messageId == ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID) {
+//            if (current instanceof Panel3) {
+//                Panel3 panel3 = (Panel3) current;
+//                panel3.setNewMessages(data);
+//            }
+//            return;
+//        }
     }
 
     @Override

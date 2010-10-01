@@ -39,8 +39,7 @@ public class InGameState extends AbstractClientState {
                     + "Moves allowed only every "
                     + Constants.GAME_STEP_TIME + "ms.");
 
-            return protocol.notOk( //TODO it must not be ok =)
-                    ProtocolConstants.DO_MOVE_MESSAGE_ID,
+            return protocol.notOk(ProtocolConstants.DO_MOVE_MESSAGE_ID,
                     "false");
         }
 
@@ -72,17 +71,17 @@ public class InGameState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> getGamePlayersStats() {
-        return protocol.sendPlayersStats(game);
+        return protocol.playersStats(game);
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameStatus() {
-        return protocol.sendGameStatus(game);
+        return protocol.gameStatus(game);
     }
     
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo(game, controller.getGamePlayer());
+        return protocol.gameInfo(game, controller.getGamePlayer());
     }
 
     @Override

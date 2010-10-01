@@ -17,7 +17,6 @@ import org.amse.bomberman.protocol.RequestCreator;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -181,8 +180,8 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestAddChatMessage(message));
     }
 
-    public void requestNewChatMessages() throws NetException {
-        sendRequest(protocol.requestNewChatMessages());
+    public void requestGetNewChatMessages() throws NetException {
+        sendRequest(protocol.requestGetNewChatMessages());
     }
 
     public void requestDownloadMap(String gameMapName) throws NetException {

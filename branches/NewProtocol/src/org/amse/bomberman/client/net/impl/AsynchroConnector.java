@@ -174,7 +174,7 @@ public class AsynchroConnector implements Connector {
 
             private void processNotification(String string) throws NetException {
                 if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    ControllerImpl.getInstance().requestNewChatMessages();
+                    ControllerImpl.getInstance().requestGetNewChatMessages();
                 } else if (string.equals(ProtocolConstants.UPDATE_GAMES_LIST)) {
                     ControllerImpl.getInstance().requestGamesList();
                 } else if (string.equals(ProtocolConstants.UPDATE_GAME_INFO)) {
@@ -182,7 +182,7 @@ public class AsynchroConnector implements Connector {
                 } else if (string.equals(ProtocolConstants.UPDATE_GAME_MAP)) {
                     ControllerImpl.getInstance().requestGameMap();
                 } else if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    ControllerImpl.getInstance().requestNewChatMessages();
+                    ControllerImpl.getInstance().requestGetNewChatMessages();
                 }
             }
         }

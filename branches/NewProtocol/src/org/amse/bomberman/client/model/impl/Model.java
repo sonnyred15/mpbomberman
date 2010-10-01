@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.amse.bomberman.client.model.*;
-import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.view.IView;
 import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.protocol.ProtocolConstants;
@@ -106,7 +105,7 @@ public class Model implements IModel, RequestResultListener{
                        , "Game ended.", JOptionPane.INFORMATION_MESSAGE);
                 escapeGame();
             }
-        } else if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {//TODO hardcoded string
             if (!data.get(0).equals("No new messages.")) {
                 history.addAll(data);
                 this.updateListeners();

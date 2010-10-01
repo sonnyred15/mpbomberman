@@ -108,7 +108,7 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new TcpServer(port);//TODO mb make fabric?
+            server = new TcpServer(port);
             server.start();
             infoFrame.setServer(server);
             btnStatus.setEnabled(true);

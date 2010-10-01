@@ -47,7 +47,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
         this.playerId = -1;
     }
 
-    public void parametersChanged(Game game) {//TODO BIG! send some to client
+    public void parametersChanged(Game game) {
         this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
                     ProtocolConstants.UPDATE_GAME_INFO));
     }
@@ -60,7 +60,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
         }
     }
 
-    public void gameTerminated(Game game) { //TODO change controller state reset fields
+    public void gameTerminated(Game game) {
         this.controller.setState(new NotJoinedState(controller));
         this.resetId();
         if (!game.isGameOwner(this)) {
@@ -70,7 +70,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
     }
 
     public void newChatMessage(String message) {
-        this.controller.sendToClient(protocol.chatMessage(message));//TODO WILL NOT WORK AS YOU THINK =)
+        this.controller.sendToClient(protocol.chatMessage(message));
     }
 
     public void fieldChanged() {
@@ -79,10 +79,10 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
     }
 
     public void gameEnded(Game game) {
-        this.controller.sendToClient(protocol.sendGameEnd(game));
+        this.controller.sendToClient(protocol.gameEnd(game));
     }
 
     public void statsChanged(Game game) {
-        this.controller.sendToClient(protocol.sendPlayersStats(game));
+        this.controller.sendToClient(protocol.playersStats(game));
     }
 }

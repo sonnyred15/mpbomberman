@@ -30,7 +30,7 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
  */
 public class Controller implements RequestExecutor {
 
-    private final ResponseCreator protocol = new ResponseCreator();
+    private final ResponseCreator protocol = new ResponseCreator();//TODO inject from session
     private final NetGamePlayer player = new NetGamePlayer(this);
     //
     private volatile ClientState state = new NotJoinedState(this);
@@ -161,7 +161,7 @@ public class Controller implements RequestExecutor {
         }
 
         Iterator<String> iterator = args.iterator();
-        String gameMapName = iterator.next() + ".map"; //TODO change this on client and server
+        String gameMapName = iterator.next();
 
         sendToClient(protocol.downloadGameMap(gameMapName));
     }
@@ -172,14 +172,14 @@ public class Controller implements RequestExecutor {
     }
 
     public void sendGameMapsList() {
-        sendToClient(protocol.sendGameMapsList());//TODO converter must do it
+        sendToClient(protocol.gameMapsList());//TODO converter must do it
     }
 
     public void tryAddBot(List<String> args) throws InvalidDataException {
         if(args.size() != 1) {
             System.out.println("Session: tryAddBot warning. Not enough arguments. Cancelled.");
             throw new InvalidDataException(ProtocolConstants.BOT_ADD_MESSAGE_ID,
-                                           "Not enough arguments.");
+                                           "Wrong number of arguments.");
         }
 
         Iterator<String> iterator = args.iterator();
@@ -194,22 +194,22 @@ public class Controller implements RequestExecutor {
     }
 
     public void addMessageToChat(List<String> args) throws InvalidDataException {
-        if(args.isEmpty()) {
+        if(args.size() != 1) {
             System.out.println("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
 
             throw new InvalidDataException(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
-                                           "Not enough arguments.");
+                                           "Wrong number of arguments.");
         }
 
-        sendToClient(protocol.chatMessage(args.get(0)));//TODO WORKS WRONG!!
+        sendToClient(state.addMessageToChat(args.get(0)));
     }
 
     public void sendNewMessagesFromChat() {
-        sendToClient(state.getNewMessagesFromChat()); //BIG TODO NOT WORKS
+        sendToClient(state.getNewMessagesFromChat());
     }
 
     public void tryRemoveBot() {
-        sendToClient(state.removeBot()); //BIG TODO NOT WORK
+        sendToClient(state.removeBot()); //TODO BIG! NOT WORK
     }
 
     public void sendGamePlayersStats() {        

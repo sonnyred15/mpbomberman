@@ -121,20 +121,20 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> addMessageToChat(String message) {
-        this.game.addMessageToChat(message);
+        this.game.addMessageToChat(controller.getGamePlayer().getNickName() +
+                ": " + message);
         return protocol.ok(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
                 "Added.");
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getNewMessagesFromChat() {
-        //TODO BIG
-        return super.getNewMessagesFromChat();
+    public ProtocolMessage<Integer, String> getNewMessagesFromChat() {        
+        return protocol.chatMessage("No new messages.");
     }
 
     @Override
     public ProtocolMessage<Integer, String> getGameInfo() {
-        return protocol.sendGameInfo(game, controller.getGamePlayer());
+        return protocol.gameInfo(game, controller.getGamePlayer());
     }
 
     @Override
@@ -163,7 +163,7 @@ public class InLobbyState extends AbstractClientState {
 
     @Override
     public ProtocolMessage<Integer, String> getGameStatus() {
-        return protocol.sendGameStatus(game);
+        return protocol.gameStatus(game);
     }
 
     @Override

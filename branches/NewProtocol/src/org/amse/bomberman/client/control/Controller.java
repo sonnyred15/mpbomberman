@@ -48,7 +48,7 @@ public interface Controller {
 
     public void requestSendChatMessage(String message) throws NetException;
 
-    public void requestNewChatMessages() throws NetException;
+    public void requestGetNewChatMessages() throws NetException;
 
     public void requestDownloadMap(String gameMapName) throws NetException;
 

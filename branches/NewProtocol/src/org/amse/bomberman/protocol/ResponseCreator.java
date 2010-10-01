@@ -80,7 +80,7 @@ public class ResponseCreator {
     }
 
     public ProtocolMessage<Integer, String> chatMessage(String chatMessage) {
-        return singleMessage(ProtocolConstants.CHAT_ADD_MESSAGE_ID, chatMessage);
+        return singleMessage(ProtocolConstants.CHAT_GET_MESSAGE_ID, chatMessage);
     }
 
     /**
@@ -143,7 +143,7 @@ public class ResponseCreator {
      * @return message to send to client
      * that contains game status.
      */
-    public ProtocolMessage<Integer, String> sendGameStatus(Game game) {
+    public ProtocolMessage<Integer, String> gameStatus(Game game) {
         List<String> data = new ArrayList<String>();
         data.add(converter.convertGameStartStatus(game));
 
@@ -157,7 +157,7 @@ public class ResponseCreator {
      * @return message that contains availiable
      * gameMaps.
      */
-    public ProtocolMessage<Integer, String> sendGameMapsList() {
+    public ProtocolMessage<Integer, String> gameMapsList() {
         List<String> data = converter.convertGameMapsList();
 
         if (data.isEmpty()) {
@@ -180,7 +180,7 @@ public class ResponseCreator {
      * @return message to send to client
      * that contains game info.
      */
-    public ProtocolMessage<Integer, String> sendGameInfo(Game game, GamePlayer player) {
+    public ProtocolMessage<Integer, String> gameInfo(Game game, GamePlayer player) {
         List<String> data = new ArrayList<String>();
         data.addAll(converter.convertGameInfo(game, player));
 
@@ -196,7 +196,7 @@ public class ResponseCreator {
      * @return message to send to client that contains
      * client game`s players stats.
      */
-    public ProtocolMessage<Integer, String> sendPlayersStats(Game game) {
+    public ProtocolMessage<Integer, String> playersStats(Game game) {
         List<String> data = new ArrayList<String>();
 
         data.addAll(converter.convertPlayersStats(game.getPlayersStats()));
@@ -204,7 +204,7 @@ public class ResponseCreator {
         return message(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID, data);
     }
 
-    public ProtocolMessage<Integer, String> sendGameEnd(Game game) {
+    public ProtocolMessage<Integer, String> gameEnd(Game game) {
         List<String> data = new ArrayList<String>();
 
         data.addAll(converter.convertPlayersStats(game.getPlayersStats()));
