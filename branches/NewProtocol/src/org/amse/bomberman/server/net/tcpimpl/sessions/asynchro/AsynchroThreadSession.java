@@ -33,6 +33,7 @@ import org.amse.bomberman.protocol.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.IOUtilities;
 
 /**
  * This class represents asynchronous session between client and server
@@ -43,15 +44,13 @@ import org.amse.bomberman.util.Constants;
 public class AsynchroThreadSession extends AbstractSession {
 
     private final ResponseCreator protocol = new ResponseCreator();
-    private final Controller controller;
+
     /** GameStorage for this session. */
     private final GameStorage gameStorage;
-    private final SessionEndListener endListener;
+    private final Thread sessionThread;
     //
-    private Thread sessionThread;
+    private Controller controller;
     private AsynchroSender sender;
-    //
-    private DataInputStream in = null;
 
     /**
      * Constructs asynchro session. This session can send messages to client
@@ -59,40 +58,30 @@ public class AsynchroThreadSession extends AbstractSession {
      * from client side. However, client must support asynchronous
      * receivers to work with this session.
      *
-     * @param endListener listener of session end.
+     * @param creator listener of session end.
      * @param clientSocket socket of client of this session.
      * @param gameStorage game storage for this session.
-     * @param sessionID unique id of this session.
+     * @param sessionId unique id of this session.
      */
-    public AsynchroThreadSession(SessionEndListener endListener,
+    public AsynchroThreadSession(SessionEndListener creator,
                                  Socket clientSocket,
-                                 GameStorage gameStorage, long sessionID) {
-        super(clientSocket, sessionID);
+                                 GameStorage gameStorage, long sessionId) {
+        super(clientSocket, sessionId);
 
-        this.endListener = endListener; //TODO move listeners support to AbstractSession
         this.gameStorage = gameStorage;
-        this.controller = new Controller(this);
+        this.listeners.add(creator);
 
-    }
-
-    public void start() throws IOException {
-        this.sender = new AsynchroSender(this, clientSocket);
         this.sessionThread = new SessionThread();
         this.sessionThread.setDaemon(true);
-        in = initReader();
+    }
+
+    public void start() {
+        this.controller = new Controller(this);
+
+        this.sender = new AsynchroSender(clientSocket, sessionId);
+        this.listeners.add(sender);
+
         this.sessionThread.start();
-    }
-
-    private DataInputStream initReader() throws IOException {
-        InputStream is = clientSocket.getInputStream();
-        return new DataInputStream(new BufferedInputStream(is));
-    }
-
-    /**
-     * @return object that will execute protocol commands.
-     */
-    private RequestExecutor getRequestExecutor() {
-        return controller;
     }
 
     public void send(ProtocolMessage<Integer, String> message) {
@@ -116,46 +105,15 @@ public class AsynchroThreadSession extends AbstractSession {
      *
      * @see SessionEndListener
      */
-    private void freeResources() {
-        if(this.controller != null) { //Do all these checks realy need?
-            //if(this.controller.getMyGame() != null) {    // without this check controller will print error.
-                this.controller.tryLeave();
-            //}
-        }
-
-        if(this.endListener != null) {
-            this.endListener.sessionTerminated(this);
-        }
-    }
-
-    /**
-     * Processing query. Maybe sending response - <b>it depends</b> on realization
-     * of RequestExecutor and actual realization of <i>sendAnswer(...)</i> method.
-     *
-     * @see RequestExecutor
-     * @param query request to process.
-     */   
-    protected void process(ProtocolMessage<Integer, String> message) {
-        System.out.println("Session: message received.");
-
-        RequestCommand cmd = null;
-        try {
-            int commandId = message.getMessageId();                                                                       
-            cmd = RequestCommand.valueOf(commandId); // throws IllegalArgumentException
-            cmd.execute(this.getRequestExecutor(), message.getData()); 
-        } catch (IllegalArgumentException ex) {
-            send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
-                    "Not supported command."));
-            System.out.println("Session: answerOnCommand error. "
-                    + "Non supported command int from client. "
-                    + ex.getMessage());
-        } catch (InvalidDataException ex) {
-            send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
-                    ex.getMessage()));
+    private void release() {//TODO what about leave game!?
+        for (SessionEndListener listener : listeners) {
+            listener.sessionTerminated(this);
         }
     }
 
     private class SessionThread extends Thread {
+        //
+        private DataInputStream in = null;
 
         /**
          * Method in which session gets requests from client and process them.
@@ -164,48 +122,34 @@ public class AsynchroThreadSession extends AbstractSession {
         public void run() {
             setClientSocketTimeout(Constants.DEFAULT_CLIENT_TIMEOUT);
             try {
+                in = initReader();
                 sender.start();
-                
-                System.out.println("Session: waiting queries from client...");
-                cyclicReadAndProcess(in);
+                cyclicReadAndProcess(in);//main part
             } catch (SocketTimeoutException ex) {
                 System.out.println("Session: terminated by socket timeout. "
                         + ex.getMessage());
             } catch (IOException ex) {
                 System.err.println("Session: run error. " + ex.getMessage());
             } finally {
-                this.closeConnection(in);
+                closeConnection(in);
+                release();
             }
         }
 
-        private void closeConnection(Closeable in) {
-            System.out.println("Session: freeing resources.");
-            try {
-                if(in != null) {
-                    in.close(); // this will close socket too...
-                } else {
-                    clientSocket.close();
-                }
-            } catch (IOException ex) {
-                System.err.println("Session: terminating error. IOException "
-                        + "while closing resourses. " + ex.getMessage());
-            }
-            freeResources();
-
-            System.out.println("Session: terminated.");
-        }
-
-        private void cyclicReadAndProcess(DataInputStream in) throws EOFException, IOException {            
+        private void cyclicReadAndProcess(DataInputStream in) throws IOException {
             while(!mustEnd) {
 
-                ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+                ProtocolMessage<Integer, String> message
+                        = new ProtocolMessage<Integer, String>();
                 int messageId = in.readInt();
+                /* client want to disconnect */
                 if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
                     break;
                 }
 
                 int dataCount = in.readInt();
-                List<String> data = new ArrayList<String>(dataCount); //TODO what if dataCount < 0  !?!?
+                //throws IllegalArgumentExeption if dataCount < 0
+                List<String> data = new ArrayList<String>(dataCount);
                 for(int i = 0; i < dataCount; ++i) {
                     data.add(in.readUTF());
                 }
@@ -216,12 +160,55 @@ public class AsynchroThreadSession extends AbstractSession {
             }
         }
 
+        /**
+         * Processing query. Maybe sending response - <b>it depends</b> on realization
+         * of RequestExecutor and actual realization of <i>sendAnswer(...)</i> method.
+         *
+         * @see RequestExecutor
+         * @param query request to process.
+         */
+        private void process(ProtocolMessage<Integer, String> message) {
+            RequestCommand cmd = null;
+            try {
+                int commandId = message.getMessageId();
+                cmd = RequestCommand.valueOf(commandId); // throws IllegalArgumentException
+                cmd.execute(controller, message.getData());
+            } catch (IllegalArgumentException ex) {
+                send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
+                        "Not supported command."));
+                System.out.println("Session: answerOnCommand error. "
+                        + "Non supported command int from client. "
+                        + ex.getMessage());
+            } catch (InvalidDataException ex) {
+                send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
+                        ex.getMessage()));
+            }
+        }
+
+        private void closeConnection(Closeable in) {
+            try {
+                IOUtilities.close(in);
+                if(clientSocket != null && !clientSocket.isConnected()) {
+                    clientSocket.close();
+                }
+            } catch (IOException ex) {
+                System.err.println("Session: terminating error. IOException "
+                        + "while closing resourses. " + ex.getMessage());
+            }
+            System.out.println("Session: terminated.");
+        }
+
         private void setClientSocketTimeout(int timeout) {
             try {
                 clientSocket.setSoTimeout(timeout); // throws SocketException
             } catch (SocketException ex) {
                 System.err.println("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
             }
-        }                
+        }
+
+        private DataInputStream initReader() throws IOException {
+            InputStream is = clientSocket.getInputStream();
+            return new DataInputStream(new BufferedInputStream(is));
+        }
     }
 }

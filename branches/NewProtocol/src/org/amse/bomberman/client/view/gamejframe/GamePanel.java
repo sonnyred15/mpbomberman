@@ -23,6 +23,7 @@ import javax.swing.JPanel;
  *
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class GamePanel  extends JPanel{
     private BombMap map;
     private List<Cell> changes;

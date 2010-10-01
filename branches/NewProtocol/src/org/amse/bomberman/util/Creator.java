@@ -38,11 +38,13 @@ public class Creator {
      * @return list of gameMaps.
      */
     public static List<String> createGameMapsList() {
-        String[]     gameMaps = createGameMapsListFromDirectory();
-        List<String> result   = new ArrayList<String>();
+        String[] gameMaps = createGameMapsListFromDirectory();
+        List<String> result = new ArrayList<String>();
 
-        for (String string : gameMaps) {// TODO game maps can be null...
-            result.add(string);
+        if (gameMaps != null) {
+            for (String string : gameMaps) {
+                result.add(string);
+            }
         }
 
         return result;

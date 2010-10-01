@@ -95,8 +95,7 @@ public class Panel1 extends JPanel {
         Box topBox = Box.createHorizontalBox();
 
         JLabel ipLabel = new JLabel("IP");       
-        ipLabel.setForeground(textColor);
-        ipLabel.setHorizontalAlignment(SwingConstants.RIGHT);//TODO does it really need?
+        ipLabel.setForeground(textColor);        
 
         try {
             MaskFormatter mf = new MaskFormatter("###.###.###.###");

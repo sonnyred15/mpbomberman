@@ -92,17 +92,6 @@ public class Game implements ModelListener {
         this.started = false;
     }
 
-    /**
-     * Adding message to chat.
-     * @param player player which is adding message.
-     * @param message message to add in chat.
-     */
-    @Deprecated //untill fix all =)
-    public void addMessageToChat(ModelPlayer player, String message) {//TODO BIG
-//        this.chat.addMessage(player.getNickName(), message, controllers);
-//        notifyGameSessions(ProtocolConstants.UPDATE_CHAT_MSGS);
-    }
-
     public void addMessageToChat(String message) {
         this.chat.addMessage(message, gameChangeListeners);
     }
@@ -373,7 +362,7 @@ public class Game implements ModelListener {
         }
     }
 
-    public void statsChanged() {//TODO
+    public void statsChanged() {
         for (GameChangeListener listener : gameChangeListeners) {
             listener.statsChanged(this);
         }

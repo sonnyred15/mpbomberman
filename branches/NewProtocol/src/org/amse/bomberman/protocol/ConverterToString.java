@@ -151,11 +151,11 @@ public class ConverterToString implements Converter<String> {
      * @param game game to get status from.
      * @return "started" if game started, "not started" otherwise.
      */
-    public String convertGameStartStatus(Game game) {    // TODO started not started bad decision make true false.
+    public String convertGameStartStatus(Game game) {
         if (game.isStarted()) {
-            return "started.";
+            return "true";
         } else {
-            return "not started.";
+            return "false";
         }
     }
 

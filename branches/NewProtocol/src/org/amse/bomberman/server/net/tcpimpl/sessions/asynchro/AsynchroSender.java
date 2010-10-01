@@ -14,46 +14,44 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
+import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
-public class AsynchroSender {
+public class AsynchroSender implements SessionEndListener {
 
     private final SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>> messagesMap =
             new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(24);
     //
-    private final Session session; //TODO maybe use observer for session terminate instead of reference and check mustEnd?
     private final Socket clientSocket;
     private final Thread senderThread;
-    private DataOutputStream out;
+    private volatile boolean mustEnd = false;
 
-    public AsynchroSender(Session session, Socket clientSocket) {
-        this.session = session;
+    public AsynchroSender(Socket clientSocket, long sessionId) {
         this.clientSocket = clientSocket;
 
         this.senderThread = new SenderThread("Single Notificator("
-                + session.getID() + ")");
+                + sessionId + ")");
         this.senderThread.setDaemon(true);
     }
 
-    public void start() throws IOException {
-        this.out = initWriter();
+    public void start() {
         this.senderThread.start();
-    }
-
-    private DataOutputStream initWriter() throws IOException {
-        OutputStream os = this.clientSocket.getOutputStream();        
-        return new DataOutputStream(new BufferedOutputStream(os));
     }
 
     public void addToQueue(ProtocolMessage<Integer, String> message) {
         messagesMap.put(message.getMessageId(), message);
     }
 
+    public void sessionTerminated(Session endedSession) {
+        this.mustEnd = true;
+    }
+
     private class SenderThread extends Thread {
+        private DataOutputStream out;
 
         private SenderThread(String name) {
             super(name);
@@ -64,20 +62,25 @@ public class AsynchroSender {
             System.out.println(super.getName() + " thread started.");
             Set<Entry<Integer, ProtocolMessage<Integer, String>>> entrySet = messagesMap.entrySet();
             try {
-                while(!session.isMustEnd()) {
+                out = initWriter();
+                while(!mustEnd && !isInterrupted()) {
                     try {
                         for(Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
                             ProtocolMessage<Integer, String> toSend = entry.setValue(null);
                             if(toSend != null) {
-                                this.send(toSend);
+                                send(toSend);
                             }
                         }
-                        Thread.sleep(20);// sleeping at least for 20 milliseconds
-                    } catch (InterruptedException ex) {//must never happen
+                        Thread.sleep(30);//to not spam client every nanosecond =)
+                    } catch (InterruptedException ex) {//must never happen, but who knows =)
                         ex.printStackTrace();
+                        //restoring interrupted status.
+                        Thread.currentThread().interrupt();
                     }
                 }
-            } finally {
+            } catch(IOException ex) {
+                ex.printStackTrace();
+            }finally {
                 IOUtilities.close(out);
             }
             
@@ -90,29 +93,29 @@ public class AsynchroSender {
          *
          * @throws IllegalArgumentException
          */
-        private void send(ProtocolMessage<Integer, String> response) {
-            if(response.isBroken()) {
-                throw new IllegalArgumentException(
-                        "Broken response. Message id or message data are null.");
+        private void send(ProtocolMessage<Integer, String> response)
+                throws IOException {
+            if (response.isBroken()) {
+                throw new IllegalArgumentException("Broken response. " +
+                        "Message id or message data are null.");
             }
 
-            try {
-                System.out.println(super.getName() + " sending answer...");
+            System.out.println(super.getName() + " sending answer...");
 
-                List<String> data = response.getData();
-                int size = data.size();
+            List<String> data = response.getData();
+            int size = data.size();
 
-                out.writeInt(response.getMessageId());
-                out.writeInt(size);
-                for(String string : data) {
-                    out.writeUTF(string);
-                }
-                out.flush();
-
-            } catch (IOException ex) {
-                System.err.println(super.getName() + " sendAnswer error. "
-                        + ex.getMessage());
+            out.writeInt(response.getMessageId());
+            out.writeInt(size);
+            for (String string : data) {
+                out.writeUTF(string);
             }
+            out.flush();
+        }
+
+        private DataOutputStream initWriter() throws IOException {
+            OutputStream os = clientSocket.getOutputStream();
+            return new DataOutputStream(new BufferedOutputStream(os));
         }
     }
 }

@@ -42,7 +42,8 @@ public class DefaultModel implements Model, DieListener {
     private final GameMap                     gameMap;
     private final List<ModelPlayer>           players;
     private StatsTable                        stats;
-    private boolean                           ended;
+    private volatile boolean                  started;
+    private volatile boolean                  ended;
 
     private int maxPlayersToEnd;
 
@@ -66,7 +67,8 @@ public class DefaultModel implements Model, DieListener {
 
         this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);
         this.explosionSquares = new CopyOnWriteArrayList<Pair>();
-        
+
+        this.started = false;
         this.ended = false;
         this.listeners.add(game);
     }
@@ -341,10 +343,10 @@ public class DefaultModel implements Model, DieListener {
         for (ModelPlayer player : players) {
             if (player.getID() == playerID) {
                 this.players.remove(player);
-                this.freeIDs.add(playerID); //TODO comment will produce bug fix it
-//                if(this.game.isStarted()){
-//                    this.gameMap.removePlayer(playerID);
-//                }
+                this.freeIDs.add(playerID); 
+                if(started) {
+                    this.gameMap.removePlayer(playerID);
+                }
                 return true;
             }
         }
@@ -364,6 +366,7 @@ public class DefaultModel implements Model, DieListener {
             Pair playerCoords = this.gameMap.getPlayerPosition(player.getID());
             player.setPosition(playerCoords);
         }
+        this.started = true;
     }
 
     public void end() {

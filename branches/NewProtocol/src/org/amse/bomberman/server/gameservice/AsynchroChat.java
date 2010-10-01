@@ -31,36 +31,17 @@ public class AsynchroChat {
     public AsynchroChat() {
     }
 
-    /**
-     * Adding message to chat in next notation:
-     * <p>
-     * playerName: message.
-     * Additionally SuperMind will try to parse expression and do something.
-     * @param playerName nickName of player that added message.
-     * @param message message to add to chat.
-     */
-    public void addMessage(String message) {
-//        addMessage(playerName + ": " + message);
-        
-//        Super mind will try to parse command and answer or ignore.
-//        superMindAnswer(message, subscribers);
-    }
-
     public void addMessage(String message, Collection<GameChangeListener> listeners) {
         for (GameChangeListener gameChangeListener : listeners) {
             gameChangeListener.newChatMessage(message);
+            String answer = superMindAnswer(message);
+            if(answer != null) {
+                gameChangeListener.newChatMessage(message);
+            }
         }
     }
 
-//    public void addMessage(String message) {
-//        List<String> forClients = new ArrayList<String>();
-//
-//        forClients.add(ProtocolConstants.CAPTION_NEW_CHAT_MSGS);
-//        forClients.add(message);
-//        this.game.notifyGameSessions(forClients);
-//    }
-
-    private void superMindAnswer(String text) {
+    private String superMindAnswer(String text) {
         String        idName = null;
         StringBuilder res    = new StringBuilder();
 
@@ -102,8 +83,7 @@ public class AsynchroChat {
 
             res.append(buff);
 
-            // adding to chat
-//            addMessage("SuperMind: " + res.toString());
+            return ("SuperMind: " + res.toString());
         } catch (ArithmeticException ex) {
             System.err.println("Chat: addMessage warning. " +
                               "SuperMind got arithmetic exception."
@@ -117,6 +97,8 @@ public class AsynchroChat {
                               "SuperMind can`t parse expression."
                               + ex.getMessage());
         }
+
+        return null;
     }
 
     private String getIdentificatorName(String input) throws ParseException {

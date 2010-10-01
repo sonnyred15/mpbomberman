@@ -167,8 +167,7 @@ public class AsynchroConnector implements Connector {
                     } else {
                         ControllerImpl.getInstance().receivedRequestResult(message);
                     }
-                } catch (NetException ex) {
-                    //TODO what to do with it?
+                } catch (NetException ex) { // notification process failed. Ignore.
                     ex.printStackTrace();
                 }
             }

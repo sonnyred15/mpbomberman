@@ -53,7 +53,7 @@ public interface Session {
      * <p> Note that if id type overflow, id would be not unique.
      * @return unique id of session.
      */
-    long getID();
+    long getId();
 
     /**
      * Returns if current session must terminate.

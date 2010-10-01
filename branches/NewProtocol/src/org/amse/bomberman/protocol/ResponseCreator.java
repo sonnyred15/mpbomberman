@@ -158,7 +158,7 @@ public class ResponseCreator {
      * gameMaps.
      */
     public ProtocolMessage<Integer, String> sendGameMapsList() {
-        List<String> data = converter.convertGameMapsList();//TODO must NEVER return null but returns
+        List<String> data = converter.convertGameMapsList();
 
         if (data.isEmpty()) {
             System.out.println("Session: sendMapsList error. No maps founded on server.");

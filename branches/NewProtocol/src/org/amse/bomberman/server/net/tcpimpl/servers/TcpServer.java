@@ -41,8 +41,8 @@ public class TcpServer implements Server {
     private final Comparator<Session> comparator = new Comparator<Session>() {
 
         public int compare(Session ses1, Session ses2) {
-            long id1 = ses1.getID();
-            long id2 = ses2.getID();
+            long id1 = ses1.getId();
+            long id2 = ses2.getId();
 
             return (int)(id1 - id2);// lost of presicion
         }
@@ -122,7 +122,7 @@ public class TcpServer implements Server {
     /**
      * {@inheritDoc}
      */
-    public void sessionTerminated(Session endedSession) {//TODO synchronization!!!
+    public synchronized void sessionTerminated(Session endedSession) {//synchronization for decrement atomicity
         this.sessions.remove(endedSession);
         this.sessionCounter--;
 

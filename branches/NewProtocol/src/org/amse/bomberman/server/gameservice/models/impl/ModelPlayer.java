@@ -36,7 +36,7 @@ public class ModelPlayer implements MoveableObject {
     protected int explRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
 
     //
-    private Pair                 position; //TODO maybe must be volatile?
+    private Pair                 position;
     private volatile PlayerState state = PlayerState.NORMAL;
 
     //

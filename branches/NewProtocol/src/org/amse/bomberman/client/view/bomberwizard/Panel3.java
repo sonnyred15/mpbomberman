@@ -115,7 +115,7 @@ public class Panel3 extends JPanel {
 
         DefaultListModel model = (DefaultListModel) this.playersList.getModel();
 
-        model.clear();    // TODO Bad decision to always clear model
+        model.clear();
 
         for (int i = 0; i < Integer.parseInt(info.get(2)); i++) {    // setting names for existing players
             model.addElement(info.get(i + 3));

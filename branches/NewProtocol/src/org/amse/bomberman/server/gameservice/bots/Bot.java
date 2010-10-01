@@ -10,6 +10,7 @@ import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
+import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
 
 /**
@@ -77,6 +78,14 @@ public class Bot extends ModelPlayer
     }
 
     public void fieldChanged() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void gameEnded(Game game) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void statsChanged(Game game) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

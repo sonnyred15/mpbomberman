@@ -108,7 +108,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
             }
             return;
         } else if (messageId == ProtocolConstants.GAME_STATUS_MESSAGE_ID) {
-            if (data.get(0).equals("started.")) {
+            if (data.get(0).equals("true")) {
                 if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
                         Model.getInstance().setStart(true);
