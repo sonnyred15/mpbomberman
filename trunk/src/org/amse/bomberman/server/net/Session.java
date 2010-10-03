@@ -7,11 +7,12 @@ package org.amse.bomberman.server.net;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.GameStorage;
+import java.io.IOException;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.util.List;
+import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * Interface that represents session between client side and server side
@@ -30,19 +31,13 @@ public interface Session {
     /**
      * Tells session to start receiving requests and process them.
      */
-    void start();
+    void start() throws IOException;
 
     /**
      * Sends list of strings to client.
      * @param messages lines of strings to send to client.
      */
-    void sendAnswer(List<String> messages);
-
-    /**
-     * Sends simple one-string message to client.
-     * @param message string to send to client.
-     */
-    void sendAnswer(String message);
+    void send(ProtocolMessage<Integer, String> message);
 
     /**
      * Returns GameStorage where games are storing.
@@ -57,7 +52,7 @@ public interface Session {
      * <p> Note that if id type overflow, id would be not unique.
      * @return unique id of session.
      */
-    long getID();
+    long getId();
 
     /**
      * Returns if current session must terminate.

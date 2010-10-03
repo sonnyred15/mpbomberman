@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class Wizard extends JFrame implements WizardListener{
     private List<PanelDescriptor> myDescriptors;
     private Dimension size = new Dimension(0,0);

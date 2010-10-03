@@ -19,6 +19,7 @@ import javax.swing.SwingConstants;
  *
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class CreateGameJPanel extends JPanel{
     private final int width = 400;
     private final int heigth = 30;

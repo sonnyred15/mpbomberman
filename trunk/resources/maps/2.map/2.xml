@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<map name="second.map" maxPlayers="4" dimension="5">
+<map name="2.map" maxPlayers="4" dimension="5">
     <description>
 	    Info about map must be here. =)
     </description>

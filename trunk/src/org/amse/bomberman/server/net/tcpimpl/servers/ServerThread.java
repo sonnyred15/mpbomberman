@@ -26,7 +26,7 @@ class ServerThread implements Runnable {
                 Socket clientSocket = server.getServerSocket().accept();
                 System.out.println("Server: client connected. "
                         + "Starting new session thread...");
-                server.setSessionCounter(server.getSessionCounter() + 1); //TODO synchronize problem;
+                server.setSessionCounter(server.getSessionCounter() + 1); //TODO maybe synchronize problem;
                 //
                 Session newSession =
                         new AsynchroThreadSession(server, clientSocket,
@@ -56,7 +56,7 @@ class ServerThread implements Runnable {
         //Terminating all sessions
         for(Session session : server.sessions) {
             System.out.println(
-                    "Server: interrupting session " + session.getID() + "...");
+                    "Server: interrupting session " + session.getId() + "...");
             session.terminateSession();
         }
         server.setSessionCounter(0);

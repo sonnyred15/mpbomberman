@@ -1,9 +1,9 @@
 package org.amse.bomberman.client.control.impl;
 
-import org.amse.bomberman.client.net.IConnector;
+import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.net.impl.AsynchroConnector;
-import org.amse.bomberman.client.control.IController;
+import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
@@ -12,49 +12,50 @@ import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.RequestCreator;
+import org.amse.bomberman.protocol.requests.RequestCreator;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
-public class Controller implements IController {
+public class ControllerImpl implements Controller {
 
-    private IConnector connector = null;
-    private static IController controller = null;
-    private RequestResultListener receiveResultListener;
+    private Connector connector = null;
+    private static Controller controller = null;
+    private RequestResultListener responseListener;
     private final RequestCreator protocol = new RequestCreator();
     private JFrame gameJFrame = null;
 
-    private Controller() {
+    private ControllerImpl() {
         if (connector == null) {
             connector = AsynchroConnector.getInstance();
         }
     }
 
-    public static IController getInstance() {
+    public static Controller getInstance() {
         if(controller == null) {
-            controller = new Controller();
+            controller = new ControllerImpl();
         }
         return controller;
     }
 
     public void lostConnection(String exception) {
-        if(this.receiveResultListener instanceof Wizard) {
-            Wizard wizard = (Wizard) this.receiveResultListener;
+        if(this.responseListener instanceof Wizard) {
+            Wizard wizard = (Wizard) this.responseListener;
             System.out.println(exception);
             JOptionPane.showMessageDialog(wizard, exception, "Error",
                                           JOptionPane.ERROR_MESSAGE);
 
             wizard.setCurrentJPanel(BomberWizard.IDENTIFIER1);
-            this.setReceiveInfoListener(receiveResultListener);
+            this.setReceiveInfoListener(responseListener);
             gameJFrame = null;
         } else {
             System.out.println(exception);
@@ -72,8 +73,8 @@ public class Controller implements IController {
     }
 
     public void startGame() {
-        if(receiveResultListener instanceof Wizard) {
-            Wizard wizard = (Wizard) receiveResultListener;
+        if(responseListener instanceof Wizard) {
+            Wizard wizard = (Wizard) responseListener;
             wizard.dispose();
             this.setReceiveInfoListener(
                     (RequestResultListener) Model.getInstance());
@@ -91,7 +92,7 @@ public class Controller implements IController {
     }
 
     public void leaveGame() {
-        if(!(receiveResultListener instanceof Wizard)) {
+        if(!(responseListener instanceof Wizard)) {
             gameJFrame.dispose();
             Model.getInstance().removeListeners();
             BomberWizard wizard = new BomberWizard();
@@ -104,7 +105,7 @@ public class Controller implements IController {
 
     public void setReceiveInfoListener(
             RequestResultListener receiveResultListener) {
-        this.receiveResultListener = receiveResultListener;
+        this.responseListener = receiveResultListener;
     }
 
     public void connect(InetAddress serverIP, int serverPort)
@@ -113,7 +114,12 @@ public class Controller implements IController {
     }
 
     public void disconnect() {
-        this.connector.disconnect();
+        try {
+            this.connector.sendRequest(protocol.requestServerDisconnect());
+            this.connector.closeConnection();
+        } catch (NetException ex) {
+            //ignore
+        }
     }
 
     public void requestGamesList() throws NetException {
@@ -121,8 +127,7 @@ public class Controller implements IController {
     }
 
     public void requestCreateGame(String gameName, String mapName,
-                                  int maxPlayers)
-            throws NetException {
+                                  int maxPlayers) throws NetException {
         sendRequest(protocol.requestCreateGame(gameName,
                                                mapName,
                                                maxPlayers));
@@ -149,7 +154,7 @@ public class Controller implements IController {
     }
 
     public void requestPlantBomb() throws NetException {
-        sendRequest(protocol.requestPlantBomb());
+        sendRequest(protocol.requestPlaceBomb());
     }
 
     public void requestJoinBotIntoGame() throws NetException {
@@ -176,8 +181,8 @@ public class Controller implements IController {
         sendRequest(protocol.requestAddChatMessage(message));
     }
 
-    public void requestNewChatMessages() throws NetException {
-        sendRequest(protocol.requestNewChatMessages());
+    public void requestGetNewChatMessages() throws NetException {
+        sendRequest(protocol.requestGetNewChatMessages());
     }
 
     public void requestDownloadMap(String gameMapName) throws NetException {
@@ -185,12 +190,39 @@ public class Controller implements IController {
     }
 
     public void requestSetPlayerName(String playerName) throws NetException {
-        sendRequest(protocol.requestSetPlayerName(playerName));
+        sendRequest(protocol.requestSetClientName(playerName));
     }
 
-    public void receivedRequestResult(List<String> requestResult) {
-        if(this.receiveResultListener != null) {
-            this.receiveResultListener.received(requestResult);
+    //TODO REDESIGN PLEASE
+    //Actually, controller must know about models that need some result.
+    //After receive controller must parse result, and set data to proper model.
+    //And concrete model must notify View listener about changes,
+    //after that, View must self take info from model. That is the MVC.
+    //...Difference between current realization is that listener must not parse
+    //response themselfs. They don`t need to know about ProtocolMessage at all!!
+    public void receivedResponse(ProtocolMessage<Integer, String> response) {
+        int messageId = response.getMessageId();
+
+        ///////THIS MUST NOT EXIST!!!///////
+        try {
+            if (messageId == ProtocolConstants.GAMES_LIST_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGamesList();
+                return;
+            } else if (messageId == ProtocolConstants.GAME_INFO_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGameInfo();
+                return;
+            } else if (messageId == ProtocolConstants.GAME_FIELD_CHANGED_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGameMap();
+                return;
+            }            
+        } catch (NetException ex) {
+            //ignore //TODO Server must send info not such cyclic update messages.
+            return;
+        }
+        ///////END OF BAD DESIGN =)!!!///////
+
+        if(this.responseListener != null) {
+            this.responseListener.received(response);
         } else {
             Creator.createErrorDialog(null, "Error", "No listener for "
                     + "received info.");

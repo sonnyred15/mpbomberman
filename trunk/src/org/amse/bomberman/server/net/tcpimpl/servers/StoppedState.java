@@ -6,7 +6,7 @@ package org.amse.bomberman.server.net.tcpimpl.servers;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 /**
  *

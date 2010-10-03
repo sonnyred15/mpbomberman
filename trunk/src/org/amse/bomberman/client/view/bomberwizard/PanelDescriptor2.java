@@ -3,8 +3,8 @@ package org.amse.bomberman.client.view.bomberwizard;
 import java.util.List;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.view.wizard.PanelDescriptor;
-import org.amse.bomberman.client.control.IController;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.net.NetException;
 import javax.swing.JOptionPane;
 
@@ -21,10 +21,10 @@ public class PanelDescriptor2 extends PanelDescriptor{
     @Override
     public void doBeforeDisplay() {
         try {
-            Controller.getInstance().requestGamesList();
-            Controller.getInstance().requestMapsList();
+            ControllerImpl.getInstance().requestGamesList();
+            ControllerImpl.getInstance().requestMapsList();
         } catch (NetException ex) {
-            Controller.getInstance().lostConnection(ex.getMessage());
+            ControllerImpl.getInstance().lostConnection(ex.getMessage());
             /*JOptionPane.showMessageDialog(this.getWizard(),
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             this.getWizard().setCurrentJPanel(BombWizard.IDENTIFIER1);*/
@@ -36,7 +36,7 @@ public class PanelDescriptor2 extends PanelDescriptor{
         Panel2 panel2 = (Panel2) this.getPanel();
         String state = panel2.getState();
         if (state.equals(Panel2.CREATE_NAME)) {
-            IController con = Controller.getInstance();
+            Controller con = ControllerImpl.getInstance();
             try {
                 String mapName = panel2.getMap();
                 String gameName = panel2.getGameName();
@@ -44,7 +44,7 @@ public class PanelDescriptor2 extends PanelDescriptor{
                 con.requestCreateGame(gameName, mapName, maxPlayers);
                 return true;
             } catch (NetException ex) {
-                Controller.getInstance().lostConnection(ex.getMessage());
+                ControllerImpl.getInstance().lostConnection(ex.getMessage());
             }
         } else {
             List<String> selectedGame = panel2.getSelectedGame();
@@ -60,10 +60,10 @@ public class PanelDescriptor2 extends PanelDescriptor{
                 return false;
             } else {
                 try {
-                    Controller.getInstance().requestJoinGame(gameNumber);
+                    ControllerImpl.getInstance().requestJoinGame(gameNumber);
                     return true;
                 } catch (NetException ex) {
-                    Controller.getInstance().lostConnection(ex.getMessage());
+                    ControllerImpl.getInstance().lostConnection(ex.getMessage());
                     return false;
                 }
             }
@@ -73,7 +73,7 @@ public class PanelDescriptor2 extends PanelDescriptor{
 
     @Override
     public boolean goBack() {
-        Controller.getInstance().disconnect();
+        ControllerImpl.getInstance().disconnect();
         return true;
     }
 }

@@ -20,7 +20,7 @@ import java.util.Comparator;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.amse.bomberman.server.gameinit.GameStorage;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 /**
  *
@@ -41,8 +41,8 @@ public class TcpServer implements Server {
     private final Comparator<Session> comparator = new Comparator<Session>() {
 
         public int compare(Session ses1, Session ses2) {
-            long id1 = ses1.getID();
-            long id2 = ses2.getID();
+            long id1 = ses1.getId();
+            long id2 = ses2.getId();
 
             return (int)(id1 - id2);// lost of presicion
         }
@@ -61,11 +61,13 @@ public class TcpServer implements Server {
 
     /**
      * Main constructor that creating Server object with port param.
-     * @param port Free port number. Port must be between 0 and 65535, inclusive.
-     * '0' for random free port. 0 is not reccomended cause clients must know
-     * actual port number to connect.
+     * @param port Free port number. Port must be between 1 and 65535, inclusive.
+     * 
      */
     public TcpServer(int port) {
+        if (port < 1 || port > 65535) {
+            throw new IllegalArgumentException();
+        }
         this.port = port;
     }
 
@@ -100,7 +102,7 @@ public class TcpServer implements Server {
      * {@inheritDoc}
      */
     public int getPort() {
-        return this.port;
+        return port;
     }
 
     /**
@@ -120,7 +122,7 @@ public class TcpServer implements Server {
     /**
      * {@inheritDoc}
      */
-    public void sessionTerminated(Session endedSession) {//TODO synchronization!!!
+    public synchronized void sessionTerminated(Session endedSession) {//synchronization for decrement atomicity
         this.sessions.remove(endedSession);
         this.sessionCounter--;
 
