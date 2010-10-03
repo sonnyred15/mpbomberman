@@ -303,7 +303,10 @@ public class DefaultModel implements Model, DieListener {
             atackerStat.increaseSuicides();
         }
 
-        victim.bombed();        
+        victim.bombed();
+        for(ModelListener listener : listeners) {
+            listener.fireStatsChanged();
+        }
     }
 
     @Override

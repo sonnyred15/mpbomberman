@@ -57,7 +57,8 @@ public class StatsTable {
         }
 
         public int getPoints() {
-            return kills/(deaths+suicides);
+            int divisor = deaths + suicides;            
+            return (divisor == 0 ? (kills +3) : (kills/divisor));
         }
     }
 }

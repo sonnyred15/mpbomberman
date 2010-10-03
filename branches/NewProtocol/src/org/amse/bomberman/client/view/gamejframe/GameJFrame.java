@@ -9,17 +9,13 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
@@ -68,7 +64,7 @@ public class GameJFrame extends JFrame implements IView {
         this.setVisible(true);
     }
 
-    public synchronized void update() {
+    public synchronized void update() {//TODO update must be on EDT
         IModel model = Model.getInstance();
         if (!model.isStarted()) {
             ControllerImpl.getInstance().leaveGame();
@@ -91,8 +87,16 @@ public class GameJFrame extends JFrame implements IView {
                 if (!dead) {
                     dead = true;
                     stopGame();
-                    JOptionPane.showMessageDialog(this, "You are dead!!!"
-                            , "Death", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "You are dead!!!",
+                            "Death", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+            if(model.isEnded()) {
+                if(!dead) { //TODO bad code
+                    dead = true;
+                    stopGame();
+                    JOptionPane.showMessageDialog(this, "You win!!!",
+                            "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }

@@ -24,6 +24,7 @@ public interface IModel {
     public void setPlayerRadius(int radius);
     public int getPlayerRadius();
     public boolean isStarted();
+    public boolean isEnded();
     public void setStart(boolean flag);
     public List<String> getResults();
 }

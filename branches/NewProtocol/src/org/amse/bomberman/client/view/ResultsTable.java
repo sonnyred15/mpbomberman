@@ -49,7 +49,7 @@ public class ResultsTable extends JTable {
     @SuppressWarnings("serial")
     private class ResultsTableModel extends AbstractTableModel {
 
-        String[] columnNames = {"№", "Name", "Kills", "Deaths", "Frags"};
+        String[] columnNames = {"№", "Name", "Kills", "Deaths", "Points"};
         Object[][] data;
 
         public ResultsTableModel() {
@@ -71,6 +71,7 @@ public class ResultsTable extends JTable {
                 data[i][3] = iterator.next();
                 data[i][4] = iterator.next();
             }
+            fireTableStructureChanged();
         }
 
         public int getRowCount() {

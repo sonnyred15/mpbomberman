@@ -64,7 +64,7 @@ public class ProtocolConstants {
     //
     public static final int PLAYERS_STATS_MESSAGE_ID = 170;
 
-    public static int END_RESULTS_MESSAGE_ID = 180;
+    public static final int END_RESULTS_MESSAGE_ID = 180;
     
     //
     public static final int LEAVE_MESSAGE_ID = 190;

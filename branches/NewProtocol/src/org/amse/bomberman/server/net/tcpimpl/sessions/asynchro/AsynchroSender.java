@@ -26,7 +26,7 @@ import org.amse.bomberman.util.IOUtilities;
 public class AsynchroSender implements SessionEndListener {
 
     private final SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>> messagesMap =
-            new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(24);
+            new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(27);
     //
     private final Socket clientSocket;
     private final SenderThread senderThread;
