@@ -7,9 +7,7 @@ package org.amse.bomberman.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameinit.Game;
-import org.amse.bomberman.server.gameinit.GameMap;
-import org.amse.bomberman.server.net.Server;
+import org.amse.bomberman.server.gameservice.GameMap;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -22,12 +20,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JOptionPane;
-import org.amse.bomberman.server.gameinit.GameStorage;
-import org.amse.bomberman.server.net.tcpimpl.Controller;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 /**
  * Utility class.
@@ -35,6 +30,7 @@ import org.xml.sax.SAXException;
  * @author Kirilchuk V.E.
  */
 public class Creator {
+
     private Creator() {}
 
     /**
@@ -42,11 +38,13 @@ public class Creator {
      * @return list of gameMaps.
      */
     public static List<String> createGameMapsList() {
-        String[]     gameMaps = createGameMapsListFromDirectory();
-        List<String> result   = new ArrayList<String>();
+        String[] gameMaps = createGameMapsListFromDirectory();
+        List<String> result = new ArrayList<String>();
 
-        for (String string : gameMaps) {// TODO game maps can be null...
-            result.add(string);
+        if (gameMaps != null) {
+            for (String string : gameMaps) {
+                result.add(string);
+            }
         }
 
         return result;
@@ -73,6 +71,7 @@ public class Creator {
      * @throws FileNotFoundException if gameMap with such name was not founded.
      * @throws IOException if IO errors occurs while creating gameMap.
      */
+    @Deprecated //TODO replaced with XML map!!! ERRORS!!!!!!
     public static int[][] createMapAndGetField(String fileName) throws FileNotFoundException, IOException {
         int[][] ret = null;
         GameMap map = new GameMap(fileName);
@@ -80,42 +79,6 @@ public class Creator {
         ret = map.getField();
 
         return ret;
-    }
-
-    /**
-     * Creates game.
-     * @param server server on which game must be created.
-     * @param gameMapName name of gameMap.
-     * @param gameName name of game.
-     * @param maxPlayers maxPlayers parameter of game.
-     * @return created game.
-     * @throws FileNotFoundException if gameMap with defined name was not finded.
-     * @throws IOException if IO errors occurs while creating gameMap.
-     */
-    public static Game createGame(GameStorage gameStorage,
-                                   Controller controller,
-                                   String gameMapName,
-                                   String gameName,
-                                   int maxPlayers)
-            throws FileNotFoundException, IOException {
-
-        File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
-        String name = gameMapName.substring(0, gameMapName.indexOf(".map"));
-        f = new File(f.getPath() + File.separatorChar +
-                     gameMapName + File.separatorChar + name + ".xml");
-
-        GameMap gameMap = null;
-        try {
-            gameMap = new GameMapXMLParser().parseAndCreate(f);
-        } catch (SAXException ex) {
-            throw new IOException("SAXException while creating gameMap.");
-        } catch (DOMException ex) {
-            throw new IOException("DOMException while creating gameMap.");
-        } catch (IllegalArgumentException ex) {
-            throw new IOException("Wrong gameMap xml file." + ex.getMessage());
-        }
-
-        return new Game(gameStorage, controller, gameMap, gameName, maxPlayers);
     }
 
     /**
@@ -127,18 +90,36 @@ public class Creator {
      * @param message message of error.
      */
     public static void createErrorDialog(Component parent, 
-                                        String description,
-                                        String message) {
+                                         String description,
+                                         String message) {
         //
         JOptionPane.showMessageDialog(parent, description + "\n" + message,
                                      "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void main(String[] args) {
-        String[] maps = Creator.createGameMapsListFromDirectory();
+    static String[] botNames =
+    {"Suicider",
+     "Nike",
+     "Adibas",
+     "Gosu",
+     "Idiot",
+     "Gosling",
+     "Gauss",
+     "Lenin",
+     "Stalin",
+     "Steveee",
+     "Patriot",
+     "Slayer",
+     "J2SEBot",
+     "iBot",
+     "I_KILL_YOU",
+     "Ololo",
+     "GoGoGo"
+    };
+    static Random rnd = new Random();
 
-        for (String string : maps) {
-            createErrorDialog(null, "Game maps.", string);
-        }
+    public static String createBotName() {
+        int id = rnd.nextInt(botNames.length);
+        return botNames[id];
     }
 }

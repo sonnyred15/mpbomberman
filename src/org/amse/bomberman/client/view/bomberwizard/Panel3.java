@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.bomberwizard;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;
@@ -51,11 +51,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import org.amse.bomberman.client.view.wizard.WizardController;
 import org.amse.bomberman.client.view.wizard.WizardEvent;
+import org.amse.bomberman.util.ImageUtilities;
 
 /**
  *
  * @author Mikhail Korovkin
- * @author Kirilchuk Vadim
+ * @author Kirilchuk V.E.
  */
 public class Panel3 extends JPanel {
     private final static long serialVersionUID = 1L;
@@ -66,9 +67,8 @@ public class Panel3 extends JPanel {
 
     //
     private Image image;
-    private static final String BACKGROUND_PATH = "/org/amse/bomberman/client" +
+    private static final String BACKGROUND_RESOURCE_NAME = "/org/amse/bomberman/client" +
             "/view/resources/cover3.png";
-    private static final URL BACKGROUND_URL = Panel3.class.getResource(BACKGROUND_PATH);
 
     //
     private int              maxPlayers = Constants.MAX_PLAYERS;
@@ -89,14 +89,13 @@ public class Panel3 extends JPanel {
     private JList playersList;
 
     public Panel3() {
-        super();
         this.setSize(width, height);
         this.playersPanel = this.createPlayersComponent();
         this.botsPanel = this.createBotsComponent();
         this.chatPanel = this.createChatComponent();
         initComponents();
+        initBackgroundImage();
         setVisible(true);
-        this.initBackgroundImage();
     }
 
     public void setMaxPlayers(int number) {
@@ -116,7 +115,7 @@ public class Panel3 extends JPanel {
 
         DefaultListModel model = (DefaultListModel) this.playersList.getModel();
 
-        model.clear();    // TODO Bad decision to always clear model
+        model.clear();
 
         for (int i = 0; i < Integer.parseInt(info.get(2)); i++) {    // setting names for existing players
             model.addElement(info.get(i + 3));
@@ -135,25 +134,23 @@ public class Panel3 extends JPanel {
         }
     }
 
-    public void clean() {
+    public void cleanChatArea() {
         this.chatTA.setText("");
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(this.image!=null){//actually image is BufferedImage so drawImage will return true.
+        if(this.image != null){//actually image is BufferedImage so drawImage will return true.
             g.drawImage(this.image, 0, 0, null);
         }
     }
 
     private void initBackgroundImage() {
         try{
-            this.image = ImageIO.read(BACKGROUND_URL);//returns BufferedImage
-            this.image =
-                    this.image.getScaledInstance(this.getWidth(),
-                                                 this.getHeight(),
-                                                 Image.SCALE_SMOOTH);
+            this.image = ImageUtilities.initImage(BACKGROUND_RESOURCE_NAME,
+                                                  this.getWidth(),
+                                                  this.getHeight());
         }catch (IOException ex){
             Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
             this.image = null;
@@ -206,7 +203,7 @@ public class Panel3 extends JPanel {
                             String message = getMessage();
 
                             if (message.length() > 0) {
-                                Controller.getInstance().requestSendChatMessage(message);
+                                ControllerImpl.getInstance().requestSendChatMessage(message);
                             }
                         } catch (NetException ex) {
 
@@ -328,7 +325,7 @@ public class Panel3 extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestJoinBotIntoGame();
+                ControllerImpl.getInstance().requestJoinBotIntoGame();
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
@@ -347,7 +344,7 @@ public class Panel3 extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestRemoveBotFromGame();
+                ControllerImpl.getInstance().requestRemoveBotFromGame();
             } catch (NetException ex) {
 
                 WizardController.throwWizardAction(new WizardEvent
@@ -370,7 +367,7 @@ public class Panel3 extends JPanel {
                 String message = getMessage();
 
                 if (message.length() > 0) {
-                    Controller.getInstance().requestSendChatMessage(message);
+                    ControllerImpl.getInstance().requestSendChatMessage(message);
                 }
             } catch (NetException ex) {
 
@@ -422,17 +419,12 @@ public class Panel3 extends JPanel {
             return label;
         }
 
-        private void initJoinedIcon() {    // TODO DO SUPER METHOD IN CREATOR CLASS FOR ALL SUCH METHODS!
+        private void initJoinedIcon() {
             try {
                 this.joinedIcon = ImageIO.read(JOINED_ICON_URL);    // returns BufferedImage
-
-                // this.joinedIcon =
-                // this.joinedIcon.getScaledInstance(this.iconDim, this.iconDim,
-                // Image.SCALE_SMOOTH);
             } catch (IOException ex) {
                 Creator.createErrorDialog(this, "Can`t load image for icon!",
                                           ex.getMessage());
-                this.joinedIcon = null;
             }
         }
     }

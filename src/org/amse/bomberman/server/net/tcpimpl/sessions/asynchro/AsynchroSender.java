@@ -4,76 +4,67 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
+import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
-public class AsynchroSender {
+public class AsynchroSender implements SessionEndListener {
 
-    private final SeparatelySynchronizedMap<String, List<String>> messagesMap =
-            new SeparatelySynchronizedMap<String, List<String>>(24);
+    private final SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>> messagesMap =
+            new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(27);
     //
-    private final Session session;
     private final Socket clientSocket;
-    private final Thread senderThread;
-    private BufferedWriter out;
+    private final SenderThread senderThread;
+    private volatile boolean mustEnd = false;
 
-    public AsynchroSender(Session session, Socket clientSocket) {
-        this.session = session;
+    public AsynchroSender(Socket clientSocket, long sessionId) {
         this.clientSocket = clientSocket;
 
         this.senderThread = new SenderThread("Single Notificator("
-                + session.getID() + ")");
+                + sessionId + ")");
         this.senderThread.setDaemon(true);
     }
 
-    public void start() throws IOException {
-        this.out = initWriter();
+    public void start() {
         this.senderThread.start();
     }
 
-    private BufferedWriter initWriter() throws IOException {
-        OutputStream os = this.clientSocket.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        return new BufferedWriter(osw);
+    public void addToQueue(ProtocolMessage<Integer, String> message) {
+        messagesMap.put(message.getMessageId(), message);
     }
 
-    /**
-     * Ignore message if there is too much messages in queue.
-     * @param message to send.
-     */
-    public void addToQueue(String message) {
-        List<String> list = new ArrayList<String>(1);
-        list.add(message);
-        addToQueue(message, list);
-    }
-
-    /**
-     * Ignore message if there is too much messages in queue.
-     * @param message to send.
-     */
-    public void addToQueue(List<String> message) {
-        String caption = message.get(0);
-        addToQueue(caption, message);
-    }
-
-    private void addToQueue(String key, List<String> value) {
-        messagesMap.put(key, value);
+    public void sessionTerminated(Session endedSession) {
+        this.mustEnd = true;
+        ProtocolMessage<Integer, String> disconnectMessage
+                = new ProtocolMessage<Integer, String>();
+        disconnectMessage.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+        disconnectMessage.setData(new ArrayList<String>());
+        try {
+            senderThread.send(disconnectMessage);
+        } catch (IOException ex) {
+            //ignore cause can do nothing..
+        }
+        senderThread.interrupt();
     }
 
     private class SenderThread extends Thread {
+
+        private DataOutputStream out;
 
         private SenderThread(String name) {
             super(name);
@@ -82,25 +73,35 @@ public class AsynchroSender {
         @Override
         public void run() {
             System.out.println(super.getName() + " thread started.");
-            Set<Entry<String, List<String>>> entrySet = messagesMap.entrySet();
+            Set<Entry<Integer, ProtocolMessage<Integer, String>>> entrySet = messagesMap.entrySet();
             try {
-                while(!session.isMustEnd()) {
+                out = initWriter();
+                while (!mustEnd && !isInterrupted()) {
                     try {
-                        for(Entry<String, List<String>> entry : entrySet) {
-                            List<String> toSend = entry.setValue(null);
-                            if(toSend != null) {
-                                this.send(toSend);
+                        for (Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
+                            ProtocolMessage<Integer, String> toSend = entry.setValue(null);
+                            if (toSend != null) {
+                                send(toSend);
                             }
                         }
-                        Thread.sleep(20);// sleeping at least for 20 milliseconds
-                    } catch (InterruptedException ex) {//must never happen
-                        ex.printStackTrace();
+                        Thread.sleep(30);//to not spam client every nanosecond =)
+                    } catch (InterruptedException ex) {                                                
+                        Thread.currentThread().interrupt();
                     }
                 }
+            } catch (IOException ex) {
+                ex.printStackTrace();
             } finally {
                 IOUtilities.close(out);
+                try {
+                    if(clientSocket != null && !clientSocket.isClosed()) {
+                        clientSocket.close();
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
-            
+
             System.out.println(super.getName() + " thread ended.");
         }
 
@@ -110,27 +111,27 @@ public class AsynchroSender {
          *
          * @throws IllegalArgumentException
          */
-        private void send(List<String> linesToSend) {
-            if(linesToSend == null || linesToSend.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "Null or empty argument not supported.");
+        private void send(ProtocolMessage<Integer, String> response)
+                throws IOException {
+            if (response.isBroken()) {
+                throw new IllegalArgumentException("Broken response. "
+                        + "Message id or message data are null.");
             }
 
-            try {
-                System.out.println(super.getName() + " sending answer...");
+            List<String> data = response.getData();
+            int size = data.size();
 
-                for(String string : linesToSend) {
-                    out.write(string);
-                    out.newLine();
-                }
-
-                out.write("");    // TODO magic code...
-                out.newLine();
-                out.flush();
-            } catch (IOException ex) {
-                System.err.println(super.getName() + " sendAnswer error. "
-                        + ex.getMessage());
+            out.writeInt(response.getMessageId());
+            out.writeInt(size);
+            for (String string : data) {
+                out.writeUTF(string);
             }
+            out.flush();
+        }
+
+        private DataOutputStream initWriter() throws IOException {
+            OutputStream os = clientSocket.getOutputStream();
+            return new DataOutputStream(new BufferedOutputStream(os));
         }
     }
 }

@@ -7,7 +7,7 @@ package org.amse.bomberman.server.net.tcpimpl.sessions;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.protocol.RequestExecutor;
+import org.amse.bomberman.protocol.requests.RequestExecutor;
 
 import org.amse.bomberman.server.net.Session;
 
@@ -16,6 +16,9 @@ import org.amse.bomberman.server.net.Session;
 import java.io.IOException;
 
 import java.net.Socket;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import org.amse.bomberman.server.net.SessionEndListener;
 
 /**
  * Abstract class that represents basic functionality of session.
@@ -32,7 +35,10 @@ public abstract class AbstractSession implements Session {
     protected final Socket clientSocket;
 
     /** Session id. In fact it can be not unique. */
-    protected final long sessionID;
+    protected final long sessionId;
+
+    protected final Set<SessionEndListener> listeners
+            = new CopyOnWriteArraySet<SessionEndListener>();
 
     /** The mustEnd boolean. Tells if this session must terminate. */
     protected volatile boolean mustEnd;
@@ -52,8 +58,16 @@ public abstract class AbstractSession implements Session {
         }
 
         this.clientSocket = clientSocket;
-        this.sessionID    = sessionID;
+        this.sessionId    = sessionID;
         this.mustEnd      = false;
+    }
+
+    public void addEndListener(SessionEndListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeEndListener(SessionEndListener listener) {
+        this.listeners.remove(listener);
     }
 
     /**
@@ -73,12 +87,11 @@ public abstract class AbstractSession implements Session {
      * <p>By default, the second call on this method
      * will lead to RuntimeException.
      */
-    public synchronized void terminateSession() {
-        if(this.mustEnd) {
+    public void terminateSession() {
+        if (this.mustEnd) {
             throw new IllegalStateException("Already terminating.");
         }
 
-        //setting to true
         this.mustEnd = true;
 
         try {
@@ -94,8 +107,8 @@ public abstract class AbstractSession implements Session {
      *
      * @return pseudo-unique id for this session.
      */
-    public long getID() {
-        return sessionID;
+    public long getId() {
+        return sessionId;
     }
 }
 

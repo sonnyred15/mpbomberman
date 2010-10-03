@@ -7,69 +7,6 @@ package org.amse.bomberman.protocol;
  */
 public class ProtocolConstants {
 
-    /** Caption for message with list of availiable games. */
-    public static final String CAPTION_GAMES_LIST = "Games list.";
-
-    /** Caption for message with result of "create game" request. */
-    public static final String CAPTION_CREATE_GAME_RESULT = "Create game info.";
-
-    /** Caption for message with result of "join game" request. */
-    public static final String CAPTION_JOIN_GAME_RESULT = "Join game info.";
-
-    /** Caption for message with result of "do move" request. */
-    public static final String CAPTION_DO_MOVE_RESULT = "Do move info.";
-
-    /**
-     * Caption for message with game field, exlosions and other
-     * info about position. This is info to draw field on client.
-     */
-    public static final String CAPTION_GAME_MAP_INFO = "Game map info.";
-
-    /** Caption for message with result of "start game" request. */
-    public static final String CAPTION_START_GAME_RESULT = "Start game info.";
-
-    /** Caption for message with result of "leave game" request. */
-    public static final String CAPTION_LEAVE_GAME_RESULT = "Leave game info.";
-
-    /** Caption for message with result of "place bomb" request. */
-    public static final String CAPTION_PLACE_BOMB_RESULT = "Plant bomb info.";
-
-    /** Caption for message with game map which client is requested to download. */
-    public static final String CAPTION_DOWNLOAD_GAME_MAP = "Game map download.";
-
-    /** Caption for message with status of game: is it started or not. */
-    public static final String CAPTION_GAME_STATUS = "Game status info.";
-
-    /** Caption for message with list of availiable game maps. */
-    public static final String CAPTION_GAME_MAPS_LIST = "Game maps list.";
-
-    /**
-     * Caption for message with main info game. Usually it is info about
-     * number of max and current players in game, their names and so on.
-     */
-    public static final String CAPTION_GAME_INFO = "Game info.";
-
-    /** Caption for message with result of "join bot" request. */
-    public static final String CAPTION_JOIN_BOT_RESULT = "Join bot.";
-
-    /** Caption for message with result of "remove bomb" request. */
-    public static final String CAPTION_REMOVE_BOT_RESULT = "Remove bot info.";
-
-    /** Caption for message with result of "add message to chat" request. */
-    public static final String CAPTION_ADD_CHAT_MSG_RESULT = "Send chat messages.";
-
-    /** Caption for message with new chat messages. */
-    public static final String CAPTION_NEW_CHAT_MSGS = "Get chat messages.";
-
-    /** Caption for message with players stats. Usually it is deaths-kills and so on. */
-    public static final String CAPTION_GAME_PLAYERS_STATS = "Game players stats.";
-
-    /** Caption for message with players result. It is sended when game ends. */
-    public static final String CAPTION_GAME_END_RESULTS = "Game ended players stats.";
-
-    /** Caption for message with result of "set client name" request. */
-    public static final String CAPTION_SET_CLIENT_NAME = "Set client name info.";
-
     /** Message for client about kick from game. */
     public static final String MESSAGE_GAME_KICK = "You were kicked from the game.";
 
@@ -85,12 +22,69 @@ public class ProtocolConstants {
     /** Notification for client to update game info(about number of players and so on). */
     public static final String UPDATE_GAME_INFO = "Update game info.";
 
-    /** Notification for client to update chat messages. */
-    public static final String UPDATE_CHAT_MSGS = "Update chat messages.";
-
     /** Split symbol that must be used in protocol between args. */
     public static final String SPLIT_SYMBOL = "/";
 
     private ProtocolConstants() {}
 
+    public static final int SET_NAME_MESSAGE_ID = 10;
+
+    public static final int GAMES_LIST_MESSAGE_ID = 20;
+
+    public static final int GAME_MAPS_LIST_MESSAGE_ID = 30;
+    
+    public static final int CREATE_GAME_MESSAGE_ID = 40;
+
+    public static final int JOIN_GAME_MESSAGE_ID = 50;
+
+    //
+    public static final int GAME_INFO_MESSAGE_ID = 60;
+
+    public static final int GAME_STATUS_MESSAGE_ID = 70;
+
+    public static final int CHAT_ADD_MESSAGE_ID = 80;
+
+    public static final int CHAT_ADD_RESULT_MESSAGE_ID = 90;
+
+    public static final int CHAT_GET_MESSAGE_ID = 100;
+
+    public static final int BOT_ADD_MESSAGE_ID = 110;    
+    
+    public static final int KICK_PLAYER_MESSAGE_ID = 120;
+      
+    //
+    public static final int START_GAME_MESSAGE_ID = 130;
+
+    public static final int GAME_MAP_INFO_MESSAGE_ID = 140;
+
+    public static final int DO_MOVE_MESSAGE_ID = 150;
+
+    public static final int PLACE_BOMB_MESSAGE_ID = 160;
+
+    //
+    public static final int PLAYERS_STATS_MESSAGE_ID = 170;
+
+    public static final int END_RESULTS_MESSAGE_ID = 180;
+    
+    //
+    public static final int LEAVE_MESSAGE_ID = 190;
+
+    //
+    public static final int DOWNLOAD_GAME_MAP_MESSAGE_ID = 200;
+
+    public static final int INVALID_REQUEST_MESSAGE_ID = 210;
+
+    //
+    public static final int GAME_INFO_NOTIFY_ID = 510;
+
+    public static final int GAME_STARTED_NOTIFY_ID = 520;
+    
+    public static final int GAME_TERMINATED_NOTIFY_ID = 530;
+
+    public static final int GAME_FIELD_CHANGED_NOTIFY_ID = 540;
+
+    public static final int GAMES_LIST_NOTIFY_ID = 550;
+
+    //
+    public static final int DISCONNECT_MESSAGE_ID = 1000;
 }

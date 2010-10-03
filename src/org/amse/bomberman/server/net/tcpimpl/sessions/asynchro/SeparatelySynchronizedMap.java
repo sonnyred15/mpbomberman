@@ -46,6 +46,7 @@ public class SeparatelySynchronizedMap<K, V> extends AbstractMap<K, V>{
      * 
      * @param capacity capacity of the underlaying array.
      */
+    @SuppressWarnings("unchecked")
     public SeparatelySynchronizedMap(int capacity) {        
         entries = (Map.Entry<K,V>[]) Array.newInstance(Map.Entry.class,capacity);
     }

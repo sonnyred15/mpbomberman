@@ -45,7 +45,7 @@ public class ServerFrame extends JFrame {
     private final JLabel         portLabel      = new JLabel("Server Port");    
     private final AbstractButton btnStatus      = new JButton("Status");
     private final AbstractButton btnControl     = new JButton(BTN_TEXT_RAISE);
-    private Server              server;
+    private Server               server;
 
     //
     private final JFormattedTextField portField
@@ -108,7 +108,7 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new TcpServer(port);//TODO mb make fabric?
+            server = new TcpServer(port);
             server.start();
             infoFrame.setServer(server);
             btnStatus.setEnabled(true);
@@ -140,13 +140,13 @@ public class ServerFrame extends JFrame {
         Creator.createErrorDialog(this, "Error.", message);
     }
 
-    private class ServerControlButtonListener implements ActionListener { //TODO bad practice code...
+    private class ServerControlButtonListener implements ActionListener { 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (btnControl.getText().equals(BTN_TEXT_RAISE)) {
+            if (server == null || server.isStopped()) {
                 raiseServer();
             } else {
-                infoFrame.setVisible(false); // Note that timer in it still works!!
+                infoFrame.setVisible(false);
                 downServer();
             }
         }

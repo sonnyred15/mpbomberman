@@ -2,7 +2,7 @@ package org.amse.bomberman.client.view.gamejframe;
 
 import org.amse.bomberman.client.model.impl.Model;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.impl.Controller;
+import org.amse.bomberman.client.control.impl.ControllerImpl;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 /**
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class GameJMenuBar extends JMenuBar {
 
     private JMenu game = new JMenu("Game");
@@ -30,7 +31,7 @@ public class GameJMenuBar extends JMenuBar {
             public void actionPerformed(ActionEvent e) {
                 Model.getInstance().removeListeners();
                 try {
-                    Controller.getInstance().requestLeaveGame();
+                    ControllerImpl.getInstance().requestLeaveGame();
                 } catch (NetException ex) {
                     System.out.println(ex);
                 }
@@ -40,7 +41,8 @@ public class GameJMenuBar extends JMenuBar {
         this.add(game);
     }
 
-    public static class LeaveAction extends AbstractAction {
+    @SuppressWarnings("serial")
+public static class LeaveAction extends AbstractAction {
 
         public LeaveAction() {
             putValue(NAME, "Leave");
@@ -50,9 +52,9 @@ public class GameJMenuBar extends JMenuBar {
 
         public void actionPerformed(ActionEvent e) {
             try {
-                Controller.getInstance().requestLeaveGame();
+                ControllerImpl.getInstance().requestLeaveGame();
             } catch (NetException ex) {
-                Controller.getInstance().lostConnection(ex.getMessage());
+                ControllerImpl.getInstance().lostConnection(ex.getMessage());
                 /*JOptionPane.showMessageDialog(parent,
                     ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 parent.dispose();

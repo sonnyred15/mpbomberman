@@ -1,8 +1,11 @@
 package org.amse.bomberman.client.net;
-import java.util.List;
+
+import org.amse.bomberman.protocol.ProtocolMessage;
+
 /**
  * @author Kirilchuk V.E
  */
 public interface RequestResultListener {
-    void received(List<String> result);
+
+    void received(ProtocolMessage<Integer, String> response);
 }
