@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.RequestCreator;
+import org.amse.bomberman.protocol.requests.RequestCreator;
 import org.amse.bomberman.util.IOUtilities;
 
 /**

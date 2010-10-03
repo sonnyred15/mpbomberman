@@ -101,7 +101,25 @@ public class InGameState extends AbstractClientState {
         return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                 "Disconnected.");
     }
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() == obj.getClass()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
     private class MyTimer {
 
         private long startTime;

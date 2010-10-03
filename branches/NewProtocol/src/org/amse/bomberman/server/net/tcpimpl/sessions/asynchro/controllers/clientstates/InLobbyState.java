@@ -7,7 +7,8 @@ package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clie
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.gameservice.GamePlayer;
+import org.amse.bomberman.server.gameservice.bots.Bot;
+import org.amse.bomberman.server.gameservice.bots.BotGamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.NetGamePlayer;
 
@@ -103,8 +104,14 @@ public class InLobbyState extends AbstractClientState {
                 if(!this.game.isFull()) {
                     joinResult = CommandResult.GAME_IS_ALREADY_STARTED;
 
-                    if(!this.game.isStarted()) {
-//                        this.game.tryAddBot(controller, botName); //TODO BIG
+                    if(!this.game.isStarted()) {                        
+                        BotGamePlayer player = new BotGamePlayer();
+                        player.setNickName(botName);
+                        int playerId = game.tryJoin(player);
+                        player.setPlayerId(playerId);
+                        Bot bot = new Bot(player, game);
+                        game.addGameChangeListener(bot);
+
                         joinResult = CommandResult.RESULT_SUCCESS;
                     }
                 }
@@ -114,9 +121,15 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> removeBot() {
-        //TODO BIG
-        return super.removeBot();
+    public ProtocolMessage<Integer, String> kickPlayer(int playerId) {
+        boolean kicked = this.game.tryKickPlayer(controller.getGamePlayer(), playerId);
+        if(kicked) {
+            return protocol.ok(ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
+                    "Kicked.");
+        } else {
+            return protocol.notOk(ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
+                    "Not kicked.");
+        }
     }
 
     @Override
@@ -178,4 +191,21 @@ public class InLobbyState extends AbstractClientState {
                             "Disconnected.");
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() == obj.getClass()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 6;
+        return hash;
+    }
 }

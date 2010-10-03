@@ -12,13 +12,14 @@ import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.RequestCreator;
+import org.amse.bomberman.protocol.requests.RequestCreator;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -199,7 +200,27 @@ public class ControllerImpl implements Controller {
     //after that, View must self take info from model. That is the MVC.
     //...Difference between current realization is that listener must not parse
     //response themselfs. They don`t need to know about ProtocolMessage at all!!
-    public void receivedRequestResult(ProtocolMessage<Integer, String> response) {
+    public void receivedResponse(ProtocolMessage<Integer, String> response) {
+        int messageId = response.getMessageId();
+
+        ///////THIS MUST NOT EXIST!!!///////
+        try {
+            if (messageId == ProtocolConstants.GAMES_LIST_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGamesList();
+                return;
+            } else if (messageId == ProtocolConstants.GAME_INFO_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGameInfo();
+                return;
+            } else if (messageId == ProtocolConstants.GAME_FIELD_CHANGED_NOTIFY_ID) {
+                ControllerImpl.getInstance().requestGameMap();
+                return;
+            }            
+        } catch (NetException ex) {
+            //ignore //TODO Server must send info not such cyclic update messages.
+            return;
+        }
+        ///////END OF BAD DESIGN =)!!!///////
+
         if(this.responseListener != null) {
             this.responseListener.received(response);
         } else {

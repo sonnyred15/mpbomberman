@@ -16,11 +16,12 @@ import org.amse.bomberman.util.Constants.Direction;
 import java.util.Iterator;
 
 import java.util.List;
-import org.amse.bomberman.protocol.InvalidDataException;
-import org.amse.bomberman.protocol.ResponseCreator;
-import org.amse.bomberman.protocol.RequestExecutor;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
+import org.amse.bomberman.protocol.requests.RequestExecutor;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.requests.InvalidDataException;
+import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
 
@@ -28,7 +29,7 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
  * Class that represents net controller of ingame player.
  * @author Kirilchuk V.E.
  */
-public class Controller implements RequestExecutor {
+public class Controller implements RequestExecutor, SessionEndListener {
 
     private final ResponseCreator protocol = new ResponseCreator();//TODO inject from session
     private final NetGamePlayer player = new NetGamePlayer(this);
@@ -208,8 +209,26 @@ public class Controller implements RequestExecutor {
         sendToClient(state.getNewMessagesFromChat());
     }
 
-    public void tryRemoveBot() {
-        sendToClient(state.removeBot()); //TODO BIG! NOT WORK
+    public void tryKickPlayer(List<String> args) throws InvalidDataException {
+        if(args.size() != 1) {
+            System.out.println("Session: kick player error. Canceled. Wrong query.");
+
+            throw new InvalidDataException(ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
+                                           "Wrong number of arguments.");
+        }
+        
+        int playerId;
+        try {
+            playerId = Integer.parseInt(args.get(0));  
+        } catch (NumberFormatException ex) {
+            System.out.println("Session: doMove error. "
+                    + "Unsupported direction(not int). ");
+
+            throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
+                                           "Player to kick id must be integer.");
+        }
+
+        sendToClient(state.kickPlayer(playerId));
     }
 
     public void sendGamePlayersStats() {        
@@ -257,5 +276,11 @@ public class Controller implements RequestExecutor {
 
     public NetGamePlayer getGamePlayer() {
         return player;
+    }
+
+    public void sessionTerminated(Session endedSession) {
+        if(!this.state.equals(new NotJoinedState(this))) {
+            this.state.leave();
+        }
     }
 }

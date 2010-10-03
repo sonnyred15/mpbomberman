@@ -99,7 +99,7 @@ public class Model implements IModel, RequestResultListener{
             if (data.get(0).equals("Disconnected.")) {
                 escapeGame();
             }
-        } else if (messageId == ProtocolConstants.NOTIFICATION_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.GAME_TERMINATED_NOTIFY_ID) {
             if (data.get(0).equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
                 JOptionPane.showMessageDialog(null, "Host is escaped from game!\n"
                        , "Game ended.", JOptionPane.INFORMATION_MESSAGE);

@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.protocol;
 
+import org.amse.bomberman.protocol.requests.RequestCreator;
 import java.util.List;
 import org.amse.bomberman.FakeAsynchroClient;
 import org.amse.bomberman.server.gameservice.Game;
@@ -69,15 +70,15 @@ public class DoMoveTest {
 
         game.tryStartGame(creator);
         response = client.receiveResult();
-        assertEquals(ProtocolConstants.NOTIFICATION_MESSAGE_ID, (int) response.getMessageId());
+        assertEquals(ProtocolConstants.GAME_STARTED_NOTIFY_ID, (int) response.getMessageId());
         response = client.receiveResult();
-        assertEquals(ProtocolConstants.NOTIFICATION_MESSAGE_ID, (int) response.getMessageId());
+        assertEquals(ProtocolConstants.GAMES_LIST_MESSAGE_ID, (int) response.getMessageId());
 
         request = requestCreator.requestDoMove(Direction.UP);
         client.sendRequest(request);
 
         response = client.receiveResult();
-        assertEquals(ProtocolConstants.NOTIFICATION_MESSAGE_ID, (int) response.getMessageId());
+        assertEquals(ProtocolConstants.GAME_FIELD_CHANGED_NOTIFY_ID, (int) response.getMessageId());
 
         response = client.receiveResult();
         assertEquals(ProtocolConstants.DO_MOVE_MESSAGE_ID, (int) response.getMessageId());

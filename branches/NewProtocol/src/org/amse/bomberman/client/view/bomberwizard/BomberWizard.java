@@ -17,9 +17,9 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  *
  * @author Mikhail Korovkin
  */
+@SuppressWarnings("serial")
 public class BomberWizard extends Wizard implements RequestResultListener {
-    private static final long serialVersionUID = 1L;
-    
+
     public static final String IDENTIFIER1 = "Server_Panel";
     public static final String IDENTIFIER2 = "Create/Join_Panel";
     public static final String IDENTIFIER3 = "GameInfo_Panel";
@@ -29,7 +29,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
     public static final String EVENT_BACK_TEXT = "Next text";
 
     public BomberWizard() {
-        super(new Dimension(640, 480),"Let's BOMBERMANNING!!!");
+        super(new Dimension(640, 480), "Let's BOMBERMANNING!!!");
         this.addPanelDescriptor(new PanelDescriptor1(this, IDENTIFIER1));
         this.addPanelDescriptor(new PanelDescriptor2(this, IDENTIFIER2));
         this.addPanelDescriptor(new PanelDescriptor3(this, IDENTIFIER3));
@@ -57,31 +57,30 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 panel2.setGames(data);
             }
             return;
-        }else if (messageId == ProtocolConstants.GAME_INFO_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.GAME_INFO_MESSAGE_ID) {
             if (current instanceof Panel3) {
                 if (!data.get(0).equals("Not joined to any game.")) {
                     Panel3 panel3 = (Panel3) current;
                     panel3.setGameInfo(data);
                 } else {
                     this.goBack();
-                    JOptionPane.showMessageDialog(this, "Created game was closed.\n"
-                       , "Game Closed.", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Created game was closed.\n", "Game Closed.", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
             return;
-        }else if (messageId == ProtocolConstants.CREATE_GAME_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.CREATE_GAME_MESSAGE_ID) {
             if (!data.get(0).equals("Game created.")) {
                 JOptionPane.showMessageDialog(this, "Can not create game.\n"
-                       + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+                        + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (messageId == ProtocolConstants.JOIN_GAME_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.JOIN_GAME_MESSAGE_ID) {
             if (!data.get(0).equals("Joined.")) {
                 JOptionPane.showMessageDialog(this, "Can not join to the game.\n"
-                       + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+                        + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (messageId == ProtocolConstants.START_GAME_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.START_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Game started.")) {
                 if (current instanceof Panel3) {
                     if (!Model.getInstance().isStarted()) {
@@ -97,14 +96,12 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        } else if (messageId == ProtocolConstants.NOTIFICATION_MESSAGE_ID) {
-            if(data.contains(ProtocolConstants.MESSAGE_GAME_START)) {
+        } else if (messageId == ProtocolConstants.GAME_STARTED_NOTIFY_ID) {
             if (current instanceof Panel3) {
                 if (!Model.getInstance().isStarted()) {
                     Model.getInstance().setStart(true);
                     this.startGame();
                 }
-            }
             }
             return;
         } else if (messageId == ProtocolConstants.GAME_STATUS_MESSAGE_ID) {
@@ -120,10 +117,10 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         } else if (messageId == ProtocolConstants.LEAVE_MESSAGE_ID) {
             if (!data.get(0).equals("Disconnected.")) {
                 JOptionPane.showMessageDialog(this, "Can not leave game.\n"
-                       + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
+                        + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
             }
             return;
-        }else if (messageId == ProtocolConstants.BOT_ADD_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.BOT_ADD_MESSAGE_ID) {
             if (current instanceof Panel3) {
                 if (!data.get(0).equals("Bot added.")) {
                     JOptionPane.showMessageDialog(this, "Can not join bot.\n"
@@ -132,16 +129,16 @@ public class BomberWizard extends Wizard implements RequestResultListener {
                 }
             }
             return;
-        }else if (messageId == ProtocolConstants.BOT_REMOVE_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.KICK_PLAYER_MESSAGE_ID) {
             if (current instanceof Panel3) {
-                if (!data.get(0).equals("Bot removed.")) {
-                    JOptionPane.showMessageDialog(this, "Can not remove bot.\n"
+                if (!data.get(0).equals("Kicked.")) {
+                    JOptionPane.showMessageDialog(this, "Kick error.\n"
                             + data.get(0), "Error", JOptionPane.ERROR_MESSAGE);
 
                 }
             }
             return;
-        }else if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {
+        } else if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {
             if (current instanceof Panel3) {
                 Panel3 panel3 = (Panel3) current;
                 panel3.setNewMessages(data);
@@ -165,7 +162,7 @@ public class BomberWizard extends Wizard implements RequestResultListener {
             ControllerImpl.getInstance().lostConnection(ex.getMessage());
             /*System.out.println(ex);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.ERROR_MESSAGE);
             this.setCurrentJPanel(IDENTIFIER1);*/
         }
     }
@@ -182,12 +179,13 @@ public class BomberWizard extends Wizard implements RequestResultListener {
         } else if (event.equals(EVENT_DISCONNECT)) {
             ControllerImpl.getInstance().lostConnection(e.getMessage());
             /*JOptionPane.showMessageDialog(this, a.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.ERROR_MESSAGE);
             this.setCurrentJPanel(IDENTIFIER1);*/
         } else {
             System.out.println(event);
         }
     }
+
     private void startGame() {
         ControllerImpl.getInstance().startGame();
     }

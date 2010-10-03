@@ -2,6 +2,7 @@ package org.amse.bomberman.client;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
@@ -42,6 +43,7 @@ public class Main {
             ProtocolMessage<Integer, String> exitMessage 
                     = new ProtocolMessage<Integer, String>();
             exitMessage.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+            exitMessage.setData(new ArrayList<String>());
             try {
                 connector.sendRequest(exitMessage);
             } catch (Exception ex) {

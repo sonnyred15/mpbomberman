@@ -4,8 +4,12 @@
  */
 package org.amse.bomberman.server.gameservice.bots;
 
+import java.util.Collections;
+import java.util.List;
+import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameservice.models.Model;
+import org.amse.bomberman.server.gameservice.models.impl.Bonus;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Constants.Direction;
 
@@ -19,8 +23,7 @@ public abstract class BotStrategy {
     /**
      * Clone of game field. Bot can do with it whatever he wants.
      */
-    protected int[][] temp;
-    private int       cons = 1000; // on temp map bot put 1000 + num of steps to destination
+    private int cons = 1000; // on temp map bot put 1000 + num of steps to destination
 
     /**
      * Method to find way to target. Not the best algorithm but can be overrided
@@ -31,15 +34,17 @@ public abstract class BotStrategy {
      * @return direction to move to became closer on one step to target.
      * @throws IllegalArgumentException if bot can`t find way to current target.
      */
-    public Direction findWay(Pair begin, Pair end, final int[][] field, Model model) throws
-            IllegalArgumentException {
+    public Direction
+            findWay(Game game, Pair begin, Pair end)
+            throws IllegalArgumentException {
+        int[][] field = game.getGameField();
+        List<Pair> explosions = Collections.unmodifiableList(game.getExplosions());
+        int[][] temp = cloneField(field);
 
-        this.temp = cloneField(field);
-
-        rec(begin, cons, model);
+        rec(temp, explosions, begin, cons);
         int steps = temp[end.getX()][end.getY()] - cons;
-        
-        if(steps<0){ //bad desicion...it fixes one bug but error is in alghorithm...
+
+        if (steps < 0) { //bad desicion...it fixes one bug but error is in alghorithm...
             throw new IllegalArgumentException();
         }
 
@@ -90,7 +95,7 @@ public abstract class BotStrategy {
      * @param model model that owns this bot.
      * @return action for bot to do.
      */
-    public abstract Action thinkAction(Bot bot, Model model);
+    public abstract Action thinkAction(Game game, BotGamePlayer bot);
 
     private int[][] cloneField(final int[][] mapArray) {
         int[][] result = new int[mapArray.length][mapArray.length];
@@ -102,7 +107,7 @@ public abstract class BotStrategy {
         return result;
     }
 
-    private void rec(Pair current, int steps, Model model) {
+    private void rec(int[][] temp, List<Pair> expl, Pair current, int steps) {
         int x = current.getX();
         int y = current.getY();
         temp[x][y] = steps;
@@ -112,12 +117,10 @@ public abstract class BotStrategy {
             int nextY = y + 1;
             next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
-                    && !model.isExplosion(next)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
+                    && !(expl.contains(next))
+                    || (Bonus.isBonus(temp[nextX][nextY]))
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1, model);
+                rec(temp, expl, new Pair(nextX, nextY), steps + 1);
             }
         }
         if (y > 0) {
@@ -125,12 +128,10 @@ public abstract class BotStrategy {
             int nextY = y - 1;
             next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
-                    && !model.isExplosion(next)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
+                    && !(expl.contains(next))
+                    || (Bonus.isBonus(temp[nextX][nextY]))
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1, model);
+                rec(temp, expl, new Pair(nextX, nextY), steps + 1);
             }
         }
         if (x > 0) {
@@ -138,12 +139,10 @@ public abstract class BotStrategy {
             int nextY = y;
             next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
-                    && !model.isExplosion(next)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
+                    && !(expl.contains(next))
+                    || (Bonus.isBonus(temp[nextX][nextY]))
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1, model);
+                rec(temp, expl, new Pair(nextX, nextY), steps + 1);
             }
         }
         if (x < temp.length - 1) {
@@ -151,14 +150,11 @@ public abstract class BotStrategy {
             int nextY = y;
             next = new Pair(nextX, nextY);
             if ((temp[nextX][nextY] == Constants.MAP_EMPTY)
-                    && !model.isExplosion(next)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_COUNT)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_BOMB_RADIUS)
-                    || (temp[nextX][nextY] == Constants.MAP_BONUS_LIFE)
+                    && !(expl.contains(next))
+                    || (Bonus.isBonus(temp[nextX][nextY]))
                     || ((temp[nextX][nextY] > 1000) && (temp[nextX][nextY] > steps + 1))) {
-                rec(new Pair(nextX, nextY), steps + 1, model);
+                rec(temp, expl, new Pair(nextX, nextY), steps + 1);
             }
         }
     }
-
 }

@@ -83,7 +83,8 @@ public class GameStorage implements GameChangeListener {
         this.games.add(gameToAdd);
         n = this.games.indexOf(gameToAdd);
         System.out.println("GameStorage: game added.");
-        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
+        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
+                ProtocolConstants.UPDATE_GAMES_LIST);
 
 
         return n;
@@ -92,7 +93,8 @@ public class GameStorage implements GameChangeListener {
     public synchronized void removeGame(Game gameToRemove) {
         if (this.games.remove(gameToRemove)) {
             System.out.println("GameStorage: game removed.");
-            this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
+            this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
+                ProtocolConstants.UPDATE_GAMES_LIST);
         } else {
             System.err.println("GameStorage: removeGame warning. " + "No specified game found.");
         }
@@ -120,12 +122,14 @@ public class GameStorage implements GameChangeListener {
 
     @Override
     public void parametersChanged(Game game) {
-        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
+        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
+                ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override
     public void gameStarted(Game game) {
-        this.notificator.addToQueue(ProtocolConstants.UPDATE_GAMES_LIST);
+        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
+                ProtocolConstants.UPDATE_GAMES_LIST);
     }
 
     @Override

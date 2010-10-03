@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
 
 /**
  * Class that represents clients notificator about
@@ -28,7 +29,7 @@ import org.amse.bomberman.protocol.ResponseCreator;
 public class GlobalNotificator extends Thread { //TODO bad concurency
 
     private final ResponseCreator protocol = new ResponseCreator(); //TODO inject from session
-    private final BlockingQueue<String> queue;
+    private final BlockingQueue<ProtocolMessage<Integer, String>> queue;
     private final Server server;
 
     /**
@@ -39,31 +40,32 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
     public GlobalNotificator(Server server) {
         super("Global notificator");
         this.server = server;
-        this.queue = new ArrayBlockingQueue<String>(5); //fixed by number of different global messages.
+        this.queue = new ArrayBlockingQueue<ProtocolMessage<Integer, String>>(5); //fixed by number of different global messages.
         this.setDaemon(true);
     }
 
     @Override
     public void run() {
         System.out.println("Global notificator thread started.");
-        List<String> messages = new ArrayList<String>();
-        while(!server.isStopped()) {
+        List<ProtocolMessage<Integer, String>> copy
+                        = new ArrayList<ProtocolMessage<Integer, String>>();
+        while (!server.isStopped()) {
             try {
-
-                // get all messages into list
-                messages.clear();
-                synchronized(queue) {
-                    queue.drainTo(messages);
-                }
 
                 // notifying all sessions
                 Set<Session> sesions = this.server.getSessions();
-
+                synchronized(copy) {
+                    copy.clear();
+                }
+                synchronized (queue) {
+                    queue.drainTo(copy);
+                }
                 for(Session session : sesions) {
-                    if(messages.isEmpty()) {
-                        break;
+                    synchronized(copy) {
+                        for (ProtocolMessage<Integer, String> message : copy) {
+                            session.send(message); //this will add message to sending queue.
+                        }
                     }
-                    session.send(protocol.notifyMessages(messages)); //this will add message to sending queue.
                 }
 
                 // sleeping at least for 1 second
@@ -82,14 +84,10 @@ public class GlobalNotificator extends Thread { //TODO bad concurency
      *
      * @param message to send.
      */
-    public void addToQueue(String message) {
+    public void addToQueue(int messageId, String detail) {
         synchronized(queue) {
-            if(queue.contains(message)) { //not need to duplicate global messages.
-                return;
-            }
-
-            //if message is new then try to add it to queue.
-            this.queue.offer(message);    // actually can return boolean
+            ProtocolMessage<Integer, String> message = protocol.ok(messageId, detail);
+            this.queue.offer(message);    // actually can return false but we don`t care
         }
     }
 

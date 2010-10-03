@@ -1,4 +1,4 @@
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.responses;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
@@ -212,7 +213,7 @@ public class ConverterToString implements Converter<String> {
     public List<String> convertFieldAndExplosions(Game game) {
         List<String> result = convertField(game.getGameField());
 
-        result.addAll(convertExplosions(game.getExplosionSquares()));
+        result.addAll(convertExplosions(game.getExplosions()));
 
         return result;
     }
@@ -270,7 +271,7 @@ public class ConverterToString implements Converter<String> {
             stringalizedField.add(buff.toString());
         }
 
-        stringalizedField.addAll(convertExplosions(game.getExplosionSquares()));
+        stringalizedField.addAll(convertExplosions(game.getExplosions()));
         
         ModelPlayer player = game.getPlayer(playerID); //TODO if playerID was incorrect.
         stringalizedField.addAll(convertPlayerInfo(player));

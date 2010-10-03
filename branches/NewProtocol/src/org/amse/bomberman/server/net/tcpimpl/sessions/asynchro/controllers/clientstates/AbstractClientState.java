@@ -5,7 +5,7 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.util.Constants.Direction;
 
 /**
@@ -70,7 +70,7 @@ public abstract class AbstractClientState implements ClientState {
         return protocol.illegalState("get new messages from chat", stateName);
     }
 
-    public ProtocolMessage<Integer, String> removeBot()  {
+    public ProtocolMessage<Integer, String> kickPlayer(int playerId)  {
         return protocol.illegalState("remove bot", stateName);
     }
 

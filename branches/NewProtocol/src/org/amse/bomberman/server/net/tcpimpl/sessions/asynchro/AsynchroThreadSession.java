@@ -3,19 +3,18 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro; 
+package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import org.amse.bomberman.protocol.RequestCommand;
-import org.amse.bomberman.protocol.RequestExecutor;
+import org.amse.bomberman.protocol.requests.RequestCommand;
+import org.amse.bomberman.protocol.requests.RequestExecutor;
 
 import org.amse.bomberman.server.gameservice.GameStorage;
 import org.amse.bomberman.server.net.SessionEndListener;
@@ -26,10 +25,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import java.util.List;
-import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.requests.InvalidDataException;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.util.Constants;
@@ -44,7 +43,6 @@ import org.amse.bomberman.util.IOUtilities;
 public class AsynchroThreadSession extends AbstractSession {
 
     private final ResponseCreator protocol = new ResponseCreator();
-
     /** GameStorage for this session. */
     private final GameStorage gameStorage;
     private final Thread sessionThread;
@@ -64,8 +62,8 @@ public class AsynchroThreadSession extends AbstractSession {
      * @param sessionId unique id of this session.
      */
     public AsynchroThreadSession(SessionEndListener creator,
-                                 Socket clientSocket,
-                                 GameStorage gameStorage, long sessionId) {
+            Socket clientSocket,
+            GameStorage gameStorage, long sessionId) {
         super(clientSocket, sessionId);
 
         this.gameStorage = gameStorage;
@@ -77,6 +75,7 @@ public class AsynchroThreadSession extends AbstractSession {
 
     public void start() {
         this.controller = new Controller(this);
+        this.listeners.add(controller);
 
         this.sender = new AsynchroSender(clientSocket, sessionId);
         this.listeners.add(sender);
@@ -105,7 +104,7 @@ public class AsynchroThreadSession extends AbstractSession {
      *
      * @see SessionEndListener
      */
-    private void release() {//TODO what about leave game!?
+    private void release() {
         for (SessionEndListener listener : listeners) {
             listener.sessionTerminated(this);
         }
@@ -113,6 +112,7 @@ public class AsynchroThreadSession extends AbstractSession {
 
     private class SessionThread extends Thread {
         //
+
         private DataInputStream in = null;
 
         /**
@@ -131,16 +131,15 @@ public class AsynchroThreadSession extends AbstractSession {
             } catch (IOException ex) {
                 System.err.println("Session: run error. " + ex.getMessage());
             } finally {
-                closeConnection(in);
                 release();
+                closeConnection(in);
             }
         }
 
         private void cyclicReadAndProcess(DataInputStream in) throws IOException {
-            while(!mustEnd) {
+            while (!mustEnd) {
 
-                ProtocolMessage<Integer, String> message
-                        = new ProtocolMessage<Integer, String>();
+                ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
                 int messageId = in.readInt();
                 /* client want to disconnect */
                 if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
@@ -150,7 +149,7 @@ public class AsynchroThreadSession extends AbstractSession {
                 int dataCount = in.readInt();
                 //throws IllegalArgumentExeption if dataCount < 0
                 List<String> data = new ArrayList<String>(dataCount);
-                for(int i = 0; i < dataCount; ++i) {
+                for (int i = 0; i < dataCount; ++i) {
                     data.add(in.readUTF());
                 }
                 message.setMessageId(messageId);
@@ -188,7 +187,7 @@ public class AsynchroThreadSession extends AbstractSession {
         private void closeConnection(Closeable in) {
             try {
                 IOUtilities.close(in);
-                if(clientSocket != null && !clientSocket.isConnected()) {
+                if (clientSocket != null && !clientSocket.isClosed()) {
                     clientSocket.close();
                 }
             } catch (IOException ex) {

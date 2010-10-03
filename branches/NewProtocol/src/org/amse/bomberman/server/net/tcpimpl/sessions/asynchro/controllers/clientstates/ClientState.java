@@ -39,7 +39,7 @@ public interface ClientState {
 
     ProtocolMessage<Integer, String> placeBomb();
 
-    ProtocolMessage<Integer, String> removeBot();
+    public abstract ProtocolMessage<Integer, String> kickPlayer(int playerId);
 
     ProtocolMessage<Integer, String> startGame();
 

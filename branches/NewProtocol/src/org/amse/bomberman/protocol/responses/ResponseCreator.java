@@ -1,4 +1,4 @@
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.responses;
 
 //~--- non-JDK imports --------------------------------------------------------
 import org.amse.bomberman.server.gameservice.Game;
@@ -11,8 +11,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.GamePlayer;
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 
 /**
  * Invoker of commands
@@ -210,10 +211,6 @@ public class ResponseCreator {
         data.addAll(converter.convertPlayersStats(game.getPlayersStats()));
 
         return message(ProtocolConstants.END_RESULTS_MESSAGE_ID, data);
-    }
-
-    public ProtocolMessage<Integer, String> notifyMessages(List<String> data) {
-        return message(ProtocolConstants.NOTIFICATION_MESSAGE_ID, data);
     }
 
     public Converter<String> getConverter() {

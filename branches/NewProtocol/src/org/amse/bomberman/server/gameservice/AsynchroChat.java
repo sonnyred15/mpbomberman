@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 

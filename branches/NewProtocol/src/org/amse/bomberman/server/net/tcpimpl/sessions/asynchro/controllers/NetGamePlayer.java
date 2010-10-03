@@ -5,7 +5,7 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ResponseCreator;
+import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
@@ -48,14 +48,14 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
     }
 
     public void parametersChanged(Game game) {
-        this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
+        this.controller.sendToClient(protocol.ok(ProtocolConstants.GAME_INFO_NOTIFY_ID,
                     ProtocolConstants.UPDATE_GAME_INFO));
     }
 
     public void gameStarted(Game game) {
         this.controller.setState(new InGameState(controller, game));
         if (!game.isGameOwner(this)) {
-            this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
+            this.controller.sendToClient(protocol.ok(ProtocolConstants.GAME_STARTED_NOTIFY_ID,
                     ProtocolConstants.MESSAGE_GAME_START));
         }
     }
@@ -64,7 +64,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
         this.controller.setState(new NotJoinedState(controller));
         this.resetId();
         if (!game.isGameOwner(this)) {
-            this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
+            this.controller.sendToClient(protocol.ok(ProtocolConstants.GAME_TERMINATED_NOTIFY_ID,
                     ProtocolConstants.MESSAGE_GAME_KICK));
         }
     }
@@ -74,7 +74,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
     }
 
     public void fieldChanged() {
-        this.controller.sendToClient(protocol.ok(ProtocolConstants.NOTIFICATION_MESSAGE_ID,
+        this.controller.sendToClient(protocol.ok(ProtocolConstants.GAME_FIELD_CHANGED_NOTIFY_ID,
                     ProtocolConstants.UPDATE_GAME_MAP));
     }
 

@@ -1,5 +1,6 @@
 package org.amse.bomberman.protocol;
 
+import org.amse.bomberman.protocol.requests.RequestCreator;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

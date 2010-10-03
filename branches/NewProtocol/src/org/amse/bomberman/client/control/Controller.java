@@ -58,7 +58,7 @@ public interface Controller {
 
     public void leaveGame();
 
-    public void receivedRequestResult(ProtocolMessage<Integer, String> requestResult) throws NetException;
+    public void receivedResponse(ProtocolMessage<Integer, String> requestResult);
 
     public void lostConnection(String message);
 

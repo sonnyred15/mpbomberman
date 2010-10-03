@@ -116,7 +116,7 @@ public class Game implements ModelListener {
         moved = model.tryDoMove(player, direction);
 
         if (moved) {
-            fieldChanged();
+            fireFieldChanged();
         }
 
         return moved;
@@ -142,15 +142,33 @@ public class Game implements ModelListener {
                 playerID = this.model.addPlayer(name);
                 player.setPlayerId(playerID);
                 this.gamePlayers.add(player);
-
-                // notifying clients
-                for (GameChangeListener gameChangeListener : gameChangeListeners) {
-                    gameChangeListener.parametersChanged(this);
-                }
+                fireParametersChanged();
             }
         }
 
         return playerID;
+    }
+
+    public boolean tryKickPlayer(GamePlayer caller, int playerToKickId) {
+        if (caller != this.owner) {
+            return false;
+        }
+
+        synchronized (this) {
+            boolean result = this.model.removePlayer(playerToKickId);
+            boolean result2 = false;
+            for (GamePlayer gamePlayer : gamePlayers) {
+                if(gamePlayer.getPlayerId() == playerToKickId) {
+                    result2 = this.gamePlayers.remove(gamePlayer);
+                    break;
+                }
+            }
+            
+            if(result && result2) {
+                fireParametersChanged();
+            }
+            return result && result2;
+        }
     }
 
     /**
@@ -170,7 +188,7 @@ public class Game implements ModelListener {
                 gameChangeListener.parametersChanged(this);
             }
         } else {
-            fieldChanged();
+            fireFieldChanged();
         }
 
         if (player == owner) {
@@ -194,7 +212,7 @@ public class Game implements ModelListener {
         placed = this.model.tryPlaceBomb(player);
 
         if (placed) {
-            fieldChanged();
+            fireFieldChanged();
         }
 
         return placed;
@@ -270,7 +288,7 @@ public class Game implements ModelListener {
      * just delegation to model of this game.
      * @return list of explosions.
      */
-    public List<Pair> getExplosionSquares() {
+    public List<Pair> getExplosions() {
         return this.model.getExplosionSquares();
     }
 
@@ -356,15 +374,22 @@ public class Game implements ModelListener {
         gameChangeListeners.clear();//!?!?good or bad?
     }
 
-    public void fieldChanged() {
+    public void fireFieldChanged() {
         for (GameChangeListener gameChangeListener : gameChangeListeners) {
             gameChangeListener.fieldChanged();
         }
     }
 
-    public void statsChanged() {
+    public void fireStatsChanged() {
         for (GameChangeListener listener : gameChangeListeners) {
             listener.statsChanged(this);
+        }
+    }
+
+    private void fireParametersChanged() {
+        // notifying clients
+        for (GameChangeListener gameChangeListener : gameChangeListeners) {
+            gameChangeListener.parametersChanged(this);
         }
     }
 

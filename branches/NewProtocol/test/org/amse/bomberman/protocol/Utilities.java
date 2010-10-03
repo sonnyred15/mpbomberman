@@ -5,6 +5,7 @@
 
 package org.amse.bomberman.protocol;
 
+import org.amse.bomberman.protocol.requests.RequestCreator;
 import java.io.IOException;
 import org.amse.bomberman.FakeAsynchroClient;
 import org.amse.bomberman.server.gameservice.GamePlayer;

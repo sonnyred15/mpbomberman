@@ -22,60 +22,69 @@ public class ProtocolConstants {
     /** Notification for client to update game info(about number of players and so on). */
     public static final String UPDATE_GAME_INFO = "Update game info.";
 
-    /** Notification for client to update chat messages. */
-    public static final String UPDATE_CHAT_MSGS = "Update chat messages.";
-
     /** Split symbol that must be used in protocol between args. */
     public static final String SPLIT_SYMBOL = "/";
 
-
-
     private ProtocolConstants() {}
 
-    public static final int CREATE_GAME_MESSAGE_ID = 1;
+    public static final int SET_NAME_MESSAGE_ID = 10;
 
-    public static final int GAMES_LIST_MESSAGE_ID = 2;
+    public static final int GAMES_LIST_MESSAGE_ID = 20;
 
-    public static final int JOIN_GAME_MESSAGE_ID = 3;
-
-    public static final int CHAT_ADD_MESSAGE_ID = 4;
-
-    public static final int DO_MOVE_MESSAGE_ID = 5;
-
-    public static final int GAME_MAP_INFO_MESSAGE_ID = 6;
-
-    public static final int START_GAME_MESSAGE_ID = 7;
-
-    public static final int LEAVE_MESSAGE_ID = 8;
-
-    public static final int PLACE_BOMB_MESSAGE_ID = 9;
-
-    public static final int DOWNLOAD_GAME_MAP_MESSAGE_ID = 10;
-
-    public static final int GAME_STATUS_MESSAGE_ID = 11;
-
-    public static final int GAME_MAPS_LIST_MESSAGE_ID = 12;
-
-    public static final int BOT_ADD_MESSAGE_ID = 13;
-
-    public static final int GAME_INFO_MESSAGE_ID = 14;
+    public static final int GAME_MAPS_LIST_MESSAGE_ID = 30;
     
-    public static final int CHAT_ADD_RESULT_MESSAGE_ID = 15;
+    public static final int CREATE_GAME_MESSAGE_ID = 40;
 
-    public static final int PLAYERS_STATS_MESSAGE_ID = 16;
+    public static final int JOIN_GAME_MESSAGE_ID = 50;
 
-    public static final int SET_NAME_MESSAGE_ID = 17;
+    //
+    public static final int GAME_INFO_MESSAGE_ID = 60;
 
-    public static final int NOTIFICATION_MESSAGE_ID = 18;
+    public static final int GAME_STATUS_MESSAGE_ID = 70;
 
-    public static final int DISCONNECT_MESSAGE_ID = 100500;
+    public static final int CHAT_ADD_MESSAGE_ID = 80;
 
-    public static final int INVALID_REQUEST_MESSAGE_ID = 1000;
+    public static final int CHAT_ADD_RESULT_MESSAGE_ID = 90;
+
+    public static final int CHAT_GET_MESSAGE_ID = 100;
+
+    public static final int BOT_ADD_MESSAGE_ID = 110;    
     
-    public static final int BOT_REMOVE_MESSAGE_ID = 2000;
+    public static final int KICK_PLAYER_MESSAGE_ID = 120;
+      
+    //
+    public static final int START_GAME_MESSAGE_ID = 130;
+
+    public static final int GAME_MAP_INFO_MESSAGE_ID = 140;
+
+    public static final int DO_MOVE_MESSAGE_ID = 150;
+
+    public static final int PLACE_BOMB_MESSAGE_ID = 160;
+
+    //
+    public static final int PLAYERS_STATS_MESSAGE_ID = 170;
+
+    public static int END_RESULTS_MESSAGE_ID = 180;
     
-    public static final int CHAT_GET_MESSAGE_ID = 3000;
+    //
+    public static final int LEAVE_MESSAGE_ID = 190;
 
-    public static int END_RESULTS_MESSAGE_ID = 4000;
+    //
+    public static final int DOWNLOAD_GAME_MAP_MESSAGE_ID = 200;
 
+    public static final int INVALID_REQUEST_MESSAGE_ID = 210;
+
+    //
+    public static final int GAME_INFO_NOTIFY_ID = 510;
+
+    public static final int GAME_STARTED_NOTIFY_ID = 520;
+    
+    public static final int GAME_TERMINATED_NOTIFY_ID = 530;
+
+    public static final int GAME_FIELD_CHANGED_NOTIFY_ID = 540;
+
+    public static final int GAMES_LIST_NOTIFY_ID = 550;
+
+    //
+    public static final int DISCONNECT_MESSAGE_ID = 1000;
 }

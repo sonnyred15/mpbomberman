@@ -221,6 +221,9 @@ public class DefaultModel implements Model, DieListener {
         int newY = destination.getY();
 
         if (objectToMove instanceof ModelPlayer) {
+            if(!((ModelPlayer) objectToMove).isAlive()) {
+                return;
+            }
             if (this.gameMap.isBomb(x, y)) {    // if player setted mine but still in same square
                 this.gameMap.setSquare(x, y, Constants.MAP_BOMB);
             } else {
@@ -462,7 +465,7 @@ public class DefaultModel implements Model, DieListener {
 
     private void notifyListenersFieldChange() {
         for (ModelListener listener : listeners) {
-            listener.fieldChanged();
+            listener.fireFieldChanged();
         }
     }
 }

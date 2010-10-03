@@ -7,7 +7,7 @@ package org.amse.bomberman.server.net.tcpimpl.sessions;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.protocol.RequestExecutor;
+import org.amse.bomberman.protocol.requests.RequestExecutor;
 
 import org.amse.bomberman.server.net.Session;
 

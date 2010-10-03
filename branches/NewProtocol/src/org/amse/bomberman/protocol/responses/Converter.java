@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.responses;
 
 import java.util.List;
 import org.amse.bomberman.server.gameservice.Game;

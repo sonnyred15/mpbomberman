@@ -2,9 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.requests;
 
 import java.util.List;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -132,11 +133,11 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
-    REMOVE_BOT_FROM_GAME(ProtocolConstants.BOT_REMOVE_MESSAGE_ID) {// "15"
+    KICK_PLAYER_FROM_GAME(ProtocolConstants.KICK_PLAYER_MESSAGE_ID) {// "15"
 
         @Override
         public void execute(RequestExecutor executor, List<String> args) throws InvalidDataException  {
-            executor.tryRemoveBot();
+            executor.tryKickPlayer(args);
         }
 
     },
@@ -199,8 +200,8 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
                 return CHAT_ADD_MSG;
             case ProtocolConstants.CHAT_GET_MESSAGE_ID:
                 return CHAT_GET_NEW_MSGS;
-            case ProtocolConstants.BOT_REMOVE_MESSAGE_ID:
-                return REMOVE_BOT_FROM_GAME;
+            case ProtocolConstants.KICK_PLAYER_MESSAGE_ID:
+                return KICK_PLAYER_FROM_GAME;
             case ProtocolConstants.PLAYERS_STATS_MESSAGE_ID:
                 return GET_GAME_PLAYERS_STATS;
             case ProtocolConstants.SET_NAME_MESSAGE_ID:

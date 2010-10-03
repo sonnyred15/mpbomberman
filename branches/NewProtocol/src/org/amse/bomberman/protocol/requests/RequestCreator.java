@@ -2,13 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.requests;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.Constants.Direction;
 import org.amse.bomberman.util.Creator;
 
@@ -75,7 +77,7 @@ public class RequestCreator {
     }
 
     public ProtocolMessage<Integer, String> requestRemoveBotFromGame() {
-        return requestWithEmptyData(ProtocolConstants.BOT_REMOVE_MESSAGE_ID);
+        return requestWithEmptyData(ProtocolConstants.KICK_PLAYER_MESSAGE_ID);
     }
 
     public ProtocolMessage<Integer, String> requestGameMapsList() {

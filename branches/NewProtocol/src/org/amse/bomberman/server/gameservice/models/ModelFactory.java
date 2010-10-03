@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.amse.bomberman.server.gameservice.models;
 
 import org.amse.bomberman.server.gameservice.Game;
@@ -15,8 +14,7 @@ import org.amse.bomberman.server.gameservice.models.impl.DefaultModel;
  */
 public class ModelFactory {
 
-    private ModelFactory() {
-    }
+    private ModelFactory() {}
 
     public static Model createModel(Game game, GameMap gameMap) {
         return new DefaultModel(gameMap, game);

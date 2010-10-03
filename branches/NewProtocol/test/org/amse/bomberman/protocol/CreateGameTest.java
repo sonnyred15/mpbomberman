@@ -1,5 +1,6 @@
 package org.amse.bomberman.protocol;
 
+import org.amse.bomberman.protocol.requests.RequestCreator;
 import java.io.IOException;
 import java.util.List;
 import org.amse.bomberman.FakeAsynchroClient;

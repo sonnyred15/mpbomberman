@@ -9,9 +9,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.server.net.SessionEndListener;
@@ -27,7 +29,7 @@ public class AsynchroSender implements SessionEndListener {
             new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(24);
     //
     private final Socket clientSocket;
-    private final Thread senderThread;
+    private final SenderThread senderThread;
     private volatile boolean mustEnd = false;
 
     public AsynchroSender(Socket clientSocket, long sessionId) {
@@ -48,9 +50,20 @@ public class AsynchroSender implements SessionEndListener {
 
     public void sessionTerminated(Session endedSession) {
         this.mustEnd = true;
+        ProtocolMessage<Integer, String> disconnectMessage
+                = new ProtocolMessage<Integer, String>();
+        disconnectMessage.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
+        disconnectMessage.setData(new ArrayList<String>());
+        try {
+            senderThread.send(disconnectMessage);
+        } catch (IOException ex) {
+            //ignore cause can do nothing..
+        }
+        senderThread.interrupt();
     }
 
     private class SenderThread extends Thread {
+
         private DataOutputStream out;
 
         private SenderThread(String name) {
@@ -63,27 +76,32 @@ public class AsynchroSender implements SessionEndListener {
             Set<Entry<Integer, ProtocolMessage<Integer, String>>> entrySet = messagesMap.entrySet();
             try {
                 out = initWriter();
-                while(!mustEnd && !isInterrupted()) {
+                while (!mustEnd && !isInterrupted()) {
                     try {
-                        for(Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
+                        for (Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
                             ProtocolMessage<Integer, String> toSend = entry.setValue(null);
-                            if(toSend != null) {
+                            if (toSend != null) {
                                 send(toSend);
                             }
                         }
                         Thread.sleep(30);//to not spam client every nanosecond =)
-                    } catch (InterruptedException ex) {//must never happen, but who knows =)
-                        ex.printStackTrace();
-                        //restoring interrupted status.
+                    } catch (InterruptedException ex) {                                                
                         Thread.currentThread().interrupt();
                     }
                 }
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 ex.printStackTrace();
-            }finally {
+            } finally {
                 IOUtilities.close(out);
+                try {
+                    if(clientSocket != null && !clientSocket.isClosed()) {
+                        clientSocket.close();
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
-            
+
             System.out.println(super.getName() + " thread ended.");
         }
 
@@ -96,11 +114,9 @@ public class AsynchroSender implements SessionEndListener {
         private void send(ProtocolMessage<Integer, String> response)
                 throws IOException {
             if (response.isBroken()) {
-                throw new IllegalArgumentException("Broken response. " +
-                        "Message id or message data are null.");
+                throw new IllegalArgumentException("Broken response. "
+                        + "Message id or message data are null.");
             }
-
-            System.out.println(super.getName() + " sending answer...");
 
             List<String> data = response.getData();
             int size = data.size();

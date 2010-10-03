@@ -14,7 +14,7 @@ import org.amse.bomberman.util.Constants;
  *
  * @author Kirilchuk V.E
  */
-public enum Bonus {
+public enum Bonus { //VISITOR pattern can be used in this situation.
     LIFE {
         @Override
         public void applyBy(ModelPlayer player) {
@@ -25,7 +25,7 @@ public enum Bonus {
         public int getID() {
             return Constants.MAP_BONUS_LIFE;
         }
-    },
+    },    //Player has method accept(Visitor v) { v.visit(this); }
     BOMB {
         @Override
         public void applyBy(ModelPlayer player) {
@@ -36,7 +36,7 @@ public enum Bonus {
         public int getID() {
             return Constants.MAP_BONUS_BOMB_COUNT;
         }
-    },
+    },    //ConcreteBonus implements Visitor { visit(Player pl) {pl.incrementLifes();}
     RADIUS {
         @Override
         public void applyBy(ModelPlayer player) {
@@ -47,8 +47,8 @@ public enum Bonus {
         public int getID() {
             return Constants.MAP_BONUS_BOMB_RADIUS;
         }
-    };
-
+    };  //Current realization not so good cause model manages the visit method,
+                    //not player himself.
     public abstract void applyBy(ModelPlayer player);
     public abstract int getID();
 

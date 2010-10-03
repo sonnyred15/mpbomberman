@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,8 +27,8 @@ import org.amse.bomberman.util.IOUtilities;
  * @author Kirilchuk V.E.
  */
 public class AsynchroConnector implements Connector {
-    private static Connector connector = null;
 
+    private static Connector connector = null;
     private Socket socket;
     private Thread inputThread;
     private DataOutputStream out = null;
@@ -67,14 +68,15 @@ public class AsynchroConnector implements Connector {
 
     public synchronized void closeConnection() {
         try {
-            if(inputThread != null) {
+            if (inputThread != null) {
                 inputThread.interrupt();
-                if(socket != null) {
+                if (socket != null && !socket.isInputShutdown()) {
                     socket.shutdownInput();
                 }
             }
             IOUtilities.close(out);
-            if(socket != null && !socket.isClosed()) {
+            IOUtilities.close(in);
+            if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
         } catch (IOException ex) {
@@ -83,7 +85,7 @@ public class AsynchroConnector implements Connector {
         }
     }
 
-    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {        
+    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {
         try {
             List<String> data = request.getData();
             if (data == null) {
@@ -93,7 +95,7 @@ public class AsynchroConnector implements Connector {
 
             out.writeInt(request.getMessageId());
             out.writeInt(size);
-            for(String string : data) {
+            for (String string : data) {
                 if (string == null) {
                     throw new IllegalArgumentException("Strings in data can`t be null.");
                 }
@@ -102,42 +104,47 @@ public class AsynchroConnector implements Connector {
             //
             out.flush();
         } catch (IOException ex) {
-            System.out.println("AsynchroConnector: sendRequest error." + ex.getMessage());
+            System.err.println("AsynchroConnector: sendRequest error." + ex.getMessage());
             throw new NetException();
         }
     }
 
     private class ServerListen implements Runnable {
-                
+
         public void run() {
             try {
                 while (!Thread.interrupted()) {
-                    ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
-                    int messageId = in.readInt();
-                    if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
-                        break;
+                    try {
+                        ProtocolMessage<Integer, String> message
+                                = new ProtocolMessage<Integer, String>();
+                        int messageId = in.readInt();
+                        if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
+                            break;
+                        }
+
+                        message.setMessageId(messageId);
+
+                        int size = in.readInt();
+                        List<String> data = new ArrayList<String>(size);
+                        for (int i = 0; i < size; i++) {
+                            data.add(in.readUTF());
+                        }
+                        message.setData(data);
+
+                        SwingUtilities.invokeLater(new InvokationCommand(message));
+                    } catch (EOFException ex) {
+                        /* Ignore cause server always send DISCONNECT_MESSAGE before
+                        end of stream. (Except the collapse)
+                        But this catch used to not fall into IOException
+                        when application is closing and we are closing connection. */
                     }
-
-                    message.setMessageId(messageId);
-
-                    int size = in.readInt();
-                    List<String> data = new ArrayList<String>(size);
-                    for (int i = 0; i < size; i++) {
-                        data.add(in.readUTF());
-                    }
-                    message.setData(data);
-
-                    SwingUtilities.invokeLater(new InvokationCommand(message));
                 }
-
             } catch (IOException ex) {
                 ex.printStackTrace();
-                System.out.println("ServerListen: run error. " + ex.getMessage());
-            } finally {
-                IOUtilities.close(in);
+                System.err.println("ServerListen: run error. " + ex.getMessage());
             }
-
-            System.out.println("ServerListen: run ended.");            
+            
+            System.out.println("ServerListen: run ended.");
         }
 
         private class InvokationCommand implements Runnable {
@@ -149,41 +156,7 @@ public class AsynchroConnector implements Connector {
             }
 
             public void run() {
-                processServerMessage();
-            }
-
-            private void processServerMessage() {
-                int messageId = message.getMessageId();
-
-                /* for debugging */
-                // TODO USE LOGGER!
-                /*--------------*/
-                try {
-                    if(messageId == ProtocolConstants.NOTIFICATION_MESSAGE_ID) {
-                        List<String> notifications = message.getData();
-                        for (String string : notifications) {
-                            processNotification(string);
-                        }
-                    } else {
-                        ControllerImpl.getInstance().receivedRequestResult(message);
-                    }
-                } catch (NetException ex) { // notification process failed. Ignore.
-                    ex.printStackTrace();
-                }
-            }
-
-            private void processNotification(String string) throws NetException {
-                if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    ControllerImpl.getInstance().requestGetNewChatMessages();
-                } else if (string.equals(ProtocolConstants.UPDATE_GAMES_LIST)) {
-                    ControllerImpl.getInstance().requestGamesList();
-                } else if (string.equals(ProtocolConstants.UPDATE_GAME_INFO)) {
-                    ControllerImpl.getInstance().requestGameInfo();
-                } else if (string.equals(ProtocolConstants.UPDATE_GAME_MAP)) {
-                    ControllerImpl.getInstance().requestGameMap();
-                } else if (string.equals(ProtocolConstants.UPDATE_CHAT_MSGS)) {
-                    ControllerImpl.getInstance().requestGetNewChatMessages();
-                }
+                ControllerImpl.getInstance().receivedResponse(message);
             }
         }
     }

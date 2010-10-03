@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.protocol.requests;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -47,7 +47,7 @@ public interface RequestExecutor {
 
     void sendNewMessagesFromChat() throws InvalidDataException ;
 
-    void tryRemoveBot() throws InvalidDataException ;
+    public abstract void tryKickPlayer(List<String> args) throws InvalidDataException ;
 
     void sendGamePlayersStats() throws InvalidDataException ;
 

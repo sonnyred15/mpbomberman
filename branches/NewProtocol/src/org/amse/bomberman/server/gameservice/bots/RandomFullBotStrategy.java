@@ -7,6 +7,7 @@ package org.amse.bomberman.server.gameservice.bots;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.util.List;
 import org.amse.bomberman.server.gameservice.GameMap;
 import org.amse.bomberman.server.gameservice.models.Model;
 import org.amse.bomberman.util.Constants.Direction;
@@ -15,6 +16,10 @@ import org.amse.bomberman.util.Pair;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Random;
+import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.models.impl.Bonus;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
+import org.amse.bomberman.util.Constants;
 
 /**
  * Class that represents bot strategy where bot
@@ -39,26 +44,19 @@ public class RandomFullBotStrategy extends BotStrategy {
      * @return new place bomb and move or just move action.
      */
     @Override
-    public Action thinkAction(Bot bot, Model model) {
-        if (bot.getPosition().equals(this.target) || (target == null)) {
-            target = findNewTarget(model);
+    public Action thinkAction(Game game, BotGamePlayer bot) {
+        ModelPlayer player = game.getPlayer(bot.getPlayerId());
+        if (player.getPosition().equals(target) || (target == null)) {
+            target = findNewTarget(game, player);
         }
 
         Direction direction = null;
 
         do {
             try {
-                Thread.sleep(75);    // here bot thread will wait for some time.
-                direction = findWay(bot.getPosition(), target,
-                                    model.getGameMap().getField(), model);
-
-                // System.out.println("Direction" + direction.toString());
+                direction = findWay(game, player.getPosition(), target);
             } catch (IllegalArgumentException ex) {
-                target = findNewTarget(model);
-
-                // System.out.println("NEW TARGET");
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                target = findNewTarget(game, player);
             }
         } while (direction == null);
 
@@ -66,26 +64,26 @@ public class RandomFullBotStrategy extends BotStrategy {
         int    n = rnd.nextInt(100);
 
         if (n < PLACE__BOMB_PROBABILITY) {
-            return new PlaceAndMoveAction(direction, bot);
+            return new PlaceAndMoveAction(game, player,direction);
         }
 
-        return new MoveAction(direction, bot);
+        return new MoveAction(game, player, direction);
     }
 
-    private Pair findNewTarget(Model model) {
-        GameMap map = model.getGameMap();
+    private Pair findNewTarget(Game game, ModelPlayer player) {
+        int[][] field = game.getGameField();
+
         Random  random = new Random();
         int     x = 0;
         int     y = 0;
 
         do {
-            x = random.nextInt(map.getDimension() - 1);
-            y = random.nextInt(map.getDimension() - 1);
-        } while (!(map.isEmpty(x, y) || map.isBonus(x, y)));
+            x = random.nextInt(field.length - 1);
+            y = random.nextInt(field.length - 1);
+        } while (!((field[x][y] == Constants.MAP_EMPTY) || Bonus.isBonus(field[x][y])));
 
         Pair dir = new Pair(x, y);
 
-        // System.out.println("Choosed " + dir.toString());
         return dir;
     }
 }
