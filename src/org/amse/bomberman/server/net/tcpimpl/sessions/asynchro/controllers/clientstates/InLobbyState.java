@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
 import org.amse.bomberman.protocol.ProtocolConstants;
@@ -189,23 +185,5 @@ public class InLobbyState extends AbstractClientState {
 
         return protocol.ok(ProtocolConstants.LEAVE_MESSAGE_ID,
                             "Disconnected.");
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() == obj.getClass()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 6;
-        return hash;
     }
 }

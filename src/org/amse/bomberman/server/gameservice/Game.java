@@ -1,15 +1,10 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.amse.bomberman.server.gameservice.models.Model;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -31,6 +26,7 @@ import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
  * <p>
  * 2) After start, game became something like a dealer between
  * players controllers and model.
+ * 
  * @author Kirilchuk V.E.
  */
 public class Game implements ModelListener {
@@ -298,7 +294,7 @@ public class Game implements ModelListener {
      * just delegation.
      * @return matrix of game field.
      */
-    public int[][] getGameField() {
+    public int[][] getGameField() {//TODO let`s return GameMap
         return this.model.getGameMap().getField();
     }
 

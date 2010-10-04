@@ -1,8 +1,3 @@
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.servers;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -36,19 +31,18 @@ public class TcpServer implements Server {
     private GameStorage  gameStorage;
     private Thread       listeningThread;
     //
-    private long sessionCounter = 0;    // need to generate unique ID`s for sessions.
+    private volatile long lastId = 0;    // need to generate unique ID`s for sessions.
     //
     private final Comparator<Session> comparator = new Comparator<Session>() {
 
         public int compare(Session ses1, Session ses2) {
             long id1 = ses1.getId();
             long id2 = ses2.getId();
-
-            return (int)(id1 - id2);// lost of presicion
+            return (int)(id1 - id2);// loss of presicion
         }
 
     };
-    final Set<Session> sessions =
+    private final Set<Session> sessions =
             new ConcurrentSkipListSet<Session>(comparator);
     //    
 
@@ -94,7 +88,7 @@ public class TcpServer implements Server {
     /**
      * {@inheritDoc}
      */
-    public boolean isStopped() {
+    public boolean isStopped() {// don`t need synchronized cause state is volatile.
         return (this.getServerState() == StoppedState.getInstance());
     }
 
@@ -109,23 +103,14 @@ public class TcpServer implements Server {
      * {@inheritDoc}
      */
     public Set<Session> getSessions() {
-        return Collections.unmodifiableSet(this.sessions);
+        return this.sessions;
     }
 
     /**
      * {@inheritDoc}
      */
-    public GameStorage getGameStorage() {
-        return gameStorage;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public synchronized void sessionTerminated(Session endedSession) {//synchronization for decrement atomicity
+    public void sessionTerminated(Session endedSession) {
         this.sessions.remove(endedSession);
-        this.sessionCounter--;
-
         System.out.println("Server: session removed.");
     }
 
@@ -158,6 +143,13 @@ public class TcpServer implements Server {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public GameStorage getGameStorage() {
+        return gameStorage;
+    }
+
+    /**
      * @param gameStorage the gameStorage to set
      */
     void setGameStorage(GameStorage gameStorage) {
@@ -181,14 +173,14 @@ public class TcpServer implements Server {
     /**
      * @return the sessionCounter
      */
-    long getSessionCounter() {
-        return sessionCounter;
+    long getLastId() {//don`t need synchronize cause lastId is volatile
+        return lastId;
     }
 
     /**
      * @param sessionCounter the sessionCounter to set
      */
-    void setSessionCounter(long sessionCounter) {
-        this.sessionCounter = sessionCounter;
+    void setLastId(long id) {
+        this.lastId = id;
     }
 }

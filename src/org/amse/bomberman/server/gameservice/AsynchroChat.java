@@ -1,8 +1,3 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -16,10 +11,7 @@ import java.util.Collection;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 
 /**
  * Class that represents lobby chat. And ingame kill info.
@@ -84,7 +76,7 @@ public class AsynchroChat {
             res.append(buff);
 
             return ("SuperMind: " + res.toString());
-        } catch (ArithmeticException ex) {
+        } catch (ArithmeticException ex) {//TODO log but not error
             System.err.println("Chat: addMessage warning. " +
                               "SuperMind got arithmetic exception."
                               + ex.getMessage());

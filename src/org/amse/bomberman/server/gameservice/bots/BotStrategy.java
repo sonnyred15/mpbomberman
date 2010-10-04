@@ -11,7 +11,7 @@ import org.amse.bomberman.util.Pair;
 import org.amse.bomberman.server.gameservice.models.Model;
 import org.amse.bomberman.server.gameservice.models.impl.Bonus;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 
 /**
  * Class that represents bot strategy. Strategy is something like methods

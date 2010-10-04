@@ -5,6 +5,7 @@
 package org.amse.bomberman.server.net.tcpimpl.servers;
 
 import java.io.IOException;
+import org.amse.bomberman.server.net.Session;
 
 /**
  *
@@ -30,26 +31,29 @@ class StartedState implements ServerState {
 
     }
 
-    public void stop(TcpServer server) throws IOException {
-        try {
-            //Stop accepting clients by closing ServerSocket
-            //So, listening thread will end, but before he must clear
-            //all resources: clear games, terminate sessions and so on.
-            if(server.getServerSocket() != null) {
+    public void stop(TcpServer server) {
+        //Stop accepting clients by closing ServerSocket
+        //So, listening thread will end.
+        if (server.getServerSocket() != null) {
+            try {
                 server.getServerSocket().close();
-                server.setServerSocket(null);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
+        }
 
-            //nulling listeningThread.
-            if(server.getListeningThread() != null) {
-                server.setListeningThread(null);
-            }
+        //Terminating all sessions
+        for (Session session : server.getSessions()) {
+            System.out.println(
+                    "Server: interrupting session " + session.getId() + "...");
+            session.terminateSession();
+        }
 
-            //sessions terminating in freeResources method.
-        } catch (IOException ex) {
-            System.err.println("Server: stop error. " + ex.getMessage());
+        server.setLastId(0);
 
-            throw ex;
+        //Clear games.
+        if (server.getGameStorage() != null) {
+            server.getGameStorage().clearGames();
         }
 
         server.setServerState(StoppedState.getInstance());

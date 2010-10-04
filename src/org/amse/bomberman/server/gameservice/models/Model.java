@@ -12,7 +12,7 @@ import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.GameMap;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------

@@ -57,6 +57,7 @@ public class AsynchroSender implements SessionEndListener {
         try {
             senderThread.send(disconnectMessage);
         } catch (IOException ex) {
+            ex.printStackTrace();
             //ignore cause can do nothing..
         }
         senderThread.interrupt();
@@ -96,13 +97,14 @@ public class AsynchroSender implements SessionEndListener {
                 try {
                     if(clientSocket != null && !clientSocket.isClosed()) {
                         clientSocket.close();
+                        System.out.println("Session: closed socket.");
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
 
-            System.out.println(super.getName() + " thread ended.");
+            System.out.println(super.getName() + " output listening thread ended.");
         }
 
         /**

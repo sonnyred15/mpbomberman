@@ -1,8 +1,3 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -68,6 +63,10 @@ public abstract class AbstractSession implements Session {
 
     public void removeEndListener(SessionEndListener listener) {
         this.listeners.remove(listener);
+    }
+
+    public void clearEndListeners() {
+        this.listeners.clear();
     }
 
     /**

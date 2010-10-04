@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.util;
 
 import java.io.Closeable;
@@ -23,7 +19,6 @@ public class IOUtilities {
         }
     }
 
-    private IOUtilities() {
-    }
+    private IOUtilities() {}
 
 }

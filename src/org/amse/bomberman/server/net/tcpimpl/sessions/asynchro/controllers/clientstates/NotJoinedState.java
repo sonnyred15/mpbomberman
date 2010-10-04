@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
 import java.io.FileNotFoundException;
@@ -9,10 +5,8 @@ import java.io.IOException;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.NetGamePlayer;
-import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -172,23 +166,5 @@ public class NotJoinedState extends AbstractClientState {
             }
         }
         return joinResult;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() == obj.getClass()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        return hash;
     }
 }

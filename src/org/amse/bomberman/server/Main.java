@@ -18,7 +18,7 @@ public class Main {
      * Initialize view.
      * @param args the command line arguments. Not supported.
      */
-    public static void main(String[] args){
+    public static void main(String[] args){//TODO make console start. GUI only for special
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new ServerFrame();

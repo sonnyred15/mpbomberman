@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.model;
 
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 
 /**
  * @author Michail Korovkin

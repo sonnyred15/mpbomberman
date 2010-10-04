@@ -1,8 +1,3 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.util;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -29,7 +24,7 @@ import org.amse.bomberman.server.gameservice.GameMap;
  *
  * @author Kirilchuk V.E.
  */
-public class GameMapXMLParser {
+public class GameMapXMLParser {//TODO TEST IT!
     private static DocumentBuilder docBuilder = null;
 
     static {
@@ -46,9 +41,9 @@ public class GameMapXMLParser {
     }
 
     public GameMap parseAndCreate(File XMLFile) throws IOException,
-                                                      SAXException,
-                                                      IllegalArgumentException,
-                                                      DOMException {
+                                                       SAXException,
+                                                       IllegalArgumentException,
+                                                       DOMException {
         String  gameMapName = null;
         int     dimension   = 0;
         int[][] field       = null;

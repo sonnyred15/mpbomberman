@@ -1,8 +1,3 @@
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -26,9 +21,9 @@ import org.amse.bomberman.protocol.responses.ResponseCreator;
  *
  * @author Kirilchuk V.E.
  */
-public class GlobalNotificator extends Thread { //TODO bad concurency
+public class GlobalNotificator extends Thread { //TODO bad concurency //TODO REDISIGN
 
-    private final ResponseCreator protocol = new ResponseCreator(); //TODO inject from session
+    private final ResponseCreator protocol = new ResponseCreator();
     private final BlockingQueue<ProtocolMessage<Integer, String>> queue;
     private final Server server;
 

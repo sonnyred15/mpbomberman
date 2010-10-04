@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.servers;
 
 import java.io.IOException;
@@ -26,8 +22,8 @@ class StoppedState implements ServerState {
     public void start(TcpServer server) throws IOException {
         try {
             server.setServerSocket(new ServerSocket(server.getPort(), 0));    // throws IOExeption,SecurityException
-            server.setListeningThread(new Thread(new ServerThread(server)));
             server.setGameStorage(new GameStorage(server));
+            server.setListeningThread(new Thread(new ServerThread(server)));
         } catch (IOException ex) {
             System.err.println("Server: start error. " + ex.getMessage());
 

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.amse.bomberman.FakeAsynchroClient;
 import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

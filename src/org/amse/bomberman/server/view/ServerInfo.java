@@ -1,8 +1,3 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.view;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -17,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.server.gameservice.Game;
@@ -40,7 +34,7 @@ public class ServerInfo extends JFrame {
     private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
 
     //
-    private Server         server;
+    private Server          server;
     private final JTextArea log                 = new JTextArea();
     private final JLabel    labelUnstartedGames = new JLabel(UNSTARTED_GAMES_LABEL_TEXT);
     private final JLabel    labelStartedGames   = new JLabel(STARTED_GAMES_LABEL_TEXT);

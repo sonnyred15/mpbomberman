@@ -69,12 +69,12 @@ public class ConverterToString implements Converter<String> {
      * @param expl explosions to stringazize.
      * @return list of explosions as list of strings.
      */
-    public List<String> convertExplosions(List<Pair> expl) {    // CHECK < THIS!!!// WHATS ABOUT SYNCHRONIZATION?
+    public List<String> convertExplosions(List<Pair> expl) {//TODO WHATS ABOUT SYNCHRONIZATION?
         List<String> result = new ArrayList<String>();
 
         result.add(String.valueOf(expl.size()));
 
-        for (Pair pair : expl) {
+        for (Pair pair : expl) {//TODO WHAT IF CONCURRENT MODIFICATION?
             result.add(pair.getX() + " " + pair.getY());
         }
 
@@ -173,7 +173,7 @@ public class ConverterToString implements Converter<String> {
      * @param gameMapField field to make list of strings from.
      * @return gameMapField as list of strings.
      */
-    public List<String> convertField(int[][] gameMapField) {    // CHECK < THIS!!!// WHATS ABOUT field SYNCHRONIZATION?
+    public List<String> convertField(int[][] gameMapField) {//TODO WHATS ABOUT field SYNCHRONIZATION?
         List<String> lst = new ArrayList<String>();
 
         lst.add("" + gameMapField.length);

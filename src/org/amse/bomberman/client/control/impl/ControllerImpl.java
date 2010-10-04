@@ -9,7 +9,7 @@ import org.amse.bomberman.client.net.RequestResultListener;
 import org.amse.bomberman.client.view.bomberwizard.BomberWizard;
 import org.amse.bomberman.client.view.gamejframe.GameJFrame;
 import org.amse.bomberman.client.view.wizard.Wizard;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.requests.RequestCreator;

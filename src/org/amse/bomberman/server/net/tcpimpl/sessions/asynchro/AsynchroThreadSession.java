@@ -1,13 +1,7 @@
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
 //~--- non-JDK imports --------------------------------------------------------
 import java.io.BufferedInputStream;
-import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,20 +55,18 @@ public class AsynchroThreadSession extends AbstractSession {
      * @param gameStorage game storage for this session.
      * @param sessionId unique id of this session.
      */
-    public AsynchroThreadSession(SessionEndListener creator,
-            Socket clientSocket,
+    public AsynchroThreadSession(Socket clientSocket,
             GameStorage gameStorage, long sessionId) {
         super(clientSocket, sessionId);
 
         this.gameStorage = gameStorage;
-        this.listeners.add(creator);
-
+        
         this.sessionThread = new SessionThread();
         this.sessionThread.setDaemon(true);
     }
 
     public void start() {
-        this.controller = new Controller(this);
+        this.controller = new Controller(this, protocol);
         this.listeners.add(controller);
 
         this.sender = new AsynchroSender(clientSocket, sessionId);
@@ -106,13 +98,17 @@ public class AsynchroThreadSession extends AbstractSession {
      */
     private void release() {
         for (SessionEndListener listener : listeners) {
-            listener.sessionTerminated(this);
+            try {
+                listener.sessionTerminated(this);
+            } catch (RuntimeException ex) {//good practice =)
+                ex.printStackTrace();
+            }
         }
+        clearEndListeners();//doesn`t need anymore
     }
 
     private class SessionThread extends Thread {
         //
-
         private DataInputStream in = null;
 
         /**
@@ -132,8 +128,10 @@ public class AsynchroThreadSession extends AbstractSession {
                 System.err.println("Session: run error. " + ex.getMessage());
             } finally {
                 release();
-                closeConnection(in);
+                IOUtilities.close(in);
             }
+
+            System.out.println("Session: input listening thread shutdowned.");
         }
 
         private void cyclicReadAndProcess(DataInputStream in) throws IOException {
@@ -147,7 +145,11 @@ public class AsynchroThreadSession extends AbstractSession {
                 }
 
                 int dataCount = in.readInt();
-                //throws IllegalArgumentExeption if dataCount < 0
+                if(dataCount < 0) {
+                    System.err.println("Client sended negative dataCount. Disconnect.");
+                    break;
+                }
+                
                 List<String> data = new ArrayList<String>(dataCount);
                 for (int i = 0; i < dataCount; ++i) {
                     data.add(in.readUTF());
@@ -182,19 +184,6 @@ public class AsynchroThreadSession extends AbstractSession {
                 send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
                         ex.getMessage()));
             }
-        }
-
-        private void closeConnection(Closeable in) {
-            try {
-                IOUtilities.close(in);
-                if (clientSocket != null && !clientSocket.isClosed()) {
-                    clientSocket.close();
-                }
-            } catch (IOException ex) {
-                System.err.println("Session: terminating error. IOException "
-                        + "while closing resourses. " + ex.getMessage());
-            }
-            System.out.println("Session: terminated.");
         }
 
         private void setClientSocketTimeout(int timeout) {

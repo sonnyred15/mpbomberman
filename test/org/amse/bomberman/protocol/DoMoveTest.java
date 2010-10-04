@@ -10,7 +10,7 @@ import org.amse.bomberman.FakeAsynchroClient;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

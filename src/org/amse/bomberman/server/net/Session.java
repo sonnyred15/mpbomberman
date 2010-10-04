@@ -1,8 +1,3 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.net;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -59,4 +54,8 @@ public interface Session {
      * @return true if session must terminate, false - otherwise.
      */
     boolean isMustEnd();
+
+    void addEndListener(SessionEndListener listener);
+
+    void removeEndListener(SessionEndListener listener);
 }
