@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  *
- * @author chibis
+ * @author Kirilchuk V.E.
  */
 public class ProtocolMessage<Identificator, DataType> {
 

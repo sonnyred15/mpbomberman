@@ -1,8 +1,6 @@
 package org.amse.bomberman.util;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -11,8 +9,7 @@ import java.util.List;
  */
 public final class Constants {
     
-    private Constants() {
-    }
+    private Constants() {}
 
     public static final int MAP_EMPTY  = 0;
     public static final int MAP_PROOF_WALL = -8;
@@ -48,40 +45,5 @@ public final class Constants {
         f = f.getParentFile();
         f = new File(f.getPath() + "/resources/maps");
         RESOURSES_GAMEMAPS_DIRECTORY = f;
-    }
-
-
-    public static enum Direction {
-
-        DOWN(0),
-        LEFT(1),
-        UP(2),
-        RIGHT(3);
-
-        private final int value;
-
-        private Direction(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return this.value;
-        }
-
-        public static Direction fromInt(int direction) throws IllegalArgumentException{
-            switch (direction) {
-                case 0:
-                    return DOWN;
-                case 1:
-                    return LEFT;
-                case 2:
-                    return UP;
-                case 3:
-                    return RIGHT;
-                default:
-                    throw new IllegalArgumentException("Wrong argument " +
-                            "must be between 0 and 3 inclusive");
-            }
-        }
     }
 }

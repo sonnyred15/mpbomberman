@@ -48,6 +48,7 @@ public class GameStorage implements GameChangeListener {
             throw new IllegalArgumentException("Args can`t be null.");
         }
 
+        //TODO all below must do spesial builder, not storage.
         File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
 
         int extensionIndex = gameMapName.indexOf(".map");
@@ -101,8 +102,7 @@ public class GameStorage implements GameChangeListener {
     }
 
     public synchronized Game getGame(int n) {
-        Game game = null;//return null if no game with such index was founded
-
+        Game game = null;
         try {
             game = this.games.get(n);
         } catch (IndexOutOfBoundsException ex) {

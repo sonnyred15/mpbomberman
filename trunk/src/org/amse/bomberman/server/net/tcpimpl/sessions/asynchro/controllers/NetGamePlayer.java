@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 import org.amse.bomberman.protocol.ProtocolConstants;
@@ -20,7 +16,7 @@ public class NetGamePlayer implements GamePlayer, GameChangeListener {
 
     private String nickName = "unnamed";
     private int playerId = -1;
-    private final ResponseCreator protocol = new ResponseCreator();
+    private final ResponseCreator protocol = new ResponseCreator();//TODO inject from
     private final Controller controller;
 
     public NetGamePlayer(Controller controller) {

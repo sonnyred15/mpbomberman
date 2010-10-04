@@ -3,7 +3,7 @@ package org.amse.bomberman.client.view.gamejframe;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.impl.ControllerImpl;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 

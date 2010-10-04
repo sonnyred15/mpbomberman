@@ -1,15 +1,10 @@
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 //~--- non-JDK imports --------------------------------------------------------
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.net.Session;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -31,7 +26,7 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
  */
 public class Controller implements RequestExecutor, SessionEndListener {
 
-    private final ResponseCreator protocol = new ResponseCreator();//TODO inject from session
+    private final ResponseCreator protocol;
     private final NetGamePlayer player = new NetGamePlayer(this);
     //
     private volatile ClientState state = new NotJoinedState(this);
@@ -43,8 +38,9 @@ public class Controller implements RequestExecutor, SessionEndListener {
      * @param sessionServer server of session that owns this controller.
      * @param session owner of this controller.
      */
-    public Controller(Session session) {
+    public Controller(Session session, ResponseCreator protocol) {
         this.session = session;
+        this.protocol = protocol;
     }
 
     public void sendGames() {
@@ -53,12 +49,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void tryCreateGame(List<String> args) throws InvalidDataException {// gameName mapName maxPlayers
-        if(args.size() != 3) { // if we getted command with wrong number of args
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Wrong command parameters. Error on client side.");
-            throw new InvalidDataException(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 3, ProtocolConstants.CREATE_GAME_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         //here all is OK
         Iterator<String> iterator = args.iterator();
@@ -80,11 +72,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void tryJoinGame(List<String> args) throws InvalidDataException {//gameID playerName
-        if(args.size() != 2) {
-            System.out.println("Session: joinGame error. Wrong command parameters. Error on client side.");
-            throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 2, ProtocolConstants.JOIN_GAME_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         //here all is OK
         int gameID = 0;
@@ -107,12 +96,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void tryDoMove(List<String> args) throws InvalidDataException {
-        if(args.size() != 1) {
-            System.out.println("Session: doMove warning. Client tryed to move, canceled. "
-                    + "Wrong number of parameters. Error on client side.");
-            throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 1, ProtocolConstants.DO_MOVE_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         Iterator<String> iterator = args.iterator();
         Direction direction = null;
@@ -154,12 +139,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
 
     public void sendDownloadingGameMap(List<String> args) throws
             InvalidDataException {
-        if(args.size() != 1) {
-            System.out.println("Session: sendDownloadingGameMap warning. "
-                    + "Wrong number of args. Error on client side.");
-            throw new InvalidDataException(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 1, ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         Iterator<String> iterator = args.iterator();
         String gameMapName = iterator.next();
@@ -177,14 +158,11 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void tryAddBot(List<String> args) throws InvalidDataException {
-        if(args.size() != 1) {
-            System.out.println("Session: tryAddBot warning. Not enough arguments. Cancelled.");
-            throw new InvalidDataException(ProtocolConstants.BOT_ADD_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 1, ProtocolConstants.BOT_ADD_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         Iterator<String> iterator = args.iterator();
-        String botName = iterator.next(); //TODO what`s about incorrect name.
+        String botName = iterator.next(); //TODO what`s about incorrect name. Ex.: null or empty!?
 
         sendToClient(state.addBot(botName));
     }
@@ -195,12 +173,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void addMessageToChat(List<String> args) throws InvalidDataException {
-        if(args.size() != 1) {
-            System.out.println("Session: addMessageToChat error. Client tryed to add message, canceled. Wrong query.");
-
-            throw new InvalidDataException(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 1, ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
+                "Wrong number of arguments.");
 
         sendToClient(state.addMessageToChat(args.get(0)));
     }
@@ -210,12 +184,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void tryKickPlayer(List<String> args) throws InvalidDataException {
-        if(args.size() != 1) {
-            System.out.println("Session: kick player error. Canceled. Wrong query.");
-
-            throw new InvalidDataException(ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
-                                           "Wrong number of arguments.");
-        }
+        checkArgsNum(args, 1, ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
+                "Wrong number of arguments.");
         
         int playerId;
         try {
@@ -237,40 +207,29 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void setClientNickName(List<String> args) throws InvalidDataException {// "17 name"
-        if(args.size() != 1) {
-            throw new InvalidDataException(ProtocolConstants.SET_NAME_MESSAGE_ID,
-                    "Wrong number of arguments.");
-        } else {
-            Iterator<String> iterator = args.iterator();
-            String name = iterator.next();
-            this.player.setNickName(name);
-            sendToClient(protocol.ok(
-                    ProtocolConstants.SET_NAME_MESSAGE_ID,
-                    "Name was set."));
-        }
-    }
+        checkArgsNum(args, 1, ProtocolConstants.SET_NAME_MESSAGE_ID,
+                "Wrong number of arguments.");
 
-    public Session getSession() {
-        return session;
+        Iterator<String> iterator = args.iterator();
+        String name = iterator.next();
+        this.player.setNickName(name);
+        sendToClient(protocol.ok(ProtocolConstants.SET_NAME_MESSAGE_ID,
+                "Name was set."));
     }
 
     public void sendToClient(ProtocolMessage<Integer, String> message) {
         this.session.send(message);
     }
 
-    private String cutLength(String string, int maxLength) {
-        if(string.length() > maxLength) {
-            return string.substring(0, maxLength);
-        } else {
-            return string;
-        }
+    public Session getSession() {
+        return session;
     }
 
     public ClientState getState() {
         return state;
     }
 
-    public synchronized void setState(ClientState state) {
+    public void setState(ClientState state) {//don`t need synchronized cause not need atomicity and state is volatile
         this.state = state;
     }
 
@@ -279,8 +238,24 @@ public class Controller implements RequestExecutor, SessionEndListener {
     }
 
     public void sessionTerminated(Session endedSession) {
-        if(!this.state.equals(new NotJoinedState(this))) {
+        if(!(this.state.getClass() == NotJoinedState.class)) {
             this.state.leave();
+        }
+    }
+
+    private void checkArgsNum(List<String> args, int expected,
+                              int errorMessageId, String errorMessage)
+                                                  throws InvalidDataException {
+        if(args.size() != expected) {
+            throw new InvalidDataException(errorMessageId, errorMessage);
+        }
+    }
+
+    private String cutLength(String string, int maxLength) {
+        if(string.length() > maxLength) {
+            return string.substring(0, maxLength);
+        } else {
+            return string;
         }
     }
 }

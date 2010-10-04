@@ -9,7 +9,7 @@ package org.amse.bomberman.server.gameservice.bots;
 
 import org.amse.bomberman.server.gameservice.Game;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 
 /**
  * Class that represents move action for bot.

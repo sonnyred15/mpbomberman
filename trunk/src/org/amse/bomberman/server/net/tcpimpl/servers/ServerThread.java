@@ -12,7 +12,7 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.AsynchroThreadSes
  */
 class ServerThread implements Runnable {
 
-    private TcpServer server;
+    private final TcpServer server;
 
     ServerThread(TcpServer server) {
         this.server = server;
@@ -22,49 +22,31 @@ class ServerThread implements Runnable {
     public void run() {
         try {
             while(!server.isStopped()) {
-                System.out.println("Server: waiting for a new client...");
                 Socket clientSocket = server.getServerSocket().accept();
-                System.out.println("Server: client connected. "
-                        + "Starting new session thread...");
-                server.setSessionCounter(server.getSessionCounter() + 1); //TODO maybe synchronize problem;
                 //
                 Session newSession =
-                        new AsynchroThreadSession(server, clientSocket,
+                        new AsynchroThreadSession(clientSocket,
                                                   server.getGameStorage(),
-                                                  server.getSessionCounter());
+                                                  server.getLastId());
                 //
-                server.sessions.add(newSession);
+                synchronized(server) {//for atomicity of get-set
+                    long lastId = server.getLastId();
+                    server.setLastId(lastId + 1);
+                                     
+                }
+                server.getSessions().add(newSession);
+                newSession.addEndListener(server);
                 newSession.start();
             }
         } catch (SocketTimeoutException ex) {
             // never happen in current realization
-            System.out.println("Server: run warning. " + ex.getMessage());
+            System.out.println("ServerThread: run warning. " + ex.getMessage());
         } catch (IOException ex) {
             // if an I/O error occurs when waiting for a connection.
-            if(ex.getMessage().equalsIgnoreCase("Socket closed")) {
-                System.out.println("Server: " + ex.getMessage()); // server socket closed
-            } else {
-                System.err.println("Server: error. " + ex.getMessage()); // else exception
+            if(!server.getServerSocket().isClosed()) {
+                ex.printStackTrace();
             }
         }
-        System.out.println(
-                "Server: listening(run) thread come to end. Freeing resources.");
-        freeResources();
+        System.out.println("ServerThread stopped.");
     }
-
-    private void freeResources() {
-        //Terminating all sessions
-        for(Session session : server.sessions) {
-            System.out.println(
-                    "Server: interrupting session " + session.getId() + "...");
-            session.terminateSession();
-        }
-        server.setSessionCounter(0);
-        //Clear all games.
-        if(server.getGameStorage() != null) {
-            server.getGameStorage().clearGames();
-            server.setGameStorage(null);
-        }
-    }
-
 }

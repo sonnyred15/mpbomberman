@@ -1,15 +1,10 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.util;
 
 /**
  * Class that represents pair of two integer values.
  * @author Kirilchuck V.E.
  */
-public class Pair {
+public class Pair {//TODO make generic and create Cell extends Pair<int,int>
     private int x;
     private int y;
 
@@ -105,6 +100,6 @@ public class Pair {
      */
     @Override
     public String toString() {
-        return "x=" + x + " y=" + y;
+        return "[" + x + "; " + y + "]";
     }
 }

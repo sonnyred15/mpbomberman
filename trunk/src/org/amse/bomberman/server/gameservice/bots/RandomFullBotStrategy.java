@@ -10,7 +10,7 @@ package org.amse.bomberman.server.gameservice.bots;
 import java.util.List;
 import org.amse.bomberman.server.gameservice.GameMap;
 import org.amse.bomberman.server.gameservice.models.Model;
-import org.amse.bomberman.util.Constants.Direction;
+import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------
