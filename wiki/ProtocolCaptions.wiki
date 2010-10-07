@@ -1,0 +1,39 @@
+#labels Phase-Design,Phase-Implementation
+#protocol captions and description
+
+==Availiable captions==
+|| *Caption pseudo name* || *identificator(int)* || *Request from client*|| *Response from server*||
+||SET_NAME_MESSAGE_ID ||10||To set name||About result||
+||GAMES_LIST_MESSAGE_ID ||20||To get unstarted games||List of games||
+||GAME_MAPS_LIST_MESSAGE_ID||30||To get list of availiable maps||List of availiable maps||
+||CREATE_GAME_MESSAGE_ID || 40 ||To create game||About result||
+||JOIN_GAME_MESSAGE_ID || 50 ||To join game|| About result||
+||||||
+||GAME_INFO_MESSAGE_ID || 60 ||
+||GAME_STATUS_MESSAGE_ID||70 ||
+||CHAT_ADD_MESSAGE_ID || 80 ||
+||CHAT_ADD_RESULT_MESSAGE_ID|| 90||
+||CHAT_GET_MESSAGE_ID ||100||
+||BOT_ADD_MESSAGE_ID ||110||    
+||KICK_PLAYER_MESSAGE_ID || 120||
+||||||
+||START_GAME_MESSAGE_ID || 130 ||
+||GAME_MAP_INFO_MESSAGE_ID || 140||
+||DO_MOVE_MESSAGE_ID ||150||
+||PLACE_BOMB_MESSAGE_ID || 160||
+||||||
+||PLAYERS_STATS_MESSAGE_ID ||170||
+||END_RESULTS_MESSAGE_ID || 180||
+||||||
+||LEAVE_MESSAGE_ID || 190 ||
+||||||
+||DOWNLOAD_GAME_MAP_MESSAGE_ID || 200||
+||INVALID_REQUEST_MESSAGE_ID || 210 ||
+||||||
+||GAME_INFO_NOTIFY_ID || 510||
+||GAME_STARTED_NOTIFY_ID ||520||
+||GAME_TERMINATED_NOTIFY_ID || 530||
+||GAME_FIELD_CHANGED_NOTIFY_ID ||540||
+||GAMES_LIST_NOTIFY_ID || 550||
+||||||
+||DISCONNECT_MESSAGE_ID || 1000||
