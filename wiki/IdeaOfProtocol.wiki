@@ -5,7 +5,7 @@
 
 Currently only tcp\ip asynchronous connection is supported. Asynchronous means that server can send some messages to client without requests from client side(like, for example, in http).
 
-Protocol message is consists of:
+Protocol message consists of:
     * signed 32 bit integer - *_Identificator of message_*
     * another one signed 32 bit integer - *_Number of elements in data_*
     * elements of data, currently UTF String - *_data of message_*
