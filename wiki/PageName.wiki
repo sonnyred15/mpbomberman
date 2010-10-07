@@ -1,0 +1,91 @@
+#mpbomberman protocol
+= Introduction =
+
+This wiki page is about mpbomberman protocol. So, everyone, who wants to write a client for mpbomberman, can do this...
+
+= Protocol =
+
+Currently only tcp\ip asynchronous connection is supported. Asynchronous means that server can send some messages to client without requests from client side(like, for example, in http).
+
+Protocol message is consists of:
+    * signed 32 bit integer - *_Identificator of message_*
+    * another one signed 32 bit integer - *_Number of elements in data_*
+    * elements of data, currently UTF String - *_data of message_*
+
+So, in java it looks like this:
+{{{
+List<String> data = message.getData();
+int size = data.size();
+
+out.writeInt(message.getMessageId());
+out.writeInt(size);
+for (String string : data) {
+    out.writeUTF(string);
+}
+}}}
+
+
+==Technical information==
+All that follow below is taken from java.io.DataInputStream and java,io.DataOutputStream.
+===How works writeInt===
+Writes an int value, which is comprised of four bytes, to the output stream. The byte values to be written, in the order shown, are: 
+    *`(byte)(0xff & (v >> 24))
+    *`(byte)(0xff & (v >> 16))
+    *`(byte)(0xff & (v >> 8))
+    *`(byte)(0xff & v)
+===How works writeUTF===
+Each character in the string s is converted to a group of one, two, or three bytes, depending on the value of the character.
+
+If a character c is in the range \u0001 through \u007f, it is represented by one byte:
+   *`(byte)c 
+If a character c is \u0000 or is in the range \u0080 through \u07ff, then it is represented by two bytes, to be written in the order shown:
+    *`(byte)(0xc0 | (0x1f & (c >> 6)))
+    *`(byte)(0x80 | (0x3f & c))
+  
+If a character c is in the range \u0800 through uffff, then it is represented by three bytes, to be written in the order shown:
+
+    *`(byte)(0xe0 | (0x0f & (c >> 12)))
+    *`(byte)(0x80 | (0x3f & (c >>  6)))
+    *`(byte)(0x80 | (0x3f & c))
+
+*First, the total number of bytes needed to represent all the characters of s is calculated.* Note that it can`t be more than 65535. This length is written to the output stream as:
+    *`(byte)(0xff & (v >> 8))
+    *`(byte)(0xff & v)
+And after this the string is writed as described above...
+
+==Availiable captions==
+|| *Caption pseudo name* || *identificator(int)* || *Request from client*|| *Response from server*||
+||SET_NAME_MESSAGE_ID ||10||To set name||About result||
+||GAMES_LIST_MESSAGE_ID ||20||To get unstarted games||List of games||
+||GAME_MAPS_LIST_MESSAGE_ID||30||To get list of availiable maps||List of availiable maps||
+||CREATE_GAME_MESSAGE_ID || 40 ||To create game||About result||
+||JOIN_GAME_MESSAGE_ID || 50 ||To join game|| About result||
+||||||
+||GAME_INFO_MESSAGE_ID || 60 ||
+||GAME_STATUS_MESSAGE_ID||70 ||
+||CHAT_ADD_MESSAGE_ID || 80 ||
+||CHAT_ADD_RESULT_MESSAGE_ID|| 90||
+||CHAT_GET_MESSAGE_ID ||100||
+||BOT_ADD_MESSAGE_ID ||110||    
+||KICK_PLAYER_MESSAGE_ID || 120||
+||||||
+||START_GAME_MESSAGE_ID || 130 ||
+||GAME_MAP_INFO_MESSAGE_ID || 140||
+||DO_MOVE_MESSAGE_ID ||150||
+||PLACE_BOMB_MESSAGE_ID || 160||
+||||||
+||PLAYERS_STATS_MESSAGE_ID ||170||
+||END_RESULTS_MESSAGE_ID || 180||
+||||||
+||LEAVE_MESSAGE_ID || 190 ||
+||||||
+||DOWNLOAD_GAME_MAP_MESSAGE_ID || 200||
+||INVALID_REQUEST_MESSAGE_ID || 210 ||
+||||||
+||GAME_INFO_NOTIFY_ID || 510||
+||GAME_STARTED_NOTIFY_ID ||520||
+||GAME_TERMINATED_NOTIFY_ID || 530||
+||GAME_FIELD_CHANGED_NOTIFY_ID ||540||
+||GAMES_LIST_NOTIFY_ID || 550||
+||||||
+||DISCONNECT_MESSAGE_ID || 1000||
