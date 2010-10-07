@@ -21,3 +21,7 @@ for (String string : data) {
     out.writeUTF(string);
 }
 }}}
+
+Goto ProtocolCaptions to see availiable protocol captions.
+
+Goto ProtocolTechnicalDetails to see how such messages are actually sending through sockets.
