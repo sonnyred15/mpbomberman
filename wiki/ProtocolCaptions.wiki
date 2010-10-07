@@ -11,9 +11,9 @@
 ||||||
 ||GAME_INFO_MESSAGE_ID||60||
 ||GAME_STATUS_MESSAGE_ID||70||
-||CHAT_ADD_MESSAGE_ID||80||To add message to chat|| About result || *check*
-||CHAT_ADD_RESULT_MESSAGE_ID||90||N/A|| Result of previous command|| *check* 
-||CHAT_GET_MESSAGE_ID||100||To get new msgs from chat(deprecated)||N/A|| *check*
+||CHAT_ADD_MESSAGE_ID||80||To add message to chat||About result||
+||CHAT_ADD_RESULT_MESSAGE_ID||90||N/A|| Result of previous command||
+||CHAT_GET_MESSAGE_ID||100||To get new msgs from chat(deprecated)||N/A||
 ||BOT_ADD_MESSAGE_ID ||110||To add bot into game||About result||    
 ||KICK_PLAYER_MESSAGE_ID||120||To kick player from game||About result||
 ||||||
@@ -35,4 +35,4 @@
 ||GAME_FIELD_CHANGED_NOTIFY_ID||540||N/A||Notification about changes in field||
 ||GAMES_LIST_NOTIFY_ID||550||N/A||Notification about changes in game list||
 ||||||
-||DISCONNECT_MESSAGE_ID || 1000|| To disconnect and close connection|| To notify client about closing connection||
+||DISCONNECT_MESSAGE_ID||1000||To disconnect and close connection||To notify client about closing connection||
