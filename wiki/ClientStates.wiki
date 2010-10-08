@@ -3,9 +3,9 @@
 
 Ok, here we will talk about client states.
 Client can be in on of three states:
-    * Not joined to any game.
+    * *Not joined* to any game.
     * Joined to game, but game is unstarted.(So called *"Lobby"* state)
-    * In started game. 
+    * *In started game.*
 
 If client sent message with caption that not corresponds to current state he will get message from server about invalid request with message like "Such action is not allowed in curent state".
 
