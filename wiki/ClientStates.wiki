@@ -1,0 +1,51 @@
+#labels Phase-Design,Phase-Implementation
+#client states
+
+Ok, here we will talk about client states.
+Client can be in on of three states:
+    * Not joined to any game.
+    * Joined to game, but game is unstarted.(So called *"Lobby"* state)
+    * In started game. 
+
+If client sent message with caption that not corresponds to current state he will get message from server about invalid request with message like "Such action is not allowed in curent state".
+
+If you don`t want this to happen look next what commands are legal in concrete state.
+
+===Not joined===
+
+||Caption pseudo name||identificator(int)||
+||SET_NAME_MESSAGE_ID||10||
+||GAMES_LIST_MESSAGE_ID||20||
+||GAME_MAPS_LIST_MESSAGE_ID||30||
+||CREATE_GAME_MESSAGE_ID||40||
+||JOIN_GAME_MESSAGE_ID||50||
+
+After last two commands if they were success you state will be changed to "Lobby" state.
+
+===Joined - Lobby===
+
+||Caption pseudo name||identificator(int)||
+||GAME_INFO_MESSAGE_ID||60||
+||GAME_STATUS_MESSAGE_ID||70||
+||CHAT_ADD_MESSAGE_ID||80||
+||CHAT_GET_MESSAGE_ID||100||
+||BOT_ADD_MESSAGE_ID ||110||
+||KICK_PLAYER_MESSAGE_ID||120||
+||START_GAME_MESSAGE_ID||130||
+||LEAVE_MESSAGE_ID||190||
+
+After game start you state will be changed to "In started game".
+After leave you state will be changed to "Not joined".
+
+===In started game===
+
+||Caption pseudo name||identificator(int)||
+||GAME_INFO_MESSAGE_ID||60||
+||GAME_STATUS_MESSAGE_ID||70||
+||GAME_MAP_INFO_MESSAGE_ID||140||
+||DO_MOVE_MESSAGE_ID||150||
+||PLACE_BOMB_MESSAGE_ID||160||
+||PLAYERS_STATS_MESSAGE_ID||170||
+||LEAVE_MESSAGE_ID||190||
+
+After leave you state will be changed to "Not joined".
