@@ -3,7 +3,7 @@
 
 Not all captions availiable for both client and server, some of them can be sent only by one. And even if some message caption availiable for client, request with it can in some situations lead to InvalidRequestMessage from server.
 
-To see such situations go to ClientStates.
+To see when and what messages are availiable go to ClientStates.
 
 ==Availiable captions==
 ||*Caption pseudo name*||*identificator(int)*||*Request from client*||*Response from server*||
