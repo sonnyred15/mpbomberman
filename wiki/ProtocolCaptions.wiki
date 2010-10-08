@@ -6,37 +6,37 @@ Not all captions availiable for both client and server, some of them can be sent
 To see when and what messages are availiable go to ClientStates.
 
 ==Message captions==
-||*Caption pseudo name*||*identificator(int)*||*Request from client*||*Response from server*||
-||SET_NAME_MESSAGE_ID||10||To set name||About result||
-||GAMES_LIST_MESSAGE_ID||20||To get unstarted games||List of games with game params||
-||GAME_MAPS_LIST_MESSAGE_ID||30||To get list of availiable maps||List of availiable maps||
-||CREATE_GAME_MESSAGE_ID||40||To create game||About result||
-||JOIN_GAME_MESSAGE_ID||50||To join game||About result||
+||*Caption(pseudo name)*||*identificator(int)*||*Request from client*||*Response from server*||
+||SetName||10||To set name||About result||
+||GamesList||20||To get unstarted games||List of games with game params||
+||GameMapsList||30||To get list of availiable maps||List of availiable maps||
+||CreateGame||40||To create game||About result||
+||JoinGame||50||To join game||About result||
 ||||||
-||GAME_INFO_MESSAGE_ID||60||To get game players info||Player names and so on||
-||GAME_STATUS_MESSAGE_ID||70||To ask is game started||Is game started or not||
-||CHAT_ADD_MESSAGE_ID||80||To add message to chat||About result||
-||CHAT_ADD_RESULT_MESSAGE_ID||90||N/A|| Result of previous command||
-||CHAT_GET_MESSAGE_ID||100||To get new msgs from chat(deprecated)||N/A||
-||BOT_ADD_MESSAGE_ID ||110||To add bot into game||About result||    
-||KICK_PLAYER_MESSAGE_ID||120||To kick player from game||About result||
+||GameInfo||60||To get game players info||Player names and so on||
+||GameStatus||70||To ask is game started||Is game started or not||
+||ChatAdd||80||To add message to chat||About result||
+||ChatAddResult||90||N/A|| Result of previous command||
+||ChatGet||100||To get new msgs from chat(deprecated)||N/A||
+||BotAdd||110||To add bot into game||About result||    
+||KickPlayer||120||To kick player from game||About result||
 ||||||
-||START_GAME_MESSAGE_ID||130||To start game||About result||
-||GAME_MAP_INFO_MESSAGE_ID||140||To get field, explosions and so on||Field, explosions and so on||
-||DO_MOVE_MESSAGE_ID||150||To make move||Move result||
-||PLACE_BOMB_MESSAGE_ID||160||To place bomb||Place bomb result||
-||PLAYERS_STATS_MESSAGE_ID||170||To get stats of players||Stats of players||
-||END_RESULTS_MESSAGE_ID||180||N/A||Notification about game end with stats||
+||StartGame||130||To start game||About result||
+||GameField||140||To get field, explosions and so on||Field, explosions and so on||
+||DoMove||150||To make move||Move result||
+||PlaceBomb||160||To place bomb||Place bomb result||
+||PlayersStats||170||To get stats of players||Stats of players||
+||EndResults||180||N/A||Notification about game end with stats||
 ||||||
-||LEAVE_MESSAGE_ID||190||To leave from lobby or game||About result||
+||[Leave]||190||To leave from lobby or game||About result||
 ||||||
-||DOWNLOAD_GAME_MAP_MESSAGE_ID||200||To download map(doesnt work)||Download||
-||INVALID_REQUEST_MESSAGE_ID||210||N/A||Info about error in request||
+||DownloadMap||200||To download map(doesnt work)||Download||
+||InvalidRequest||210||N/A||Info about error in request||
 ||||||
-||GAME_INFO_NOTIFY_ID||510||N/A||Game info||
-||GAME_STARTED_NOTIFY_ID||520||N/A||Notification about game start||
-||GAME_TERMINATED_NOTIFY_ID||530||N/A||Notification about game termination||
-||GAME_FIELD_CHANGED_NOTIFY_ID||540||N/A||Notification about changes in field||
-||GAMES_LIST_NOTIFY_ID||550||N/A||Notification about changes in game list||
+||GameInfoNotify||510||N/A||Game info||
+||GameStartedNotify||520||N/A||Notification about game start||
+||GameTerminatedNotify||530||N/A||Notification about game termination||
+||FameFieldChangedNotify||540||N/A||Notification about changes in field||
+||GamesListChangedNotify||550||N/A||Notification about changes in game list||
 ||||||
-||DISCONNECT_MESSAGE_ID||1000||To disconnect and close connection||To notify client about closing connection||
+||[Disconnect]||1000||To disconnect and close connection||To notify client about closing connection||
