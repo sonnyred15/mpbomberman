@@ -1,16 +1,20 @@
 #labels Phase-Design,Phase-Implementation
 #protocol captions and description
 
+Not all captions availiable for both client and server, some of them can be sent only by one. And even if some message caption availiable for client, request with it can in some situations lead to InvalidRequestMessage from server.
+
+To see such situations go to ClientStates.
+
 ==Availiable captions==
 ||*Caption pseudo name*||*identificator(int)*||*Request from client*||*Response from server*||
 ||SET_NAME_MESSAGE_ID||10||To set name||About result||
-||GAMES_LIST_MESSAGE_ID||20||To get unstarted games||List of games||
+||GAMES_LIST_MESSAGE_ID||20||To get unstarted games||List of games with game params||
 ||GAME_MAPS_LIST_MESSAGE_ID||30||To get list of availiable maps||List of availiable maps||
 ||CREATE_GAME_MESSAGE_ID||40||To create game||About result||
 ||JOIN_GAME_MESSAGE_ID||50||To join game||About result||
 ||||||
-||GAME_INFO_MESSAGE_ID||60||
-||GAME_STATUS_MESSAGE_ID||70||
+||GAME_INFO_MESSAGE_ID||60||To get game players info||Player names and so on||
+||GAME_STATUS_MESSAGE_ID||70||To ask is game started||Is game started or not||
 ||CHAT_ADD_MESSAGE_ID||80||To add message to chat||About result||
 ||CHAT_ADD_RESULT_MESSAGE_ID||90||N/A|| Result of previous command||
 ||CHAT_GET_MESSAGE_ID||100||To get new msgs from chat(deprecated)||N/A||
