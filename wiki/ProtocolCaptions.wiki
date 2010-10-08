@@ -5,7 +5,7 @@ Not all captions availiable for both client and server, some of them can be sent
 
 To see when and what messages are availiable go to ClientStates.
 
-==Availiable captions==
+==Message captions==
 ||*Caption pseudo name*||*identificator(int)*||*Request from client*||*Response from server*||
 ||SET_NAME_MESSAGE_ID||10||To set name||About result||
 ||GAMES_LIST_MESSAGE_ID||20||To get unstarted games||List of games with game params||
