@@ -1,7 +1,7 @@
 package org.amse.bomberman.protocol.responses;
 
 import java.util.List;
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;

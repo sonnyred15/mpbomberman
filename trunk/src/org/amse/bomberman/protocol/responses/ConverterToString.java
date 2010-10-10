@@ -2,7 +2,7 @@ package org.amse.bomberman.protocol.responses;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameservice.GamePlayer;
+import org.amse.bomberman.server.gameservice.gamemap.impl.SimpleField;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
 import org.amse.bomberman.util.Constants;
@@ -211,7 +212,8 @@ public class ConverterToString implements Converter<String> {
      * @return list of strings of gameMapField and explosions
      */
     public List<String> convertFieldAndExplosions(Game game) {
-        List<String> result = convertField(game.getGameField());
+        List<String> result = convertField(((SimpleField)game.getGameField())
+                .getField());
 
         result.addAll(convertExplosions(game.getExplosions()));
 
@@ -241,8 +243,8 @@ public class ConverterToString implements Converter<String> {
      * @return list of strings of gameMapField and explosions
      */
     public List<String> convertFieldExplPlayer(Game game, int playerID) {
-        int[][]      field             = game.getGameField();
-        List<ModelPlayer> players           = game.getCurrentPlayers();
+        int[][] field = ((SimpleField)game.getGameField()).getField();
+        List<ModelPlayer> players = game.getCurrentPlayers();
         List<String> stringalizedField = new ArrayList<String>();
 
         stringalizedField.add(String.valueOf((field.length)));
@@ -259,7 +261,7 @@ public class ConverterToString implements Converter<String> {
                         int y = pl.getPosition().getY();
 
                         if ((x == i) && (y == j) && pl.isAlive()) {
-                            n = (n + 100 + pl.getID()); //player and bomb in one cell
+                            n = (n + 100 + pl.getId()); //player and bomb in one cell
                         }
                     }
                 }

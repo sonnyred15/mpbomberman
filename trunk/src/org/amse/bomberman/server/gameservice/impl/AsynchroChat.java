@@ -1,4 +1,4 @@
-package org.amse.bomberman.server.gameservice;
+package org.amse.bomberman.server.gameservice.impl;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -26,10 +26,10 @@ public class AsynchroChat {
     public void addMessage(String message, Collection<GameChangeListener> listeners) {
         for (GameChangeListener gameChangeListener : listeners) {
             gameChangeListener.newChatMessage(message);
-            String answer = superMindAnswer(message);
-            if(answer != null) {
-                gameChangeListener.newChatMessage(message);
-            }
+//            String answer = superMindAnswer(message);
+//            if(answer != null) {
+//                gameChangeListener.newChatMessage(message);
+//            }
         }
     }
 
@@ -77,17 +77,17 @@ public class AsynchroChat {
 
             return ("SuperMind: " + res.toString());
         } catch (ArithmeticException ex) {//TODO log but not error
-            System.err.println("Chat: addMessage warning. " +
-                              "SuperMind got arithmetic exception."
-                              + ex.getMessage());
+//            System.err.println("Chat: addMessage warning. " +
+//                              "SuperMind got arithmetic exception."
+//                              + ex.getMessage());
         } catch (ParseException ex) {
-            System.err.println("Chat: addMessage warning. " +
-                              "SuperMind can`t parse expression."
-                              + ex.getMessage());
+//            System.err.println("Chat: addMessage warning. " +
+//                              "SuperMind can`t parse expression."
+//                              + ex.getMessage());
         } catch (IllegalArgumentException ex) {
-            System.err.println("Chat: addMessage warning. " +
-                              "SuperMind can`t parse expression."
-                              + ex.getMessage());
+//            System.err.println("Chat: addMessage warning. " +
+//                              "SuperMind can`t parse expression."
+//                              + ex.getMessage());
         }
 
         return null;

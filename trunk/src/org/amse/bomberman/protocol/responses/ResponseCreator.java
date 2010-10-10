@@ -1,7 +1,7 @@
 package org.amse.bomberman.protocol.responses;
 
 //~--- non-JDK imports --------------------------------------------------------
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.util.Creator;
 
 //~--- JDK imports ------------------------------------------------------------

@@ -7,7 +7,7 @@ package org.amse.bomberman.server.gameservice.bots;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 
 /**
  * Interface for bot actions.

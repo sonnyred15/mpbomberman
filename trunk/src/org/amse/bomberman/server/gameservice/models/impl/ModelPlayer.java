@@ -1,46 +1,45 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice.models.impl;
 
-//~--- non-JDK imports --------------------------------------------------------
-
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Pair;
-
-//~--- JDK imports ------------------------------------------------------------
+import org.amse.bomberman.server.gameservice.models.DieListener;
+import org.amse.bomberman.server.gameservice.gamemap.impl.MoveableGameMapObject;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import org.amse.bomberman.server.gameservice.models.DieListener;
-import org.amse.bomberman.server.gameservice.models.MoveableObject;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.amse.bomberman.util.structs.IntegerHolder;
 
 /**
  * Class that represents player. Player is part of Model not part of Game.
+ * This class is thread safe.
+ * 
  * @author Kirilchuk V.E
  */
-public class ModelPlayer implements MoveableObject {
+public class ModelPlayer implements MoveableGameMapObject {
     //
     private final ScheduledExecutorService timer;
-
-    //
-    private int          id = 1;
     private final String nickName;
 
     //
-    protected int lives       = Constants.PLAYER_DEFAULT_LIVES;
-    protected int settedBombs = 0;
-    protected int maxBombs    = Constants.PLAYER_DEFAULT_MAX_BOMBS;
-    protected int explRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
+    private final IntegerHolder lives
+            = new IntegerHolder(Constants.PLAYER_DEFAULT_LIVES);
+
+    private final IntegerHolder settedBombs
+            = new IntegerHolder(0);
+
+    private final IntegerHolder maxBombs
+            = new IntegerHolder(Constants.PLAYER_DEFAULT_MAX_BOMBS);
+    
+    private final IntegerHolder explRadius
+            = new IntegerHolder(Constants.PLAYER_DEFAULT_BOMB_RADIUS);
 
     //
-    private Pair                 position;
+    private final    Pair        position;
     private volatile PlayerState state = PlayerState.NORMAL;
+    private volatile int         id = 1;
 
     //
-    private final Object BOMBS_LOCK = new Object();
     private DieListener  playerDieListener;
 
     /**
@@ -50,15 +49,16 @@ public class ModelPlayer implements MoveableObject {
     public ModelPlayer(String nickName, ScheduledExecutorService timer) {
         this.nickName = nickName;
         this.timer    = timer;
+        this.position = new Pair();
     }
 
     /**
      * Setting dieListener.
      * @see DieListener
-     * @param gameDieListener listener to set.
+     * @param listener listener to set.
      */
-    public void setDieListener(DieListener gameDieListener) {
-        this.playerDieListener = gameDieListener;
+    public void setDieListener(DieListener listener) {
+        playerDieListener = listener;
     }
 
     /**
@@ -66,27 +66,23 @@ public class ModelPlayer implements MoveableObject {
      * @return true if alive, false otherwise.
      */
     public synchronized boolean isAlive() {
-        return (this.lives > 0);
+        return (lives.getValue() > 0);
     }
 
     /**
      * Checks if this player can place bomb.
      * @return true if can, false otherwise.
      */
-    public boolean canPlaceBomb() {
-        synchronized (BOMBS_LOCK) {
-            return ((this.settedBombs < this.maxBombs) && this.isAlive());
-        }
+    public synchronized boolean canPlaceBomb() {
+        return ((settedBombs.getValue() < maxBombs.getValue()) && isAlive());
     }
 
     /**
      * If this method calls, then number of bombs placed simultaneously
      * must increase.
      */
-    public void placedBomb() {
-        synchronized (BOMBS_LOCK) {
-            this.settedBombs += 1;
-        }
+    public synchronized void placedBomb() {
+        settedBombs.increment();
     }
 
     /**
@@ -94,25 +90,40 @@ public class ModelPlayer implements MoveableObject {
      * must decrease.
      */
     public void detonatedBomb() {
-        synchronized (BOMBS_LOCK) {
-            this.settedBombs -= 1;
-        }
+       settedBombs.decrement();
     }
 
     /**
      * Setting ID of player.
      * @param id id to set.
      */
-    public void setID(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     /**
-     * Setting new position to this player.
-     * @param position position to set.
+     * Returns ID of this player.
+     * @return ID of this player.
      */
-    public void setPosition(Pair position) {
-        this.position = position;
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Setting new position to this player.
+     * @param newPosition position to set.
+     */
+    public synchronized void setPosition(Pair newPosition) {
+        position.setX(newPosition.getX());
+        position.setY(newPosition.getY());
+    }
+
+    /**
+     * Returnes position of this player.
+     * @return position of this player.
+     */
+    public synchronized Pair getPosition() {
+        return position;
     }
 
     /**
@@ -122,51 +133,23 @@ public class ModelPlayer implements MoveableObject {
      * If player was immortal then nothing will happen.
      */
     public synchronized void bombed() {
-        this.state.bombed(this);
+        state.bombed(this);
     }
 
-    /**
-     * If this method was called, then depending on bonus
-     * some player pareametres must increase or change.
-     * @param bonusID ID of taked bonus.
-     */
-    public synchronized void takeBonus(int bonusID) {
-        Bonus bonus = Bonus.valueOf(bonusID);
-        bonus.applyBy(this);
+    public synchronized void accept(ModelPlayerVisitor visitor) {
+        visitor.visit(this);
     }
-
-    private synchronized void decBonuses() {
-        if (explRadius > Constants.PLAYER_DEFAULT_BOMB_RADIUS) {
-            explRadius--;
-        }
-
-        if (maxBombs > Constants.PLAYER_DEFAULT_MAX_BOMBS) {
-            maxBombs--;
-        }
-    }
-
-    /**
-     * Returns ID of this player.
-     * @return ID of this player.
-     */
-    public int getID() {
-        return this.id;
-    }
-
-    /**
-     * Returnes position of this player.
-     * @return position of this player.
-     */
-    public Pair getPosition() {
-        return position;
-    }
-    
+   
     /**
      * Returns current explosion radius parameter.
      * @return current explosion radius parameter.
      */
     public int getRadius() {
-        return this.explRadius;
+        return explRadius.getValue();
+    }
+
+    public synchronized int changeRadius(int delta) {
+        return explRadius.changeValue(delta);
     }
 
     /**
@@ -177,7 +160,6 @@ public class ModelPlayer implements MoveableObject {
         return nickName;
     }
 
-
     /**
      * Returns how much bombes player already setted.
      * <p> This is not the amount of bombes that player placed during all game.
@@ -185,15 +167,39 @@ public class ModelPlayer implements MoveableObject {
      * @return
      */
     public int getSettedBombsNum() {
-        return this.settedBombs;
+        return settedBombs.getValue();
+    }
+
+    public synchronized int changeSettedBombs(int delta) {
+        return settedBombs.changeValue(delta);
     }
     
     public int getLives() {
-        return lives;
+        return lives.getValue();
+    }
+
+    public synchronized int changeLives(int delta) {
+        int value = lives.changeValue(delta);
+        if(value == 0) {
+            playerDieListener.playerDied(this);
+        }
+        return value;
     }
     
     public int getMaxBombs() {
-        return maxBombs;
+        return maxBombs.getValue();
+    }
+
+    public synchronized int changeMaxBombs(int delta) {
+        return maxBombs.changeValue(delta);
+    }
+
+    void setState(PlayerState state) {
+        this.state = state;
+    }
+
+    ScheduledExecutorService getTimer(){
+        return timer;
     }
 
     @Override
@@ -218,40 +224,7 @@ public class ModelPlayer implements MoveableObject {
         return hash;
     }
 
-    private static enum PlayerState{
-        NORMAL {
-            @Override
-            void bombed(ModelPlayer player){
-                player.lives  -= 1;
-                player.decBonuses();
-
-                assert (player.lives >= 0);    // here may be synchronization problem
-
-                if (player.lives == 0) {
-                    player.playerDieListener.playerDied(player);
-                } else {
-                    makeImmortal(player);
-                }
-            }
-
-            private void makeImmortal(final ModelPlayer player) {
-                player.state = PlayerState.IMMORTAL;
-                player.timer.schedule(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        player.state = PlayerState.NORMAL;
-                    }
-                }, Constants.PLAYER_IMMORTALITY_TIME, TimeUnit.MILLISECONDS);
-            }
-        },
-
-        IMMORTAL {
-            void bombed(ModelPlayer player){
-                ; //do nothing.
-            }
-        };
-
-        abstract void bombed(ModelPlayer player);
+    public void move(GameMap where, Pair destination) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

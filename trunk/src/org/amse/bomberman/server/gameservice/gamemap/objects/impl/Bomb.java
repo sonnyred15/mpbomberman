@@ -1,35 +1,27 @@
+package org.amse.bomberman.server.gameservice.gamemap.objects.impl;
 
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
-package org.amse.bomberman.server.gameservice.models.impl;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.server.gameservice.*;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Pair;
-
-//~--- JDK imports ------------------------------------------------------------
+import org.amse.bomberman.server.gameservice.models.Model;
+import org.amse.bomberman.server.gameservice.gamemap.impl.MoveableGameMapObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.amse.bomberman.server.gameservice.models.Model;
-import org.amse.bomberman.server.gameservice.models.MoveableObject;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
 /**
  * Class that represents Bomb - object of bomberman game.
  * @author Kirilchuk V.E.
  */
-public class Bomb implements MoveableObject {
+public class Bomb implements MoveableGameMapObject {
 
     private boolean                        wasDetonated = false;
     private final Model                    model;
     private final ModelPlayer              owner;
-    private final Pair                     position;
+    private final Pair                     position = new Pair();
     private final int                      radius;
     private final ScheduledExecutorService timer;
 
@@ -44,7 +36,7 @@ public class Bomb implements MoveableObject {
         /* init object fields */
         this.model    = model;
         this.owner    = player;
-        this.position = bombPosition;
+        setPosition(bombPosition);
         this.radius   = this.owner.getRadius();
 
         /* additional stuff */
@@ -164,22 +156,22 @@ public class Bomb implements MoveableObject {
     private boolean explodeSquare(int x, int y, GameMap gameMap) {
         Pair squareToExplode = new Pair(x, y);
 
-        if (gameMap.isEmpty(x, y)) {
+        if (gameMap.isEmpty(squareToExplode)) {
             if (model.isExplosion(squareToExplode)) {    // explosion
                 return true;
             }
 
             return true;                                 // emptySquare
-        } else if (gameMap.isBlock(squareToExplode)) {        // blockSquare
-            gameMap.damageBlock(x, y);
+        } else if (gameMap.isBlock(squareToExplode)) { // blockSquare
+            gameMap.damageBlock(squareToExplode);
 
             return false;
-        } else if (gameMap.playerIDAt(x, y) != -1) {     // playerSquare
-            int id = gameMap.playerIDAt(x, y);
+        } else if (gameMap.playerIdAt(squareToExplode) != -1) {  // playerSquare
+            int id = gameMap.playerIdAt(squareToExplode);
             model.playerBombed(this.owner, id);
 
             return false;
-        } else if (gameMap.isBomb(x, y)) {               // another bomb
+        } else if (gameMap.isBomb(squareToExplode)) {  // another bomb
             model.detonateBombAt(squareToExplode);
 
             return false;
@@ -194,7 +186,7 @@ public class Bomb implements MoveableObject {
      * use gameMap.setSquare(moveObj.getID).
      * @return Constants.MAP_BOMB integer value.
      */
-    public int getID() {
+    public int getId() {
         return Constants.MAP_BOMB;
     }
 
@@ -222,6 +214,10 @@ public class Bomb implements MoveableObject {
     public void setPosition(Pair newPosition) {
         this.position.setX(newPosition.getX());
         this.position.setY(newPosition.getY());
+    }
+
+    public void move(GameMap where, Pair destination) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private class ClearExplosionTask implements Runnable {

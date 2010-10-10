@@ -2,7 +2,7 @@ package org.amse.bomberman.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.GameMap;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -69,10 +69,7 @@ public class Creator {
     @Deprecated //TODO replaced with XML map!!! ERRORS!!!!!!
     public static int[][] createMapAndGetField(String fileName) throws FileNotFoundException, IOException {
         int[][] ret = null;
-        GameMap map = new GameMap(fileName);
-
-        ret = map.getField();
-
+        
         return ret;
     }
 

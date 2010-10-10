@@ -1,8 +1,9 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 //~--- non-JDK imports --------------------------------------------------------
+import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
 import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Direction;
 

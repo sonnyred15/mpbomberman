@@ -18,7 +18,7 @@ import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.amse.bomberman.server.gameservice.GameMap;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 
 /**
  *
@@ -114,7 +114,7 @@ public class GameMapXMLParser {//TODO TEST IT!
             }
         }
 
-        return new GameMap(gameMapName, field, dimension, maxPlayers);
+        return new GameMap(gameMapName, field);
     }
 
     private int[][] parseField(Node fieldNode, int dimension)

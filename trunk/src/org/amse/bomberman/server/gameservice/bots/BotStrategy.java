@@ -1,15 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice.bots;
 
 import java.util.Collections;
 import java.util.List;
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.gamemap.impl.SimpleField;
 import org.amse.bomberman.util.Pair;
-import org.amse.bomberman.server.gameservice.models.Model;
-import org.amse.bomberman.server.gameservice.models.impl.Bonus;
+import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bonus;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Direction;
 
@@ -37,7 +33,7 @@ public abstract class BotStrategy {
     public Direction
             findWay(Game game, Pair begin, Pair end)
             throws IllegalArgumentException {
-        int[][] field = game.getGameField();
+        int[][] field = ((SimpleField)game.getGameField()).getField();
         List<Pair> explosions = Collections.unmodifiableList(game.getExplosions());
         int[][] temp = cloneField(field);
 
