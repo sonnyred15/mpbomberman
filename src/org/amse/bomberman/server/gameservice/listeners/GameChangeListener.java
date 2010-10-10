@@ -1,6 +1,6 @@
 package org.amse.bomberman.server.gameservice.listeners;
 
-import org.amse.bomberman.server.gameservice.Game;
+import org.amse.bomberman.server.gameservice.impl.Game;
 
 /**
  *

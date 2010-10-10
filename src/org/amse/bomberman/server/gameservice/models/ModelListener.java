@@ -10,9 +10,9 @@ package org.amse.bomberman.server.gameservice.models;
  */
 public interface ModelListener {
 
-    void fireStatsChanged();
+    void statsChanged();
 
-    void fireFieldChanged();
+    void gameMapChanged();
 
     void end();
 }

@@ -4,8 +4,8 @@
  */
 package org.amse.bomberman.server.gameservice.models;
 
-import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.gameservice.GameMap;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.server.gameservice.models.impl.DefaultModel;
 
 /**

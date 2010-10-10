@@ -1,12 +1,7 @@
 package org.amse.bomberman.server.gameservice.bots;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.server.gameservice.Game;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.util.Random;
+import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 
@@ -76,7 +71,7 @@ public class Bot implements GameChangeListener {
     private class BotRun implements Runnable {
 
         @Override
-        public void run() {
+        public void run() { 
             try {
                 ModelPlayer bot = game.getPlayer(player.getPlayerId());
                 while (!Thread.interrupted() && bot.isAlive()) {

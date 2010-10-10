@@ -1,23 +1,16 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice.bots;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.List;
-import org.amse.bomberman.server.gameservice.GameMap;
-import org.amse.bomberman.server.gameservice.models.Model;
 import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.Random;
-import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.gameservice.models.impl.Bonus;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.gamemap.impl.SimpleField;
+import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bonus;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.util.Constants;
 
@@ -71,7 +64,7 @@ public class RandomFullBotStrategy extends BotStrategy {
     }
 
     private Pair findNewTarget(Game game, ModelPlayer player) {
-        int[][] field = game.getGameField();
+        int[][] field = ((SimpleField)game.getGameField()).getField();
 
         Random  random = new Random();
         int     x = 0;

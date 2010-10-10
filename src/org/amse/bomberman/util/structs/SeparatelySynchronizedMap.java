@@ -1,4 +1,4 @@
-package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
+package org.amse.bomberman.util.structs;
 
 import java.lang.reflect.Array;
 import java.util.AbstractMap;

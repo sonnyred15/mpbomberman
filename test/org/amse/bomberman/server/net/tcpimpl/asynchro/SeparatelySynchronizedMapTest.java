@@ -4,7 +4,7 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.asynchro;
 
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.SeparatelySynchronizedMap;
+import org.amse.bomberman.util.structs.SeparatelySynchronizedMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.junit.Before;

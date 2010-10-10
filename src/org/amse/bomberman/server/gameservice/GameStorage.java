@@ -1,8 +1,7 @@
 package org.amse.bomberman.server.gameservice;
 
-//~--- JDK imports ------------------------------------------------------------
-
-
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +24,6 @@ import org.xml.sax.SAXException;
 public class GameStorage implements GameChangeListener {
     private final List<Game> games = new LinkedList<Game>(); //TODO whats about synchronization?
     private final GlobalNotificator notificator;
-
 
     public GameStorage(Server server) {
         this.notificator = new GlobalNotificator(server);

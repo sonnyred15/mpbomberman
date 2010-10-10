@@ -4,7 +4,7 @@ package org.amse.bomberman.util;
  * Class that represents pair of two integer values.
  * @author Kirilchuck V.E.
  */
-public class Pair {//TODO make generic and create Cell extends Pair<int,int>
+public class Pair implements Cloneable {
     private int x;
     private int y;
 
@@ -56,6 +56,11 @@ public class Pair {//TODO make generic and create Cell extends Pair<int,int>
      */
     public int getY() {
         return this.y;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     /**

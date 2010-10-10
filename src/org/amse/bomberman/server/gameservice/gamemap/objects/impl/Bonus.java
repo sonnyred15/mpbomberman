@@ -1,55 +1,53 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
-package org.amse.bomberman.server.gameservice.models.impl;
-
-//~--- non-JDK imports --------------------------------------------------------
+package org.amse.bomberman.server.gameservice.gamemap.objects.impl;
 
 import java.util.Random;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayerVisitor;
 import org.amse.bomberman.util.Constants;
 
 /**
  *
  * @author Kirilchuk V.E
  */
-public enum Bonus { //VISITOR pattern can be used in this situation.
+public enum Bonus implements ModelPlayerVisitor {
+
     LIFE {
+
         @Override
-        public void applyBy(ModelPlayer player) {
-            player.lives += 1;
+        public void visit(ModelPlayer player) {
+            player.changeLives(+1);
         }
 
         @Override
         public int getID() {
             return Constants.MAP_BONUS_LIFE;
         }
-    },    //Player has method accept(Visitor v) { v.visit(this); }
+    },
     BOMB {
+
         @Override
-        public void applyBy(ModelPlayer player) {
-            player.maxBombs += 1;
+        public void visit(ModelPlayer player) {
+            player.changeMaxBombs(+1);
         }
 
         @Override
         public int getID() {
             return Constants.MAP_BONUS_BOMB_COUNT;
         }
-    },    //ConcreteBonus implements Visitor { visit(Player pl) {pl.incrementLifes();}
+    },
     RADIUS {
+
         @Override
-        public void applyBy(ModelPlayer player) {
-            player.explRadius += 1;
+        public void visit(ModelPlayer player) {
+            player.changeRadius(+1);
         }
 
         @Override
         public int getID() {
             return Constants.MAP_BONUS_BOMB_RADIUS;
         }
-    };  //Current realization not so good cause model manages the visit method,
-                    //not player himself.
-    public abstract void applyBy(ModelPlayer player);
+    };
+
     public abstract int getID();
 
     public static boolean isBonus(int id) {
@@ -61,7 +59,6 @@ public enum Bonus { //VISITOR pattern can be used in this situation.
 
         return false;
     }
-
     private static Random generator = new Random();
 
     /**
@@ -70,15 +67,15 @@ public enum Bonus { //VISITOR pattern can be used in this situation.
      * @return random Bonus or null(as no bonus).
      */
     public static Bonus randomBonus() { //TODO unhardcode!
-        int    random = generator.nextInt(100); //from 0 to 99
+        int random = generator.nextInt(100); //from 0 to 99
 
-        if(random < 5) {
+        if (random < 5) {
             return LIFE;
         }
-        if(random < 10) {
+        if (random < 10) {
             return BOMB;
         }
-        if(random < 15) {
+        if (random < 15) {
             return RADIUS;
         }
 
@@ -103,5 +100,7 @@ public enum Bonus { //VISITOR pattern can be used in this situation.
                 throw new IllegalArgumentException("Illegal bonus id: " + id);
             }
         }
-    };
+    }
+
+    ;
 }

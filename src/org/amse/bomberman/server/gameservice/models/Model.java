@@ -7,10 +7,10 @@ package org.amse.bomberman.server.gameservice.models;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.models.impl.Bomb;
+import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bomb;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
-import org.amse.bomberman.server.gameservice.Game;
-import org.amse.bomberman.server.gameservice.GameMap;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
@@ -63,12 +63,6 @@ public interface Model {
     int getCurrentPlayersNum();
 
     /**
-     * Returns list of explosions.
-     * @return list of explosions.
-     */
-    List<Pair> getExplosionSquares();
-
-    /**
      * Returns GameMap of this model.
      * @see GameMap
      * @return
@@ -113,12 +107,6 @@ public interface Model {
     void playerBombed(ModelPlayer atacker, ModelPlayer victim);
 
     /**
-     * Printing gameField to console.
-     * @deprecated
-     */
-    void printToConsole();
-
-    /**
      * Removing some explosions from model.
      * @param explosions explosions to remove.
      */
@@ -141,7 +129,7 @@ public interface Model {
      * @param direction move direction.
      * @return true if object was moved, false otherwise.
      */
-    boolean tryDoMove(MoveableObject objectToMove, Direction direction);
+    boolean tryDoMove(ModelPlayer player, Direction direction);
 
     /**
      * Tryes to place bomb by defined player.

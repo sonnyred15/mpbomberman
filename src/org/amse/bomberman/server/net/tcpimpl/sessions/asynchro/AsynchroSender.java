@@ -4,6 +4,7 @@
  */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
+import org.amse.bomberman.util.structs.SeparatelySynchronizedMap;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
