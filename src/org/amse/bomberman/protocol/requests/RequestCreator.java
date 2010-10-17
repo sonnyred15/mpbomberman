@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.amse.bomberman.client.models.gamemodel.impl.GameModel;
+import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.Direction;

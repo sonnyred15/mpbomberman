@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -12,6 +13,10 @@ import javax.imageio.ImageIO;
 public class ImageUtilities {
 
     private ImageUtilities() {
+    }
+
+    public static ImageIcon loadIcon(String path) {
+        return new ImageIcon(ImageUtilities.class.getClassLoader().getResource(path));
     }
 
     public static Image initImage(String resourceName, int width, int heigth) throws IOException {

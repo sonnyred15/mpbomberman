@@ -8,7 +8,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * @author Mikhail Korovkin
- * @author Kirilchuk V.E
+ * @author Kirilchuk V.E.
  */
 public interface Connector {
 

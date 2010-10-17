@@ -3,9 +3,11 @@ package org.amse.bomberman.client.models.gamemodel;
 import org.amse.bomberman.util.Direction;
 
 /**
+ * Immutable class.
  * @author Michail Korovkin
  */
 public class Cell {
+
     private int myX;
     private int myY;
 
@@ -13,15 +15,17 @@ public class Cell {
         myX = x;
         myY = y;
     }
+
     public int getX() {
         return myX;
     }
+
     public int getY() {
         return myY;
     }
 
     public Cell nextCell(Direction direction) throws UnsupportedOperationException {
-        switch (direction) {
+        switch(direction) {
             case LEFT: {
                 return new Cell(myX, myY - 1);
             }
@@ -38,4 +42,5 @@ public class Cell {
                 throw new UnsupportedOperationException("Unregistered ERROR!!!");
         }
     }
+
 }

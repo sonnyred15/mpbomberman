@@ -207,8 +207,7 @@ public class Controller implements RequestExecutor, SessionEndListener {
         Iterator<String> iterator = args.iterator();
         String name = iterator.next();
         this.player.setNickName(name);
-        sendToClient(protocol.ok(ProtocolConstants.SET_NAME_MESSAGE_ID,
-                "Name was set."));
+        sendToClient(protocol.ok(ProtocolConstants.SET_NAME_MESSAGE_ID, name));
     }
 
     public void sendToClient(ProtocolMessage<Integer, String> message) {

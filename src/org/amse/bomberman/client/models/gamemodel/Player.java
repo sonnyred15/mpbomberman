@@ -16,7 +16,7 @@ public interface Player {
 
     void setLives(int lives);
 
-    int getLife();
+    int getLifes();
 
     void setCoord(Cell cell);
 

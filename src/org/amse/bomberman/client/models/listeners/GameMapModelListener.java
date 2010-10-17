@@ -4,7 +4,7 @@ package org.amse.bomberman.client.models.listeners;
  *
  * @author Kirilchuk V.E.
  */
-public interface ResultModelListener {
+public interface GameMapModelListener {
 
-    void updateResults();
+    void gameMapChanged();
 }

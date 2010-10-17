@@ -2,17 +2,21 @@ package org.amse.bomberman.util.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.amse.bomberman.client.models.gamemodel.GameMap;
 import org.amse.bomberman.client.models.gamemodel.Cell;
-import org.amse.bomberman.util.IParser;
+import org.amse.bomberman.client.models.gamemodel.Player;
+import org.amse.bomberman.client.models.gamemodel.impl.PlayerImpl;
+import org.amse.bomberman.util.Parser;
 
 /**
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
-public class Parser implements IParser {
+public class ParserImpl implements Parser {
 
-    public GameMap parse(List<String> list) {
+    public GameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
         GameMap map = null;
         try {
 
@@ -34,8 +38,22 @@ public class Parser implements IParser {
                 String[] xy = list.get(i + n + 2).split(" ");
                 Cell buf = new Cell(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
                 expl.add(buf);
-            }
-            
+            }            
+
+            map.setExplosions(expl);
+        } catch (NumberFormatException ex) {
+            System.out.println("Wrong format of gameMap: " + ex);
+        }
+        return map;
+    }
+
+    public Player parsePlayer(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
+        Player player = new PlayerImpl();
+        try {
+            int n = 0; //dimension
+            n = Integer.parseInt(list.get(0));
+            int k = Integer.parseInt(list.get(n + 1)); //explosions count
+
             // PARSING PLAYER n + k + 2
             int x = Integer.parseInt(list.get(n + k + 2));
             int y = Integer.parseInt(list.get(n + k + 3));
@@ -45,16 +63,13 @@ public class Parser implements IParser {
             int maxBombs = Integer.parseInt(list.get(n + k + 7));
             int radius = Integer.parseInt(list.get(n + k + 8));
 
-//            Model model = GameModel.getInstance(); //TODO CLIENT SERVER split gameMap and player info!!!
-//            model.setPlayerLives(lives);
-//            model.setPlayerCoord(new Cell(x, y));
-//            model.setPlayerBombs(maxBombs);
-//            model.setPlayerRadius(radius);
-
-            map.setExplosions(expl);
+            player.setLives(lives);
+            player.setCoord(new Cell(x, y));
+            player.setBombAmount(maxBombs);
+            player.setBombRadius(radius);
         } catch (NumberFormatException ex) {
-            System.out.println("Wrong format of map: " + ex);
+            System.out.println("Wrong format of player: " + ex);
         }
-        return map;
+        return player;
     }
 }
