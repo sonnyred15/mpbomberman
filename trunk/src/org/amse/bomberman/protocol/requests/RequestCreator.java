@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.models.gamemodel.impl.GameModel;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.Direction;
@@ -39,9 +39,8 @@ public class RequestCreator {
     }
 
     public ProtocolMessage<Integer, String> requestJoinGame(int gameId) {
-        List<String> data = new ArrayList<String>(2);
+        List<String> data = new ArrayList<String>(1);
         data.add(String.valueOf(gameId));
-        data.add(Model.getInstance().getPlayerName());
 
         return request(ProtocolConstants.JOIN_GAME_MESSAGE_ID, data);
     }

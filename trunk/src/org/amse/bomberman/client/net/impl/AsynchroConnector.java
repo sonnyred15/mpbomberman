@@ -10,13 +10,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.SwingUtilities;
+import org.amse.bomberman.client.control.ConnectorListener;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
@@ -28,26 +26,22 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class AsynchroConnector implements Connector {
 
-    private static Connector connector = null;
+    private ConnectorListener listener;
     private Socket socket;
     private Thread inputThread;
     private DataOutputStream out = null;
     private DataInputStream in = null;
 
-    private AsynchroConnector() {
+    public AsynchroConnector() {}
+
+    public void setListener(ConnectorListener listener) {
+        this.listener = listener;
     }
 
-    public static Connector getInstance() {
-        if (connector == null) {
-            connector = new AsynchroConnector();
-        }
-        return connector;
-    }
+    public synchronized void сonnect(InetAddress address, int port)
+            throws IOException {
 
-    public synchronized void сonnect(InetAddress address, int port) throws
-            UnknownHostException, IOException, IllegalArgumentException {
-
-        this.socket = new Socket(address, port);
+        socket = new Socket(address, port);
         out = initOut();
         in = initIn();
 
@@ -57,7 +51,7 @@ public class AsynchroConnector implements Connector {
     }
 
     private DataOutputStream initOut() throws IOException {
-        OutputStream os = this.socket.getOutputStream();
+        OutputStream os = socket.getOutputStream();
         return new DataOutputStream(new BufferedOutputStream(os));
     }
 
@@ -66,7 +60,17 @@ public class AsynchroConnector implements Connector {
         return new DataInputStream(new BufferedInputStream(is));
     }
 
+    public synchronized boolean isClosed() {
+        if (socket == null || out == null || in == null || socket.isClosed()) {
+            return true;
+        }
+        return false;
+    }
+
     public synchronized void closeConnection() {
+        if (isClosed()) {
+            return;
+        }
         try {
             if (inputThread != null) {
                 inputThread.interrupt();
@@ -86,6 +90,9 @@ public class AsynchroConnector implements Connector {
     }
 
     public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {
+        if(isClosed()) {
+            throw new NetException("Can`t send any data. Connection is closed");
+        }
         try {
             List<String> data = request.getData();
             if (data == null) {
@@ -131,7 +138,7 @@ public class AsynchroConnector implements Connector {
                         }
                         message.setData(data);
 
-                        SwingUtilities.invokeLater(new InvokationCommand(message));
+                        listener.received(message);
                     } catch (EOFException ex) {
                         /* Ignore cause server always send DISCONNECT_MESSAGE before
                         end of stream. (Except the collapse)
@@ -145,19 +152,6 @@ public class AsynchroConnector implements Connector {
             }
             
             System.out.println("ServerListen: run ended.");
-        }
-
-        private class InvokationCommand implements Runnable {
-
-            ProtocolMessage<Integer, String> message;
-
-            public InvokationCommand(ProtocolMessage<Integer, String> message) {
-                this.message = message;
-            }
-
-            public void run() {
-                ControllerImpl.getInstance().receivedResponse(message);
-            }
         }
     }
 }

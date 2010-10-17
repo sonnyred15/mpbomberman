@@ -1,17 +1,13 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
-//~--- non-JDK imports --------------------------------------------------------
+import java.util.Iterator;
+import java.util.List;
+
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Direction;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Iterator;
-
-import java.util.List;
 import org.amse.bomberman.protocol.responses.ResponseCreator;
 import org.amse.bomberman.protocol.requests.RequestExecutor;
 import org.amse.bomberman.util.Constants;
@@ -72,8 +68,8 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.createGame(gameMapName, gameName, maxPlayers));
     }
 
-    public void tryJoinGame(List<String> args) throws InvalidDataException {//gameID playerName
-        checkArgsNum(args, 2, ProtocolConstants.JOIN_GAME_MESSAGE_ID,
+    public void tryJoinGame(List<String> args) throws InvalidDataException {//gameID
+        checkArgsNum(args, 1, ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                 "Wrong number of arguments.");
 
         //here all is OK
@@ -89,9 +85,6 @@ public class Controller implements RequestExecutor, SessionEndListener {
             throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                                            "Game id param must be int.");
         }
-
-        String playerName = iterator.next();
-        playerName = cutLength(playerName, Constants.MAX_PLAYER_NAME_LENGTH);
 
         sendToClient(state.joinGame(gameID));
     }

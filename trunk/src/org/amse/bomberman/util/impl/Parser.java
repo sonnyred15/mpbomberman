@@ -2,10 +2,8 @@ package org.amse.bomberman.util.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.Cell;
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.models.gamemodel.GameMap;
+import org.amse.bomberman.client.models.gamemodel.Cell;
 import org.amse.bomberman.util.IParser;
 
 /**
@@ -14,14 +12,14 @@ import org.amse.bomberman.util.IParser;
  */
 public class Parser implements IParser {
 
-    public BombMap parse(List<String> list) {
-        BombMap map = null;
+    public GameMap parse(List<String> list) {
+        GameMap map = null;
         try {
 
             // PARSING FIELD 0
             int n = 0; //dimension
             n = Integer.parseInt(list.get(0));
-            map = new BombMap(n);
+            map = new GameMap(n);
             for (int i = 0; i < n; i++) {
                 String[] numbers = list.get(i + 1).split(" ");
                 for (int j = 0; j < numbers.length; j++) {
@@ -47,11 +45,11 @@ public class Parser implements IParser {
             int maxBombs = Integer.parseInt(list.get(n + k + 7));
             int radius = Integer.parseInt(list.get(n + k + 8));
 
-            IModel model = Model.getInstance();
-            model.setPlayerLives(lives);
-            model.setPlayerCoord(new Cell(x, y));
-            model.setPlayerBombs(maxBombs);
-            model.setPlayerRadius(radius);
+//            Model model = GameModel.getInstance(); //TODO CLIENT SERVER split gameMap and player info!!!
+//            model.setPlayerLives(lives);
+//            model.setPlayerCoord(new Cell(x, y));
+//            model.setPlayerBombs(maxBombs);
+//            model.setPlayerRadius(radius);
 
             map.setExplosions(expl);
         } catch (NumberFormatException ex) {

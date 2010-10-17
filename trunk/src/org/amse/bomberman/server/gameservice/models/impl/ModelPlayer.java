@@ -8,7 +8,7 @@ import org.amse.bomberman.server.gameservice.gamemap.impl.MoveableGameMapObject;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.amse.bomberman.util.structs.IntegerHolder;
+import org.amse.bomberman.util.structs.VolatileIntegerHolder;
 
 /**
  * Class that represents player. Player is part of Model not part of Game.
@@ -22,17 +22,17 @@ public class ModelPlayer implements MoveableGameMapObject {
     private final String nickName;
 
     //
-    private final IntegerHolder lives
-            = new IntegerHolder(Constants.PLAYER_DEFAULT_LIVES);
+    private final VolatileIntegerHolder lives
+            = new VolatileIntegerHolder(Constants.PLAYER_DEFAULT_LIVES);
 
-    private final IntegerHolder settedBombs
-            = new IntegerHolder(0);
+    private final VolatileIntegerHolder settedBombs
+            = new VolatileIntegerHolder(0);
 
-    private final IntegerHolder maxBombs
-            = new IntegerHolder(Constants.PLAYER_DEFAULT_MAX_BOMBS);
+    private final VolatileIntegerHolder maxBombs
+            = new VolatileIntegerHolder(Constants.PLAYER_DEFAULT_MAX_BOMBS);
     
-    private final IntegerHolder explRadius
-            = new IntegerHolder(Constants.PLAYER_DEFAULT_BOMB_RADIUS);
+    private final VolatileIntegerHolder explRadius
+            = new VolatileIntegerHolder(Constants.PLAYER_DEFAULT_BOMB_RADIUS);
 
     //
     private final    Pair        position;
