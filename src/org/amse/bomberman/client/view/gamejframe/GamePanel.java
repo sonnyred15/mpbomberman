@@ -1,10 +1,9 @@
 package org.amse.bomberman.client.view.gamejframe;
 
 import org.amse.bomberman.client.Main;
-import org.amse.bomberman.client.model.BombMap;
-import org.amse.bomberman.client.model.Cell;
-import org.amse.bomberman.client.model.IModel;
-import org.amse.bomberman.client.model.impl.Model;
+import org.amse.bomberman.client.models.gamemodel.GameMap;
+import org.amse.bomberman.client.models.gamemodel.Cell;
+import org.amse.bomberman.client.models.gamemodel.impl.GameModel;
 import org.amse.bomberman.util.Constants;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import org.amse.bomberman.client.control.Controller;
 
 
 /**
@@ -25,7 +25,7 @@ import javax.swing.JPanel;
  */
 @SuppressWarnings("serial")
 public class GamePanel  extends JPanel{
-    private BombMap map;
+    private GameMap map;
     private List<Cell> changes;
 
     public static final int CELL_SIZE = 48;
@@ -82,19 +82,14 @@ public class GamePanel  extends JPanel{
             .getClassLoader().getResource(BURN_ICON_PATH));
 
     public GamePanel() {
-        BombMap gameMap = Model.getInstance().getMap();
-        if (gameMap != null) {
-            this.update();
-        } else {
-            range = DEFAULT_RANGE;
-            width = range*CELL_SIZE;
-            height = range*CELL_SIZE;
-            this.setPreferredSize(new Dimension(width, height));
-        }
+        range = DEFAULT_RANGE;
+        width = range * CELL_SIZE;
+        height = range * CELL_SIZE;
+        setPreferredSize(new Dimension(width, height));
     }
-    public void update() {
-        IModel model = Model.getInstance();
-        BombMap newMap = model.getMap();
+
+    public void update(GameModel model) {
+        GameMap newMap = model.getMap();
         // if map was not received yet.
         if (newMap == null) {
             return;
@@ -112,7 +107,7 @@ public class GamePanel  extends JPanel{
             width = range * CELL_SIZE;
             height = range * CELL_SIZE;
             this.setPreferredSize(new Dimension(width, height));
-            myCoord = Model.getInstance().getPlayerCoord();
+            myCoord = model.getPlayerCoord();
             this.findEyeShot();
         }
         map = newMap;
@@ -129,6 +124,7 @@ public class GamePanel  extends JPanel{
         changes = model.getChanges();
         this.repaint();
     }
+
     @Override
     public void paint(Graphics graphics) {
         if (isFirst) {

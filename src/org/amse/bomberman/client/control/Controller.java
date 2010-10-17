@@ -1,66 +1,59 @@
 package org.amse.bomberman.client.control;
 
-import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.client.net.RequestResultListener;
+import org.amse.bomberman.client.net.ServerListener;
 import org.amse.bomberman.util.Direction;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.List;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.client.control.impl.ModelsContainer;
 
 /**
  *
  * @author Mikhail Korovkin
  */
-public interface Controller {
+public interface Controller extends ConnectorListener {
 
-    public void setReceiveInfoListener(RequestResultListener receiveResultListener);
+    ModelsContainer getContext();
 
-    public void connect(InetAddress serverIP, int serverPort)
-            throws NetException, IOException;
+    void connect(AsynchroCaller caller, InetAddress serverIP, int serverPort);
 
-    public void requestGamesList() throws NetException;
+    void addServiceListener(ServerListener listener);
 
-    public void requestCreateGame(String gameName, String mapName, int maxPlayers)
-            throws NetException;
+    void removeServiceListener(ServerListener listener);
 
-    public void requestLeaveGame() throws NetException;
+    void requestGamesList();
 
-    public void requestJoinGame(int gameID) throws NetException;
+    void requestCreateGame(String gameName,
+            String mapName, int maxPlayers);
 
-    public void requestDoMove(Direction dir) throws NetException;
+    void requestLeaveGame();
 
-    public void requestStartGame() throws NetException;
+    void requestJoinGame(int gameID);
 
-    public void requestGameMap() throws NetException;
+    void requestDoMove(Direction dir);
 
-    public void requestPlantBomb() throws NetException;
+    void requestStartGame();
 
-    public void requestJoinBotIntoGame() throws NetException;
+    void requestGameMap();
 
-    public void requestRemoveBotFromGame() throws NetException;
+    void requestPlantBomb();
 
-    public void requestMapsList() throws NetException;
+    void requestJoinBotIntoGame();
 
-    public void requestIsGameStarted() throws NetException;
+    void requestRemoveBotFromGame();
 
-    public void requestGameInfo() throws NetException;
+    void requestMapsList();
 
-    public void requestSendChatMessage(String message) throws NetException;
+    void requestIsGameStarted();
 
-    public void requestGetNewChatMessages() throws NetException;
+    void requestGameInfo();
 
-    public void requestDownloadMap(String gameMapName) throws NetException;
+    void requestSendChatMessage(String message);
 
-    public void requestSetPlayerName(String playerName) throws NetException;
+    void requestGetNewChatMessages();
 
-    public void startGame();
+    void requestDownloadMap(String gameMapName);
 
-    public void leaveGame();
+    void requestSetPlayerName(String playerName);
 
-    public void receivedResponse(ProtocolMessage<Integer, String> requestResult);
-
-    public void lostConnection(String message);
-
-    public void disconnect();
+    void disconnect();
 }

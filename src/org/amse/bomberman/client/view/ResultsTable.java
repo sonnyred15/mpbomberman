@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
@@ -22,7 +21,6 @@ public class ResultsTable extends JTable {
 
     public void update(List<String> results) {
         ((ResultsTableModel) this.getModel()).setResults(results);
-        this.revalidate();
     }
 
     private void setSizes() {

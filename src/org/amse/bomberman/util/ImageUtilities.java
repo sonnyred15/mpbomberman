@@ -25,6 +25,14 @@ public class ImageUtilities {
         return image;
     }
 
+    /**
+     * Resizes an image.
+     *
+     * @param image source image to scale.
+     * @param width desired width.
+     * @param heigth desired height.
+     * @return new resized image.
+     */
     public static Image rescaleImage(Image image, int width, int heigth) {
         return image.getScaledInstance(width,
                                        heigth,

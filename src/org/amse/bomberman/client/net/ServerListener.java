@@ -5,7 +5,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 /**
  * @author Kirilchuk V.E
  */
-public interface RequestResultListener {
+public interface ServerListener {
 
-    void received(ProtocolMessage<Integer, String> response);
+    void received(ProtocolMessage<Integer, String> message);
 }
