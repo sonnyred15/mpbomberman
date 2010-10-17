@@ -25,7 +25,7 @@ public class ChatModel implements ServerListener {
         if (messageId == ProtocolConstants.CHAT_GET_MESSAGE_ID) {//TODO hardcoded string
             if (!data.get(0).equals("No new messages.")) {
                 history.addAll(data);
-                updateListeners();
+                updateListeners(data);
             }
         }
     }
@@ -42,9 +42,9 @@ public class ChatModel implements ServerListener {
         listeners.remove(listener);
     }
 
-    private void updateListeners() {
+    private void updateListeners(List<String> newMessages) {
         for (ChatModelListener listener : listeners) {
-            listener.updateChat();
+            listener.updateChat(newMessages);
         }
     }
 }

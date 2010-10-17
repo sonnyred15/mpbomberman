@@ -13,10 +13,12 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import org.amse.bomberman.client.control.AsynchroCaller;
 import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
+ * Implementation of Controller interface that uses ExecutorService to
+ * free gui Thread as soon as it is possible and to free connector thread
+ * as soon as it possible.
  *
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
@@ -28,8 +30,9 @@ public class ControllerImpl implements Controller {
     private final Connector       connector;
     private final ModelsContainer context;
 
+    //TODO CLIENT must not have listeners. Must set info to models himself!!!
     private final List<ServerListener> listeners = new CopyOnWriteArrayList<ServerListener>();
-    private final RequestCreator        protocol = new RequestCreator();
+    private final RequestCreator       protocol  = new RequestCreator();
 
     public ControllerImpl(ExecutorService executors,
             Connector connector, ModelsContainer context) {
@@ -42,19 +45,17 @@ public class ControllerImpl implements Controller {
         return context;
     }
 
-    public void connect(final AsynchroCaller caller,
-            final InetAddress serverIP, final int serverPort) {
+    public void connect(final InetAddress serverIP, final int serverPort) {
         executors.submit(new Runnable() {
 
             public void run() {
                 try {
                     connector.сonnect(serverIP, serverPort);
-                    context.getConnectionStateModel().setConnected(true);
-                    caller.returnOk();
+                    context.getConnectionStateModel().setConnected(true);                    
                 } catch (IOException ex) {
-                    caller.returnException(ex);
+                    context.getConnectionStateModel().connectException(ex);
                 } catch (IllegalArgumentException ex) { //wrong port
-                    caller.returnException(ex);
+                    context.getConnectionStateModel().connectException(ex);
                 }
             }
         });
@@ -79,8 +80,7 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestGamesList());
     }
 
-    public void requestCreateGame(String gameName,
-            String mapName, int maxPlayers) {
+    public void requestCreateGame(String gameName, String mapName, int maxPlayers) {
         sendRequest(protocol.requestCreateGame(gameName, mapName, maxPlayers));
     }
 
@@ -97,7 +97,7 @@ public class ControllerImpl implements Controller {
     }
 
     public void requestStartGame() {
-        sendRequest(protocol.requestStartGame());
+        sendRequest(protocol.requestStartGame()); 
     }
 
     public void requestGameMap() {

@@ -1,8 +1,11 @@
 package org.amse.bomberman.client.viewmanager.states;
 
+import java.util.List;
+import org.amse.bomberman.client.models.impl.ChatModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel.State;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
+import org.amse.bomberman.client.models.listeners.ChatModelListener;
 import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
 import org.amse.bomberman.client.models.listeners.GameInfoModelListener;
 import org.amse.bomberman.client.view.wizard.panels.LobbyPanel;
@@ -14,23 +17,34 @@ import org.amse.bomberman.client.viewmanager.ViewManager;
  */
 public class LobbyViewState extends AbstractState
                             implements ClientStateModelListener,
-                                       GameInfoModelListener {
+                                       GameInfoModelListener,
+                                       ChatModelListener {
+
     private final LobbyPanel panel = new LobbyPanel(getController());
     private static final String  BACK = "Leave";
     private static final String  NEXT = "Start";
 
     public LobbyViewState(ViewManager machine) {
         super(machine);
-        getController().getContext().getGameInfoModel().addListener(this);
-        getController().getContext().getClientStateModel().addListener(this);
     }
 
     public void init() {
+        getController().getContext().getGameInfoModel().addListener(this);
+        getController().getContext().getClientStateModel().addListener(this);
+        getController().getContext().getChatModel().addListener(this);
+        panel.clearGameInfo();
         panel.cleanChatArea();
         getController().requestGameInfo();
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
         getWizard().setNextText(NEXT);
+    }
+
+    @Override
+    public void release() {
+        getController().getContext().getGameInfoModel().removeListener(this);
+        getController().getContext().getClientStateModel().removeListener(this);
+        getController().getContext().getChatModel().removeListener(this);
     }
 
     public void previous() {
@@ -68,7 +82,12 @@ public class LobbyViewState extends AbstractState
     }
 
     public void gameInfoError(String error) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //TODO client
+    }
+
+    public void updateChat(List<String> newMessages) {
+        ChatModel model = getController().getContext().getChatModel();
+        panel.setNewMessages(newMessages);
     }
 }
 

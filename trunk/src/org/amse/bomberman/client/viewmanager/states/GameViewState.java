@@ -1,11 +1,17 @@
 package org.amse.bomberman.client.viewmanager.states;
 
+import java.util.List;
 import javax.swing.JOptionPane;
-import org.amse.bomberman.client.models.gamemodel.impl.GameModel;
+import org.amse.bomberman.client.models.gamemodel.Player;
+import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
+import org.amse.bomberman.client.models.gamemodel.impl.GameStateModel;
+import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.models.impl.ChatModel;
 import org.amse.bomberman.client.models.impl.ResultsModel;
 import org.amse.bomberman.client.models.listeners.ChatModelListener;
-import org.amse.bomberman.client.models.listeners.GameModelListener;
+import org.amse.bomberman.client.models.listeners.GameMapModelListener;
+import org.amse.bomberman.client.models.listeners.GameStateListener;
+import org.amse.bomberman.client.models.listeners.PlayerModelListener;
 import org.amse.bomberman.client.models.listeners.ResultModelListener;
 import org.amse.bomberman.client.view.gamejframe.GameFrame;
 import org.amse.bomberman.client.view.gamejframe.GameKeyListener;
@@ -17,9 +23,11 @@ import org.amse.bomberman.client.viewmanager.ViewManager;
  * @author Kirilchuk V.E.
  */
 public class GameViewState extends AbstractState
-                           implements GameModelListener,
+                           implements GameMapModelListener,
                                       ChatModelListener,
-                                      ResultModelListener {
+                                      ResultModelListener,
+                                      PlayerModelListener,
+                                      GameStateListener {
     private GameFrame gameFrame = new GameFrame();
     private GameKeyListener keyListener = new GameKeyListener(getController());
     private GameMenuBar menu = new GameMenuBar(getController());
@@ -29,14 +37,26 @@ public class GameViewState extends AbstractState
 
     public GameViewState(ViewManager machine) {
         super(machine);
-        getController().getContext().getGameModel().addListener(this);
+        
         gameFrame.setJMenuBar(menu);
         gameFrame.addKeyListener(keyListener);
     }
 
     public void init() {
+        getController().getContext().getGameMapModel().addListener(this);
+        getController().getContext().getChatModel().addListener(this);
+        getController().getContext().getResultsModel().addListener(this);
+        getController().getContext().getPlayerModel().addListener(this);
         getWizard().setVisible(false);
         gameFrame.setVisible(true);
+    }
+
+    @Override
+    public void release() {
+        getController().getContext().getGameMapModel().removeListener(this);
+        getController().getContext().getChatModel().removeListener(this);
+        getController().getContext().getResultsModel().removeListener(this);
+        getController().getContext().getPlayerModel().removeListener(this);
     }
 
     public void previous() {
@@ -50,8 +70,8 @@ public class GameViewState extends AbstractState
         //do nothing
     }
 
-    public void gameModelChanged() {
-        GameModel model = getController().getContext().getGameModel();
+    public void gameMapChanged() {
+        GameMapModel model = getController().getContext().getGameMapModel();
 
 //        if (isFirstInit) {//TODO CLIENT bad code
 //            int mapSize = model.getMap().getSize();
@@ -61,13 +81,27 @@ public class GameViewState extends AbstractState
 //            }
 //            isFirstInit = false;//TODO CLIENT bad code
 //        }
-        gameFrame.setGameMap(model);
-        gameFrame.setBonuses(model.getPlayerLives(),
-                             model.getPlayerBombs(),
-                             model.getPlayerRadius());
+        gameFrame.setGameMap(model);               
+    }
 
-        updateResults();
-        int lives = model.getPlayerLives();
+    public void updateResults() {
+        ResultsModel model = getController().getContext().getResultsModel();
+        gameFrame.setResults(model.getResults());
+    }
+
+    public void updateChat(List<String> newMessages) {
+        ChatModel model = getController().getContext().getChatModel();
+        gameFrame.setHistory(model.getHistory());
+    }
+
+    public void updatePlayer() {
+        PlayerModel model = getController().getContext().getPlayerModel();
+        Player player = model.getPlayer();
+        gameFrame.setBonuses(player.getLifes(),
+                             player.getBombAmount(),
+                             player.getBombRadius());
+
+        int lives = player.getLifes();
         if (lives <= 0) {
             if (!dead) {//TODO CLIENT bad code
                 dead = true;
@@ -76,6 +110,10 @@ public class GameViewState extends AbstractState
                         "Death", JOptionPane.INFORMATION_MESSAGE);
             }
         }
+    }
+
+    public void updateGameState() {
+        GameStateModel model = getController().getContext().getGameStateModel();
         if (model.isEnded()) {
             if (!dead) { //TODO bad code
                 dead = true;
@@ -86,25 +124,7 @@ public class GameViewState extends AbstractState
         }
     }
 
-    public void gameModelErrot(String error) {
-        //TODO ignore?
-    }
-
-    public void updateChat() {
-        ChatModel model = getController().getContext().getChatModel();
-        gameFrame.setHistory(model.getHistory());
-    }
-
-    public void chatError(String message) {
-        //TODO ignore?
-    }
-
-    public void updateResults() {
-        ResultsModel model = getController().getContext().getResultsModel();
-        gameFrame.setResults(model.getResults());
-    }
-
-    public void resultsError(String error) {
-        //TODO ignore?
+    public void gameTerminated(String cause) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

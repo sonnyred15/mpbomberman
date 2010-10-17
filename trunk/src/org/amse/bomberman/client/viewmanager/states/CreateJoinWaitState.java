@@ -14,11 +14,11 @@ public class CreateJoinWaitState extends AbstractState
                                  implements ClientStateModelListener {
 
     public CreateJoinWaitState(ViewManager machine) {
-        super(machine);
-        getController().getContext().getClientStateModel().addListener(this);
+        super(machine);        
     }
 
     public void init() {
+        getController().getContext().getClientStateModel().addListener(this);
         //blocking here
         DialogResult result = getWizard().showWaitingDialog(); 
         if(result == DialogResult.CANCELED) {
@@ -27,6 +27,11 @@ public class CreateJoinWaitState extends AbstractState
         } else {
             next();
         }
+    }
+
+    @Override
+    public void release() {
+        getController().getContext().getClientStateModel().removeListener(this);
     }
 
     public void previous() {
@@ -46,7 +51,7 @@ public class CreateJoinWaitState extends AbstractState
 
     public void clientStateError(State state, String error) {
        switch(state) {
-           case LOBBY: {
+           case LOBBY: {//LOBBY cause error is about going to lobby state
                getWizard().cancelWaitingDialog();
                getWizard().showError(error);
            }

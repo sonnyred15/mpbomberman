@@ -73,10 +73,19 @@ public class LobbyPanel extends JPanel {
         this.maxPlayers = number;
     }
 
-    public void setGameInfo(List<String> info) {
+    public void setGameInfo(final List<String> info) {
+        if(!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    setGameInfo(info);
+                }
+            });
+            return;//or will be done twice
+        }
+
         if (info.get(0).equals("false")) {
             this.botsPanel.setVisible(false);
-
         } else {
             this.botsPanel.setVisible(true);
         }
@@ -107,6 +116,12 @@ public class LobbyPanel extends JPanel {
 
     public void cleanChatArea() {
         this.chatTA.setText("");
+    }
+
+    public void clearGameInfo() {
+        DefaultListModel model = (DefaultListModel) this.playersList.getModel();
+
+        model.clear();
     }
 
     @Override

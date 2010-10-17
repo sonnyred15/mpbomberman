@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
-import org.amse.bomberman.client.models.gamemodel.impl.GameModel;
+import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
 import org.amse.bomberman.client.view.ResultsTable;
 import org.amse.bomberman.util.ImageUtilities;
 
@@ -138,8 +138,8 @@ public class GameFrame extends JFrame {
         }
     }
 
-    public void setGameMap(GameModel model) {
-        gamePanel.update(model);
+    public void setGameMap(GameMapModel model) {
+        gamePanel.updateGameMap(model);
     }
 
     public void setHistory(List<String> history) {

@@ -61,7 +61,7 @@ public class AsynchroConnector implements Connector {
     }
 
     public synchronized boolean isClosed() {
-        if (socket == null || out == null || in == null || socket.isClosed()) {
+        if (socket == null || socket.isClosed() || out == null || in == null ) {
             return true;
         }
         return false;

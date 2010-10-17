@@ -27,6 +27,10 @@ public class ConnectionStateModel implements ServerListener {
         }
     }
 
+    public void connectException(Exception ex) {
+        updateListeners(ex.getMessage());
+    }
+
     public void received(ProtocolMessage<Integer, String> message) {
         //TODO CLIENT when server send disconnect message
     }
@@ -42,6 +46,12 @@ public class ConnectionStateModel implements ServerListener {
     private void updateListeners() {
         for (ConnectionStateListener listener : listeners) {
             listener.connectionStateChanged();
+        }
+    }
+
+    private void updateListeners(String error) {
+        for(ConnectionStateListener listener : listeners) {
+            listener.connectionError(error);
         }
     }
 }

@@ -36,10 +36,12 @@ public class Main {
         controller.addServiceListener(context.getChatModel());
         controller.addServiceListener(context.getConnectionStateModel());
         controller.addServiceListener(context.getGameMapsModel());
-        controller.addServiceListener(context.getGameModel());
+        controller.addServiceListener(context.getGameMapModel());
+        controller.addServiceListener(context.getPlayerModel());
         controller.addServiceListener(context.getGamesModel());
         controller.addServiceListener(context.getResultsModel());
         controller.addServiceListener(context.getClientStateModel());
+        controller.addServiceListener(context.getGameStateModel());
 
         ViewManager viewState = new ViewManager(controller);
         context.getConnectionStateModel().addListener(viewState);

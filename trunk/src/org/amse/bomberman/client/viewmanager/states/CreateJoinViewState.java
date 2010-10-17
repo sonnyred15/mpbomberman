@@ -16,23 +16,29 @@ import org.amse.bomberman.client.viewmanager.ViewManager;
 public class CreateJoinViewState extends AbstractState
                                  implements GameMapsModelListener,
                                             GamesModelListener {
+
     private final GamesPanel panel = new GamesPanel();
     private static final String  BACK = "Disconnect";
     private static final String  NEXT = "Create/Join";
 
-
     public CreateJoinViewState(ViewManager machine) {
         super(machine);
-        getController().getContext().getGameMapsModel().addListener(this);
-        getController().getContext().getGamesModel().addListener(this);
     }
 
     public void init() {
+        getController().getContext().getGameMapsModel().addListener(this);
+        getController().getContext().getGamesModel().addListener(this);
         getController().requestGamesList();
         getController().requestMapsList();
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
         getWizard().setNextText(NEXT);
+    }
+
+    @Override
+    public void release() {
+        getController().getContext().getGameMapsModel().removeListener(this);
+        getController().getContext().getGamesModel().removeListener(this);
     }
 
     public void previous() {
@@ -73,7 +79,7 @@ public class CreateJoinViewState extends AbstractState
     }
 
     public void gameMapsError(String error) {
-        getWizard().showError(error); //TODO !?
+        getWizard().showError(error);
     }
 
     public void updateGamesList() {
@@ -82,6 +88,6 @@ public class CreateJoinViewState extends AbstractState
     }
 
     public void gamesListError(String error) {
-        getWizard().showError(error); //TODO !?
+        getWizard().showError(error);
     }
 }

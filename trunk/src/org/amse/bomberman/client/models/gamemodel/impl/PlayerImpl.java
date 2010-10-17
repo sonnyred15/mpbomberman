@@ -17,9 +17,9 @@ public class PlayerImpl implements Player {
     private Cell   myCoord = new Cell(0, 0);
 
     public PlayerImpl() {
-        this.life       = Constants.PLAYER_DEFAULT_LIVES;
-        this.bombAmount = Constants.PLAYER_DEFAULT_MAX_BOMBS;
-        this.bombRadius = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
+        this.life        = Constants.PLAYER_DEFAULT_LIVES;
+        this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;
+        this.bombRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
         this.settedBombs = 0;
     }
 
@@ -39,7 +39,7 @@ public class PlayerImpl implements Player {
         bombAmount = amount;
     }
 
-    public int getLife() {
+    public int getLifes() {
         return life;
     }
 
@@ -69,5 +69,12 @@ public class PlayerImpl implements Player {
 
     public void setSettedBombs(int amount) {
         settedBombs = amount;
+    }
+
+    public void reset() {
+        this.life        = Constants.PLAYER_DEFAULT_LIVES;
+        this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;
+        this.bombRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
+        this.settedBombs = 0;
     }
 }

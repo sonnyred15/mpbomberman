@@ -41,11 +41,12 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         createJoinViewState = new CreateJoinViewState(this);
         createJoinWaitState = new CreateJoinWaitState(this);
         lobbyViewState      = new LobbyViewState(this);
-        startWaitState      = new StartWaitState(this);
+        startWaitState      = new StartWaitState(this);//not used //TODO CLIENT think about it...
         gameViewState       = new GameViewState(this);
 
         initStatesConnections();
-        setState(getNotConnectedState());
+        state = notConnectedState;
+        state.init();
     }
 
     private void next() {
@@ -65,9 +66,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     }
 
     public void setState(State state) {
-        if (this.state != null) {
-            this.state.release();
-        }
+        this.state.release();
         this.state = state;
         state.init();
     }
@@ -103,30 +102,6 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         }
     }
 
-    public State getCreateJoinViewState() {
-        return createJoinViewState;
-    }
-
-    public State getCreateJoinWaitState() {
-        return createJoinWaitState;
-    }
-
-    public State getGameViewState() {
-        return gameViewState;
-    }
-
-    public State getLobbyViewState() {
-        return lobbyViewState;
-    }
-
-    public State getNotConnectedState() {
-        return notConnectedState;
-    }
-
-    public State getStartWaitState() {
-        return startWaitState;
-    }
-
     private void initStatesConnections() {
         notConnectedState
                 .setPrevious(null)
@@ -150,7 +125,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         if (!model.isConnected()) {//if we disconnected
             wizard.cancelWaitingDialog();
             wizard.showError(NetException.MESSAGE);
-            setState(getNotConnectedState());
+            setState(notConnectedState);
         }
     }
 
