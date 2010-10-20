@@ -123,7 +123,7 @@ public class AsynchroSender implements SessionEndListener {
 
             List<String> data = response.getData();
             int size = data.size();
-
+            
             out.writeInt(response.getMessageId());
             out.writeInt(size);
             for (String string : data) {

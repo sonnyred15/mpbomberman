@@ -53,7 +53,6 @@ public class GameFrame extends JFrame {
         super("BomberMan");
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);//TODO CLIENT Bad reaction =)
-        setLocationRelativeTo(null);
         setResizable(true);
         initComponents();
     }

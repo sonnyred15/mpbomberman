@@ -32,7 +32,7 @@ public class LobbyViewState extends AbstractState
         getController().getContext().getClientStateModel().addListener(this);
         getController().getContext().getChatModel().addListener(this);
         panel.clearGameInfo();
-        panel.clearChatArea();
+        panel.clearChatArea();        
         getController().requestGameInfo();
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
@@ -52,8 +52,7 @@ public class LobbyViewState extends AbstractState
     }
 
     public void next() {
-        getController().requestStartGame();
-        machine.setState(next);
+        getController().requestStartGame();        
     }
 
     public void clientStateChanged() {
@@ -61,18 +60,27 @@ public class LobbyViewState extends AbstractState
         State state = model.getState();
         switch(state) {
             case GAME: {
-                next();
+                machine.setState(next);
                 break;
             }
             case NOT_JOINED: {
-                previous();
+                machine.setState(previous);
                 break;
             }
         }
     }
 
     public void clientStateError(State state, String error) {
-        getWizard().showError(error);//for can`t leave and can`t start
+        switch(state) {
+            case GAME: {
+                getWizard().showError(error);//for can`t start
+                break;
+            }
+            case NOT_JOINED: {
+                getWizard().showError(error);//for can`t leave
+                break;
+            }
+        }
     }
 
     public void updateGameInfo() {

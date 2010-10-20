@@ -19,15 +19,6 @@ public class CreateJoinWaitState extends AbstractState
 
     public void init() {
         getController().getContext().getClientStateModel().addListener(this);
-        //blocking here
-        DialogState result = getWizard().showWaitingDialog();
-        //unblocked
-        if(result == DialogState.CANCELED) {
-            getController().requestLeaveGame();
-            previous();
-        } else {
-            next();
-        }
     }
 
     @Override
@@ -45,18 +36,19 @@ public class CreateJoinWaitState extends AbstractState
 
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
-        if(model.getState() == ClientStateModel.State.LOBBY) {
-            getWizard().closeWaitingDialog();
+        if (model.getState() == ClientStateModel.State.LOBBY) {
+            next();
         }
     }
 
     public void clientStateError(State state, String error) {
-       switch(state) {
-           case LOBBY: {//LOBBY cause error is about going to lobby state
-               getWizard().cancelWaitingDialog();
-               getWizard().showError(error);
-           }
-       }
+        switch (state) {
+            case LOBBY: {//LOBBY because error is about going to lobby state
+                getController().requestLeaveGame();
+                previous();
+                break;
+            }
+        }
     }
 }
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -109,14 +110,26 @@ public class Wizard extends JFrame {
         this.mainPanel = mainPanel;
     }
 
+    /**
+     * Be careful! This method is blocking! Until user clicks
+     * OK on message dialog, calling thread will be blocked on this method.
+     *
+     * @param errorMessage message to show.
+     */
     public void showError(final String errorMessage) {
         if(!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(new Runnable() {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
 
                 public void run() {
                     showError(errorMessage);
                 }
             });
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            } catch (InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
             return;
         }
 

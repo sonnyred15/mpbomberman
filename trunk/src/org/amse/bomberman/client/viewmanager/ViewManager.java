@@ -123,9 +123,6 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     public void connectionStateChanged() {
         ConnectionStateModel model = controller.getContext().getConnectionStateModel();
         if (!model.isConnected()) {//if we disconnected
-            if(wizard.isWaitingDialogOpened()) {
-                wizard.cancelWaitingDialog();
-            }
             wizard.showError(NetException.MESSAGE);
             setState(notConnectedState);
         }

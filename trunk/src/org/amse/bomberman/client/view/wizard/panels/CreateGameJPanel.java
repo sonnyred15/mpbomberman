@@ -28,7 +28,7 @@ public class CreateGameJPanel extends JPanel {
     private JLabel mapLabel;
 
     public CreateGameJPanel() {
-        this.setPreferredSize(new Dimension(width, heigth));
+        setPreferredSize(new Dimension(width, heigth));
         //this.setBorder(new LineBorder(Color.ORANGE, 1));
 
         // creating leftPanel for gameName Field

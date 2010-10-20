@@ -15,7 +15,7 @@ public final class Constants {
     public static final int MAP_PROOF_WALL = -8;
     public static final int MAP_BOMB  = -16;
     public static final int MAP_DETONATED_BOMB = -17;
-    public static final int MAP_EXPLOSION_LINE = -18;
+    public static final int MAP_EXPLOSION = -18;
     public static final int MAP_BONUS_LIFE = -9;
     public static final int MAP_BONUS_BOMB_COUNT = -10;
     public static final int MAP_BONUS_BOMB_RADIUS = -11;

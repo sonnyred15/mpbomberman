@@ -33,7 +33,6 @@ public class GameViewState extends AbstractState
     private GameMenuBar menu = new GameMenuBar(getController());
 
     private boolean dead = false;
-    private boolean isFirstInit = true;
 
     public GameViewState(ViewManager machine) {
         super(machine);
@@ -47,7 +46,9 @@ public class GameViewState extends AbstractState
         getController().getContext().getChatModel().addListener(this);
         getController().getContext().getResultsModel().addListener(this);
         getController().getContext().getPlayerModel().addListener(this);
+        getController().requestGameMap();
         getWizard().setVisible(false);
+        gameFrame.setLocationRelativeTo(getWizard());
         gameFrame.setVisible(true);
     }
 
@@ -57,12 +58,12 @@ public class GameViewState extends AbstractState
         getController().getContext().getChatModel().removeListener(this);
         getController().getContext().getResultsModel().removeListener(this);
         getController().getContext().getPlayerModel().removeListener(this);
+        gameFrame.setVisible(false);
+        getWizard().setVisible(true);
     }
 
     public void previous() {
-        gameFrame.setVisible(false);
         machine.setState(previous);
-        getWizard().setVisible(true);
     }
 
     public void next() {
@@ -72,15 +73,6 @@ public class GameViewState extends AbstractState
 
     public void gameMapChanged() {
         GameMapModel model = getController().getContext().getGameMapModel();
-
-//        if (isFirstInit) {//TODO CLIENT bad code
-//            int mapSize = model.getMap().getSize();
-//            if (mapSize < GamePanel.DEFAULT_RANGE) {
-//                width = mapSize * GamePanel.CELL_SIZE + 50 + infoTextWidth;
-//                height = mapSize * GamePanel.CELL_SIZE + 160;
-//            }
-//            isFirstInit = false;//TODO CLIENT bad code
-//        }
         gameFrame.setGameMap(model);               
     }
 
