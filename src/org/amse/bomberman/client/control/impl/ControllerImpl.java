@@ -17,7 +17,7 @@ import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  * Implementation of Controller interface that uses ExecutorService to
- * free gui Thread as soon as it is possible and to free connector thread
+ * free gui thread(EDT) as soon as it is possible and to free connector thread
  * as soon as it possible.
  *
  * @author Mikhail Korovkin
@@ -31,7 +31,9 @@ public class ControllerImpl implements Controller {
     private final ModelsContainer context;
 
     //TODO CLIENT must not have listeners. Must set info to models himself!!!
-    private final List<ServerListener> listeners = new CopyOnWriteArrayList<ServerListener>();
+    private final List<ServerListener> listeners
+            = new CopyOnWriteArrayList<ServerListener>();
+
     private final RequestCreator       protocol  = new RequestCreator();
 
     public ControllerImpl(ExecutorService executors,
@@ -45,12 +47,12 @@ public class ControllerImpl implements Controller {
         return context;
     }
 
-    public void connect(final InetAddress serverIP, final int serverPort) {
+    public void connect(final InetAddress serverIp, final int serverPort) {
         executors.submit(new Runnable() {
 
             public void run() {
                 try {
-                    connector.сonnect(serverIP, serverPort);
+                    connector.сonnect(serverIp, serverPort);
                     context.getConnectionStateModel().setConnected(true);                    
                 } catch (IOException ex) {
                     context.getConnectionStateModel().connectException(ex);
@@ -70,6 +72,7 @@ public class ControllerImpl implements Controller {
                 } catch (NetException ex) {
                     //ignore
                 } finally {
+                    context.getConnectionStateModel().setConnected(false);
                     connector.closeConnection();
                 }
             }
@@ -188,7 +191,7 @@ public class ControllerImpl implements Controller {
                 try {
                     connector.sendRequest(message);
                 } catch (NetException ex) {
-                    ex.printStackTrace();
+                    //TODO log
                     context.getConnectionStateModel().setConnected(false);
                 }
             }

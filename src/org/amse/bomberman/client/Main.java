@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.control.impl.ModelsContainer;
@@ -21,7 +23,19 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) { 
+    public static void main(String[] args) {
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
+//        } catch (InstantiationException ex) {
+//            ex.printStackTrace();
+//        } catch (IllegalAccessException ex) {
+//            ex.printStackTrace();
+//        } catch (UnsupportedLookAndFeelException ex) {
+//            ex.printStackTrace();
+//        }
+
         Connector connector = new AsynchroConnector();
 
         ModelsContainer context = new ModelsContainer();

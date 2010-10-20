@@ -7,6 +7,4 @@ package org.amse.bomberman.client.models.listeners;
 public interface GamesModelListener {
 
     void updateGamesList();
-
-    void gamesListError(String error);
 }

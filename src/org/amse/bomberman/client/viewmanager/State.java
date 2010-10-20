@@ -5,6 +5,7 @@ package org.amse.bomberman.client.viewmanager;
  * @author Kirilchuk V.E.
  */
 public interface State {
+
     void init();
 
     void previous();

@@ -24,7 +24,7 @@ import org.amse.bomberman.util.ImageUtilities;
  * @author Mikhail Korovkin
  */
 @SuppressWarnings("serial")
-public class GamePanel  extends JPanel{
+public class GamePanel  extends JPanel{//TODO TODO TODO OMGOMGOMGOMGOMGOMG TODO
     private GameMap map;
     private List<Cell> changes;
 

@@ -12,6 +12,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class ClientStateModel implements ServerListener {
+
     private final List<ClientStateModelListener> listeners
             = new CopyOnWriteArrayList<ClientStateModelListener>();
 
@@ -32,32 +33,27 @@ public class ClientStateModel implements ServerListener {
         List<String> data = message.getData();
         if (messageId == ProtocolConstants.CREATE_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Game created.")) {
-                state = State.LOBBY;
-                updateListeners();
+                setState(State.LOBBY);
             } else {
                 updateListeners(State.LOBBY, "Can not create game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.JOIN_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Joined.")) {
-                state = State.LOBBY;
-                updateListeners();
+                setState(State.LOBBY);
             } else {
                 updateListeners(State.LOBBY, "Can not join to the game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.START_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Game started.")) {
-                state = State.GAME;
-                updateListeners();
+                setState(State.GAME);
             } else {
-                updateListeners(State.LOBBY, "Can not start game.\n" + data.get(0));
+                updateListeners(State.GAME, "Can not start game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.GAME_STARTED_NOTIFY_ID) {
-            state = State.GAME;
-            updateListeners();
+            setState(State.GAME);
         } else if (messageId == ProtocolConstants.LEAVE_MESSAGE_ID) {
             if (data.get(0).equals("Disconnected.")) {
-                state = State.NOT_JOINED;
-                updateListeners();
+                setState(State.NOT_JOINED);
             } else {
                 updateListeners(State.NOT_JOINED, "Can not leave game.\n" + data.get(0));
             }
@@ -71,7 +67,7 @@ public class ClientStateModel implements ServerListener {
 
     public void setState(State state) {
         this.state = state;
-
+        updateListeners();
     }
     
     public void addListener(ClientStateModelListener listener) {
@@ -88,6 +84,12 @@ public class ClientStateModel implements ServerListener {
         }
     }
 
+    /**
+     * Tells listeners about error while going to next state.
+     *
+     * @param state next state that can`t be set because of error.
+     * @param string description of error.
+     */
     private void updateListeners(State state, String string) {
         for (ClientStateModelListener listener : listeners) {
             listener.clientStateError(state, string);

@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.models.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.client.models.listeners.ChatModelListener;
@@ -16,7 +15,7 @@ public class ChatModel implements ServerListener {
     private final List<ChatModelListener> listeners
             = new CopyOnWriteArrayList<ChatModelListener>();
 
-    private List<String> history = new ArrayList<String>();
+    private List<String> history = new CopyOnWriteArrayList<String>();
 
     //TODO CLIENT must be not here
     public void received(ProtocolMessage<Integer, String> message) {
@@ -30,7 +29,7 @@ public class ChatModel implements ServerListener {
         }
     }
 
-    public List<String> getHistory() {
+    public List<String> getHistory() {//not need synchronize cause history thread safe
         return history;
     }
 

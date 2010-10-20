@@ -1,27 +1,19 @@
 package org.amse.bomberman.client.view.wizard.panels;
 
 import java.text.ParseException;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.NumberFormat;
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.SwingConstants;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -31,8 +23,9 @@ import org.amse.bomberman.util.ImageUtilities;
 @SuppressWarnings("serial")
 public class ConnectionPanel extends JPanel {
 
-    private static final String BACKGROUND_RESOURCE_NAME = "/org/amse/bomberman/client"
-            + "/view/resources/cover.png";
+    private static final String BACKGROUND_RESOURCE_NAME
+            = "/org/amse/bomberman/client/view/resources/cover.png";
+
     private Image image;
 
     private Color textColor = Color.ORANGE;
@@ -60,14 +53,6 @@ public class ConnectionPanel extends JPanel {
 
     public int getPort() {
         return Integer.parseInt(portTF.getText().replaceAll(" ", ""));
-    }
-
-    public void setIP(String ipValue) {
-        ipTF.setText(ipValue);
-    }
-
-    public void setPort(int portValue) {
-        portTF.setText(String.valueOf(portValue));
     }
 
     public String getPlayerName() {
@@ -172,8 +157,8 @@ public class ConnectionPanel extends JPanel {
     private void initBackgroundImage() {
         try {
             this.image = ImageUtilities.initImage(BACKGROUND_RESOURCE_NAME,
-                    this.getWidth(),
-                    this.getHeight());
+                                                  this.getWidth(),
+                                                  this.getHeight());
         } catch (IOException ex) {
             Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
         }

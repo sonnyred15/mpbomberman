@@ -5,15 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 /**
  *
@@ -22,12 +14,15 @@ import javax.swing.SwingConstants;
 @SuppressWarnings("serial")
 public class CreateGameJPanel extends JPanel {
 
-    private final int width = 400;
+    private final int width  = 400;
     private final int heigth = 30;
+
     private Color foreground = Color.ORANGE;
+
     private JTextField gameNameTF = new JTextField();
-    private JSpinner playersSpinner;
-    private JComboBox mapBox = new JComboBox();
+    private JSpinner   playersSpinner;
+    private JComboBox  mapBox = new JComboBox();
+
     private JLabel nameLabel;
     private JLabel maxPlLabel;
     private JLabel mapLabel;
@@ -72,14 +67,18 @@ public class CreateGameJPanel extends JPanel {
         this.add(centralBox);
         this.add(rightBox);
         this.setOpaque(false);
-        setVisible(true);
     }
 
-    public void setMaps(List<String> maps) {
-        this.mapBox.removeAllItems();
-        for (int i = 0; i < maps.size(); i++) {
-            this.mapBox.addItem(maps.get(i));
-        }
+    public void setMaps(final List<String> maps) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                mapBox.removeAllItems();
+                for (int i = 0; i < maps.size(); i++) {
+                    mapBox.addItem(maps.get(i));
+                }
+            }
+        });
     }
 
     public String getGameName() {
@@ -96,6 +95,11 @@ public class CreateGameJPanel extends JPanel {
 
     @Override
     public void setEnabled(boolean b) {
+        if(!SwingUtilities.isEventDispatchThread()) {
+            throw new RuntimeException("Must be called from EDT.");
+        }
+
+        super.setEnabled(b);
         this.gameNameTF.setEnabled(b);
         this.nameLabel.setEnabled(b);
         this.playersSpinner.setEnabled(b);

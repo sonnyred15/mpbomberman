@@ -1,18 +1,8 @@
 package org.amse.bomberman.client.view.gamejframe;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.*;
+import javax.swing.*;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
 import org.amse.bomberman.client.view.ResultsTable;

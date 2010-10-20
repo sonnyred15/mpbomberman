@@ -3,7 +3,7 @@ package org.amse.bomberman.client.viewmanager.states;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel.State;
 import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
-import org.amse.bomberman.client.view.WaitingDialog.DialogResult;
+import org.amse.bomberman.client.view.WaitingDialog.DialogState;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -20,8 +20,9 @@ public class CreateJoinWaitState extends AbstractState
     public void init() {
         getController().getContext().getClientStateModel().addListener(this);
         //blocking here
-        DialogResult result = getWizard().showWaitingDialog(); 
-        if(result == DialogResult.CANCELED) {
+        DialogState result = getWizard().showWaitingDialog();
+        //unblocked
+        if(result == DialogState.CANCELED) {
             getController().requestLeaveGame();
             previous();
         } else {

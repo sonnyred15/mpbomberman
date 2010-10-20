@@ -40,7 +40,7 @@ public class GameStateModel implements ServerListener {
         }
     }
 
-    public boolean isEnded() {
+    public boolean isEnded() {//don`t need synchronize - volatile is enough here
         return ended;
     }
 

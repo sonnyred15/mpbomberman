@@ -42,5 +42,4 @@ public class Cell {
                 throw new UnsupportedOperationException("Unregistered ERROR!!!");
         }
     }
-
 }

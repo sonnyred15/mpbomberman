@@ -13,6 +13,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class ResultsModel implements ServerListener {
+
     private final List<ResultModelListener> listeners 
             = new CopyOnWriteArrayList<ResultModelListener>();
 
@@ -21,17 +22,19 @@ public class ResultsModel implements ServerListener {
     public void received(ProtocolMessage<Integer, String> message) {
         int messageId = message.getMessageId();
         List<String> data = message.getData();
-
         if (messageId == ProtocolConstants.END_RESULTS_MESSAGE_ID) {
-            results = new ArrayList<String>(data);
-            updateListeners();
+            setResults(data);
         } else if (messageId == ProtocolConstants.PLAYERS_STATS_MESSAGE_ID) {
-            results = new ArrayList<String>(data);
-            updateListeners();
+            setResults(data);
         }
     }
 
-    public List<String> getResults() {
+    private void setResults(List<String> data) {
+        results = new ArrayList<String>(data);
+        updateListeners();
+    }
+
+    public List<String> getResults() {//don`t need synchronize - volatile is enough here
         return results;
     }
 

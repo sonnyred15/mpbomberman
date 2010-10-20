@@ -146,11 +146,10 @@ public class AsynchroConnector implements Connector {
                         when application is closing and we are closing connection. */
                     }
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException ex) {                
                 System.err.println("ServerListen: run error. " + ex.getMessage());
             }
-            
+            closeConnection();
             System.out.println("ServerListen: run ended.");
         }
     }

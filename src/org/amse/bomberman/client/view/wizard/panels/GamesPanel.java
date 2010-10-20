@@ -1,27 +1,15 @@
 package org.amse.bomberman.client.view.wizard.panels;
 
-import org.amse.bomberman.util.Creator;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
+import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -30,26 +18,30 @@ import org.amse.bomberman.util.ImageUtilities;
 @SuppressWarnings("serial")
 public class GamesPanel extends JPanel {
 
-    private static final String BACKGROUND_RESOURCE_NAME = "/org/amse/bomberman/client"
-            + "/view/resources/cover2.png";
+    private static final String BACKGROUND_RESOURCE_NAME
+            = "/org/amse/bomberman/client/view/resources/cover2.png";
+
     private Image image;
+
     private final int width = 640;
     private final int height = 480;
+
     private Color foreground = new Color(255, 100, 100);
-    private JPanel joinPanel;
+    
+    private JPanel           joinPanel;
     private CreateGameJPanel createPanel;
-    private JTable table;
-    private JScrollPane jsp;
+    
+    private JTable       table;
     private JRadioButton createButton;
     private JRadioButton joinButton;
+
     public static final String CREATE_NAME = "New game";
     public static final String JOIN_NAME = "Join game";
 
     public GamesPanel() {
-        this.setSize(width, height);
+        setSize(width, height);
         initComponents();
-        this.initBackgroundImage();
-        this.setVisible(true);
+        initBackgroundImage();
     }
 
     public String getState() {
@@ -86,24 +78,34 @@ public class GamesPanel extends JPanel {
         }
     }
 
-    public void setGames(List<String> games) {
-        MyTableModel tableModel = (MyTableModel) table.getModel();
-        tableModel.clear();
-        int counter = 0;
-        for (String game : games) {
-            String[] buf = game.split(ProtocolConstants.SPLIT_SYMBOL);
-            table.setValueAt(buf[0], counter, 0);
-            table.setValueAt(buf[1], counter, 1);
-            table.setValueAt(buf[2], counter, 2);
-            table.setValueAt(buf[3], counter, 3);
-            table.setValueAt(buf[4], counter, 4);
-            counter++;
-        }
-        table.repaint();
+    public void setGames(final List<String> games) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                MyTableModel tableModel = (MyTableModel) table.getModel();
+                tableModel.clear();
+                int counter = 0;
+                for (String game : games) {
+                    String[] buf = game.split(ProtocolConstants.SPLIT_SYMBOL);
+                    table.setValueAt(buf[0], counter, 0);
+                    table.setValueAt(buf[1], counter, 1);
+                    table.setValueAt(buf[2], counter, 2);
+                    table.setValueAt(buf[3], counter, 3);
+                    table.setValueAt(buf[4], counter, 4);
+                    counter++;
+                }
+                tableModel.fireTableStructureChanged();
+            }
+        });
     }
 
-    public void setMaps(List<String> maps) {
-        createPanel.setMaps(maps);
+    public void setMaps(final List<String> maps) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                createPanel.setMaps(maps);
+            }
+        });
     }
 
     public String getMap() {
@@ -137,7 +139,9 @@ public class GamesPanel extends JPanel {
 
         // JoinPanel
         joinPanel = new JPanel();
-        jsp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane jsp = new JScrollPane(table,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setPreferredSize(new Dimension(width - 150, height - 170));
         joinPanel.add(jsp);
         joinPanel.setOpaque(false);

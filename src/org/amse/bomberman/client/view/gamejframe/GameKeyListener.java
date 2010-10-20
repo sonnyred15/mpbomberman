@@ -1,15 +1,13 @@
 package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.event.KeyAdapter;
-import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.Controller;
-import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.util.Direction;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 /**
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
 public class GameKeyListener extends KeyAdapter {
 
