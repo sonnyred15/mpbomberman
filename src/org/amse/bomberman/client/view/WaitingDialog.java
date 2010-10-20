@@ -60,7 +60,6 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
     }
 
     public DialogState showDialog() {
-        System.out.println("Dialog going to show");
         setVisible(true);
         return state;
     }
@@ -75,18 +74,12 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
 
     public void propertyChange(PropertyChangeEvent e) {
         String prop = e.getPropertyName();
-        System.out.println("Property event: " + prop + " New value: " + e.getNewValue());
-        System.out.println("V: " + isVisible());
-        System.out.println("S: " + isShowing());
-        System.out.println("V2: " + optionPane.isVisible());
-        System.out.println("S2: " + optionPane.isShowing());
         if (isVisible()
                 && (e.getSource() == optionPane)
                 && (prop.equals(JOptionPane.VALUE_PROPERTY))) {            
             // when we resetting value
             if (optionPane.getValue() == JOptionPane.UNINITIALIZED_VALUE) {
                 //value reseted. Not need other, so return.
-                System.out.println("reseted");
                 return;
             }
 
@@ -106,7 +99,6 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
             //property change event will be fired.
             optionPane.setValue(
                     JOptionPane.UNINITIALIZED_VALUE);
-            System.out.println("Dialog going to hide");            
             setVisible(false);
         }
     }

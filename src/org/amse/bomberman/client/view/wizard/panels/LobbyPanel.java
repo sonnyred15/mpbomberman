@@ -56,17 +56,17 @@ public class LobbyPanel extends JPanel {
     //
     private final Controller controller;
 
-    public LobbyPanel(Controller controller) {
-        this.setSize(width, height);
-
+    public LobbyPanel(Controller controller) {        
         this.controller = controller;
 
-        this.playersPanel = this.createPlayersComponent();
-        this.botsPanel = this.createBotsComponent();
-        this.chatPanel = this.createChatComponent();
+        playersPanel = createPlayersComponent();
+        botsPanel = createBotsComponent();
+        chatPanel = createChatComponent();
+
+        setSize(width, height);
+
         initComponents();
         initBackgroundImage();
-        setVisible(true);
     }
 
     private void setMaxPlayers(int number) {
@@ -91,9 +91,9 @@ public class LobbyPanel extends JPanel {
         }
 
         maxPlayers = Integer.parseInt(info.get(1));
-        this.setMaxPlayers(maxPlayers);
+        setMaxPlayers(maxPlayers);
 
-        DefaultListModel model = (DefaultListModel) this.playersList.getModel();
+        DefaultListModel model = (DefaultListModel) playersList.getModel();
 
         model.clear();
 
@@ -156,7 +156,7 @@ public class LobbyPanel extends JPanel {
     }
 
     private void initComponents() {
-        this.setLayout(new BorderLayout(10, 0));
+        setLayout(new BorderLayout(10, 0));
 
         /* creating players and botsControl panels */
         JPanel left = new JPanel(new GridBagLayout());
@@ -186,12 +186,12 @@ public class LobbyPanel extends JPanel {
         left.add(botsPanel, cons);
 
         //
-        this.add(left, BorderLayout.WEST);
+        add(left, BorderLayout.WEST);
 
         chatPanel.setOpaque(false);
         /* adding chat panel in the center */
-        this.add(chatPanel, BorderLayout.CENTER);
-        this.add(Box.createVerticalStrut(10), BorderLayout.NORTH);
+        add(chatPanel, BorderLayout.CENTER);
+        add(Box.createVerticalStrut(10), BorderLayout.NORTH);
         messageTF.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -211,11 +211,11 @@ public class LobbyPanel extends JPanel {
     private JComponent createPlayersComponent() {
         DefaultListModel defaultListModel = new DefaultListModel();
 
-        this.playersList = new JList(defaultListModel);
-        this.playersList.setOpaque(false);        
-        this.playersList.setCellRenderer(new IconListRenderer());
+        playersList = new JList(defaultListModel);
+        playersList.setOpaque(false);        
+        playersList.setCellRenderer(new IconListRenderer());
 
-        JPanel      playersJPanel = new JPanel(new GridLayout());
+        JPanel playersJPanel = new JPanel(new GridLayout());
         playersJPanel.setOpaque(false);
         JScrollPane scrollJList = new JScrollPane(playersList);
 
@@ -235,9 +235,9 @@ public class LobbyPanel extends JPanel {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         panel.setOpaque(false);
         panel.add(botAddJButton);
-        this.botAddJButton.setAction(new AddBotAction());
+        botAddJButton.setAction(new AddBotAction());
         panel.add(botRemoveJButton);
-        this.botRemoveJButton.setAction(new RemoveBotAction());
+        botRemoveJButton.setAction(new RemoveBotAction());
 
         return panel;
     }
@@ -245,12 +245,11 @@ public class LobbyPanel extends JPanel {
     private JComponent createChatComponent() {
         JPanel chatJPanel = new JPanel(new GridBagLayout());
 
-        //this.chatTA.setBorder(new TitledBorder("Chat"));
-        this.chatTA.setEditable(false);
-        this.chatTA.setLineWrap(true);
-        this.chatTA.setForeground(Color.ORANGE);
-        this.chatTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 15));
-        this.chatTA.setOpaque(false);
+        chatTA.setEditable(false);
+        chatTA.setLineWrap(true);
+        chatTA.setForeground(Color.ORANGE);
+        chatTA.setFont(new Font(Font.MONOSPACED, Font.BOLD + Font.ITALIC, 15));
+        chatTA.setOpaque(false);
 
         GridBagConstraints cons = new GridBagConstraints();
 
@@ -270,8 +269,6 @@ public class LobbyPanel extends JPanel {
         borderTA.setTitleColor(Color.WHITE);
         borderTA.setTitleFont(new Font(null, Font.BOLD, 16));
         scrollTA.setViewportBorder(borderTA);
-        //        scrollTA.getViewport().setBackground(new Color(1f,
-//                1f, 1f, 0.2f));
         scrollTA.setBorder(null);
 
         chatJPanel.add(scrollTA , cons);
@@ -293,7 +290,7 @@ public class LobbyPanel extends JPanel {
         cons.gridwidth = GridBagConstraints.REMAINDER;
         cons.fill = GridBagConstraints.NONE;
         cons.insets = new Insets(0, 0, 5, 10);
-        this.chatJButton.setAction(new ChatAction());
+        chatJButton.setAction(new ChatAction());
         chatJPanel.add(this.chatJButton, cons);
         
         return chatJPanel;
@@ -378,7 +375,6 @@ public class LobbyPanel extends JPanel {
                                                             cellHasFocus);
             // Set icon            
             label.setIcon(new ImageIcon(joinedIcon));
-//            label.setOpaque(false);
             label.setBackground(new Color(1f, 1f,
                                           1f, 0f));
             label.setForeground(Color.ORANGE);

@@ -40,8 +40,8 @@ public class Main {
 
         ModelsContainer context = new ModelsContainer();
 
-        ExecutorService executors = Executors.newFixedThreadPool(1,
-                new DaemonThreadFactory());
+        ExecutorService executors
+                = Executors.newFixedThreadPool(2, new DaemonThreadFactory());
 
         Controller controller = new ControllerImpl(executors, connector, context);
         connector.setListener(controller);
