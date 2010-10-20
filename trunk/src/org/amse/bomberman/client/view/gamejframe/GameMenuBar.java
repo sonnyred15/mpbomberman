@@ -14,31 +14,29 @@ import org.amse.bomberman.client.control.Controller;
 @SuppressWarnings("serial")
 public class GameMenuBar extends JMenuBar {
 
-    private JMenu game = new JMenu("Game");
+    private JMenu gameMenu = new JMenu("Game");
+
     private JMenuItem leave = new JMenuItem();
-    private JMenuItem exit = new JMenuItem("Exit");
+    private JMenuItem exit  = new JMenuItem("Exit");
+
     private final Controller controller;
 
     public GameMenuBar(final Controller controller) {
         this.controller = controller;
 
-        game.add(leave);
-        game.addSeparator();
-        game.add(exit);
+        gameMenu.add(leave);
+        gameMenu.addSeparator();
+        gameMenu.add(exit);
         leave.setAction(new LeaveAction());
         exit.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-//                GameModel.getInstance().removeListeners();
-//                try {
                 controller.disconnect();
-//                } catch (NetException ex) {
-//                    System.out.println(ex);
-//                }
                 System.exit(0);
             }
         });
-        this.add(game);
+
+        add(gameMenu);
     }
 
     @SuppressWarnings("serial")

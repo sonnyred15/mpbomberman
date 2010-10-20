@@ -61,8 +61,8 @@ public class GameViewState extends AbstractState
 
     public void previous() {
         gameFrame.setVisible(false);
-        getWizard().setVisible(true);
         machine.setState(previous);
+        getWizard().setVisible(true);
     }
 
     public void next() {
@@ -125,6 +125,8 @@ public class GameViewState extends AbstractState
     }
 
     public void gameTerminated(String cause) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        gameFrame.stopGame();
+        JOptionPane.showMessageDialog(gameFrame, "Game terminated.",
+                        cause, JOptionPane.ERROR_MESSAGE);
     }
 }

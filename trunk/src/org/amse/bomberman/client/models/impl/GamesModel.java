@@ -13,19 +13,11 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class GamesModel implements ServerListener {
+
     private final List<GamesModelListener> listeners 
             = new CopyOnWriteArrayList<GamesModelListener>();
 
     private volatile List<String> games = new ArrayList<String>();
-
-    private void setGames(List<String> data) {
-        games = data;
-        updateListeners();
-    }
-
-    public List<String> getGames() {
-        return games;
-    }
 
     //TODO CLIENT must be not here
     public void received(ProtocolMessage<Integer, String> message) {
@@ -38,6 +30,15 @@ public class GamesModel implements ServerListener {
                 setGames(new ArrayList<String>(0));
             }
         }
+    }
+
+    private void setGames(List<String> data) {
+        games = data;
+        updateListeners();
+    }
+
+    public List<String> getGames() {
+        return games;
     }
 
     public void addListener(GamesModelListener listener) {

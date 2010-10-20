@@ -11,6 +11,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class ConnectionStateModel implements ServerListener {
+
     private final List<ConnectionStateListener> listeners
             = new CopyOnWriteArrayList<ConnectionStateListener>();
 

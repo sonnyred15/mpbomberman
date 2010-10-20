@@ -76,5 +76,6 @@ public class PlayerImpl implements Player {
         this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;
         this.bombRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
         this.settedBombs = 0;
+        this.myCoord = new Cell(0, 0);
     }
 }

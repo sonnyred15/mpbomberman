@@ -13,14 +13,11 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Kirilchuk V.E.
  */
 public class GameMapsModel implements ServerListener {
+
     private final List<GameMapsModelListener> listeners
             = new CopyOnWriteArrayList<GameMapsModelListener>();
 
     private volatile List<String> gameMaps = new ArrayList<String>(0);
-
-    public List<String> getGameMaps() {
-        return gameMaps;
-    }
 
     //TODO CLIENT must be not here
     public void received(ProtocolMessage<Integer, String> message) {
@@ -34,6 +31,10 @@ public class GameMapsModel implements ServerListener {
                 updateListeners("No maps on server was founded.");
             }
         }
+    }
+
+    public List<String> getGameMaps() {//don`t need syncronized - volatile is enough here
+        return gameMaps;
     }
 
     private void setMaps(List<String> data) {

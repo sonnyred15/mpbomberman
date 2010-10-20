@@ -1,7 +1,6 @@
 package org.amse.bomberman.client.viewmanager.states;
 
 import java.util.List;
-import org.amse.bomberman.client.models.impl.ChatModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel.State;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
@@ -33,7 +32,7 @@ public class LobbyViewState extends AbstractState
         getController().getContext().getClientStateModel().addListener(this);
         getController().getContext().getChatModel().addListener(this);
         panel.clearGameInfo();
-        panel.cleanChatArea();
+        panel.clearChatArea();
         getController().requestGameInfo();
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
@@ -73,7 +72,7 @@ public class LobbyViewState extends AbstractState
     }
 
     public void clientStateError(State state, String error) {
-        //TODO CLIENT
+        getWizard().showError(error);//for can`t leave and can`t start
     }
 
     public void updateGameInfo() {
@@ -82,11 +81,10 @@ public class LobbyViewState extends AbstractState
     }
 
     public void gameInfoError(String error) {
-        //TODO client
+        getWizard().showError(error);//for can`t add, bot can`t kick
     }
 
-    public void updateChat(List<String> newMessages) {
-        ChatModel model = getController().getContext().getChatModel();
+    public void updateChat(List<String> newMessages) {//need only new, so history from model ignored.
         panel.setNewMessages(newMessages);
     }
 }

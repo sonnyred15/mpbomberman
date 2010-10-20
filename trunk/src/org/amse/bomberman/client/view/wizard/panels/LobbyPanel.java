@@ -27,13 +27,13 @@ public class LobbyPanel extends JPanel {
     private final static long serialVersionUID = 1L;
 
     //
-    private final int width = 640;
+    private final int width  = 640;
     private final int height = 480;
 
     //
     private Image image;
-    private static final String BACKGROUND_RESOURCE_NAME = "/org/amse/bomberman/client" +
-            "/view/resources/cover3.png";
+    private static final String BACKGROUND_RESOURCE_NAME
+            = "/org/amse/bomberman/client/view/resources/cover3.png";
 
     //
     private int              maxPlayers = Constants.MAX_PLAYERS;
@@ -46,7 +46,7 @@ public class LobbyPanel extends JPanel {
     private final JComponent chatPanel;
 
     //
-    private JButton          botAddJButton = new JButton("Add bot");
+    private JButton          botAddJButton    = new JButton("Add bot");
     private final JButton    botRemoveJButton = new JButton("Remove");
     private final JComponent botsPanel;
 
@@ -69,7 +69,7 @@ public class LobbyPanel extends JPanel {
         setVisible(true);
     }
 
-    public void setMaxPlayers(int number) {
+    private void setMaxPlayers(int number) {
         this.maxPlayers = number;
     }
 
@@ -106,22 +106,34 @@ public class LobbyPanel extends JPanel {
         }
     }
 
-    public void setNewMessages(List<String> messages) {
-        if (!messages.get(0).equals("No new messages.")) {
-            for (String message : messages) {
-                chatTA.append(message + "\n");
+    public void setNewMessages(final List<String> messages) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                if (!messages.get(0).equals("No new messages.")) {//TODO hardcoded String
+                    for (String message : messages) {
+                        chatTA.append(message + "\n");
+                    }
+                }
             }
-        }
+        });
     }
 
-    public void cleanChatArea() {
+    /**
+     * Thread safe.
+     */
+    public void clearChatArea() {
         this.chatTA.setText("");
     }
 
     public void clearGameInfo() {
-        DefaultListModel model = (DefaultListModel) this.playersList.getModel();
+        SwingUtilities.invokeLater(new Runnable() {
 
-        model.clear();
+            public void run() {
+                DefaultListModel model = (DefaultListModel) playersList.getModel();
+                model.clear();//fires change
+            }
+        });
     }
 
     @Override
@@ -185,18 +197,11 @@ public class LobbyPanel extends JPanel {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ENTER: {
-//                        try {
                         String message = getMessage();
 
                         if (message.length() > 0) {
                             controller.requestSendChatMessage(message);
                         }
-//                        } catch (NetException ex) {
-//
-//                            System.out.println(ex);
-//                            WizardController.throwWizardAction(new WizardEvent
-//                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
-//                        }
                     }
                 }
             }
@@ -310,13 +315,7 @@ public class LobbyPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-//            try {
             controller.requestJoinBotIntoGame();
-//            } catch (NetException ex) {
-//
-//                WizardController.throwWizardAction(new WizardEvent
-//                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
-//            }
         }
     }
 
@@ -330,13 +329,7 @@ public class LobbyPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-//            try {
             controller.requestRemoveBotFromGame();
-//            } catch (NetException ex) {
-//
-//                WizardController.throwWizardAction(new WizardEvent
-//                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
-//            }
         }
     }
 
@@ -349,26 +342,23 @@ public class LobbyPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-//            try {
             String message = getMessage();
 
             if (message.length() > 0) {
                 controller.requestSendChatMessage(message);
             }
-//            } catch (NetException ex) {
-//
-//                WizardController.throwWizardAction(new WizardEvent
-//                                (BomberWizard.EVENT_DISCONNECT, ex.getMessage()));
-//            }
         }
     }
 
     private class IconListRenderer extends DefaultListCellRenderer {
         private static final long serialVersionUID = 1L;
-        private final String      JOINED_ICON =
-            "/org/amse/bomberman/client/icons/bomb-48.png";
+
+        private final String      JOINED_ICON
+                = "/org/amse/bomberman/client/icons/bomb-48.png";
+
         private final URL JOINED_ICON_URL =
             ConnectionPanel.class.getResource(JOINED_ICON);
+        
         private Image joinedIcon;
 
         public IconListRenderer() {

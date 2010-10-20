@@ -6,26 +6,27 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
+ * Class that represents Waiting Modal dialog.
  *
  * @author Kirilchuk V.E.
  */
 @SuppressWarnings("serial")
 public class WaitingDialog extends JDialog implements PropertyChangeListener {
 
-    public static enum DialogResult {
+    public static enum DialogState {
 
-        OPENED, CLOSED, CANCELED;
+        CLOSED, CANCELED;
     }
     private static final String MESSAGE = "Waiting response from server.\n"
             + "Please, be patient. =)";
     private final JOptionPane optionPane;
 
-    private final String opened = "Opened";
     private final String closed = "Closed";
     private final String cancel = "Cancel";
+
+    private volatile DialogState state = DialogState.CLOSED;
 
     public WaitingDialog(Window owner) {
         this(owner, "Waiting response from server.");
@@ -44,7 +45,7 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
 
         //creating dialog option pane
         optionPane = new JOptionPane(elements, JOptionPane.INFORMATION_MESSAGE,
-                JOptionPane.CANCEL_OPTION, null, options, closed);
+                JOptionPane.CANCEL_OPTION, null, options);
 
         //set the dialog display panel
         setContentPane(optionPane);
@@ -54,49 +55,58 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
         optionPane.addPropertyChangeListener(this);
 
         pack();
+        setResizable(false);
         setLocationRelativeTo(owner);
     }
 
-    public DialogResult showDialog() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Must be called from EDT");
-        }
-
-        optionPane.setValue(opened);
+    public DialogState showDialog() {
+        System.out.println("Dialog going to show");
         setVisible(true);
-        Object selectedValue = optionPane.getValue();
-        if (selectedValue.equals(cancel)) {
-            return DialogResult.CANCELED;
-        } else {
-            return DialogResult.CLOSED;
-        }
+        return state;
     }
 
     public void closeDialog() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Must be called from EDT");
-        }
-
         optionPane.setValue(closed);
     }
 
     public void cancelDialog() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            throw new RuntimeException("Must be called from EDT");
-        }
-        
         optionPane.setValue(cancel);
     }
 
     public void propertyChange(PropertyChangeEvent e) {
         String prop = e.getPropertyName();
-
+        System.out.println("Property event: " + prop + " New value: " + e.getNewValue());
+        System.out.println("V: " + isVisible());
+        System.out.println("S: " + isShowing());
+        System.out.println("V2: " + optionPane.isVisible());
+        System.out.println("S2: " + optionPane.isShowing());
         if (isVisible()
                 && (e.getSource() == optionPane)
-                && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                && (prop.equals(JOptionPane.VALUE_PROPERTY))) {            
+            // when we resetting value
+            if (optionPane.getValue() == JOptionPane.UNINITIALIZED_VALUE) {
+                //value reseted. Not need other, so return.
+                System.out.println("reseted");
+                return;
+            }
+
             //If you were going to check something
             //before closing the window, you'd do
             //it here.
+            Object selectedValue = optionPane.getValue();
+            if (selectedValue.equals(cancel)) {
+                state = DialogState.CANCELED;
+            } else {
+                state = DialogState.CLOSED;
+            }
+
+            //Reset the JOptionPane's value.
+            //If you don't do this, then if the user
+            //presses the same button next time, no
+            //property change event will be fired.
+            optionPane.setValue(
+                    JOptionPane.UNINITIALIZED_VALUE);
+            System.out.println("Dialog going to hide");            
             setVisible(false);
         }
     }

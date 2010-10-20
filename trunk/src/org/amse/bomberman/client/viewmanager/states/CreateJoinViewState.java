@@ -86,8 +86,4 @@ public class CreateJoinViewState extends AbstractState
         GamesModel games = getController().getContext().getGamesModel();
         panel.setGames(games.getGames());
     }
-
-    public void gamesListError(String error) {
-        getWizard().showError(error);
-    }
 }

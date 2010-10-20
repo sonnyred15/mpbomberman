@@ -24,9 +24,10 @@ public class GameMapModel implements ServerListener {
     private volatile GameMap gameMap;
 
     /**
-     * Set BombMap in the model. It modifies list of changes too!!! After setting
-     * BombMap it calls @update for all listeners of Model.
-     * @param newGameMap new BombMap.
+     * Sets GameMap in the model. It modifies list of changes too!!!
+     * After setting GameMap it notifies all listeners of this model.
+     *
+     * @param newGameMap new GameMap.
      */
     public synchronized void setGameMap(GameMap newGameMap) {
         Cell buf = new Cell(0, 0);
@@ -85,7 +86,7 @@ public class GameMapModel implements ServerListener {
         return gameMap;
     }
 
-    public List<Cell> getChanges() {
+    public synchronized List<Cell> getChanges() {//need synchronize cause changes list is not thread safe.
         return changes;
     }
 

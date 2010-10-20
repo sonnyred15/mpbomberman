@@ -1,8 +1,8 @@
 package org.amse.bomberman.client.view.wizard;
 
 /**
+ * Enum that represents events for wizard buttons clicks.
  *
- * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
 public enum WizardEvent {

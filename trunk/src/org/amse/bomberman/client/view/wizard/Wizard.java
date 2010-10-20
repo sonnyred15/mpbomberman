@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import org.amse.bomberman.client.view.WaitingDialog;
-import org.amse.bomberman.client.view.WaitingDialog.DialogResult;
+import org.amse.bomberman.client.view.WaitingDialog.DialogState;
 
 /**
  *
@@ -17,23 +17,22 @@ import org.amse.bomberman.client.view.WaitingDialog.DialogResult;
  * @author Kirilchuk V.E.
  */
 @SuppressWarnings("serial")
-public class Wizard extends JFrame { 
+public class Wizard extends JFrame {
     private final List<WizardListener> listeners = new ArrayList<WizardListener>();
     private WaitingDialog waitingDialog;
     ////
     private Dimension size;
     ////
     private JPanel mainPanel = new JPanel();
-    //private CardLayout cardLayout;
     ////
     private static final String NEXT = "Next";
     private static final String BACK = "Back";
     private static final String FINISH = "Finish";
     private static final String CANCEL = "Cancel";
     ////
-    private JPanel buttonPanel;
-    private JButton backJButton = new JButton(BACK);
-    private JButton nextJButton = new JButton(NEXT);
+    private JPanel  buttonPanel;
+    private JButton backJButton   = new JButton(BACK);
+    private JButton nextJButton   = new JButton(NEXT);
     private JButton cancelJButton = new JButton(CANCEL);
 
     public Wizard() {
@@ -42,12 +41,22 @@ public class Wizard extends JFrame {
         initComponents();//will init cards panel with card layout
     }
 
-    public void setNextText(String text) {
-        this.nextJButton.setText(text);
+    public void setNextText(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                nextJButton.setText(text);
+            }
+        });
     }
 
-    public void setBackText(String text) {
-        this.backJButton.setText(text);
+    public void setBackText(final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                backJButton.setText(text);
+            }
+        });
     }
 
     private void initComponents() {
@@ -57,6 +66,7 @@ public class Wizard extends JFrame {
         this.setResizable(false);
 
         waitingDialog =  new WaitingDialog(this);
+
         buttonPanel   = new JPanel();
 
         JSeparator separator = new JSeparator();
@@ -75,9 +85,6 @@ public class Wizard extends JFrame {
         backJButton.setAction(new BackAction());
         nextJButton.setAction(new NextAction());
 
-        //cards = new JPanel();
-        //cardLayout = new CardLayout();
-        //cards.setLayout(cardLayout);
 
         buttonPanel.add(buttonBox, BorderLayout.EAST);
         Container c = this.getContentPane();
@@ -117,31 +124,20 @@ public class Wizard extends JFrame {
                 "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    /**
-     * This method must be called on EDT.
-     * 
-     * @return result of dialog.
-     */
-    public DialogResult showWaitingDialog() {
+    public DialogState showWaitingDialog() {
         return waitingDialog.showDialog();
     }
 
-    public void closeWaitingDialog() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                waitingDialog.closeDialog();
-            }
-        });
+    public boolean isWaitingDialogOpened() {
+        return waitingDialog.isShowing();
     }
-    
-    public void cancelWaitingDialog() {
-        SwingUtilities.invokeLater(new Runnable() {
 
-            public void run() {
-                waitingDialog.cancelDialog();
-            }
-        });
+    public void closeWaitingDialog() {
+        waitingDialog.closeDialog();
+    }
+
+    public void cancelWaitingDialog() {
+        waitingDialog.cancelDialog();
     }
 
     public void addListener(WizardListener listener) {

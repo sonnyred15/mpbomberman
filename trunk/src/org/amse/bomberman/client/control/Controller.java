@@ -8,6 +8,7 @@ import org.amse.bomberman.client.control.impl.ModelsContainer;
 /**
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
 public interface Controller extends ConnectorListener {
 
