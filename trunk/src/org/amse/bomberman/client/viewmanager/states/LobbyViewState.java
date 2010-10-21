@@ -74,12 +74,13 @@ public class LobbyViewState extends AbstractState
 
     public void clientStateError(State state, String error) {
         switch(state) {
-            case GAME: {
+            case LOBBY: {//LOBBY state that caused error
                 getWizard().showError(error);//for can`t start
                 break;
             }
-            case NOT_JOINED: {
-                getWizard().showError(error);//for can`t leave
+            case GAME: {//GAME cause game terminated
+                getWizard().showError(error);//for host leave
+                previous();
                 break;
             }
         }
@@ -91,7 +92,7 @@ public class LobbyViewState extends AbstractState
     }
 
     public void gameInfoError(String error) {
-        getWizard().showError(error);//for can`t add, bot can`t kick
+        getWizard().showError(error);//for can`t add bot and can`t kick someone
     }
 
     public void updateChat(List<String> newMessages) {//need only new, so history from model ignored.

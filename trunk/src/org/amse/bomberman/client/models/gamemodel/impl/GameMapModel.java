@@ -104,7 +104,7 @@ public class GameMapModel implements ServerListener {
         }
     }
 
-    public void reset() {
+    public void reset() {//TODO CLIENT When it must be reseted!?
         this.gameMap = null;
         this.changes.clear();
     }

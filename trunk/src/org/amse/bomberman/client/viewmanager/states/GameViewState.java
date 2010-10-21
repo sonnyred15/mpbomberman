@@ -53,9 +53,10 @@ public class GameViewState extends AbstractState
         getController().getContext().getResultsModel().addListener(this);
         getController().getContext().getPlayerModel().addListener(this);
         getController().getContext().getClientStateModel().addListener(this);
+        getController().getContext().getGameStateModel().addListener(this);
         getController().requestGameMap();
-        getWizard().setVisible(false);
         gameFrame.setLocationRelativeTo(getWizard());
+        getWizard().setVisible(false);
         gameFrame.setVisible(true);
     }
 
@@ -68,6 +69,7 @@ public class GameViewState extends AbstractState
         getController().getContext().getResultsModel().removeListener(this);
         getController().getContext().getPlayerModel().removeListener(this);
         getController().getContext().getClientStateModel().removeListener(this);
+        getController().getContext().getGameStateModel().removeListener(this);
         gameFrame.dispose();//or JVM can`t auto shutdown when wizard disposed
         getWizard().setVisible(true);
     }
@@ -127,11 +129,6 @@ public class GameViewState extends AbstractState
         }
     }
 
-    public void gameTerminated(String cause) {
-        JOptionPane.showMessageDialog(gameFrame, "Game terminated.",
-                        cause, JOptionPane.ERROR_MESSAGE);
-    }
-
     private void stopGame() {
         gameFrame.removeKeyListener(keyListener);
     }
@@ -149,8 +146,15 @@ public class GameViewState extends AbstractState
     public void clientStateError(State state, String error) {
         switch (state) {
             case NOT_JOINED: {//NOT JOINED because error is about going to not joined state.
-                JOptionPane.showMessageDialog(gameFrame, "Leave error.",
-                        error, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(gameFrame, error,
+                        "Leave error.", JOptionPane.ERROR_MESSAGE);
+                break;
+            }
+            case GAME: {
+                JOptionPane.showMessageDialog(gameFrame, error,
+                        "Game error.", JOptionPane.ERROR_MESSAGE);
+                previous();
+                break;
             }
         }
     }

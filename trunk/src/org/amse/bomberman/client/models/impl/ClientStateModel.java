@@ -35,19 +35,19 @@ public class ClientStateModel implements ServerListener {
             if (data.get(0).equals("Game created.")) {
                 setState(State.LOBBY);
             } else {
-                updateListeners(State.LOBBY, "Can not create game.\n" + data.get(0));
+                updateListeners(State.NOT_JOINED, "Can not create game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.JOIN_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Joined.")) {
                 setState(State.LOBBY);
             } else {
-                updateListeners(State.LOBBY, "Can not join to the game.\n" + data.get(0));
+                updateListeners(State.NOT_JOINED, "Can not join to the game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.START_GAME_MESSAGE_ID) {
             if (data.get(0).equals("Game started.")) {
                 setState(State.GAME);
             } else {
-                updateListeners(State.GAME, "Can not start game.\n" + data.get(0));
+                updateListeners(State.LOBBY, "Can not start game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.GAME_STARTED_NOTIFY_ID) {
             setState(State.GAME);
@@ -58,9 +58,10 @@ public class ClientStateModel implements ServerListener {
                 updateListeners(State.NOT_JOINED, "Can not leave game.\n" + data.get(0));
             }
         } else if (messageId == ProtocolConstants.GAME_STATUS_MESSAGE_ID) {
-            if (data.get(0).equals("true")) {
-                //state = State.GAME;
-                //updateListeners(); //TODO CLIENT
+            //ignore result
+        } else if(messageId == ProtocolConstants.GAME_TERMINATED_NOTIFY_ID) {
+            if(data.get(0).equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
+                updateListeners(State.GAME, "Host is escaped from game!\n Game terminated.");
             }
         }
     }
