@@ -49,8 +49,7 @@ public class GameMenuBar extends JMenuBar {
         }
 
         public void actionPerformed(ActionEvent e) {
-            //TODO CLIENT return functionality
-//            controller.requestLeaveGame();
+            controller.requestLeaveGame();
         }
     }
 }

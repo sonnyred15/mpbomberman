@@ -42,12 +42,12 @@ public class LobbyPanel extends JPanel {
 
     //
     private final JTextArea  chatTA = new JTextArea();
-    private final JButton    chatJButton = new JButton("Send");
+    private final JButton    chatButton = new JButton("Send");
     private final JComponent chatPanel;
 
     //
-    private JButton          botAddJButton    = new JButton("Add bot");
-    private final JButton    botRemoveJButton = new JButton("Remove");
+    private JButton          botAddButton    = new JButton("Add bot");
+    private final JButton    kickButton = new JButton("Kick");
     private final JComponent botsPanel;
 
     //
@@ -234,10 +234,10 @@ public class LobbyPanel extends JPanel {
     private JComponent createBotsComponent() {        
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         panel.setOpaque(false);
-        panel.add(botAddJButton);
-        botAddJButton.setAction(new AddBotAction());
-        panel.add(botRemoveJButton);
-        botRemoveJButton.setAction(new RemoveBotAction());
+        panel.add(botAddButton);
+        botAddButton.setAction(new AddBotAction());
+        panel.add(kickButton);
+        kickButton.setAction(new KickAction());
 
         return panel;
     }
@@ -290,8 +290,8 @@ public class LobbyPanel extends JPanel {
         cons.gridwidth = GridBagConstraints.REMAINDER;
         cons.fill = GridBagConstraints.NONE;
         cons.insets = new Insets(0, 0, 5, 10);
-        chatJButton.setAction(new ChatAction());
-        chatJPanel.add(this.chatJButton, cons);
+        chatButton.setAction(new ChatAction());
+        chatJPanel.add(this.chatButton, cons);
         
         return chatJPanel;
     }
@@ -316,17 +316,18 @@ public class LobbyPanel extends JPanel {
         }
     }
 
-    private class RemoveBotAction extends AbstractAction {
+    private class KickAction extends AbstractAction {
         private static final long serialVersionUID = 1L;
 
-        public RemoveBotAction() {
+        public KickAction() {
             putValue(NAME, "Remove");
             putValue(SHORT_DESCRIPTION, "Remove one bot from this game");
             putValue(SMALL_ICON, null);
         }
 
         public void actionPerformed(ActionEvent e) {
-            controller.requestRemoveBotFromGame();
+            //TODO Client SERVER work on it.
+//            controller.requestKickFromGame();
         }
     }
 

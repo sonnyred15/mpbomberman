@@ -34,7 +34,7 @@ public class RemoveBotTest {
 
     @Test
     public void removeBotNotJoinedTest() throws Exception {
-        ProtocolMessage<Integer, String> request = requestCreator.requestRemoveBotFromGame();
+        ProtocolMessage<Integer, String> request = requestCreator.requestKickFromGame(2);
         client.sendRequest(request);
 
         ProtocolMessage<Integer, String> response = client.receiveResult();

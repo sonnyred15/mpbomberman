@@ -1,5 +1,6 @@
 package org.amse.bomberman.client.view;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JTable;
@@ -19,8 +20,12 @@ public class ResultsTable extends JTable {
         this.setVisible(true);
     }
 
-    public void update(List<String> results) {
+    public void setResults(List<String> results) {
         ((ResultsTableModel) this.getModel()).setResults(results);
+    }
+
+    public void clearResults() {
+        ((ResultsTableModel) getModel()).setResults(new ArrayList<String>());
     }
 
     private void setSizes() {
@@ -38,10 +43,6 @@ public class ResultsTable extends JTable {
         columnModel.getColumn(4).setPreferredWidth(w);
         columnModel.getColumn(4).setMinWidth(w);
         columnModel.getColumn(4).setResizable(false);
-    }
-
-    private void setResults(List<String> results) {
-        ((ResultsTableModel) this.getModel()).setResults(results);
     }
 
     @SuppressWarnings("serial")

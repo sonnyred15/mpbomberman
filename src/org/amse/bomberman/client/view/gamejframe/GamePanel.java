@@ -29,7 +29,7 @@ import org.amse.bomberman.util.ImageUtilities;
 public class GamePanel  extends JPanel {
     private final ImageFactory images = new ImageFactory();
 
-    private GameMap gameMap = null;
+    private GameMap    gameMap = null;
     private List<Cell> changes = new ArrayList<Cell>();
 
     public static final int CELL_SIZE = 48;
@@ -45,7 +45,7 @@ public class GamePanel  extends JPanel {
     private Cell LUCell = new Cell(0, 0);
     // Cell that is the most Right and Down at the screen
     private Cell RDCell = new Cell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
-    private Cell myCoord;
+    private Cell myCoord = new Cell(0, 0);
 
     private final int step = 4;
 
@@ -54,13 +54,6 @@ public class GamePanel  extends JPanel {
 
     private static final Color EMPTY_COLOR   = Color.LIGHT_GRAY;
     private static final Color PL_EXPL_COLOR = Color.RED;
-
-    public GamePanel() {
-        range = DEFAULT_RANGE;
-        width = range * CELL_SIZE;
-        height = range * CELL_SIZE;
-        setPreferredSize(new Dimension(width, height));
-    }
 
     public void updateGameMap(final GameMapModel model) {
         if(!SwingUtilities.isEventDispatchThread()) {
@@ -73,21 +66,22 @@ public class GamePanel  extends JPanel {
             return;
         }
 
-        GameMap newMap = model.getMap();
+        GameMap newGameMap = model.getMap();
 
-        // if this is first invocation after receiving of map
+        // if this is first invocation after receiving of gameMap
         if (gameMap == null) {
-            size = newMap.getSize();
+            size = newGameMap.getSize();
             if (size < DEFAULT_RANGE) {
                 range = size;
+                RDCell = new Cell(size-1, size-1);
             } else {
                 range = DEFAULT_RANGE;
             }
             width = range * CELL_SIZE;
             height = range * CELL_SIZE;
-            setPreferredSize(new Dimension(width, height));            
+            setPreferredSize(new Dimension(width, height));
         }
-        gameMap = newMap;
+        gameMap = newGameMap;
         changes = model.getChanges();
         repaint();
     }
@@ -117,8 +111,7 @@ public class GamePanel  extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics graphics) {
-        super.paintComponent(graphics);
+    public void paintComponent(Graphics graphics) {        
         if (gameMap == null) {//if we have no gameMap
             return;
         }
@@ -154,7 +147,7 @@ public class GamePanel  extends JPanel {
     }
 
     private void findEyeShot() {
-        if (range >= size) {
+        if (range >= size) {//if we can see more then gameMapSize - do nothing.
             LUCell = new Cell(0,0);
             RDCell = new Cell(size-1, size-1);
         } else {
@@ -243,5 +236,14 @@ public class GamePanel  extends JPanel {
         }
 
         return image;
+    }
+
+    public void reset() {
+        gameMap = null;
+        range = DEFAULT_RANGE;
+        LUCell = new Cell(0, 0);
+        RDCell = new Cell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
+        myCoord = new Cell(0, 0);
+        size = 0;
     }
 }

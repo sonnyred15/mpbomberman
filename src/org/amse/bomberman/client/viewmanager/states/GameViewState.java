@@ -7,8 +7,11 @@ import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
 import org.amse.bomberman.client.models.gamemodel.impl.GameStateModel;
 import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.models.impl.ChatModel;
+import org.amse.bomberman.client.models.impl.ClientStateModel;
+import org.amse.bomberman.client.models.impl.ClientStateModel.State;
 import org.amse.bomberman.client.models.impl.ResultsModel;
 import org.amse.bomberman.client.models.listeners.ChatModelListener;
+import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
 import org.amse.bomberman.client.models.listeners.GameMapModelListener;
 import org.amse.bomberman.client.models.listeners.GameStateListener;
 import org.amse.bomberman.client.models.listeners.PlayerModelListener;
@@ -27,25 +30,29 @@ public class GameViewState extends AbstractState
                                       ChatModelListener,
                                       ResultModelListener,
                                       PlayerModelListener,
-                                      GameStateListener {
-    private GameFrame gameFrame = new GameFrame();
+                                      GameStateListener,
+                                      ClientStateModelListener {
+    private GameFrame       gameFrame = new GameFrame();
     private GameKeyListener keyListener = new GameKeyListener(getController());
-    private GameMenuBar menu = new GameMenuBar(getController());
+    private GameMenuBar     menu = new GameMenuBar(getController());
 
     private boolean dead = false;
+    private boolean ended = false;
 
     public GameViewState(ViewManager machine) {
         super(machine);
-        
-        gameFrame.setJMenuBar(menu);
-        gameFrame.addKeyListener(keyListener);
+        gameFrame.setJMenuBar(menu);        
     }
 
     public void init() {
+        dead  = false;
+        ended = false;
+        gameFrame.addKeyListener(keyListener);
         getController().getContext().getGameMapModel().addListener(this);
         getController().getContext().getChatModel().addListener(this);
         getController().getContext().getResultsModel().addListener(this);
         getController().getContext().getPlayerModel().addListener(this);
+        getController().getContext().getClientStateModel().addListener(this);
         getController().requestGameMap();
         getWizard().setVisible(false);
         gameFrame.setLocationRelativeTo(getWizard());
@@ -54,11 +61,14 @@ public class GameViewState extends AbstractState
 
     @Override
     public void release() {
+        gameFrame.reset();
+        gameFrame.removeKeyListener(keyListener);
         getController().getContext().getGameMapModel().removeListener(this);
         getController().getContext().getChatModel().removeListener(this);
         getController().getContext().getResultsModel().removeListener(this);
         getController().getContext().getPlayerModel().removeListener(this);
-        gameFrame.setVisible(false);
+        getController().getContext().getClientStateModel().removeListener(this);
+        gameFrame.dispose();//or JVM can`t auto shutdown when wizard disposed
         getWizard().setVisible(true);
     }
 
@@ -92,12 +102,13 @@ public class GameViewState extends AbstractState
         gameFrame.setBonuses(player.getLifes(),
                              player.getBombAmount(),
                              player.getBombRadius());
+        gameFrame.setPlayerInfo(model);
 
         int lives = player.getLifes();
         if (lives <= 0) {
             if (!dead) {//TODO CLIENT bad code
                 dead = true;
-                gameFrame.stopGame();
+                stopGame();
                 JOptionPane.showMessageDialog(gameFrame, "You are dead!!!",
                         "Death", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -107,18 +118,40 @@ public class GameViewState extends AbstractState
     public void updateGameState() {
         GameStateModel model = getController().getContext().getGameStateModel();
         if (model.isEnded()) {
-            if (!dead) { //TODO bad code
-                dead = true;
-                gameFrame.stopGame();
-                JOptionPane.showMessageDialog(gameFrame, "You win!!!",
-                        "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
+            if (!ended) { //TODO bad code
+                ended = true;
+                JOptionPane.showMessageDialog(gameFrame, "End of game.",
+                        "Game ended. Now you can take a cup of tea. =)",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
 
     public void gameTerminated(String cause) {
-        gameFrame.stopGame();
         JOptionPane.showMessageDialog(gameFrame, "Game terminated.",
                         cause, JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void stopGame() {
+        gameFrame.removeKeyListener(keyListener);
+    }
+
+    public void clientStateChanged() {
+        ClientStateModel model = getController().getContext().getClientStateModel();
+        State state = model.getState();
+        switch (state) {
+            case NOT_JOINED: {
+                previous();
+            }
+        }
+    }
+
+    public void clientStateError(State state, String error) {
+        switch (state) {
+            case NOT_JOINED: {//NOT JOINED because error is about going to not joined state.
+                JOptionPane.showMessageDialog(gameFrame, "Leave error.",
+                        error, JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }

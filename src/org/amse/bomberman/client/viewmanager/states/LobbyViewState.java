@@ -31,9 +31,9 @@ public class LobbyViewState extends AbstractState
         getController().getContext().getGameInfoModel().addListener(this);
         getController().getContext().getClientStateModel().addListener(this);
         getController().getContext().getChatModel().addListener(this);
-        panel.clearGameInfo();
-        panel.clearChatArea();        
+
         getController().requestGameInfo();
+
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
         getWizard().setNextText(NEXT);
@@ -41,6 +41,8 @@ public class LobbyViewState extends AbstractState
 
     @Override
     public void release() {
+        panel.clearGameInfo();
+        panel.clearChatArea();
         getController().getContext().getGameInfoModel().removeListener(this);
         getController().getContext().getClientStateModel().removeListener(this);
         getController().getContext().getChatModel().removeListener(this);
