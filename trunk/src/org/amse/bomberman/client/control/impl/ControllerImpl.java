@@ -115,8 +115,8 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestJoinBotIntoGame());
     }
 
-    public void requestRemoveBotFromGame() {
-        sendRequest(protocol.requestRemoveBotFromGame());
+    public void requestKickFromGame(int id) {
+        sendRequest(protocol.requestKickFromGame(id));
     }
 
     public void requestMapsList() {

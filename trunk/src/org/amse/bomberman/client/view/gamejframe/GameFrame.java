@@ -1,33 +1,37 @@
 package org.amse.bomberman.client.view.gamejframe;
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import javax.swing.*;
 import java.util.List;
 import org.amse.bomberman.client.Main;
 import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
+import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.view.ResultsTable;
 import org.amse.bomberman.util.ImageUtilities;
 
 /**
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
 @SuppressWarnings("serial")
-public class GameFrame extends JFrame {
+public class GameFrame extends JFrame implements ComponentListener {
 
     private GamePanel    gamePanel;
     private BonusLabel   livesLabel;
     private BonusLabel   bombsLabel;
     private BonusLabel   radiusLabel;
     private ResultsTable resultsTable;
-
-    private JTextArea infoTA;
+    private JTextArea    infoTA;
     
     private int width  = 800;
     private int height = 600;
 
     private final int infoTextWidth = 250;
 
+    //TODO CLIENT move this to ImageFactory
     private static final String LIFE_ICON_PATH
             = "org/amse/bomberman/client/icons/heart-48.png";
 
@@ -52,15 +56,10 @@ public class GameFrame extends JFrame {
     public GameFrame() {
         super("BomberMan");
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);//TODO CLIENT Bad reaction =)
-        setResizable(true);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
-    }
-
-    public void stopGame() {
-        livesLabel.setEnabled(false);
-        bombsLabel.setEnabled(false);
-        radiusLabel.setEnabled(false);
+        gamePanel.addComponentListener(this);
+        setResizable(true);
     }
 
     private void initComponents() {
@@ -72,63 +71,94 @@ public class GameFrame extends JFrame {
         radiusLabel  = new BonusLabel(ICON_BONUS_B_RADIUS, 0);
         resultsTable = new ResultsTable();
 
+        /* BONUS BOX */
         Box bonusBox = Box.createHorizontalBox();
+        bonusBox.add(Box.createHorizontalGlue());
         bonusBox.add(livesLabel);
         bonusBox.add(Box.createHorizontalStrut(15));
         bonusBox.add(bombsLabel);
         bonusBox.add(Box.createHorizontalStrut(15));
         bonusBox.add(radiusLabel);
+        bonusBox.add(Box.createHorizontalGlue());
 
-        Box rightBox = Box.createVerticalBox();
-        rightBox.add(Box.createVerticalStrut(42)); // !!!
-
+        /* INFO STUFF */
         JScrollPane jsp = new JScrollPane(resultsTable,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp.setPreferredSize(new Dimension(infoTextWidth, height / 3));
-        rightBox.add(jsp);
-
-        rightBox.add(Box.createVerticalGlue());
 
         JScrollPane jsp2 = new JScrollPane(createInfoTA(),
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jsp2.setPreferredSize(new Dimension(infoTextWidth, height / 3));
-        rightBox.add(jsp2);
+        
+        /* Adding all to content pane.. */
+        Container content = getContentPane();
+        content.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
 
-        Box leftBox = Box.createVerticalBox();
-        leftBox.add(bonusBox);
-        leftBox.add(Box.createVerticalStrut(10));
-        leftBox.add(gamePanel);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.BOTH;
+        content.add(bonusBox, c);
 
-        Box mainBox = Box.createHorizontalBox();
-        mainBox.add(leftBox);
-        mainBox.add(Box.createHorizontalStrut(10));
-        mainBox.add(rightBox);
+        c.gridx = 1;
+        c.gridy = 0;
+        content.add(Box.createGlue(), c);
 
-        Container c = getContentPane();
-        c.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        c.add(mainBox);
+        c.fill = GridBagConstraints.VERTICAL;
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridheight = 2;//gamePanel <-> results cell and chat cell
+        content.add(gamePanel, c);//[0;1]
+
+        c.gridx = 1;
+        c.gridy = 1;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridheight = 1;
+        content.add(jsp, c);
+
+        c.gridx = 1;
+        c.gridy = 2;
+        content.add(jsp2, c);
+
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.gridx = 1;
+        c.gridy = 3;
+        c.gridwidth = 2;
+        content.add(Box.createGlue(), c);
     }
 
-    public void setResults(List<String> results) {
-        resultsTable.update(results);
+    public void setResults(final List<String> results) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                resultsTable.setResults(results);
+            }
+        });
     }
 
-    public void setBonuses(int lives, int bombs, int radius) {
-        if (livesLabel.getCount() != lives) {
-            livesLabel.update(lives);
-        }
-        if (bombsLabel.getCount() != bombs) {
-            bombsLabel.update(bombs);
-        }
-        if (radiusLabel.getCount() != radius) {
-            radiusLabel.update(radius);
-        }
+    public void setBonuses(final int lives,final  int bombs,final int radius) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                livesLabel.setValue(lives);
+                bombsLabel.setValue(bombs);
+                radiusLabel.setValue(radius);
+            }
+        });
     }
 
     public void setGameMap(GameMapModel model) {
-        gamePanel.updateGameMap(model);
+        gamePanel.updateGameMap(model);//will automatically use EDT
+    }
+
+    public void setPlayerInfo(PlayerModel model) {
+        gamePanel.updatePlayer(model);//will automatically use EDT
     }
 
     public void setHistory(List<String> history) {
@@ -143,6 +173,17 @@ public class GameFrame extends JFrame {
         infoTA.setText(sb.toString());
     }
 
+    public void reset() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                resultsTable.clearResults();
+                infoTA.setText("");
+                gamePanel.reset();
+            }
+        });
+    }
+
     private JTextArea createInfoTA() {
         infoTA = new JTextArea();
         infoTA.setFocusable(false);
@@ -153,16 +194,27 @@ public class GameFrame extends JFrame {
         return infoTA;
     }
 
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "GameJFrame",
-                JOptionPane.ERROR_MESSAGE);
+    public void componentResized(ComponentEvent e) {
+        pack();
+    }
+
+    public void componentMoved(ComponentEvent e) {
+        //ignore
+    }
+
+    public void componentShown(ComponentEvent e) {
+        //ignore
+    }
+
+    public void componentHidden(ComponentEvent e) {
+        //ignore
     }
 
     @SuppressWarnings("serial")
     private class BonusLabel extends JLabel {
 
         private ImageIcon image;
-        private int count;
+        private int value;
         private final int size = 32;
 
         private BonusLabel(ImageIcon icon, int firstCount) {
@@ -174,15 +226,15 @@ public class GameFrame extends JFrame {
             this.setVisible(true);
         }
 
-        private void update(int newCount) {
-            if (newCount != count) {
-                count = newCount;
-                this.setText("x" + newCount);
+        private void setValue(int value) {
+            if (this.value != value) {
+                this.value = value;
+                this.setText("x" + value);
             }
         }
 
-        private int getCount() {
-            return count;
+        private int getValue() {
+            return value;
         }
     }
 }

@@ -39,7 +39,7 @@ public interface Controller extends ConnectorListener {
 
     void requestJoinBotIntoGame();
 
-    void requestRemoveBotFromGame();
+    void requestKickFromGame(int id);
 
     void requestMapsList();
 

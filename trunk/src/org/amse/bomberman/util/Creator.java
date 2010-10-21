@@ -90,23 +90,23 @@ public class Creator {
     }
 
     static String[] botNames =
-    {"Suicider",
-     "Nike",
-     "Adibas",
-     "Gosu",
-     "Idiot",
-     "Gosling",
-     "Gauss",
-     "Lenin",
-     "Stalin",
-     "Steveee",
-     "Patriot",
-     "Slayer",
-     "J2SEBot",
-     "iBot",
-     "I_KILL_YOU",
-     "Ololo",
-     "GoGoGo"
+    {"Suicider", "Terminator",
+     "Nike", "Budda",
+     "Adibas", "Killer",
+     "Gosu", "Nietzsche",
+     "Idiot", "Archimed",
+     "Gosling", "Switch",
+     "Gauss", "KISS",
+     "Lenin", "Factory",
+     "Stalin", "Singletone",
+     "Steveee", "Compositor",
+     "Patriot", "Adapter",
+     "Slayer", "Debian",
+     "J2SEBot", "Lenny",
+     "iBot", "Squeeze",
+     "I_KILL_YOU", "SuperMan",
+     "Ololo", "Linus T.",
+     "Bug", "Feature"
     };
     static Random rnd = new Random();
 

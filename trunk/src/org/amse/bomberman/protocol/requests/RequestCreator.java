@@ -71,8 +71,11 @@ public class RequestCreator {
         return request(ProtocolConstants.BOT_ADD_MESSAGE_ID, data);
     }
 
-    public ProtocolMessage<Integer, String> requestRemoveBotFromGame() {
-        return requestWithEmptyData(ProtocolConstants.KICK_PLAYER_MESSAGE_ID);
+    public ProtocolMessage<Integer, String> requestKickFromGame(int id) {
+        List<String> data = new ArrayList<String>(1);
+        data.add(String.valueOf(id));
+        
+        return request(ProtocolConstants.KICK_PLAYER_MESSAGE_ID, data);
     }
 
     public ProtocolMessage<Integer, String> requestGameMapsList() {
