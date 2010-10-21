@@ -23,11 +23,6 @@ public class GameStateModel implements ServerListener {
         List<String> data = message.getData();
         if(messageId == ProtocolConstants.LEAVE_MESSAGE_ID) {
             setEnded(true);
-        } else if(messageId == ProtocolConstants.GAME_TERMINATED_NOTIFY_ID) {
-            if(data.get(0).equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
-                setEnded(true);
-                updateListeners("Host is escaped from game!\n Game terminated.");
-            }
         } else if(messageId == ProtocolConstants.END_RESULTS_MESSAGE_ID) {
             setEnded(true);
         }
@@ -56,11 +51,5 @@ public class GameStateModel implements ServerListener {
 
     public void removeListener(GameStateListener listener) {
         listeners.remove(listener);
-    }
-
-    private void updateListeners(String error) {
-        for(GameStateListener listener : listeners) {
-            listener.gameTerminated(error);
-        }
     }
 }

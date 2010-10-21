@@ -43,8 +43,8 @@ public class CreateJoinWaitState extends AbstractState
 
     public void clientStateError(State state, String error) {
         switch (state) {
-            case LOBBY: {//LOBBY because error is about going to lobby state
-                getController().requestLeaveGame();
+            case NOT_JOINED: {//NOT_JOINED state that caused error
+                getWizard().showError(error);
                 previous();
                 break;
             }

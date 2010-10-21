@@ -85,7 +85,6 @@ public class GameStorage implements GameChangeListener {
         this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
                 ProtocolConstants.UPDATE_GAMES_LIST);
 
-
         return n;
     }
 

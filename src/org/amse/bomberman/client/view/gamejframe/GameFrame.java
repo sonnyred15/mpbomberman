@@ -59,7 +59,7 @@ public class GameFrame extends JFrame implements ComponentListener {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
         gamePanel.addComponentListener(this);
-        setResizable(true);
+        setResizable(false);
     }
 
     private void initComponents() {

@@ -235,7 +235,7 @@ public class DefaultModel implements Model, DieListener {
         }
         started = true;
 
-        //fireStatsChanged();
+        fireStatsChanged();
     }
 
     public void end() {
