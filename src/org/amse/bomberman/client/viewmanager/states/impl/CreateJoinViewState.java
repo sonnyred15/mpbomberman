@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.viewmanager.states;
+package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.util.List;
 import org.amse.bomberman.client.models.impl.GameMapsModel;
@@ -29,7 +29,7 @@ public class CreateJoinViewState extends AbstractState
         getController().getContext().getGameMapsModel().addListener(this);
         getController().getContext().getGamesModel().addListener(this);
         getController().requestGamesList();
-        getController().requestMapsList();
+        getController().requestGameMapsList();
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
         getWizard().setNextText(NEXT);

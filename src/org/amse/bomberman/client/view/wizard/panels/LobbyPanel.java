@@ -312,7 +312,7 @@ public class LobbyPanel extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-            controller.requestJoinBotIntoGame();
+            controller.requestAddBot();
         }
     }
 

@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.viewmanager.states;
+package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -46,6 +46,7 @@ public class GameViewState extends AbstractState
 
     public void init() {
         getController().getContext().getGameStateModel().reset();
+        getController().getContext().getGameMapModel().reset();
         dead  = false;
         ended = false;
         gameFrame.addKeyListener(keyListener);

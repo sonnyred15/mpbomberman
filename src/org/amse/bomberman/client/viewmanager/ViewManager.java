@@ -1,11 +1,11 @@
 package org.amse.bomberman.client.viewmanager;
 
-import org.amse.bomberman.client.viewmanager.states.StartWaitState;
-import org.amse.bomberman.client.viewmanager.states.NotConnectedState;
-import org.amse.bomberman.client.viewmanager.states.CreateJoinWaitState;
-import org.amse.bomberman.client.viewmanager.states.LobbyViewState;
-import org.amse.bomberman.client.viewmanager.states.GameViewState;
-import org.amse.bomberman.client.viewmanager.states.CreateJoinViewState;
+import org.amse.bomberman.client.viewmanager.states.impl.StartWaitState;
+import org.amse.bomberman.client.viewmanager.states.impl.NotConnectedState;
+import org.amse.bomberman.client.viewmanager.states.impl.CreateJoinWaitState;
+import org.amse.bomberman.client.viewmanager.states.impl.LobbyViewState;
+import org.amse.bomberman.client.viewmanager.states.impl.GameViewState;
+import org.amse.bomberman.client.viewmanager.states.impl.CreateJoinViewState;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.models.impl.ConnectionStateModel;
@@ -16,6 +16,7 @@ import org.amse.bomberman.client.view.wizard.WizardEvent;
 import org.amse.bomberman.client.view.wizard.WizardListener;
 
 /**
+ * Class that manages View(part of MVC).
  *
  * @author Kirilchuk V.E.
  */
@@ -33,6 +34,11 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
 
     private volatile State state;
 
+    /**
+     * Creates ViewManager with specified Controller.
+     *
+     * @param controller controller part of MVC.
+     */
     public ViewManager(Controller controller) {
         this.controller = controller;
         wizard = new Wizard();
@@ -57,21 +63,39 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         state.previous();
     }
 
+    /**
+     * Returns wizard frame.
+     *
+     * @return wizard frame.
+     */
     public Wizard getWizard() {
         return wizard;
     }
 
+    /**
+     * @return controller.
+     */
     public Controller getController() {
         return controller;
     }
 
+    /**
+     * Sets new state for view. Firstly,
+     * {@link State#release()} then setting state, and then
+     * {@link State#init()}
+     *
+     * @param state state to set.
+     */
     public void setState(State state) {
         this.state.release();
         this.state = state;
-        state.init();
+        this.state.init();
     }
 
-    public void showView() {
+    /**
+     * Shows Wizard.
+     */
+    public void showWizard() {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -81,7 +105,14 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         });
     }
 
-    //Always called from EDT
+    /**
+     * Executes action that corresponds for specified
+     * wizard event.
+     * <p>Assumes that this method is always called from
+     * Event Dispatch Thread.
+     *
+     * @param event event from wizard.
+     */
     public void wizardEvent(WizardEvent event) {
         switch (event) {
             case BACK_PRESSED: {
@@ -120,6 +151,10 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
                 .setNext(null);
     }
 
+    /**
+     * Implementation of ConnectionStateListener interface method.
+     * Reacts on connection lost by showing error in View.
+     */
     public void connectionStateChanged() {
         ConnectionStateModel model = controller.getContext().getConnectionStateModel();
         if (!model.isConnected()) {//if we disconnected
@@ -128,6 +163,10 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         }
     }
 
+    /**
+     * Implementation of ConnectionStateListener interface method.
+     * Do nothing.
+     */
     public void connectionError(String error) {
         //this is for situations when we try to connect, but have error.
         //We don`t need to do something here.

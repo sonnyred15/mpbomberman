@@ -107,15 +107,15 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestPlaceBomb());
     }
 
-    public void requestJoinBotIntoGame() {
+    public void requestAddBot() {
         sendRequest(protocol.requestJoinBotIntoGame());
     }
 
-    public void requestKickFromGame(int id) {
+    public void requestKick(int id) {
         sendRequest(protocol.requestKickFromGame(id));
     }
 
-    public void requestMapsList() {
+    public void requestGameMapsList() {
         sendRequest(protocol.requestGameMapsList());
     }
 
@@ -135,11 +135,11 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestGetNewChatMessages());
     }
 
-    public void requestDownloadMap(String gameMapName) {
+    public void requestDownloadGameMap(String gameMapName) {
         sendRequest(protocol.requestDownloadGameMap(gameMapName));
     }
 
-    public void requestSetPlayerName(String playerName) {
+    public void requestSetClientName(String playerName) {
         sendRequest(protocol.requestSetClientName(playerName));
     }
 

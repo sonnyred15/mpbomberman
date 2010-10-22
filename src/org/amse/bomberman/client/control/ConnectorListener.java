@@ -3,6 +3,7 @@ package org.amse.bomberman.client.control;
 import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
+ * Class that represents listener of connector.
  *
  * @author Kirilchuk V.E.
  */
@@ -16,7 +17,7 @@ public interface ConnectorListener {
      * <p>
      * <b>Free caller thread as fast as you can!</b>
      *
-     * @param message
+     * @param message received protocol message.
      */
     void received(ProtocolMessage<Integer, String> message);
 }

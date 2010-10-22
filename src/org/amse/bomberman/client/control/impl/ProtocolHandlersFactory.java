@@ -3,38 +3,19 @@ package org.amse.bomberman.client.control.impl;
 import java.util.HashMap;
 import java.util.Map;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.BotAddResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.CreateGameResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.DoMoveResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.EndResultsHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GameInfoMessageHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GameMapsListHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GameStartedMessageHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GameStatusMessageHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GameTerminatedMessageHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.GamesListHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.JoinGameResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.KickResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.LeaveResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.NewChatMessagesHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.PlaceBombResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.PlayersStatsHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.SetGameMapHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.SetNameHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.StartGameResultHandler;
-import org.amse.bomberman.client.control.protocolhandlers.impl.UpdateGameFieldCommand;
-import org.amse.bomberman.client.control.protocolhandlers.impl.UpdateGameInfoCommand;
-import org.amse.bomberman.client.control.protocolhandlers.impl.UpdateGamesListCommand;
+import org.amse.bomberman.client.control.protocolhandlers.impl.*;
 import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
+ * Class that corresponds for giving protocol handlers to hancle protocol
+ * messages.
  *
  * @author Kirilchuk V.E.
  */
 public class ProtocolHandlersFactory {
 
-    Map<Integer, ProtocolHandler> handlers
-            = new HashMap<Integer, ProtocolHandler>();
+    private final Map<Integer, ProtocolHandler> handlers = new HashMap<Integer, ProtocolHandler>();
+
     {
         handlers.put(ProtocolConstants.GAMES_LIST_NOTIFY_ID, new UpdateGamesListCommand());
         handlers.put(ProtocolConstants.GAME_INFO_NOTIFY_ID, new UpdateGameInfoCommand());
@@ -60,6 +41,14 @@ public class ProtocolHandlersFactory {
         handlers.put(ProtocolConstants.PLAYERS_STATS_MESSAGE_ID, new PlayersStatsHandler());
     }
 
+    /**
+     * Returnes protocol message handler for specified message id, or
+     * null if no handler for such message.
+     *
+     * @param protocolMessageId id of message to get handler for.
+     * @return protocol message handler for specified message id, or
+     * null if no handler for such message.
+     */
     public ProtocolHandler getCommand(int protocolMessageId) {
         return handlers.get(protocolMessageId);
     }//TODO CLIENT when server send disconnect message

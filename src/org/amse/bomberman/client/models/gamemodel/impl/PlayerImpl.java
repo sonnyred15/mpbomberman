@@ -9,26 +9,14 @@ import org.amse.bomberman.util.Constants;
  */
 public class PlayerImpl implements Player {
 
-    private String name = "Noname";
     private int    life;
     private int    bombAmount;
     private int    settedBombs;
     private int    bombRadius;
-    private Cell   myCoord = new Cell(0, 0);
+    private Cell   myCoord;
 
     public PlayerImpl() {
-        this.life        = Constants.PLAYER_DEFAULT_LIVES;
-        this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;
-        this.bombRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
-        this.settedBombs = 0;
-    }
-
-    public void setName(String string) {
-        name = string;
-    }
-
-    public String getName() {
-        return name;
+        reset();
     }
 
     public int getBombAmount() {
@@ -71,6 +59,13 @@ public class PlayerImpl implements Player {
         settedBombs = amount;
     }
 
+    /**
+     * Resets player to initial state.
+     * Sets parameters to defaults.
+     * <p> Just creating new Player would do same thing but will
+     * produce new object. So, you may choose between creating new object and
+     * just reseting state of existing player.
+     */
     public void reset() {
         this.life        = Constants.PLAYER_DEFAULT_LIVES;
         this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;

@@ -4,6 +4,7 @@ import org.amse.bomberman.util.Direction;
 
 /**
  * Immutable class.
+ * 
  * @author Michail Korovkin
  */
 public class Cell {

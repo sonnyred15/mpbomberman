@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.viewmanager.states;
+package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.util.List;
 import org.amse.bomberman.client.models.impl.ClientStateModel;

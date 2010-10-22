@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.viewmanager.states;
+package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.net.UnknownHostException;
 import org.amse.bomberman.client.models.impl.ConnectionStateModel;
@@ -52,7 +52,7 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
         }
 
         if (model.isConnected()) {
-            getController().requestSetPlayerName(panel.getPlayerName());
+            getController().requestSetClientName(panel.getPlayerName());
             machine.setState(next);
         }
     }
