@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.amse.bomberman.client.view;
 
 import java.awt.Image;
@@ -11,6 +6,7 @@ import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.ImageUtilities;
 
 /**
+ * Class that corresponds for creating Images that used in application.
  *
  * @author Kirilchuk V.E.
  */
@@ -41,7 +37,14 @@ public class ImageFactory {
     private static ImageIcon ICON_BONUS_B_RADIUS = ImageUtilities.loadIcon(B_RADIUS_ICON_PATH);
     private static ImageIcon ICON_BONUS_B_COUNT  = ImageUtilities.loadIcon(B_COUNT_ICON_PATH);
 
-    public Image getImage(int imageId) {
+    /**
+     * Returnes image for specified id.
+     *
+     * @param imageId id of image to get.
+     * @return image that is binded for given id or null if no such
+     * image was founded.
+     */
+    public Image getImage(int imageId) {//TODO CLIENT use map not ugly switch
         Image icon = null;
         switch (imageId) {
             case Constants.MAP_EMPTY: {

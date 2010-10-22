@@ -8,8 +8,10 @@ import org.amse.bomberman.client.models.gamemodel.GameMap;
 import org.amse.bomberman.client.models.listeners.GameMapModelListener;
 
 /**
+ * Class that represents gameMap model.
  *
  * @author Mikhail Korovkin
+ * @author Kirilchuk V.E.
  */
 public class GameMapModel {
 
@@ -65,18 +67,34 @@ public class GameMapModel {
         updateListeners();
     }
 
-    public GameMap getMap() {//don`t need synchronize. volatile is enough here
+    /**
+     * @return last game map.
+     */
+    public GameMap getGameMap() {//don`t need synchronize. volatile is enough here
         return gameMap;
     }
 
+    /**
+     * @return changes between previous and last gameMap.
+     */
     public synchronized List<Cell> getChanges() {//need synchronize cause changes list is not thread safe.
         return changes;
     }
 
+    /**
+     * Adds listener to this model.
+     *
+     * @param listener listener to add.
+     */
     public void addListener(GameMapModelListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Removes listener from this model.
+     *
+     * @param listener listener to remove.
+     */
     public void removeListener(GameMapModelListener listener) {
         listeners.remove(listener);
     }
@@ -87,7 +105,11 @@ public class GameMapModel {
         }
     }
 
-    public void reset() {//TODO CLIENT When it must be reseted!?
+    /**
+     * Resetes this model to initial state.
+     * This method does not notifies listeners.
+     */
+    public void reset() {
         this.gameMap = null;
         this.changes.clear();
     }

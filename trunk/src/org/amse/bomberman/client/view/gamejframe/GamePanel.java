@@ -13,12 +13,10 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.view.ImageFactory;
-import org.amse.bomberman.util.ImageUtilities;
 
 
 /**
@@ -66,7 +64,7 @@ public class GamePanel  extends JPanel {
             return;
         }
 
-        GameMap newGameMap = model.getMap();
+        GameMap newGameMap = model.getGameMap();
 
         // if this is first invocation after receiving of gameMap
         if (gameMap == null) {

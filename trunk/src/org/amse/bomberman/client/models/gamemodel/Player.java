@@ -6,10 +6,6 @@ package org.amse.bomberman.client.models.gamemodel;
  */
 public interface Player {
 
-    void setName(String string);
-
-    String getName();
-
     void setBombAmount(int amount);
 
     int getBombAmount();

@@ -10,7 +10,7 @@ import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.impl.ControllerImpl;
 import org.amse.bomberman.client.control.impl.ModelsContainer;
 import org.amse.bomberman.client.net.Connector;
-import org.amse.bomberman.client.net.impl.AsynchroConnector;
+import org.amse.bomberman.client.net.impl.ConnectorImpl;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -36,7 +36,7 @@ public class Main {
 //            ex.printStackTrace();
 //        }
 
-        Connector connector = new AsynchroConnector();
+        Connector connector = new ConnectorImpl();
 
         ModelsContainer context = new ModelsContainer();
 
@@ -48,7 +48,7 @@ public class Main {
 
         ViewManager viewState = new ViewManager(controller);
         context.getConnectionStateModel().addListener(viewState);
-        viewState.showView();
+        viewState.showWizard();
 
         Runtime.getRuntime().addShutdownHook(new ShutdowHook(executors, controller));
     }

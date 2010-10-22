@@ -1,13 +1,6 @@
 package org.amse.bomberman.client.net.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,11 +13,12 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
+ * Realization of Connector interface.
  *
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
-public class AsynchroConnector implements Connector {
+public class ConnectorImpl implements Connector {
 
     private ConnectorListener listener;
     private Socket socket;
@@ -32,7 +26,7 @@ public class AsynchroConnector implements Connector {
     private DataOutputStream out = null;
     private DataInputStream in = null;
 
-    public AsynchroConnector() {}
+    public ConnectorImpl() {}
 
     public void setListener(ConnectorListener listener) {
         this.listener = listener;

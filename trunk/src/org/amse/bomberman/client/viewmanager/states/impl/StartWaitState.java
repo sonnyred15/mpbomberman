@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.viewmanager.states;
+package org.amse.bomberman.client.viewmanager.states.impl;
 
 import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;
