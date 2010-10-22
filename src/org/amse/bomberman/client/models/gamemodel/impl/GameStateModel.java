@@ -13,7 +13,7 @@ public class GameStateModel {
     private final List<GameStateListener> listeners
             = new CopyOnWriteArrayList<GameStateListener>();
 
-    private volatile boolean ended = false;//TODO CLIENT when it must be reset?
+    private volatile boolean ended = false;
 
     public void setEnded(boolean ended) {
         if(this.ended != ended) { //to not spam listeners every time
@@ -38,5 +38,9 @@ public class GameStateModel {
 
     public void removeListener(GameStateListener listener) {
         listeners.remove(listener);
+    }
+
+    public void reset() {
+        ended = false;
     }
 }
