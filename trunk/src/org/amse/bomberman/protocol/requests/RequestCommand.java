@@ -1,4 +1,4 @@
-package org.amse.bomberman.protocol.requests;
+package org.amse.bomberman.protocol.requests;//TODO this class must be not here.
 
 import java.util.List;
 import org.amse.bomberman.protocol.ProtocolConstants;

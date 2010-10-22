@@ -42,7 +42,7 @@ public interface RequestExecutor {
 
     void sendNewMessagesFromChat() throws InvalidDataException ;
 
-    public abstract void tryKickPlayer(List<String> args) throws InvalidDataException ;
+    void tryKickPlayer(List<String> args) throws InvalidDataException ;
 
     void sendGamePlayersStats() throws InvalidDataException ;
 

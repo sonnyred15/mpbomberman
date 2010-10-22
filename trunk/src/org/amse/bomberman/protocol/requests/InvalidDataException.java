@@ -1,8 +1,10 @@
 package org.amse.bomberman.protocol.requests;
 
 /**
+ * Class that represents exception about not valid data
+ * in protocol message.
  *
- * @author chibis
+ * @author Kirilchuk V.E.
  */
 public class InvalidDataException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -40,6 +42,10 @@ public class InvalidDataException extends Exception {
         this.messageId = messageId;
     }
 
+    /**
+     * @return message id that tells for what message invalid data exception
+     * was thrown.
+     */
     public int getMessageId() {
         return messageId;
     }
