@@ -3,18 +3,15 @@ package org.amse.bomberman.client.models.gamemodel.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.amse.bomberman.client.models.gamemodel.*;
+import org.amse.bomberman.client.models.gamemodel.Cell;
+import org.amse.bomberman.client.models.gamemodel.GameMap;
 import org.amse.bomberman.client.models.listeners.GameMapModelListener;
-import org.amse.bomberman.client.net.ServerListener;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.util.impl.ParserImpl;
 
 /**
  *
  * @author Mikhail Korovkin
  */
-public class GameMapModel implements ServerListener {
+public class GameMapModel {
 
     private final List<GameMapModelListener> listeners
             = new CopyOnWriteArrayList<GameMapModelListener>();
@@ -66,20 +63,6 @@ public class GameMapModel implements ServerListener {
         }
         this.gameMap = newGameMap;
         updateListeners();
-    }
-
-    //TODO CLIENT must not be here BAD DESIGN
-    public void received(ProtocolMessage<Integer, String> message) {
-        int messageId = message.getMessageId();
-        List<String> data = message.getData();
-        if(messageId == ProtocolConstants.GAME_MAP_INFO_MESSAGE_ID) {
-            ParserImpl parser = new ParserImpl();
-            setGameMap(parser.parseGameMap(data));//will updateListeners
-        } else if(messageId == ProtocolConstants.DO_MOVE_MESSAGE_ID) {
-            //ignore answer
-        } else if(messageId == ProtocolConstants.PLACE_BOMB_MESSAGE_ID) {
-            //ignore answer
-        }
     }
 
     public GameMap getMap() {//don`t need synchronize. volatile is enough here

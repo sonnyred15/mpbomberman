@@ -3,17 +3,14 @@ package org.amse.bomberman.client.control.impl;
 import org.amse.bomberman.client.net.Connector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.Controller;
-import org.amse.bomberman.client.net.ServerListener;
 import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.protocol.requests.RequestCreator;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 
 /**
  * Implementation of Controller interface that uses ExecutorService to
@@ -27,12 +24,11 @@ public class ControllerImpl implements Controller {
 
     private final ExecutorService executors;
 
+    private final ProtocolHandlersFactory commandsFactory
+            = new ProtocolHandlersFactory();
+
     private final Connector       connector;
     private final ModelsContainer context;
-
-    //TODO CLIENT must not have listeners. Must set info to models himself!!!
-    private final List<ServerListener> listeners
-            = new CopyOnWriteArrayList<ServerListener>();
 
     private final RequestCreator       protocol  = new RequestCreator();
 
@@ -149,39 +145,14 @@ public class ControllerImpl implements Controller {
 
     public void received(final ProtocolMessage<Integer, String> message) {
         int messageId = message.getMessageId();
-
-        ///////THIS MUST NOT EXIST!!!///////
-        if (messageId == ProtocolConstants.GAMES_LIST_NOTIFY_ID) {
-            requestGamesList();
-            return;
-        } else if (messageId == ProtocolConstants.GAME_INFO_NOTIFY_ID) {
-            requestGameInfo();
-            return;
-        } else if (messageId == ProtocolConstants.GAME_FIELD_CHANGED_NOTIFY_ID) {
-            requestGameMap();
-            return;
-        }
+        final ProtocolHandler handler = commandsFactory.getCommand(messageId);
 
         executors.submit(new Runnable() {
 
             public void run() {
-                fireMessageReceived(message);
+                handler.process(ControllerImpl.this, message.getData());
             }
         });
-    }
-
-    public void addServiceListener(ServerListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeServiceListener(ServerListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireMessageReceived(ProtocolMessage<Integer, String> message) {
-        for (ServerListener listener : listeners) {
-            listener.received(message);
-        }
     }
 
     private void sendRequest(final ProtocolMessage<Integer, String> message) {

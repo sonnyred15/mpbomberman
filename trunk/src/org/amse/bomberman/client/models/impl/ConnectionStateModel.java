@@ -3,14 +3,12 @@ package org.amse.bomberman.client.models.impl;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.client.models.listeners.ConnectionStateListener;
-import org.amse.bomberman.client.net.ServerListener;
-import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
-public class ConnectionStateModel implements ServerListener {
+public class ConnectionStateModel {
 
     private final List<ConnectionStateListener> listeners
             = new CopyOnWriteArrayList<ConnectionStateListener>();
@@ -30,10 +28,6 @@ public class ConnectionStateModel implements ServerListener {
 
     public void connectException(Exception ex) {
         updateListeners(ex.getMessage());
-    }
-
-    public void received(ProtocolMessage<Integer, String> message) {
-        //TODO CLIENT when server send disconnect message
     }
 
     public void addListener(ConnectionStateListener listener) {

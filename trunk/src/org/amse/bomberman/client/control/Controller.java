@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.control;
 
-import org.amse.bomberman.client.net.ServerListener;
 import org.amse.bomberman.util.Direction;
 import java.net.InetAddress;
 import org.amse.bomberman.client.control.impl.ModelsContainer;
@@ -15,10 +14,6 @@ public interface Controller extends ConnectorListener {
     ModelsContainer getContext();
 
     void connect(InetAddress serverIP, int serverPort);
-
-    void addServiceListener(ServerListener listener);
-
-    void removeServiceListener(ServerListener listener);
 
     void requestGamesList();
 
