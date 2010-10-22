@@ -45,6 +45,7 @@ public class GameViewState extends AbstractState
     }
 
     public void init() {
+        getController().getContext().getGameStateModel().reset();
         dead  = false;
         ended = false;
         gameFrame.addKeyListener(keyListener);
