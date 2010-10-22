@@ -21,8 +21,7 @@ class StoppedState implements ServerState {
 
     public void start(TcpServer server) throws IOException {
         try {
-            server.setServerSocket(new ServerSocket(server.getPort(), 0));    // throws IOExeption,SecurityException
-            server.setGameStorage(new GameStorage(server));
+            server.setServerSocket(new ServerSocket(server.getPort(), 0));    // throws IOExeption,SecurityException            
             server.setListeningThread(new Thread(new ServerThread(server)));
         } catch (IOException ex) {
             System.err.println("Server: start error. " + ex.getMessage());
@@ -31,6 +30,7 @@ class StoppedState implements ServerState {
         }
 
         server.setServerState(StartedState.getInstance());
+        server.setGameStorage(new GameStorage(server));
         server.getListeningThread().start();
         System.out.println("Server: started.");
     }
