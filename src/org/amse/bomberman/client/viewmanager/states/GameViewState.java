@@ -122,8 +122,9 @@ public class GameViewState extends AbstractState
         if (model.isEnded()) {
             if (!ended) { //TODO bad code
                 ended = true;
-                JOptionPane.showMessageDialog(gameFrame, "End of game.",
+                JOptionPane.showMessageDialog(gameFrame,
                         "Game ended. Now you can take a cup of tea. =)",
+                        "End of game.",
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }

@@ -46,17 +46,6 @@ public class Main {
         Controller controller = new ControllerImpl(executors, connector, context);
         connector.setListener(controller);
 
-        controller.addServiceListener(context.getGameInfoModel());
-        controller.addServiceListener(context.getChatModel());
-        controller.addServiceListener(context.getConnectionStateModel());
-        controller.addServiceListener(context.getGameMapsModel());
-        controller.addServiceListener(context.getGameMapModel());
-        controller.addServiceListener(context.getPlayerModel());
-        controller.addServiceListener(context.getGamesModel());
-        controller.addServiceListener(context.getResultsModel());
-        controller.addServiceListener(context.getClientStateModel());
-        controller.addServiceListener(context.getGameStateModel());
-
         ViewManager viewState = new ViewManager(controller);
         context.getConnectionStateModel().addListener(viewState);
         viewState.showView();

@@ -8,8 +8,12 @@ import java.text.NumberFormat;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.SwingConstants;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
+import javax.swing.text.PlainDocument;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
 import org.amse.bomberman.util.Constants;
@@ -36,7 +40,7 @@ public class ConnectionPanel extends JPanel {
 
     private JFormattedTextField ipTF;
     private JFormattedTextField portTF;
-    private JFormattedTextField playerNameTF;
+    private JTextField playerNameTF;
 
     private final String defaultIp = "127. 0 . 0 . 1 ";
 
@@ -56,7 +60,7 @@ public class ConnectionPanel extends JPanel {
     }
 
     public String getPlayerName() {
-        return playerNameTF.getValue().toString();
+        return playerNameTF.getText();
     }
 
     private void initComponents() {
@@ -129,15 +133,31 @@ public class ConnectionPanel extends JPanel {
         nameLabel.setForeground(textColor);
         nameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        try {
-            MaskFormatter mf = new MaskFormatter("********");
-            mf.setInvalidCharacters("" + ProtocolConstants.SPLIT_SYMBOL);
-            playerNameTF = new JFormattedTextField(mf);
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-        }
+        //TODO CLIENT push to client constants
+        final int maxLength = 10;
+        PlainDocument doc = new PlainDocument();
+        doc.setDocumentFilter(new DocumentFilter(){
+
+            @Override
+            public void insertString(FilterBypass fb, int offset,
+                    String string, AttributeSet attr) throws BadLocationException {
+                replace(fb, offset, 0, string, attr);
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length,
+                    String text, AttributeSet attrs) throws BadLocationException {
+                int addCount = (text==null ? 0 : text.length());
+                int count = fb.getDocument().getLength();
+                if(count - length +addCount > maxLength) {
+                    UIManager.getLookAndFeel().provideErrorFeedback(playerNameTF);
+                } else {
+                    fb.replace(offset, length, text, attrs);
+                }
+            }
+        });
+        playerNameTF = new JTextField(doc, "Unnamed", 8);
         playerNameTF.setPreferredSize(new Dimension(textWidth, 20));
-        playerNameTF.setValue("unnamed");
 
         bottomBox.add(nameLabel);
         bottomBox.add(Box.createHorizontalStrut(5));
