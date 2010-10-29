@@ -27,6 +27,7 @@ public class LobbyViewState extends AbstractState
         super(machine);
     }
 
+    @Override
     public void init() {
         getController().getContext().getGameInfoModel().addListener(this);
         getController().getContext().getClientStateModel().addListener(this);
@@ -48,15 +49,18 @@ public class LobbyViewState extends AbstractState
         getController().getContext().getChatModel().removeListener(this);
     }
 
+    @Override
     public void previous() {
         getController().requestLeaveGame();
         machine.setState(previous);
     }
 
+    @Override
     public void next() {
         getController().requestStartGame();        
     }
 
+    @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
         State state = model.getState();
@@ -72,6 +76,7 @@ public class LobbyViewState extends AbstractState
         }
     }
 
+    @Override
     public void clientStateError(State state, String error) {
         switch(state) {
             case LOBBY: {//LOBBY state that caused error
@@ -86,15 +91,18 @@ public class LobbyViewState extends AbstractState
         }
     }
 
+    @Override
     public void updateGameInfo() {
         GameInfoModel model = getController().getContext().getGameInfoModel();
         panel.setGameInfo(model.getGameInfo());
     }
 
+    @Override
     public void gameInfoError(String error) {
         getWizard().showError(error);//for can`t add bot and can`t kick someone
     }
 
+    @Override
     public void updateChat(List<String> newMessages) {//need only new, so history from model ignored.
         panel.setNewMessages(newMessages);
     }

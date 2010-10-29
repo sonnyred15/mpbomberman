@@ -1,6 +1,5 @@
 package org.amse.bomberman.client.viewmanager.states.impl;
 
-import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -13,14 +12,17 @@ public class StartWaitState extends AbstractState {
         super(machine);
     }
 
+    @Override
     public void init() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void previous() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void next() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

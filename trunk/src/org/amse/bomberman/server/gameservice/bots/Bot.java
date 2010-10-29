@@ -40,30 +40,37 @@ public class Bot implements GameChangeListener {
         return player;
     }
 
+    @Override
     public void gameStarted(Game game) {
         this.botThread.start();
     }
 
+    @Override
     public void gameTerminated(Game game) {
         game.removeGameChangeListener(this);
     }
 
+    @Override
     public void fieldChanged() {
         //ignore
     }
 
+    @Override
     public void gameEnded(Game game) {
         this.botThread.interrupt();
     }
 
+    @Override
     public void newChatMessage(String message) {
         //ignore
     }
 
+    @Override
     public void parametersChanged(Game game) {
         //ignore
     }
 
+    @Override
     public void statsChanged(Game game) {
         //ignore
     }

@@ -10,6 +10,7 @@ import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
  */
 public class PlaceBombResultHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> args) {
         //do nothing
         //we ignore result of place bomb

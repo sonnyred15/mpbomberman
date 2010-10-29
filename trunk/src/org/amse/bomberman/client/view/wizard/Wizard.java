@@ -45,6 +45,7 @@ public class Wizard extends JFrame {
     public void setNextText(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 nextJButton.setText(text);
             }
@@ -54,6 +55,7 @@ public class Wizard extends JFrame {
     public void setBackText(final String text) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 backJButton.setText(text);
             }
@@ -97,6 +99,7 @@ public class Wizard extends JFrame {
         if(!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     setPanel(mainPanel);
                 }
@@ -121,6 +124,7 @@ public class Wizard extends JFrame {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
+                    @Override
                 public void run() {
                     showError(errorMessage);
                 }
@@ -181,6 +185,7 @@ public class Wizard extends JFrame {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             fireWizardEvent(WizardEvent.CANCEL_PRESSED);
         }
@@ -194,6 +199,7 @@ public class Wizard extends JFrame {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             fireWizardEvent(WizardEvent.BACK_PRESSED);
         }
@@ -207,6 +213,7 @@ public class Wizard extends JFrame {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             fireWizardEvent(WizardEvent.NEXT_PRESSED);
         }

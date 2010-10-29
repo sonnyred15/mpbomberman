@@ -1,6 +1,5 @@
 package org.amse.bomberman.server.gameservice.bots;
 
-//~--- non-JDK imports --------------------------------------------------------
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.util.Direction;
@@ -29,6 +28,7 @@ public class MoveAction implements Action {
      * @see IAction
      * @param game game in which action must be executed.
      */
+    @Override
     public void executeAction(Game game) {
         game.tryDoMove(this.player.getId(), this.direction);
     }

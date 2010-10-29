@@ -357,12 +357,14 @@ public class Game implements ModelListener {
         gameChangeListeners.clear();
     }
 
+    @Override
     public void gameMapChanged() {
         for (GameChangeListener gameChangeListener : gameChangeListeners) {
             gameChangeListener.fieldChanged();
         }
     }
 
+    @Override
     public void statsChanged() {
         for (GameChangeListener listener : gameChangeListeners) {
             listener.statsChanged(this);
@@ -375,6 +377,7 @@ public class Game implements ModelListener {
         }
     }
 
+    @Override
     public void end() {
         for (GameChangeListener listener : gameChangeListeners) {
             listener.gameEnded(this);

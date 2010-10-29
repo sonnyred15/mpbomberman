@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.asynchro;
 
 import org.amse.bomberman.util.structs.SeparatelySynchronizedMap;
@@ -101,5 +97,4 @@ public class SeparatelySynchronizedMapTest {
         }
 
     }
-
 }

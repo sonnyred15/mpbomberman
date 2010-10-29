@@ -1,7 +1,5 @@
 package org.amse.bomberman.server.view;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
@@ -14,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.Server;
 
@@ -55,12 +54,12 @@ public class ServerInfo extends JFrame {
 
         /* initial form properties */
         super("server status");
-        this.setDefaultCloseOperation(HIDE_ON_CLOSE);
-        this.setMinimumSize(new Dimension(400, 300));
-        this.setResizable(true);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setMinimumSize(new Dimension(400, 300));
+        setResizable(true);
 
         // null for center position nothing for upper left corner
-        // this.setLocationRelativeTo(null);
+        // setLocationRelativeTo(null);
 
         /* adding elements to up panel */
         JPanel infoPanel = new JPanel(new GridLayout(3, 2));
@@ -71,14 +70,16 @@ public class ServerInfo extends JFrame {
         infoPanel.add(labelUnstartedGames);
         infoPanel.add(labelStartedGames);
 
-        this.add(infoPanel);
+        add(infoPanel);
 
         //
         timer.scheduleAtFixedRate(new Runnable() {
 
+            @Override
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         update();
                     }
@@ -93,12 +94,12 @@ public class ServerInfo extends JFrame {
 
     private void update() {
         if (server != null) {
-            this.labelShutdowned.setText(this.SHUTDOWNED_LABEL_TEXT + this.server.isStopped());
-            this.labelPort.setText(this.PORT_LABEL_TEXT + this.server.getPort());
-            this.labelClients.setText(this.CLIENTS_LABEL_TEXT + this.server.getSessions().size());
+            labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + server.isStopped());
+            labelPort.setText(PORT_LABEL_TEXT + server.getPort());
+            labelClients.setText(CLIENTS_LABEL_TEXT + server.getSessions().size());
 
             if(!server.isStopped()) {
-                List<Game> games = server.getGameStorage().getGamesList();
+                List<Game> games = server.getServiceContext().getGameStorage().getGamesList();
                 int started = 0;
                 int unstarted = 0;
                 for (Game game : games) {
@@ -109,11 +110,9 @@ public class ServerInfo extends JFrame {
                     }
                 }
 
-                this.labelStartedGames.setText(this.STARTED_GAMES_LABEL_TEXT + started);
-                this.labelUnstartedGames.setText(this.UNSTARTED_GAMES_LABEL_TEXT + unstarted);
+                labelStartedGames.setText(STARTED_GAMES_LABEL_TEXT + started);
+                labelUnstartedGames.setText(UNSTARTED_GAMES_LABEL_TEXT + unstarted);
             }
         }
     }
-
-
 }

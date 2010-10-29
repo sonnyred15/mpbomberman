@@ -19,6 +19,7 @@ public class Main {
     public static void main(String[] args) {//TODO make console start. GUI only for special
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 new ServerFrame();
             }

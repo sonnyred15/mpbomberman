@@ -73,14 +73,17 @@ public class ResultsTable extends JTable {
             fireTableStructureChanged();
         }
 
+        @Override
         public int getRowCount() {
             return data.length;
         }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }

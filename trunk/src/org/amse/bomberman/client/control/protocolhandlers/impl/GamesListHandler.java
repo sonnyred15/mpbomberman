@@ -12,6 +12,7 @@ import org.amse.bomberman.client.models.impl.GamesModel;
  */
 public class GamesListHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GamesModel gamesModel = controller.getContext().getGamesModel();
 

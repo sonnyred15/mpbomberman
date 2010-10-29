@@ -14,7 +14,6 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 import javax.swing.text.PlainDocument;
-import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Creator;

@@ -15,6 +15,7 @@ import org.amse.bomberman.util.impl.ParserImpl;
 public class SetGameMapHandler implements ProtocolHandler {
     private final Parser parser = new ParserImpl();
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GameMapModel gameMapModel = controller.getContext().getGameMapModel();
         gameMapModel.setGameMap(parser.parseGameMap(data));

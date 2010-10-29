@@ -4,7 +4,7 @@ import java.util.List;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
-import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
 
 /**
  *
@@ -12,6 +12,7 @@ import org.amse.bomberman.protocol.ProtocolConstants;
  */
 public class BotAddResultHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GameInfoModel gameInfoModel = controller.getContext().getGameInfoModel();
 

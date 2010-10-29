@@ -72,6 +72,7 @@ public class CreateGameJPanel extends JPanel {
     public void setMaps(final List<String> maps) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 mapBox.removeAllItems();
                 for (int i = 0; i < maps.size(); i++) {

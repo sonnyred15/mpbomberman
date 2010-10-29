@@ -19,34 +19,42 @@ public class PlayerImpl implements Player {
         reset();
     }
 
+    @Override
     public int getBombAmount() {
         return bombAmount;
     }
 
+    @Override
     public void setBombAmount(int amount) {
         bombAmount = amount;
     }
 
+    @Override
     public int getLifes() {
         return life;
     }
 
+    @Override
     public void setLives(int lives) {
         life = lives;
     }
 
+    @Override
     public void setCoord(Cell cell) {
         myCoord = cell;
     }
 
+    @Override
     public Cell getCoord() {
         return myCoord;
     }
 
+    @Override
     public void setBombRadius(int r) {
         bombRadius = r;
     }
 
+    @Override
     public int getBombRadius() {
         return bombRadius;
     }

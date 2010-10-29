@@ -11,6 +11,7 @@ import org.amse.bomberman.client.models.impl.ResultsModel;
  */
 public class PlayersStatsHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         ResultsModel resultsModel = controller.getContext().getResultsModel();
         resultsModel.setResults(data);

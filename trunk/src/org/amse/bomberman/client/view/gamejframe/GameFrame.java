@@ -136,6 +136,7 @@ public class GameFrame extends JFrame implements ComponentListener {
     public void setResults(final List<String> results) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 resultsTable.setResults(results);
             }
@@ -145,6 +146,7 @@ public class GameFrame extends JFrame implements ComponentListener {
     public void setBonuses(final int lives,final  int bombs,final int radius) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 livesLabel.setValue(lives);
                 bombsLabel.setValue(bombs);
@@ -176,6 +178,7 @@ public class GameFrame extends JFrame implements ComponentListener {
     public void reset() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 resultsTable.clearResults();
                 infoTA.setText("");
@@ -194,18 +197,22 @@ public class GameFrame extends JFrame implements ComponentListener {
         return infoTA;
     }
 
+    @Override
     public void componentResized(ComponentEvent e) {
         pack();
     }
 
+    @Override
     public void componentMoved(ComponentEvent e) {
         //ignore
     }
 
+    @Override
     public void componentShown(ComponentEvent e) {
         //ignore
     }
 
+    @Override
     public void componentHidden(ComponentEvent e) {
         //ignore
     }

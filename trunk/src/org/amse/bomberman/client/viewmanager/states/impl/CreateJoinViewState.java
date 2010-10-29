@@ -25,6 +25,7 @@ public class CreateJoinViewState extends AbstractState
         super(machine);
     }
 
+    @Override
     public void init() {
         getController().getContext().getGameMapsModel().addListener(this);
         getController().getContext().getGamesModel().addListener(this);
@@ -41,11 +42,13 @@ public class CreateJoinViewState extends AbstractState
         getController().getContext().getGamesModel().removeListener(this);
     }
 
+    @Override
     public void previous() {
         getController().disconnect();
         machine.setState(previous);
     }
 
+    @Override
     public void next() {
         String state = panel.getState();
         if (state.equals(GamesPanel.CREATE_NAME)) {//CREATE game option
@@ -73,15 +76,18 @@ public class CreateJoinViewState extends AbstractState
         }
     }
 
+    @Override
     public void updateGameMaps() {
         GameMapsModel gameMaps = getController().getContext().getGameMapsModel();
         panel.setMaps(gameMaps.getGameMaps());
     }
 
+    @Override
     public void gameMapsError(String error) {
         getWizard().showError(error);
     }
 
+    @Override
     public void updateGamesList() {
         GamesModel games = getController().getContext().getGamesModel();
         panel.setGames(games.getGames());

@@ -48,10 +48,12 @@ public class Unary implements Expression {
 	return 19 * this.operand.hashCode() + 37 * operator.hashCode();
     }
        
+    @Override
     public Expression dash(Variable v) {
 	throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Double evaluate(Map<Variable, Constant> context) {
 	// evaluating meanings of left and right operands
 	Double val = operand.evaluate(context);
@@ -63,6 +65,7 @@ public class Unary implements Expression {
 	throw new IllegalArgumentException();
     }
 
+    @Override
     public Iterator<Variable> iterator() {
 	throw new UnsupportedOperationException("Not supported yet.");
     }

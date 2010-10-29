@@ -11,6 +11,7 @@ import org.amse.bomberman.client.models.impl.GameInfoModel;
  */
 public class GameInfoMessageHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GameInfoModel gameInfoModel = controller.getContext().getGameInfoModel();
 

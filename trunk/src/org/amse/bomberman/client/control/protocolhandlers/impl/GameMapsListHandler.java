@@ -11,6 +11,7 @@ import org.amse.bomberman.client.models.impl.GameMapsModel;
  */
 public class GameMapsListHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GameMapsModel gameMapsModel = controller.getContext().getGameMapsModel();
 

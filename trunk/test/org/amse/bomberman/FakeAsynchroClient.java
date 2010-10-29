@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman;
 
 import java.io.BufferedInputStream;
@@ -16,9 +12,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.requests.RequestCreator;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.GenericProtocolMessage;
+import org.amse.bomberman.protocol.impl.requests.RequestCreator;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
@@ -37,7 +33,7 @@ public class FakeAsynchroClient {
         in = initIn();
     }
 
-    public void sendRequest(ProtocolMessage<Integer, String> request) throws IOException {
+    public void sendRequest(GenericProtocolMessage<Integer, String> request) throws IOException {
         List<String> data = request.getData();
         if(data == null) {
             throw new IllegalArgumentException("Data can`t be null.");
@@ -56,8 +52,8 @@ public class FakeAsynchroClient {
         out.flush();
     }
 
-    public ProtocolMessage<Integer, String> receiveResult() throws IOException {
-        ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+    public GenericProtocolMessage<Integer, String> receiveResult() throws IOException {
+        GenericProtocolMessage<Integer, String> message = new GenericProtocolMessage<Integer, String>();
         int messageId = in.readInt();
 
         message.setMessageId(messageId);

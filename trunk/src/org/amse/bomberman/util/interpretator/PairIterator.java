@@ -14,10 +14,12 @@ public class PairIterator<E> implements Iterator<E> {
 	this.it2 = it2;
     }
 
+    @Override
     public boolean hasNext() {
 	return it1.hasNext() || it2.hasNext();
     }
 
+    @Override
     public E next() {
 	if (it1.hasNext()) {
 	    return it1.next();
@@ -26,6 +28,7 @@ public class PairIterator<E> implements Iterator<E> {
 	}
     }
 
+    @Override
     public void remove() {
 	throw new UnsupportedOperationException();
     }

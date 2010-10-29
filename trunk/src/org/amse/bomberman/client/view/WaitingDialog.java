@@ -72,6 +72,7 @@ public class WaitingDialog extends JDialog implements PropertyChangeListener {
         optionPane.setValue(cancel);
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
         String prop = e.getPropertyName();
         if (isVisible()

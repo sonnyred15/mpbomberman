@@ -43,6 +43,7 @@ public class ResultsJDialog extends JDialog {
 
         okButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
@@ -115,14 +116,17 @@ public class ResultsJDialog extends JDialog {
             }
         }
 
+        @Override
         public int getRowCount() {
             return data.length;
         }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }

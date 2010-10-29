@@ -43,6 +43,7 @@ public class SimpleField implements Field {
     /**
      * @return max players for this field.
      */
+    @Override
     public int getMaxPlayers() {
         return maxPlayers;
     }
@@ -53,6 +54,7 @@ public class SimpleField implements Field {
      * @param position coordinate on field where to set value.
      * @param value value to set.
      */
+    @Override
     public void setValue(Pair position, int value) {
         int x = position.getX();
         int y = position.getY();
@@ -66,6 +68,7 @@ public class SimpleField implements Field {
      * @param position coordinate on field to get value from.
      * @return value at specified position.
      */
+    @Override
     public int getValue(Pair position) {
         int x = position.getX();
         int y = position.getY();
@@ -78,6 +81,7 @@ public class SimpleField implements Field {
     /**
      * @return field dimension.
      */
+    @Override
     public int getDimension() {//TODO what`s about non square?
         return field.length;
     }

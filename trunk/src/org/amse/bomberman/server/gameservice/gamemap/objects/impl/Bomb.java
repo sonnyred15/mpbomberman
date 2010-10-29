@@ -51,8 +51,9 @@ public class Bomb implements MoveableGameMapObject {
      * When bomb is moving to explosion it must detonate.
      * @see MoveableObject
      */
+    @Override
     public void bombed() {
-        this.detonate(true);
+        detonate(true);
     }
 
     /**
@@ -186,6 +187,7 @@ public class Bomb implements MoveableGameMapObject {
      * use gameMap.setSquare(moveObj.getID).
      * @return Constants.MAP_BOMB integer value.
      */
+    @Override
     public int getId() {
         return Constants.MAP_BOMB;
     }
@@ -203,6 +205,7 @@ public class Bomb implements MoveableGameMapObject {
      * Returns the position of this bomb on gameMap.
      * @return position of this bomb on gameMap
      */
+    @Override
     public Pair getPosition() {
         return this.position;
     }
@@ -211,11 +214,13 @@ public class Bomb implements MoveableGameMapObject {
      * Sets the new position of this bomb.
      * @param newPosition new position on gameMap.
      */
+    @Override
     public void setPosition(Pair newPosition) {
         this.position.setX(newPosition.getX());
         this.position.setY(newPosition.getY());
     }
 
+    @Override
     public void move(GameMap where, Pair destination) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
