@@ -25,9 +25,8 @@ class ServerThread implements Runnable {
                 Socket clientSocket = server.getServerSocket().accept();
                 //
                 Session newSession =
-                        new AsynchroThreadSession(clientSocket,
-                                                  server.getGameStorage(),
-                                                  server.getLastId());
+                        new AsynchroThreadSession(clientSocket, server.getLastId(),
+                                                  server.getServiceContext());
                 //
                 synchronized(server) {//for atomicity of get-set
                     long lastId = server.getLastId();

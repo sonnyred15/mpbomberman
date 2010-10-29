@@ -2,8 +2,8 @@ package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clie
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
@@ -41,13 +41,13 @@ public class NotJoinedState extends AbstractClientState {
      * @throws IOException if IO errors occurs while creating gameMap.
      */
     @Override
-    public ProtocolMessage<Integer, String> createGame(String gameMapName,
+    public ProtocolMessage createGame(String gameMapName,
                                                        String gameName,
                                                        int maxPlayers) {
         try {
             NetGamePlayer creator = controller.getGamePlayer();
 
-            Game game = controller.getSession().getGameStorage()
+            Game game = controller.getSession().getServiceContext().getGameStorage()
                     .createGame(creator, gameMapName, gameName, maxPlayers);
             game.addGameChangeListener(creator);
 
@@ -71,7 +71,7 @@ public class NotJoinedState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> joinGame(int gameID) {
+    public ProtocolMessage joinGame(int gameID) {
         CommandResult joinResult = this.tryJoinGame(gameID);
 
         switch(joinResult) {
@@ -140,9 +140,8 @@ public class NotJoinedState extends AbstractClientState {
      */
     private CommandResult tryJoinGame(int gameID) {
 
-        Game gameToJoin = this.controller
-                .getSession()
-                .getGameStorage()
+        Game gameToJoin = this.controller.getSession()
+                .getServiceContext().getGameStorage()
                 .getGame(gameID);
 
         CommandResult joinResult = CommandResult.NO_SUCH_UNSTARTED_GAME;

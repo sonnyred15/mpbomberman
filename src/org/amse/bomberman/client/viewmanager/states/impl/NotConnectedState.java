@@ -21,10 +21,12 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
         super(machine);
     }
 
+    @Override
     public void previous() {
         getWizard().dispose();
     }
 
+    @Override
     public void next() {
         try {
             getController().connect(panel.getIPAddress(), panel.getPort());
@@ -33,6 +35,7 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
         }
     }
 
+    @Override
     public void init() {
         getController().getContext().getConnectionStateModel().addListener(this);
         getWizard().setPanel(panel);
@@ -45,6 +48,7 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
         getController().getContext().getConnectionStateModel().removeListener(this);
     }
 
+    @Override
     public void connectionStateChanged() {//will be called from executors thread.
         ConnectionStateModel model = getController().getContext().getConnectionStateModel();
         if (!model.isConnected()) {
@@ -57,6 +61,7 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
         }
     }
 
+    @Override
     public void connectionError(String error) {//will be called from executors thread.
         getWizard().showError("Can not connect to the server.\n" + error);
     }

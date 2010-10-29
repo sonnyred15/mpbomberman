@@ -4,15 +4,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
-import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Direction;
-import org.amse.bomberman.protocol.responses.ResponseCreator;
-import org.amse.bomberman.protocol.requests.RequestExecutor;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.requests.InvalidDataException;
+import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
+import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.server.gameservice.GameStorageListener;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
@@ -21,7 +21,7 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
  * Class that represents net controller of ingame player.
  * @author Kirilchuk V.E.
  */
-public class Controller implements RequestExecutor, SessionEndListener {
+public class Controller implements RequestExecutor, SessionEndListener, GameStorageListener {
 
     private final ResponseCreator protocol;
     private final NetGamePlayer player = new NetGamePlayer(this);
@@ -40,11 +40,13 @@ public class Controller implements RequestExecutor, SessionEndListener {
         this.protocol = protocol;
     }
 
+    @Override
     public void sendGames() {
-        List<Game> games = this.session.getGameStorage().getGamesList();
+        List<Game> games = this.session.getServiceContext().getGameStorage().getGamesList();
         sendToClient(protocol.unstartedGamesList(games));
     }
 
+    @Override
     public void tryCreateGame(List<String> args) throws InvalidDataException {// gameName mapName maxPlayers
         checkArgsNum(args, 3, ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -68,6 +70,7 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.createGame(gameMapName, gameName, maxPlayers));
     }
 
+    @Override
     public void tryJoinGame(List<String> args) throws InvalidDataException {//gameID
         checkArgsNum(args, 1, ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -89,6 +92,7 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.joinGame(gameID));
     }
 
+    @Override
     public void tryDoMove(List<String> args) throws InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.DO_MOVE_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -115,22 +119,27 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.doMove(direction));
     }
 
+    @Override
     public void sendGameMapInfo() {
         sendToClient(state.getGameMapInfo());
     }
 
+    @Override
     public void tryStartGame() {
         sendToClient(state.startGame());
     }
 
+    @Override
     public void tryLeave() {
         sendToClient(state.leave());
     }
 
+    @Override
     public void tryPlaceBomb() {
         sendToClient(state.placeBomb());
     }
 
+    @Override
     public void sendDownloadingGameMap(List<String> args) throws
             InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID,
@@ -142,15 +151,18 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(protocol.downloadGameMap(gameMapName));
     }
 
+    @Override
     public void sendGameStatus() {
         System.out.println("Session: sended game status to client.");
         sendToClient(state.getGameStatus());
     }
 
+    @Override
     public void sendGameMapsList() {
         sendToClient(protocol.gameMapsList());//TODO converter must do it
     }
 
+    @Override
     public void tryAddBot(List<String> args) throws InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.BOT_ADD_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -161,11 +173,13 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.addBot(botName));
     }
 
+    @Override
     public void sendGameInfo() {
         System.out.println("Session: sended gameInfo to client.");
         sendToClient(state.getGameInfo());
     }
 
+    @Override
     public void addMessageToChat(List<String> args) throws InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -173,10 +187,12 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.addMessageToChat(args.get(0)));
     }
 
+    @Override
     public void sendNewMessagesFromChat() {
         sendToClient(state.getNewMessagesFromChat());
     }
 
+    @Override
     public void tryKickPlayer(List<String> args) throws InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -195,11 +211,13 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(state.kickPlayer(playerId));
     }
 
+    @Override
     public void sendGamePlayersStats() {        
         System.out.println("Session: sended gamePlayersStats to client.");
         sendToClient(state.getGamePlayersStats());
     }
 
+    @Override
     public void setClientNickName(List<String> args) throws InvalidDataException {// "17 name"
         checkArgsNum(args, 1, ProtocolConstants.SET_NAME_MESSAGE_ID,
                 "Wrong number of arguments.");
@@ -210,7 +228,13 @@ public class Controller implements RequestExecutor, SessionEndListener {
         sendToClient(protocol.ok(ProtocolConstants.SET_NAME_MESSAGE_ID, name));
     }
 
-    public void sendToClient(ProtocolMessage<Integer, String> message) {
+    @Override
+    public void gamesChanged() {
+        sendToClient(protocol.ok(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
+                ProtocolConstants.UPDATE_GAMES_LIST));
+    }
+
+    public void sendToClient(ProtocolMessage message) {
         this.session.send(message);
     }
 
@@ -230,6 +254,7 @@ public class Controller implements RequestExecutor, SessionEndListener {
         return player;
     }
 
+    @Override
     public void sessionTerminated(Session endedSession) {
         if(!(this.state.getClass() == NotJoinedState.class)) {
             this.state.leave();

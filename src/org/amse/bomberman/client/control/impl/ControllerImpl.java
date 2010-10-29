@@ -1,16 +1,16 @@
 package org.amse.bomberman.client.control.impl;
 
-import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.util.Direction;
-import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.requests.RequestCreator;
+import org.amse.bomberman.protocol.impl.requests.RequestCreator;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 
 /**
  * Implementation of Controller interface that uses ExecutorService to
@@ -27,13 +27,13 @@ public class ControllerImpl implements Controller {
     private final ProtocolHandlersFactory commandsFactory
             = new ProtocolHandlersFactory();
 
-    private final Connector       connector;
+    private final GenericConnector<ProtocolMessage> connector;
     private final ModelsContainer context;
 
     private final RequestCreator       protocol  = new RequestCreator();
 
     public ControllerImpl(ExecutorService executors,
-            Connector connector, ModelsContainer context) {
+            GenericConnector<ProtocolMessage> connector, ModelsContainer context) {
         this.executors = executors;
         this.connector = connector;
         this.context   = context;
@@ -64,7 +64,7 @@ public class ControllerImpl implements Controller {
 
             public void run() {
                 try {//not using private sendRequest method cause need finally block
-                    connector.sendRequest(protocol.requestServerDisconnect());
+                    connector.send(protocol.requestServerDisconnect());
                 } catch (NetException ex) {
                     //ignore
                 } finally {
@@ -143,7 +143,7 @@ public class ControllerImpl implements Controller {
         sendRequest(protocol.requestSetClientName(playerName));
     }
 
-    public void received(final ProtocolMessage<Integer, String> message) {
+    public void received(final ProtocolMessage message) {
         int messageId = message.getMessageId();
         final ProtocolHandler handler = commandsFactory.getCommand(messageId);
 
@@ -155,12 +155,12 @@ public class ControllerImpl implements Controller {
         });
     }
 
-    private void sendRequest(final ProtocolMessage<Integer, String> message) {
+    private void sendRequest(final ProtocolMessage message) {
         executors.execute(new Runnable() {
 
             public void run() {
                 try {
-                    connector.sendRequest(message);
+                    connector.send(message);
                 } catch (NetException ex) {
                     //TODO log
                     context.getConnectionStateModel().setConnected(false);

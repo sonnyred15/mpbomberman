@@ -11,6 +11,7 @@ import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
  */
 public class SetNameHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> args) {
         String name = args.get(0);
         PlayerModel model = controller.getContext().getPlayerModel();

@@ -12,6 +12,7 @@ import org.amse.bomberman.client.models.impl.ClientStateModel.State;
  */
 public class GameStartedMessageHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> args) {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 

@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
 import org.amse.bomberman.util.Creator;
 
@@ -81,6 +81,7 @@ public class GamesPanel extends JPanel {
     public void setGames(final List<String> games) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 MyTableModel tableModel = (MyTableModel) table.getModel();
                 tableModel.clear();
@@ -102,6 +103,7 @@ public class GamesPanel extends JPanel {
     public void setMaps(final List<String> maps) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 createPanel.setMaps(maps);
             }
@@ -173,6 +175,7 @@ public class GamesPanel extends JPanel {
         createButton = new JRadioButton("New game");
         createButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(false);
                 createPanel.setEnabled(true);
@@ -186,6 +189,7 @@ public class GamesPanel extends JPanel {
         joinButton = new JRadioButton("Join game");
         joinButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 table.setEnabled(true);
                 createPanel.setEnabled(false);
@@ -282,10 +286,12 @@ public class GamesPanel extends JPanel {
         private String[] columnNames = {"ID", "Name", "Map", "Players", "maxPlayers"};
         private Object[][] data = new Object[50][columnNames.length];
 
+        @Override
         public int getRowCount() {
             return data.length;
         }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
@@ -295,6 +301,7 @@ public class GamesPanel extends JPanel {
             return columnNames[col];
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             return data[row][col];
         }

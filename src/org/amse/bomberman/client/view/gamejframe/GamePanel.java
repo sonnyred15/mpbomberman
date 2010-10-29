@@ -18,13 +18,12 @@ import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.view.ImageFactory;
 
-
 /**
  *
  * @author Mikhail Korovkin
  */
 @SuppressWarnings("serial")
-public class GamePanel  extends JPanel {
+public class GamePanel extends JPanel {
     private final ImageFactory images = new ImageFactory();
 
     private GameMap    gameMap = null;
@@ -57,6 +56,7 @@ public class GamePanel  extends JPanel {
         if(!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     updateGameMap(model);
                 }
@@ -88,6 +88,7 @@ public class GamePanel  extends JPanel {
         if(!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     updatePlayer(model);
                 }

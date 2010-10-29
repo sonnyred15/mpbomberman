@@ -1,19 +1,13 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.protocol.requests.RequestExecutor;
-
-import org.amse.bomberman.server.net.Session;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.net.Socket;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.SessionEndListener;
+import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
+import org.amse.bomberman.server.net.Session;
 
 /**
  * Abstract class that represents basic functionality of session.
@@ -57,10 +51,12 @@ public abstract class AbstractSession implements Session {
         this.mustEnd      = false;
     }
 
+    @Override
     public void addEndListener(SessionEndListener listener) {
         this.listeners.add(listener);
     }
 
+    @Override
     public void removeEndListener(SessionEndListener listener) {
         this.listeners.remove(listener);
     }
@@ -74,6 +70,7 @@ public abstract class AbstractSession implements Session {
      *
      * @return true if session must terminate, false - otherwise.
      */
+    @Override
     public boolean isMustEnd() {
         return this.mustEnd;
     }
@@ -86,6 +83,7 @@ public abstract class AbstractSession implements Session {
      * <p>By default, the second call on this method
      * will lead to RuntimeException.
      */
+    @Override
     public void terminateSession() {
         if (this.mustEnd) {
             throw new IllegalStateException("Already terminating.");
@@ -106,6 +104,7 @@ public abstract class AbstractSession implements Session {
      *
      * @return pseudo-unique id for this session.
      */
+    @Override
     public long getId() {
         return sessionId;
     }

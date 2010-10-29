@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.servers;
 
 import java.io.IOException;
@@ -22,7 +18,8 @@ class StartedState implements ServerState {
         return INSTANCE;
     }
 
-    public void start(TcpServer server) throws IOException,
+    @Override
+    public void start(TcpServer server, int port) throws IOException,
                                                IllegalStateException {
         System.err.println(
                 "Server: start error. Already in started state.");
@@ -31,6 +28,7 @@ class StartedState implements ServerState {
 
     }
 
+    @Override
     public void stop(TcpServer server) {
         //Stop accepting clients by closing ServerSocket
         //So, listening thread will end.
@@ -52,8 +50,8 @@ class StartedState implements ServerState {
         server.setLastId(0);
 
         //Clear games.
-        if (server.getGameStorage() != null) {
-            server.getGameStorage().clearGames();
+        if (server.getServiceContext() != null) {
+            server.getServiceContext().getGameStorage().clearGames();
         }
 
         server.setServerState(StoppedState.getInstance());

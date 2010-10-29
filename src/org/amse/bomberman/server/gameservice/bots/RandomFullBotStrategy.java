@@ -1,13 +1,9 @@
 package org.amse.bomberman.server.gameservice.bots;
 
-//~--- non-JDK imports --------------------------------------------------------
+import java.util.Random;
 
 import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.Random;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.gamemap.impl.SimpleField;
 import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bonus;

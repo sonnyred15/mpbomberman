@@ -1,7 +1,7 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.bots.Bot;
 import org.amse.bomberman.server.gameservice.bots.BotGamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;
@@ -25,7 +25,7 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> addBot(String botName) {
+    public ProtocolMessage addBot(String botName) {
         CommandResult joinBotResult = this.tryAddBotIntoGame(botName);
 
         switch(joinBotResult) {
@@ -117,7 +117,7 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> kickPlayer(int playerId) {
+    public ProtocolMessage kickPlayer(int playerId) {
         boolean kicked = this.game.tryKickPlayer(controller.getGamePlayer(), playerId);
         if(kicked) {
             return protocol.ok(ProtocolConstants.KICK_PLAYER_MESSAGE_ID,
@@ -129,7 +129,7 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> addMessageToChat(String message) {
+    public ProtocolMessage addMessageToChat(String message) {
         this.game.addMessageToChat(controller.getGamePlayer().getNickName() +
                 ": " + message);
         return protocol.ok(ProtocolConstants.CHAT_ADD_RESULT_MESSAGE_ID,
@@ -137,17 +137,17 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getNewMessagesFromChat() {        
+    public ProtocolMessage getNewMessagesFromChat() {
         return protocol.chatMessage("No new messages.");
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGameInfo() {
+    public ProtocolMessage getGameInfo() {
         return protocol.gameInfo(game, controller.getGamePlayer());
     }
 
     @Override
-    public ProtocolMessage<Integer, String> startGame() {
+    public ProtocolMessage startGame() {
         if(game.isStarted()) {
             System.out.println("Session: sendMapArray warning. Canceled. Game is already started.");
             return protocol.notOk(ProtocolConstants.START_GAME_MESSAGE_ID,
@@ -171,12 +171,12 @@ public class InLobbyState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGameStatus() {
+    public ProtocolMessage getGameStatus() {
         return protocol.gameStatus(game);
     }
 
     @Override
-    public ProtocolMessage<Integer, String> leave() {
+    public ProtocolMessage leave() {
         NetGamePlayer gamePlayer = this.controller.getGamePlayer();
         this.game.removeGameChangeListener(gamePlayer);
         this.game.leaveFromGame(gamePlayer);

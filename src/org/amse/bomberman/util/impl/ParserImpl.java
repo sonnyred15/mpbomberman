@@ -16,6 +16,7 @@ import org.amse.bomberman.util.Parser;
  */
 public class ParserImpl implements Parser {
 
+    @Override
     public GameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
         GameMap map = null;
         try {
@@ -47,6 +48,7 @@ public class ParserImpl implements Parser {
         return map;
     }
 
+    @Override
     public Player parsePlayer(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
         Player player = new PlayerImpl();
         try {

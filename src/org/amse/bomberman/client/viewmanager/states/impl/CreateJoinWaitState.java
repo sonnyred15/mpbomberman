@@ -17,6 +17,7 @@ public class CreateJoinWaitState extends AbstractState
         super(machine);        
     }
 
+    @Override
     public void init() {
         getController().getContext().getClientStateModel().addListener(this);
     }
@@ -26,14 +27,17 @@ public class CreateJoinWaitState extends AbstractState
         getController().getContext().getClientStateModel().removeListener(this);
     }
 
+    @Override
     public void previous() {
         machine.setState(previous);
     }
 
+    @Override
     public void next() {
         machine.setState(next);
     }
 
+    @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
         if (model.getState() == ClientStateModel.State.LOBBY) {
@@ -41,6 +45,7 @@ public class CreateJoinWaitState extends AbstractState
         }
     }
 
+    @Override
     public void clientStateError(State state, String error) {
         switch (state) {
             case NOT_JOINED: {//NOT_JOINED state that caused error

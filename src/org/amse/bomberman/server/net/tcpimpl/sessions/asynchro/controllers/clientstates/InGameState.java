@@ -1,8 +1,8 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
 import java.util.List;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
@@ -28,7 +28,7 @@ public class InGameState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> doMove(Direction direction) {
+    public ProtocolMessage doMove(Direction direction) {
         if(timer.getDiff() < Constants.GAME_STEP_TIME) {
             System.out.println("Session: doMove warning. "
                     + "Client tryed to move, canceled. "
@@ -51,7 +51,7 @@ public class InGameState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGameMapInfo() {
+    public ProtocolMessage getGameMapInfo() {
         if(!this.game.isStarted()) {
             
             return(protocol.notOk(
@@ -66,29 +66,29 @@ public class InGameState extends AbstractClientState {
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGamePlayersStats() {
+    public ProtocolMessage getGamePlayersStats() {
         return protocol.playersStats(game);
     }
 
     @Override
-    public ProtocolMessage<Integer, String> getGameStatus() {
+    public ProtocolMessage getGameStatus() {
         return protocol.gameStatus(game);
     }
     
     @Override
-    public ProtocolMessage<Integer, String> getGameInfo() {
+    public ProtocolMessage getGameInfo() {
         return protocol.gameInfo(game, controller.getGamePlayer());
     }
 
     @Override
-    public ProtocolMessage<Integer, String> placeBomb() {
+    public ProtocolMessage placeBomb() {
        this.game.tryPlaceBomb(controller.getGamePlayer().getPlayerId());
        return protocol.ok(ProtocolConstants.PLACE_BOMB_MESSAGE_ID,
                "Placed.");
     }
 
     @Override
-    public ProtocolMessage<Integer, String> leave() {
+    public ProtocolMessage leave() {
         NetGamePlayer player = controller.getGamePlayer();
         this.game.removeGameChangeListener(player);
         this.game.leaveFromGame(player);

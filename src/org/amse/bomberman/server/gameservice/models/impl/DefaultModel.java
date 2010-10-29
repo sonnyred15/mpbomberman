@@ -118,6 +118,7 @@ public class DefaultModel implements Model, DieListener {
         bombToDetonate.detonate(true);
     }
 
+    @Override
     public void tryEnd() {
         int aliveCount = 0;
         for (ModelPlayer pl : players) {
@@ -298,6 +299,7 @@ public class DefaultModel implements Model, DieListener {
         return false;
     }
 
+    @Override
     public StatsTable getStatsTable() {
         return stats;
     }

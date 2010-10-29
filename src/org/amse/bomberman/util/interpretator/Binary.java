@@ -58,11 +58,13 @@ public class Binary implements Expression {
     }
 
     // realization of iterator from Iterable interface
+    @Override
     public Iterator<Variable> iterator() {
 	return new PairIterator<Variable>(left.iterator(), right.iterator());
     }
 
     // realization of Expression interface methods
+    @Override
     public Expression dash(Variable v) {
 	// 
 	Expression leftDash = left.dash(v);
@@ -80,6 +82,7 @@ public class Binary implements Expression {
 	throw new IllegalArgumentException();
     }
 
+    @Override
     public Double evaluate(Map<Variable, Constant> context) {
 	// evaluating meanings of left and right operands
 	Double leftVal = left.evaluate(context);

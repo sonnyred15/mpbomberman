@@ -44,6 +44,7 @@ public class GameViewState extends AbstractState
         gameFrame.setJMenuBar(menu);        
     }
 
+    @Override
     public void init() {
         getController().getContext().getGameStateModel().reset();
         getController().getContext().getGameMapModel().reset();
@@ -76,30 +77,36 @@ public class GameViewState extends AbstractState
         getWizard().setVisible(true);
     }
 
+    @Override
     public void previous() {
         machine.setState(previous);
     }
 
+    @Override
     public void next() {
         //TODO log
         //do nothing
     }
 
+    @Override
     public void gameMapChanged() {
         GameMapModel model = getController().getContext().getGameMapModel();
         gameFrame.setGameMap(model);               
     }
 
+    @Override
     public void updateResults() {
         ResultsModel model = getController().getContext().getResultsModel();
         gameFrame.setResults(model.getResults());
     }
 
+    @Override
     public void updateChat(List<String> newMessages) {
         ChatModel model = getController().getContext().getChatModel();
         gameFrame.setHistory(model.getHistory());
     }
 
+    @Override
     public void updatePlayer() {
         PlayerModel model = getController().getContext().getPlayerModel();
         Player player = model.getPlayer();
@@ -119,6 +126,7 @@ public class GameViewState extends AbstractState
         }
     }
 
+    @Override
     public void updateGameState() {
         GameStateModel model = getController().getContext().getGameStateModel();
         if (model.isEnded()) {
@@ -136,6 +144,7 @@ public class GameViewState extends AbstractState
         gameFrame.removeKeyListener(keyListener);
     }
 
+    @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
         State state = model.getState();
@@ -146,6 +155,7 @@ public class GameViewState extends AbstractState
         }
     }
 
+    @Override
     public void clientStateError(State state, String error) {
         switch (state) {
             case NOT_JOINED: {//NOT JOINED because error is about going to not joined state.

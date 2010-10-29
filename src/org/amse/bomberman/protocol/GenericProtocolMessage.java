@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author Kirilchuk V.E.
  */
-public class ProtocolMessage<Identificator, DataType> {
+public class GenericProtocolMessage<Identificator, DataType> {
 
     private Identificator messageId = null;
     private List<? extends DataType> data = null;

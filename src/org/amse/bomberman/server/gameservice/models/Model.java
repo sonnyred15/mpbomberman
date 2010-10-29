@@ -1,11 +1,6 @@
-
-/*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
- */
 package org.amse.bomberman.server.gameservice.models;
 
-//~--- non-JDK imports --------------------------------------------------------
+import java.util.List;
 
 import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bomb;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
@@ -14,10 +9,6 @@ import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.util.Direction;
 import org.amse.bomberman.util.Pair;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.util.List;
 
 /**
  * Interface that provides methods of Model of BomberMan Game.

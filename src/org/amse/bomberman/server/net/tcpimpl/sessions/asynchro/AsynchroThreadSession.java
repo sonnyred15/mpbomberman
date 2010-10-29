@@ -1,28 +1,24 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
-//~--- non-JDK imports --------------------------------------------------------
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import org.amse.bomberman.protocol.requests.RequestCommand;
-import org.amse.bomberman.protocol.requests.RequestExecutor;
-
-import org.amse.bomberman.server.gameservice.GameStorage;
-import org.amse.bomberman.server.net.SessionEndListener;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.net.Socket;
 import java.util.ArrayList;
-
 import java.util.List;
-import org.amse.bomberman.protocol.requests.InvalidDataException;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
-import org.amse.bomberman.protocol.responses.ResponseCreator;
+
+import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestCommand;
+import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
+import org.amse.bomberman.server.gameservice.GameStorage;
+import org.amse.bomberman.server.net.SessionEndListener;
+import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
+import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.util.Constants;
@@ -38,7 +34,7 @@ public class AsynchroThreadSession extends AbstractSession {
 
     private final ResponseCreator protocol = new ResponseCreator();
     /** GameStorage for this session. */
-    private final GameStorage gameStorage;
+    private final ServiceContext context;
     private final Thread sessionThread;
     //
     private Controller controller;
@@ -55,19 +51,20 @@ public class AsynchroThreadSession extends AbstractSession {
      * @param gameStorage game storage for this session.
      * @param sessionId unique id of this session.
      */
-    public AsynchroThreadSession(Socket clientSocket,
-            GameStorage gameStorage, long sessionId) {
+    public AsynchroThreadSession(Socket clientSocket, long sessionId, ServiceContext context) {
         super(clientSocket, sessionId);
 
-        this.gameStorage = gameStorage;
-        
+        this.context = context;
+
         this.sessionThread = new SessionThread();
         this.sessionThread.setDaemon(true);
     }
 
+    @Override
     public void start() {
         this.controller = new Controller(this, protocol);
         this.listeners.add(controller);
+        this.context.getGameStorage().addListener(controller);
 
         this.sender = new AsynchroSender(clientSocket, sessionId);
         this.listeners.add(sender);
@@ -75,7 +72,8 @@ public class AsynchroThreadSession extends AbstractSession {
         this.sessionThread.start();
     }
 
-    public void send(ProtocolMessage<Integer, String> message) {
+    @Override
+    public void send(ProtocolMessage message) {
         this.sender.addToQueue(message);
     }
 
@@ -85,8 +83,9 @@ public class AsynchroThreadSession extends AbstractSession {
      * @see GameStorage
      * @return game storage of this session.
      */
-    public GameStorage getGameStorage() {
-        return this.gameStorage;
+    @Override
+    public ServiceContext getServiceContext() {
+        return context;
     }
 
     /**
@@ -137,7 +136,7 @@ public class AsynchroThreadSession extends AbstractSession {
         private void cyclicReadAndProcess(DataInputStream in) throws IOException {
             while (!mustEnd) {
 
-                ProtocolMessage<Integer, String> message = new ProtocolMessage<Integer, String>();
+                ProtocolMessage message = new ProtocolMessage();
                 int messageId = in.readInt();
                 /* client want to disconnect */
                 if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
@@ -168,7 +167,7 @@ public class AsynchroThreadSession extends AbstractSession {
          * @see RequestExecutor
          * @param query request to process.
          */
-        private void process(ProtocolMessage<Integer, String> message) {
+        private void process(ProtocolMessage message) {
             RequestCommand cmd = null;
             try {
                 int commandId = message.getMessageId();

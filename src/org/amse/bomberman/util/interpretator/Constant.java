@@ -26,14 +26,17 @@ public class Constant implements Expression, Comparable<Constant> {
     // Iterator of constant is empty iterator
     private static class ConstIterator implements Iterator<Variable> {
 
+        @Override
 	public boolean hasNext() {
 	    return false;
 	}
 
+        @Override
 	public Variable next() {
 	    return null;
 	}
 
+        @Override
 	public void remove() {
 	    throw new UnsupportedOperationException();
 	}
@@ -58,20 +61,24 @@ public class Constant implements Expression, Comparable<Constant> {
     }
 
     // Comparable interface methods
+    @Override
     public int compareTo(Constant c) {
 	return value.compareTo(c.value);
     }
 
     //  Iterable interface methods
+    @Override
     public Iterator<Variable> iterator() {
 	return new ConstIterator();
     }
 
     //  Expression interface methods
+    @Override
     public Expression dash(Variable v) {
 	return ZERO;
     }
 
+    @Override
     public Double evaluate(Map<Variable, Constant> context) {
 	return value;
     }

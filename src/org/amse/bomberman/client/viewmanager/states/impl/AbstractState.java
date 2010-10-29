@@ -21,11 +21,13 @@ public abstract class AbstractState implements State {
         this.machine  = machine;
     }
 
+    @Override
     public State setPrevious(State previous) {
         this.previous = previous;
         return this;
     }
 
+    @Override
     public State setNext(State next) {
         this.next = next;
         return this;
@@ -44,6 +46,7 @@ public abstract class AbstractState implements State {
      * state. This method is used by ViewManager and must not be called
      * directly in state to release resourses before calling viewManager.setState()
      */
+    @Override
     public void release() {
         //do_nothing by default
     }

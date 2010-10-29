@@ -98,6 +98,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     public void showWizard() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 wizard.addListener(ViewManager.this);
                 wizard.setVisible(true);
@@ -113,6 +114,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
      *
      * @param event event from wizard.
      */
+    @Override
     public void wizardEvent(WizardEvent event) {
         switch (event) {
             case BACK_PRESSED: {
@@ -155,6 +157,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
      * Implementation of ConnectionStateListener interface method.
      * Reacts on connection lost by showing error in View.
      */
+    @Override
     public void connectionStateChanged() {
         ConnectionStateModel model = controller.getContext().getConnectionStateModel();
         if (!model.isConnected()) {//if we disconnected
@@ -167,6 +170,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
      * Implementation of ConnectionStateListener interface method.
      * Do nothing.
      */
+    @Override
     public void connectionError(String error) {
         //this is for situations when we try to connect, but have error.
         //We don`t need to do something here.

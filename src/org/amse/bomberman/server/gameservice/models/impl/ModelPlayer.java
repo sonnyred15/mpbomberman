@@ -105,6 +105,7 @@ public class ModelPlayer implements MoveableGameMapObject {
      * Returns ID of this player.
      * @return ID of this player.
      */
+    @Override
     public int getId() {
         return id;
     }
@@ -113,6 +114,7 @@ public class ModelPlayer implements MoveableGameMapObject {
      * Setting new position to this player.
      * @param newPosition position to set.
      */
+    @Override
     public synchronized void setPosition(Pair newPosition) {
         position.setX(newPosition.getX());
         position.setY(newPosition.getY());
@@ -122,6 +124,7 @@ public class ModelPlayer implements MoveableGameMapObject {
      * Returnes position of this player.
      * @return position of this player.
      */
+    @Override
     public synchronized Pair getPosition() {
         return position;
     }
@@ -132,6 +135,7 @@ public class ModelPlayer implements MoveableGameMapObject {
      *
      * If player was immortal then nothing will happen.
      */
+    @Override
     public synchronized void bombed() {
         state.bombed(this);
     }
@@ -224,6 +228,7 @@ public class ModelPlayer implements MoveableGameMapObject {
         return hash;
     }
 
+    @Override
     public void move(GameMap where, Pair destination) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

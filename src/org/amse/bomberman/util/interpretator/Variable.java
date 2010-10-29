@@ -31,16 +31,19 @@ public class Variable implements Expression {
 	}
 
 	// Реализация методов итератора
+        @Override
 	public boolean hasNext() {
 	    return v != null;
 	}
 
+        @Override
 	public Variable next() {
 	    Variable saveV = v;
 	    v = null;
 	    return saveV;
 	}
 
+        @Override
 	public void remove() {
 	    throw new UnsupportedOperationException();
 	}
@@ -63,15 +66,18 @@ public class Variable implements Expression {
     }
 
     // Iterator interface method
+    @Override
     public Iterator<Variable> iterator() {
 	return new VarIterator(this);
     }
 
     // Expression interface method
+    @Override
     public Expression dash(Variable v) {
 	return v.equals(this) ? Constant.ONE : Constant.ZERO;
     }
 
+    @Override
     public Double evaluate(Map<Variable, Constant> context) {
 	try{
 	    Double bn = context.get(this).getValue();
@@ -79,6 +85,5 @@ public class Variable implements Expression {
 	} catch(NullPointerException ex){
 	    throw new IllegalArgumentException(name + ":unknown Variable ");
 	}
-	
     }
 }

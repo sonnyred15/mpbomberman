@@ -11,6 +11,7 @@ import org.amse.bomberman.client.models.impl.ChatModel;
  */
 public class NewChatMessagesHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         ChatModel chat = controller.getContext().getChatModel();
         if (!data.get(0).equals("No new messages.")) {

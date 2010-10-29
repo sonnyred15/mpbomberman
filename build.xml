@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- You may freely edit this file. See commented blocks below for -->
-<!-- some examples of how to customize the build. -->
-<!-- (If you delete it and reopen the project it will be recreated.) -->
-<!-- By default, only the Clean and Build commands use this build script. -->
-<!-- Commands such as Run, Debug, and Test only use this build script if -->
-<!-- the Compile on Save feature is turned off for the project. -->
-<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
-<!-- in the project's Project Properties dialog box.-->
+<!-- This is manually writed ant script for mpbomberman project. 
+Note that you must copy text of this file into file that used by your IDE 
+if you want it to work.
+For example: in netbeans you must copy this into nbbuild.xml(if it used as default script file). 
+And don`t forget to import standart netbeans ant script
+<import file="nbproject/build-impl.xml"/>
+-->
+
 <project name="bomberman" default="default" basedir=".">
     <description>
 	    Builds the bomberman project.
@@ -14,10 +14,15 @@
     
     <!-- set global properties for this build -->
     <property name="src" location="src"/>
+    <property name="libs" location="libraries"/>
     <property name="build" location="build"/>
     <property name="build.classes" location="${build}/classes"/>
     <property name="dist"  location="dist"/>
     <property name="resources"  location="resources"/>
+
+    <path id="classpath">
+        <fileset dir="${libs}" includes="**/*"/>
+    </path>
 
     <target name="-pre-init">
         <!-- Create the time stamp -->
@@ -30,7 +35,7 @@
 
     <target name="compile" depends="-pre-init" description="compile the source " >
         <!-- Compile the java code from ${src} into ${build} -->
-        <javac srcdir="${src}" destdir="${build.classes}"/>
+        <javac srcdir="${src}" destdir="${build.classes}" classpathref="classpath"/>
         <!-- Copy resources in the source code parent directory -->
         <copy todir="${build}/resources">
             <fileset dir="${resources}"/>
@@ -73,21 +78,13 @@
         </copy>
     </target>
 
-    <target name="dist" depends="compile" description="generate the distribution" >
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist}/lib"/>
-        <!-- Put everything in ${build} into the bomberman.jar file -->   
-        <jar jarfile="${dist}/lib/bomberman.jar" basedir="${build}"/>        
-    </target>
     
 
     <target name="clean" description="clean up" >
         <!-- Delete the ${build} and ${dist} directory trees -->
         <delete dir="${build}"/>
         <delete dir="${dist}"/>
-    </target>
-
-    <import file="nbproject/build-impl.xml"/>
+    </target>    
     <!--
 
     There exist several targets which are by default empty and which can be 

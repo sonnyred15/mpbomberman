@@ -1,14 +1,9 @@
 package org.amse.bomberman.server.net;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.server.gameservice.GameStorage;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.util.Set;
+import org.amse.bomberman.server.ServiceContext;
+import org.amse.bomberman.server.gameservice.GameStorage;
 
 /**
  * Interface that represents server.
@@ -23,7 +18,7 @@ public interface Server extends SessionEndListener {
      * @throws IOException if any IO errors occurs while raising server.
      * @throws IllegalStateException if server was already raised.
      */
-    void start() throws IOException, IllegalStateException;
+    void start(int port) throws IOException, IllegalStateException;
 
     /**
      * Shutdown`s server, so it stop`s to listen on it`s port and unavailiable
@@ -31,7 +26,7 @@ public interface Server extends SessionEndListener {
      * @throws IOException if any IO errors occurs while shutdowning server.
      * @throws IllegalStateException if server was already shutdowned.
      */
-    void stop() throws IOException, IllegalStateException;
+    void shutdown() throws IOException, IllegalStateException;
 
     /**
      * Checks if server is shutdowned.
@@ -51,7 +46,7 @@ public interface Server extends SessionEndListener {
      * Returns game storage for this server.
      * @return game storage for this server.
      */
-    GameStorage getGameStorage();
+    ServiceContext getServiceContext();
 
     /**
      * Returns set of sessions on this server.

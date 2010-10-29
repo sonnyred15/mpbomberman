@@ -1,14 +1,5 @@
 package org.amse.bomberman.server.view;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.server.net.Server;
-import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -25,6 +16,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.MaskFormatter;
+
+import org.amse.bomberman.server.net.ServerFactory;
+import org.amse.bomberman.server.net.Server;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.Creator;
+
 
 /**
  * Server startup window class.
@@ -103,8 +100,8 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new TcpServer(port);
-            server.start();
+            server = new ServerFactory().newInstance();
+            server.start(port);
             infoFrame.setServer(server);
             btnStatus.setEnabled(true);
             btnControl.setText(BTN_TEXT_DOWN);
@@ -121,7 +118,7 @@ public class ServerFrame extends JFrame {
 
     private void downServer() {
         try {
-            server.stop();
+            server.shutdown();
             btnStatus.setEnabled(false);
             btnControl.setText(BTN_TEXT_RAISE);
         } catch (IOException ex) {              // Server loggs IOErrors and throw them again.

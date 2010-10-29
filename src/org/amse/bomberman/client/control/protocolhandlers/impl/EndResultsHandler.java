@@ -12,6 +12,7 @@ import org.amse.bomberman.client.models.impl.ResultsModel;
  */
 public class EndResultsHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         GameStateModel gameStateModel = controller.getContext().getGameStateModel();
         gameStateModel.setEnded(true);

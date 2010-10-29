@@ -29,6 +29,7 @@ enum PlayerState {
     },
     IMMORTAL {
 
+        @Override
         void bombed(ModelPlayer player) {
             ; //do nothing.
         }

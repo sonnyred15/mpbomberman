@@ -1,21 +1,13 @@
 package org.amse.bomberman.server.net.tcpimpl.servers;
 
-//~--- non-JDK imports --------------------------------------------------------
-import org.amse.bomberman.server.net.*;
-import org.amse.bomberman.util.Constants;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.net.ServerSocket;
-import java.util.Collections;
 import java.util.Comparator;
-
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.amse.bomberman.server.gameservice.GameStorage;
+import org.amse.bomberman.server.ServiceContext;
+
+import org.amse.bomberman.server.net.*;
 
 /**
  *
@@ -23,18 +15,18 @@ import org.amse.bomberman.server.gameservice.GameStorage;
  */
 public class TcpServer implements Server {
 
-    private final int port;
-    //    
     private volatile ServerState serverState = StoppedState.getInstance();
     //
-    private ServerSocket serverSocket;
-    private GameStorage  gameStorage;
-    private Thread       listeningThread;
+    private ServerSocket   serverSocket;
+    
+    private Thread         listeningThread;
     //
     private volatile long lastId = 0;    // need to generate unique ID`s for sessions.
     //
+    private final ServiceContext context;
     private final Comparator<Session> comparator = new Comparator<Session>() {
 
+        @Override
         public int compare(Session ses1, Session ses2) {
             long id1 = ses1.getId();
             long id2 = ses2.getId();
@@ -44,33 +36,19 @@ public class TcpServer implements Server {
     };
     private final Set<Session> sessions =
             new ConcurrentSkipListSet<Session>(comparator);
-    //    
 
-    /**
-     * Constructor with default port.
-     */
-    public TcpServer() {
-        this(Constants.DEFAULT_PORT);
+    public TcpServer(ServiceContext context) {
+        this.context = context;
     }
-
-    /**
-     * Main constructor that creating Server object with port param.
-     * @param port Free port number. Port must be between 1 and 65535, inclusive.
-     * 
-     */
-    public TcpServer(int port) {
-        if (port < 1 || port > 65535) {
-            throw new IllegalArgumentException();
-        }
-        this.port = port;
-    }
+    //
 
     /**
      * {@inheritDoc}
      */
-    public synchronized void start() throws IOException,
+    @Override
+    public synchronized void start(int port) throws IOException,
                                             IllegalStateException {
-        this.serverState.start(this);
+        serverState.start(this, port);
     }
 
     /**
@@ -80,38 +58,51 @@ public class TcpServer implements Server {
      * @throws java.io.IOException if an error occurs when closing socket.
      * @throws IllegalStateException if we are trying to shutdown not raised server.
      */
-    public synchronized void stop() throws IOException,
+    @Override
+    public synchronized void shutdown() throws IOException,
                                            IllegalStateException {
-        this.serverState.stop(this);
+        serverState.stop(this);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isStopped() {// don`t need synchronized cause state is volatile.
-        return (this.getServerState() == StoppedState.getInstance());
+        return (serverState == StoppedState.getInstance());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getPort() {
-        return port;
+        return serverSocket.getLocalPort();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<Session> getSessions() {
-        return this.sessions;
+        return sessions;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void sessionTerminated(Session endedSession) {
-        this.sessions.remove(endedSession);
+        sessions.remove(endedSession);
         System.out.println("Server: session removed.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ServiceContext getServiceContext() {
+        return context;
     }
 
     /**
@@ -140,20 +131,6 @@ public class TcpServer implements Server {
      */
     void setServerSocket(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public GameStorage getGameStorage() {
-        return gameStorage;
-    }
-
-    /**
-     * @param gameStorage the gameStorage to set
-     */
-    void setGameStorage(GameStorage gameStorage) {
-        this.gameStorage = gameStorage;
     }
 
     /**

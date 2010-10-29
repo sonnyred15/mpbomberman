@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import org.amse.bomberman.client.control.ConnectorListener;
-import org.amse.bomberman.client.net.Connector;
+import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
@@ -18,7 +18,7 @@ import org.amse.bomberman.util.IOUtilities;
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
-public class ConnectorImpl implements Connector {
+public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
 
     private ConnectorListener listener;
     private Socket socket;
@@ -28,10 +28,12 @@ public class ConnectorImpl implements Connector {
 
     public ConnectorImpl() {}
 
+    @Override
     public void setListener(ConnectorListener listener) {
         this.listener = listener;
     }
 
+    @Override
     public synchronized void сonnect(InetAddress address, int port)
             throws IOException {
 
@@ -61,6 +63,7 @@ public class ConnectorImpl implements Connector {
         return false;
     }
 
+    @Override
     public synchronized void closeConnection() {
         if (isClosed()) {
             return;
@@ -83,7 +86,8 @@ public class ConnectorImpl implements Connector {
         }
     }
 
-    public synchronized void sendRequest(ProtocolMessage<Integer, String> request) throws NetException {
+    @Override
+    public synchronized void send(ProtocolMessage request) throws NetException {
         if(isClosed()) {
             throw new NetException("Can`t send any data. Connection is closed");
         }
@@ -112,12 +116,13 @@ public class ConnectorImpl implements Connector {
 
     private class ServerListen implements Runnable {
 
+        @Override
         public void run() {
             try {
                 while (!Thread.interrupted()) {
                     try {
-                        ProtocolMessage<Integer, String> message
-                                = new ProtocolMessage<Integer, String>();
+                        ProtocolMessage message
+                                = new ProtocolMessage();
                         int messageId = in.readInt();
                         if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
                             break;

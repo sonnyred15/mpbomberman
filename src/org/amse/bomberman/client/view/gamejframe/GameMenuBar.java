@@ -30,6 +30,7 @@ public class GameMenuBar extends JMenuBar {
         leave.setAction(new LeaveAction());
         exit.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 controller.disconnect();
                 System.exit(0);
@@ -48,6 +49,7 @@ public class GameMenuBar extends JMenuBar {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             controller.requestLeaveGame();
         }

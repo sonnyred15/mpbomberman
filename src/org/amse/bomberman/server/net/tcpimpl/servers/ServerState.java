@@ -8,7 +8,7 @@ import java.io.IOException;
  */
 interface ServerState {
 
-    void start(TcpServer server) throws IOException, IllegalStateException;
+    void start(TcpServer server, int port) throws IOException, IllegalStateException;
 
     void stop(TcpServer server) throws IOException, IllegalStateException;
 }

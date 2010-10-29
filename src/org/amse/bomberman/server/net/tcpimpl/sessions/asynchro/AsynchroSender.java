@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro;
 
 import org.amse.bomberman.util.structs.SeparatelySynchronizedMap;
@@ -14,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.IOUtilities;
@@ -26,8 +22,8 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class AsynchroSender implements SessionEndListener {
 
-    private final SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>> messagesMap =
-            new SeparatelySynchronizedMap<Integer, ProtocolMessage<Integer, String>>(27);
+    private final SeparatelySynchronizedMap<Integer, ProtocolMessage> messagesMap =
+            new SeparatelySynchronizedMap<Integer, ProtocolMessage>(30);
     //
     private final Socket clientSocket;
     private final SenderThread senderThread;
@@ -45,14 +41,15 @@ public class AsynchroSender implements SessionEndListener {
         this.senderThread.start();
     }
 
-    public void addToQueue(ProtocolMessage<Integer, String> message) {
+    public void addToQueue(ProtocolMessage message) {
         messagesMap.put(message.getMessageId(), message);
     }
 
+    @Override
     public void sessionTerminated(Session endedSession) {
         this.mustEnd = true;
-        ProtocolMessage<Integer, String> disconnectMessage
-                = new ProtocolMessage<Integer, String>();
+        ProtocolMessage disconnectMessage
+                = new ProtocolMessage();
         disconnectMessage.setMessageId(ProtocolConstants.DISCONNECT_MESSAGE_ID);
         disconnectMessage.setData(new ArrayList<String>());
         try {
@@ -75,13 +72,13 @@ public class AsynchroSender implements SessionEndListener {
         @Override
         public void run() {
             System.out.println(super.getName() + " thread started.");
-            Set<Entry<Integer, ProtocolMessage<Integer, String>>> entrySet = messagesMap.entrySet();
+            Set<Entry<Integer, ProtocolMessage>> entrySet = messagesMap.entrySet();
             try {
                 out = initWriter();
                 while (!mustEnd && !isInterrupted()) {
                     try {
-                        for (Entry<Integer, ProtocolMessage<Integer, String>> entry : entrySet) {
-                            ProtocolMessage<Integer, String> toSend = entry.setValue(null);
+                        for (Entry<Integer, ProtocolMessage> entry : entrySet) {
+                            ProtocolMessage toSend = entry.setValue(null);
                             if (toSend != null) {
                                 send(toSend);
                             }
@@ -114,7 +111,7 @@ public class AsynchroSender implements SessionEndListener {
          *
          * @throws IllegalArgumentException
          */
-        private void send(ProtocolMessage<Integer, String> response)
+        private void send(ProtocolMessage response)
                 throws IOException {
             if (response.isBroken()) {
                 throw new IllegalArgumentException("Broken response. "

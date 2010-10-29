@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.amse.bomberman.client.control.ConnectorListener;
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.GenericProtocolMessage;
 
 /**
  * Class that corresponds for connection between client and server.
@@ -19,7 +19,7 @@ import org.amse.bomberman.protocol.ProtocolMessage;
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
-public interface Connector {
+public interface GenericConnector<Message> {
 
     /**
      * Tryes to connect to server with specified inet adress and port.
@@ -42,8 +42,7 @@ public interface Connector {
      * @param message request message.
      * @throws NetException if connection is broken.
      */
-    void sendRequest(ProtocolMessage<Integer, String> message)
-            throws NetException;
+    void send(Message message) throws NetException;
 
     /**
      * Sets listener of connector. Currently support only one listener.

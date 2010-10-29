@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.control;
 
-import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.protocol.impl.ProtocolMessage;
 
 /**
  * Class that represents listener of connector.
@@ -19,5 +19,5 @@ public interface ConnectorListener {
      *
      * @param message received protocol message.
      */
-    void received(ProtocolMessage<Integer, String> message);
+    void received(ProtocolMessage message);
 }

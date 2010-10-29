@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers;
 
 import org.junit.After;
@@ -34,5 +29,4 @@ public class ControllerTest {//TODO TEST
     @After
     public void tearDown() {
     }
-
 }

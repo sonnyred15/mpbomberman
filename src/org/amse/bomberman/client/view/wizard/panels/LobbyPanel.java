@@ -77,6 +77,7 @@ public class LobbyPanel extends JPanel {
         if(!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     setGameInfo(info);
                 }
@@ -109,6 +110,7 @@ public class LobbyPanel extends JPanel {
     public void setNewMessages(final List<String> messages) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 if (!messages.get(0).equals("No new messages.")) {//TODO hardcoded String
                     for (String message : messages) {
@@ -129,6 +131,7 @@ public class LobbyPanel extends JPanel {
     public void clearGameInfo() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 DefaultListModel model = (DefaultListModel) playersList.getModel();
                 model.clear();//fires change
@@ -311,6 +314,7 @@ public class LobbyPanel extends JPanel {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             controller.requestAddBot();
         }
@@ -325,6 +329,7 @@ public class LobbyPanel extends JPanel {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             //TODO Client SERVER work on it.
 //            controller.requestKickFromGame();
@@ -339,6 +344,7 @@ public class LobbyPanel extends JPanel {
             putValue(SMALL_ICON, null);
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             String message = getMessage();
 

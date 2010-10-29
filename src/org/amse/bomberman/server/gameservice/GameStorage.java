@@ -1,34 +1,26 @@
 package org.amse.bomberman.server.gameservice;
 
 import org.amse.bomberman.server.gameservice.impl.Game;
-import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.amse.bomberman.server.gameservice.impl.GameCreator;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
-import org.amse.bomberman.server.net.Server;
-import org.amse.bomberman.protocol.ProtocolConstants;
-import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.GlobalNotificator;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.GameMapXMLParser;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class GameStorage implements GameChangeListener {
-    private final List<Game> games = new LinkedList<Game>(); //TODO whats about synchronization?
-    private final GlobalNotificator notificator;
+    private final GameCreator gameCreator = new GameCreator();
 
-    public GameStorage(Server server) {
-        this.notificator = new GlobalNotificator(server);
-        this.notificator.start();
-    }
+    private final List<Game> games
+            = new CopyOnWriteArrayList<Game>();
+
+    private final List<GameStorageListener> listeners
+            = new CopyOnWriteArrayList<GameStorageListener>();
 
     /**
      * Creates game.
@@ -40,113 +32,96 @@ public class GameStorage implements GameChangeListener {
      * @throws IOException if IO errors occurs while creating gameMap.
      */
     public Game createGame(GamePlayer creator, String gameMapName,
-                           String gameName, int maxPlayers)
-                           throws FileNotFoundException, IOException {
-        if(creator == null || gameMapName == null || gameName == null) {
-            throw new IllegalArgumentException("Args can`t be null.");
-        }
+            String gameName, int maxPlayers)
+            throws FileNotFoundException, IOException {
 
-        //TODO all below must do spesial builder, not storage.
-        File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
-
-        int extensionIndex = gameMapName.indexOf(".map");
-        if(extensionIndex == -1) {
-            throw new FileNotFoundException("GameMap name must have .map extension.");
-        }
-
-        String name = gameMapName.substring(0, extensionIndex);
-        f = new File(f.getPath() + File.separatorChar +
-                     gameMapName + File.separatorChar + name + ".xml");
-
-        GameMap gameMap = null;
-        try {
-            gameMap = new GameMapXMLParser().parseAndCreate(f);
-        } catch (SAXException ex) {
-            throw new IOException("SAXException while creating gameMap.");
-        } catch (DOMException ex) {
-            throw new IOException("DOMException while creating gameMap.");
-        } catch (IllegalArgumentException ex) {
-            throw new IOException("Wrong gameMap xml file." + ex.getMessage());
-        }
-
-        Game game = new Game(creator, gameMap, gameName, maxPlayers);
+        Game game = gameCreator.createGame(creator, gameMapName, gameName, maxPlayers);
         game.addGameChangeListener(this);
-        this.addGame(game);
+
+        addGame(game);
 
         return game;
     }
 
-    public synchronized int addGame(Game gameToAdd) {
-        int n = -1;
-
-        this.games.add(gameToAdd);
-        n = this.games.indexOf(gameToAdd);
-        System.out.println("GameStorage: game added.");
-        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
-                ProtocolConstants.UPDATE_GAMES_LIST);
-
-        return n;
+    public void addGame(Game gameToAdd) {
+        games.add(gameToAdd);
+        fireGamesChanged();
     }
 
-    public synchronized void removeGame(Game gameToRemove) {
-        if (this.games.remove(gameToRemove)) {
+    public void removeGame(Game gameToRemove) {
+        if (games.remove(gameToRemove)) {
             System.out.println("GameStorage: game removed.");
-            this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
-                ProtocolConstants.UPDATE_GAMES_LIST);
         } else {
-            System.err.println("GameStorage: removeGame warning. " + "No specified game found.");
+            System.err.println("GameStorage: removeGame warning. No specified game found.");
         }
     }
 
-    public synchronized Game getGame(int n) {
+    public Game getGame(int n) {
         Game game = null;
         try {
-            game = this.games.get(n);
+            game = games.get(n);
         } catch (IndexOutOfBoundsException ex) {
-            System.err.println("GameStorager: getGame warning. " + "Tryed to get game with illegal ID.");
+            System.err.println("GameStorager: getGame warning. Tryed to get game with illegal ID.");
         }
 
         return game;
     }
 
     public List<Game> getGamesList() {
-        return Collections.unmodifiableList(this.games);
+        return Collections.unmodifiableList(games);
     }
 
-    public synchronized void clearGames() {
+    public void clearGames() {
         games.clear();
+    }
+
+    public void addListener(GameStorageListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(GameStorageListener listener) {
+        listeners.remove(listener);
     }
 
     @Override
     public void parametersChanged(Game game) {
-        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
-                ProtocolConstants.UPDATE_GAMES_LIST);
+        fireGamesChanged();
     }
 
     @Override
     public void gameStarted(Game game) {
-        this.notificator.addToQueue(ProtocolConstants.GAMES_LIST_NOTIFY_ID,
-                ProtocolConstants.UPDATE_GAMES_LIST);
+        fireGamesChanged();
     }
 
     @Override
     public void gameTerminated(Game game) {
-        this.removeGame(game);
+        removeGame(game);
+        fireGamesChanged();
     }
 
+    @Override
     public void newChatMessage(String message) {
         //ignore =)
     }
 
+    @Override
     public void fieldChanged() {
         //ignore again =)
     }
 
+    @Override
     public void gameEnded(Game game) {
         //ignore again =)
     }
 
+    @Override
     public void statsChanged(Game game) {
         //ignore again =)
+    }
+
+    private void fireGamesChanged() {
+        for (GameStorageListener listener : listeners) {
+            listener.gamesChanged();
+        }
     }
 }

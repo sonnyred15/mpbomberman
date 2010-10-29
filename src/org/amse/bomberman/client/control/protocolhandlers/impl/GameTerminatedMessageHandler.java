@@ -5,7 +5,7 @@ import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel.State;
-import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.impl.ProtocolConstants;
 
 /**
  *
@@ -13,6 +13,7 @@ import org.amse.bomberman.protocol.ProtocolConstants;
  */
 public class GameTerminatedMessageHandler implements ProtocolHandler {
 
+    @Override
     public void process(Controller controller, List<String> data) {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 

@@ -2,7 +2,6 @@ package org.amse.bomberman.client.control.protocolhandlers;
 
 import java.util.List;
 import org.amse.bomberman.client.control.Controller;
-import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * Class that corresponds for handling protocol message.

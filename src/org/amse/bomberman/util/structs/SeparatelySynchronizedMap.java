@@ -62,14 +62,17 @@ public class SeparatelySynchronizedMap<K, V> extends AbstractMap<K, V>{
             return new Iterator<Entry<K, V>>() {
                 int current = 0;
 
+                @Override
                 public boolean hasNext() {
                     return (current < size);
                 }
 
+                @Override
                 public Entry<K, V> next() {
                     return entries[current++];
                 }
 
+                @Override
                 public void remove() {
                     throw new UnsupportedOperationException("Not supported.");
                 }
