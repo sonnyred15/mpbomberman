@@ -1,9 +1,9 @@
 package org.amse.bomberman.client.viewmanager.states.impl;
 
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
-import org.amse.bomberman.client.view.WaitingDialog.DialogState;
+import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -13,12 +13,16 @@ import org.amse.bomberman.client.viewmanager.ViewManager;
 public class CreateJoinWaitState extends AbstractState
                                  implements ClientStateModelListener {
 
-    public CreateJoinWaitState(ViewManager machine) {
-        super(machine);        
+    public CreateJoinWaitState(ViewManager machine, State previous) {
+        super(machine);
+        setPrevious(previous);
+        //Previous state for Lobby is CreateJoinState!!! Not WaitState!!!
+        setNext(new LobbyViewState(machine, previous));
     }
 
     @Override
     public void init() {
+        getWizard().showDialog();
         getController().getContext().getClientStateModel().addListener(this);
     }
 
@@ -29,28 +33,30 @@ public class CreateJoinWaitState extends AbstractState
 
     @Override
     public void previous() {
-        machine.setState(previous);
+        throw new UnsupportedOperationException("This state does not support this.");
     }
 
     @Override
     public void next() {
-        machine.setState(next);
+        throw new UnsupportedOperationException("This state does not support this.");
     }
 
     @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
-        if (model.getState() == ClientStateModel.State.LOBBY) {
-            next();
+        if (model.getState() == ClientStateModel.ClientState.LOBBY) {
+            getWizard().hideDialog();
+            machine.setState(next);
         }
     }
 
     @Override
-    public void clientStateError(State state, String error) {
+    public void clientStateError(ClientState state, String error) {
         switch (state) {
             case NOT_JOINED: {//NOT_JOINED state that caused error
+                getWizard().hideDialog();
                 getWizard().showError(error);
-                previous();
+                machine.setState(previous);
                 break;
             }
         }

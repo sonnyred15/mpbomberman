@@ -1,7 +1,7 @@
 package org.amse.bomberman.client.viewmanager.states.impl;
 
 import org.amse.bomberman.client.control.Controller;
-import org.amse.bomberman.client.view.WaitingDialog.DialogState;
+import org.amse.bomberman.client.view.DialogState;
 import org.amse.bomberman.client.view.wizard.Wizard;
 import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;

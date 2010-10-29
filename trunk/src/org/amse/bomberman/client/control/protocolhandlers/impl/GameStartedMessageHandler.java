@@ -4,7 +4,7 @@ import java.util.List;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 
 /**
  *
@@ -16,6 +16,6 @@ public class GameStartedMessageHandler implements ProtocolHandler {
     public void process(Controller controller, List<String> args) {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 
-        clientStateModel.setState(State.GAME);
+        clientStateModel.setState(ClientState.GAME);
     }
 }

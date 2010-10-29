@@ -4,7 +4,7 @@ import java.util.List;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 
 /**
  *
@@ -17,9 +17,9 @@ public class CreateGameResultHandler implements ProtocolHandler {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 
         if (data.get(0).equals("Game created.")) {
-            clientStateModel.setState(State.LOBBY);
+            clientStateModel.setState(ClientState.LOBBY);
         } else {
-            clientStateModel.stateChangeError(State.NOT_JOINED,
+            clientStateModel.stateChangeError(ClientState.NOT_JOINED,
                     "Can not create game.\n" + data.get(0));
         }
     }

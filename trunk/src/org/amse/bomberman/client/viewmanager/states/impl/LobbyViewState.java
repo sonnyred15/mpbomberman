@@ -2,12 +2,13 @@ package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.util.List;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
 import org.amse.bomberman.client.models.listeners.ChatModelListener;
 import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
 import org.amse.bomberman.client.models.listeners.GameInfoModelListener;
 import org.amse.bomberman.client.view.wizard.panels.LobbyPanel;
+import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -18,13 +19,16 @@ public class LobbyViewState extends AbstractState
                             implements ClientStateModelListener,
                                        GameInfoModelListener,
                                        ChatModelListener {
-
-    private final LobbyPanel panel = new LobbyPanel(getController());
     private static final String  BACK = "Leave";
     private static final String  NEXT = "Start";
+    
+    private final LobbyPanel panel = new LobbyPanel(getController());
 
-    public LobbyViewState(ViewManager machine) {
+    public LobbyViewState(ViewManager machine, State previous) {
         super(machine);
+        setPrevious(previous);
+        //Previous state for game state is CreateJoinState!!! Not this!!!
+        setNext(new GameViewState(machine, previous));
     }
 
     @Override
@@ -57,13 +61,14 @@ public class LobbyViewState extends AbstractState
 
     @Override
     public void next() {
+        //if user pressed start button
         getController().requestStartGame();        
     }
 
     @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
-        State state = model.getState();
+        ClientState state = model.getState();
         switch(state) {
             case GAME: {
                 machine.setState(next);
@@ -77,7 +82,7 @@ public class LobbyViewState extends AbstractState
     }
 
     @Override
-    public void clientStateError(State state, String error) {
+    public void clientStateError(ClientState state, String error) {
         switch(state) {
             case LOBBY: {//LOBBY state that caused error
                 getWizard().showError(error);//for can`t start

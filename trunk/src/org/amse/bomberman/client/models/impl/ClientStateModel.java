@@ -11,24 +11,24 @@ import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
 public class ClientStateModel {
 
     private final List<ClientStateModelListener> listeners = new CopyOnWriteArrayList<ClientStateModelListener>();
-    private volatile State state = State.NOT_CONNECTED;
+    private volatile ClientState state = ClientState.NOT_CONNECTED;
 
-    public enum State {
+    public enum ClientState {
 
         NOT_CONNECTED, NOT_JOINED, LOBBY, GAME;
     }
 
-    public void setState(State state) {
+    public void setState(ClientState state) {
         this.state = state;
         updateListeners();
     }
 
-    public State getState() {
+    public ClientState getState() {
         return state;
     }
 
     //TODO CLIENT do something with logic...
-    public void stateChangeError(State state, String error) {
+    public void stateChangeError(ClientState state, String error) {
         updateListeners(state, error);
     }
 
@@ -52,7 +52,7 @@ public class ClientStateModel {
      * @param state next state that can`t be set because of error.
      * @param string description of error.
      */
-    private void updateListeners(State state, String string) {
+    private void updateListeners(ClientState state, String string) {
         for (ClientStateModelListener listener : listeners) {
             listener.clientStateError(state, string);
         }
