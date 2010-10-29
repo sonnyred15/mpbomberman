@@ -1,9 +1,6 @@
 package org.amse.bomberman.client.viewmanager.states.impl;
 
 import java.net.UnknownHostException;
-import org.amse.bomberman.client.models.impl.ConnectionStateModel;
-import org.amse.bomberman.client.models.listeners.ConnectionStateListener;
-import org.amse.bomberman.client.view.WaitingDialog.DialogState;
 import org.amse.bomberman.client.view.wizard.panels.ConnectionPanel;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
@@ -11,14 +8,16 @@ import org.amse.bomberman.client.viewmanager.ViewManager;
  *
  * @author Kirilchuk V.E.
  */
-public class NotConnectedState extends AbstractState implements ConnectionStateListener {
+public class NotConnectedState extends AbstractState {
 
-    private final ConnectionPanel panel = new ConnectionPanel();
     private static final String BACK = "Exit";
     private static final String NEXT = "Connect";
 
+    private final ConnectionPanel panel = new ConnectionPanel();
+
     public NotConnectedState(ViewManager machine) {
         super(machine);
+        setNext(new ConnectionWaitState(machine, panel, this));
     }
 
     @Override
@@ -29,6 +28,7 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
     @Override
     public void next() {
         try {
+            machine.setState(next);
             getController().connect(panel.getIPAddress(), panel.getPort());
         } catch (UnknownHostException ex) {
             getWizard().showError("Unknown host.\n" + ex.getMessage());
@@ -37,32 +37,8 @@ public class NotConnectedState extends AbstractState implements ConnectionStateL
 
     @Override
     public void init() {
-        getController().getContext().getConnectionStateModel().addListener(this);
         getWizard().setPanel(panel);
         getWizard().setBackText(BACK);
         getWizard().setNextText(NEXT);
-    }
-
-    @Override
-    public void release() {
-        getController().getContext().getConnectionStateModel().removeListener(this);
-    }
-
-    @Override
-    public void connectionStateChanged() {//will be called from executors thread.
-        ConnectionStateModel model = getController().getContext().getConnectionStateModel();
-        if (!model.isConnected()) {
-            return;
-        }
-
-        if (model.isConnected()) {
-            getController().requestSetClientName(panel.getPlayerName());
-            machine.setState(next);
-        }
-    }
-
-    @Override
-    public void connectionError(String error) {//will be called from executors thread.
-        getWizard().showError("Can not connect to the server.\n" + error);
     }
 }

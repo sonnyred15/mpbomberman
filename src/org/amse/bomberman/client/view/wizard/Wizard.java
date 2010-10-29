@@ -1,16 +1,22 @@
 package org.amse.bomberman.client.view.wizard;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.FocusEvent;
 import java.util.List;
-import java.util.ArrayList;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.FocusAdapter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import org.amse.bomberman.client.view.WaitingDialog;
-import org.amse.bomberman.client.view.WaitingDialog.DialogState;
+import org.amse.bomberman.client.view.DialogState;
+import org.amse.bomberman.client.view.PseudoWaitingDialog;
 
 /**
  *
@@ -19,8 +25,21 @@ import org.amse.bomberman.client.view.WaitingDialog.DialogState;
  */
 @SuppressWarnings("serial")
 public class Wizard extends JFrame {
-    private final List<WizardListener> listeners = new ArrayList<WizardListener>();
-    private WaitingDialog waitingDialog;
+
+    private final List<WizardListener> listeners = new CopyOnWriteArrayList<WizardListener>();
+    ////
+    private final PseudoWaitingDialog waitingDialog = new PseudoWaitingDialog();
+    private final JComponent dialogPanel = new JComponent() {
+        private static final long serialVersionUID = 1L;
+        private final Color bg = new Color(0, 0, 0, 64);
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            g.setColor(bg);
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    };
+    private volatile DialogState dialogState = DialogState.CLOSED;
     ////
     private Dimension size;
     ////
@@ -32,8 +51,8 @@ public class Wizard extends JFrame {
     private static final String CANCEL = "Cancel";
     ////
     private JPanel  buttonPanel;
-    private JButton backJButton   = new JButton(BACK);
-    private JButton nextJButton   = new JButton(NEXT);
+    private JButton backJButton = new JButton(BACK);
+    private JButton nextJButton = new JButton(NEXT);
     private JButton cancelJButton = new JButton(CANCEL);
 
     public Wizard() {
@@ -68,9 +87,7 @@ public class Wizard extends JFrame {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
 
-        waitingDialog =  new WaitingDialog(this);
-
-        buttonPanel   = new JPanel();
+        buttonPanel = new JPanel();
 
         JSeparator separator = new JSeparator();
         buttonPanel.setLayout(new BorderLayout());
@@ -93,10 +110,64 @@ public class Wizard extends JFrame {
         Container c = this.getContentPane();
         c.add(buttonPanel, BorderLayout.SOUTH);
         c.add(mainPanel, BorderLayout.CENTER);
+
+        initDialogPanel();
+    }
+
+    private void initDialogPanel() {
+        dialogPanel.setLayout(new GridBagLayout());
+        dialogPanel.setOpaque(false);
+        dialogPanel.add(waitingDialog, new GridBagConstraints());        
+        dialogPanel.addMouseListener(new MouseAdapter() {});
+        dialogPanel.addFocusListener(new FocusAdapter() {
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if(dialogPanel.isVisible()) {
+                    dialogPanel.requestFocus();
+                }
+            }
+
+        });
+        dialogPanel.addComponentListener(new ComponentAdapter() {
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                dialogPanel.requestFocus();
+            }
+        });
+        dialogPanel.setVisible(false);
+        getRootPane().setGlassPane(dialogPanel);
+    }
+
+    public DialogState getDialogState() {
+        return dialogState;
+    }
+
+    public void showDialog() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                dialogState = DialogState.OPENED;
+                dialogPanel.setVisible(true);
+            }
+        });
+    }
+
+    public void hideDialog() {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                dialogState = DialogState.CLOSED;
+                dialogPanel.setVisible(false);
+            }
+        });
     }
 
     public void setPanel(final JPanel mainPanel) {
-        if(!SwingUtilities.isEventDispatchThread()) {
+        if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -120,15 +191,15 @@ public class Wizard extends JFrame {
      * @param errorMessage message to show.
      */
     public void showError(final String errorMessage) {
-        if(!SwingUtilities.isEventDispatchThread()) {
+        if (!SwingUtilities.isEventDispatchThread()) {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
                     @Override
-                public void run() {
-                    showError(errorMessage);
-                }
-            });
+                    public void run() {
+                        showError(errorMessage);
+                    }
+                });
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             } catch (InvocationTargetException ex) {
@@ -141,39 +212,17 @@ public class Wizard extends JFrame {
                 "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public DialogState showWaitingDialog() {
-        return waitingDialog.showDialog();
-    }
-
-    public boolean isWaitingDialogOpened() {
-        return waitingDialog.isShowing();
-    }
-
-    public void closeWaitingDialog() {
-        waitingDialog.closeDialog();
-    }
-
-    public void cancelWaitingDialog() {
-        waitingDialog.cancelDialog();
-    }
-
     public void addListener(WizardListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     public void removeListener(WizardListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     private void fireWizardEvent(WizardEvent event) {
-        synchronized (listeners) {
-            for (WizardListener listener : listeners) {
-                listener.wizardEvent(event);
-            }
+        for (WizardListener listener : listeners) {
+            listener.wizardEvent(event);
         }
     }
 

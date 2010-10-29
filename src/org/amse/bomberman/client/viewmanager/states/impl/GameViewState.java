@@ -8,7 +8,7 @@ import org.amse.bomberman.client.models.gamemodel.impl.GameStateModel;
 import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
 import org.amse.bomberman.client.models.impl.ChatModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 import org.amse.bomberman.client.models.impl.ResultsModel;
 import org.amse.bomberman.client.models.listeners.ChatModelListener;
 import org.amse.bomberman.client.models.listeners.ClientStateModelListener;
@@ -19,6 +19,7 @@ import org.amse.bomberman.client.models.listeners.ResultModelListener;
 import org.amse.bomberman.client.view.gamejframe.GameFrame;
 import org.amse.bomberman.client.view.gamejframe.GameKeyListener;
 import org.amse.bomberman.client.view.gamejframe.GameMenuBar;
+import org.amse.bomberman.client.viewmanager.State;
 import org.amse.bomberman.client.viewmanager.ViewManager;
 
 /**
@@ -32,6 +33,7 @@ public class GameViewState extends AbstractState
                                       PlayerModelListener,
                                       GameStateListener,
                                       ClientStateModelListener {
+
     private GameFrame       gameFrame = new GameFrame();
     private GameKeyListener keyListener = new GameKeyListener(getController());
     private GameMenuBar     menu = new GameMenuBar(getController());
@@ -39,8 +41,9 @@ public class GameViewState extends AbstractState
     private boolean dead = false;
     private boolean ended = false;
 
-    public GameViewState(ViewManager machine) {
+    public GameViewState(ViewManager machine, State previous) {
         super(machine);
+        setPrevious(previous);
         gameFrame.setJMenuBar(menu);        
     }
 
@@ -84,8 +87,7 @@ public class GameViewState extends AbstractState
 
     @Override
     public void next() {
-        //TODO log
-        //do nothing
+        throw new UnsupportedOperationException("This state does not support this.");
     }
 
     @Override
@@ -147,7 +149,7 @@ public class GameViewState extends AbstractState
     @Override
     public void clientStateChanged() {
         ClientStateModel model = getController().getContext().getClientStateModel();
-        State state = model.getState();
+        ClientState state = model.getState();
         switch (state) {
             case NOT_JOINED: {
                 previous();
@@ -156,7 +158,7 @@ public class GameViewState extends AbstractState
     }
 
     @Override
-    public void clientStateError(State state, String error) {
+    public void clientStateError(ClientState state, String error) {
         switch (state) {
             case NOT_JOINED: {//NOT JOINED because error is about going to not joined state.
                 JOptionPane.showMessageDialog(gameFrame, error,

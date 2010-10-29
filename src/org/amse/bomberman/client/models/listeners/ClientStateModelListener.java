@@ -10,5 +10,5 @@ public interface ClientStateModelListener {
 
     void clientStateChanged();
 
-    void clientStateError(ClientStateModel.State state, String error);
+    void clientStateError(ClientStateModel.ClientState state, String error);
 }

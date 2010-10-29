@@ -4,7 +4,7 @@ import java.util.List;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 import org.amse.bomberman.protocol.impl.ProtocolConstants;
 
 /**
@@ -18,7 +18,7 @@ public class GameTerminatedMessageHandler implements ProtocolHandler {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 
         if (data.get(0).equals(ProtocolConstants.MESSAGE_GAME_KICK)) {
-            clientStateModel.stateChangeError(State.GAME,
+            clientStateModel.stateChangeError(ClientState.GAME,
                     "Host is escaped from game!\n Game terminated.");
         }
     }

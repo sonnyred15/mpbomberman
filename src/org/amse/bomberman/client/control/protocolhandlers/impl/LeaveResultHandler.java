@@ -5,7 +5,7 @@ import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.gamemodel.impl.GameStateModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
-import org.amse.bomberman.client.models.impl.ClientStateModel.State;
+import org.amse.bomberman.client.models.impl.ClientStateModel.ClientState;
 
 /**
  *
@@ -21,9 +21,9 @@ public class LeaveResultHandler implements ProtocolHandler {
         ClientStateModel clientStateModel = controller.getContext().getClientStateModel();
 
         if (data.get(0).equals("Disconnected.")) {
-            clientStateModel.setState(State.NOT_JOINED);
+            clientStateModel.setState(ClientState.NOT_JOINED);
         } else {
-            clientStateModel.stateChangeError(State.NOT_JOINED,
+            clientStateModel.stateChangeError(ClientState.NOT_JOINED,
                     "Can not leave game.\n" + data.get(0));
         }
     }

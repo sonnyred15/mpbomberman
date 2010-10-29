@@ -1,11 +1,6 @@
 package org.amse.bomberman.client.viewmanager;
 
-import org.amse.bomberman.client.viewmanager.states.impl.StartWaitState;
 import org.amse.bomberman.client.viewmanager.states.impl.NotConnectedState;
-import org.amse.bomberman.client.viewmanager.states.impl.CreateJoinWaitState;
-import org.amse.bomberman.client.viewmanager.states.impl.LobbyViewState;
-import org.amse.bomberman.client.viewmanager.states.impl.GameViewState;
-import org.amse.bomberman.client.viewmanager.states.impl.CreateJoinViewState;
 import javax.swing.SwingUtilities;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.models.impl.ConnectionStateModel;
@@ -25,14 +20,8 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     private final Wizard     wizard;
     private final Controller controller;
 
-    private final State notConnectedState;
-    private final State createJoinViewState;
-    private final State createJoinWaitState;
-    private final State lobbyViewState;
-    private final State startWaitState;
-    private final State gameViewState;
-
     private volatile State state;
+    private final State notConnected;
 
     /**
      * Creates ViewManager with specified Controller.
@@ -42,16 +31,8 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     public ViewManager(Controller controller) {
         this.controller = controller;
         wizard = new Wizard();
-
-        notConnectedState   = new NotConnectedState(this);
-        createJoinViewState = new CreateJoinViewState(this);
-        createJoinWaitState = new CreateJoinWaitState(this);
-        lobbyViewState      = new LobbyViewState(this);
-        startWaitState      = new StartWaitState(this);//not used //TODO CLIENT think about it...
-        gameViewState       = new GameViewState(this);
-
-        initStatesConnections();
-        state = notConnectedState;
+        notConnected = new NotConnectedState(this);
+        state = notConnected;
         state.init();
     }
 
@@ -135,24 +116,6 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         }
     }
 
-    private void initStatesConnections() {
-        notConnectedState
-                .setPrevious(null)
-                .setNext(createJoinViewState);
-        createJoinViewState
-                .setPrevious(notConnectedState)
-                .setNext(createJoinWaitState);
-        createJoinWaitState
-                .setPrevious(createJoinViewState)
-                .setNext(lobbyViewState);
-        lobbyViewState
-                .setPrevious(createJoinViewState)
-                .setNext(gameViewState);
-        gameViewState
-                .setPrevious(createJoinViewState)
-                .setNext(null);
-    }
-
     /**
      * Implementation of ConnectionStateListener interface method.
      * Reacts on connection lost by showing error in View.
@@ -162,7 +125,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
         ConnectionStateModel model = controller.getContext().getConnectionStateModel();
         if (!model.isConnected()) {//if we disconnected
             wizard.showError(NetException.MESSAGE);
-            setState(notConnectedState);
+            setState(notConnected);
         }
     }
 
