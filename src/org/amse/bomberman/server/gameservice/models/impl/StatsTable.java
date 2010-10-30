@@ -9,6 +9,7 @@ import java.util.Map;
  * @author Kirilchuk V.E.
  */
 public class StatsTable {
+
     private final Map<ModelPlayer, Stat> stats;
 
     public StatsTable(List<ModelPlayer> players) {
@@ -27,6 +28,7 @@ public class StatsTable {
         private int kills;
         private int deaths;
         private int suicides;
+        private int bonusPoints;
 
         public int getDeaths() {
             return deaths + suicides;
@@ -37,7 +39,7 @@ public class StatsTable {
         }
 
         public int getKills() {
-            return kills + suicides;
+            return kills;
         }
 
         public void increaseKills() {
@@ -52,9 +54,13 @@ public class StatsTable {
             this.suicides++;
         }
 
+        public void changeBonusPoints(int delta) {
+            bonusPoints += delta;
+        }
+
         public int getPoints() {
-            int divisor = deaths + suicides;            
-            return (divisor == 0 ? (kills +3) : (kills/divisor));
+            int allDeaths = deaths + suicides;
+            return (bonusPoints + kills - allDeaths);
         }
     }
 }
