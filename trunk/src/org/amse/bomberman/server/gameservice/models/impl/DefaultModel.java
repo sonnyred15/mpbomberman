@@ -1,5 +1,7 @@
 package org.amse.bomberman.server.gameservice.models.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.amse.bomberman.server.gameservice.gamemap.objects.impl.Bomb;
 import org.amse.bomberman.server.gameservice.models.DieListener;
 import org.amse.bomberman.server.gameservice.impl.Game;
@@ -49,13 +51,10 @@ public class DefaultModel implements Model, DieListener {
         this.listeners = new CopyOnWriteArrayList<ModelListener>();
         this.players = new CopyOnWriteArrayList<ModelPlayer>();
 
-        Integer[] freeIDArray = new Integer[game.getMaxPlayers()];
-
-        for (int i = 0; i < freeIDArray.length; ++i) {
-            freeIDArray[i] = i + 1;//cause players id`s are from 1 to ..
+        this.freeIDs = Collections.synchronizedList(new ArrayList<Integer>(game.getMaxPlayers()));
+        for (int i = 0; i < game.getMaxPlayers(); ++i) {
+            freeIDs.add(i + 1);//cause players id`s are from 1 to ..
         }
-
-        this.freeIDs = new CopyOnWriteArrayList<Integer>(freeIDArray);//TODO maybe just simple Vector?        
 
         this.started = false;
         this.ended = false;
@@ -64,7 +63,7 @@ public class DefaultModel implements Model, DieListener {
 
     @Override
     public void addExplosions(List<Pair> explosions) {//TODO move to gameMap and redesign Bomb
-        if(this.ended){
+        if(ended){
             return;
         }
         gameMap.getExplosions().addAll(explosions);
@@ -91,6 +90,7 @@ public class DefaultModel implements Model, DieListener {
         gameMap.getBombs().remove(bomb);
         ModelPlayer owner = bomb.getOwner();
 
+        //TODO gameMap must store list of objects in a cell to fix this ugly code
         if (owner.getPosition().equals(bomb.getPosition())) {
             gameMap.setValue(owner.getPosition(), owner.getId());
         } else {
@@ -102,7 +102,7 @@ public class DefaultModel implements Model, DieListener {
 
     @Override
     public void detonateBombAt(Pair position) {
-        if(this.ended){
+        if(ended){
             return;
         }
         Bomb bombToDetonate = null;
@@ -126,8 +126,8 @@ public class DefaultModel implements Model, DieListener {
                 aliveCount++;
             }
         }
-        if (aliveCount <= maxPlayersToEnd && !this.ended) {
-            this.end();
+        if (aliveCount <= maxPlayersToEnd && !ended) {
+            end();
         }
     }
 
@@ -175,7 +175,7 @@ public class DefaultModel implements Model, DieListener {
     @Override
     public void playerBombed(ModelPlayer atacker, ModelPlayer victim) {
         Stat atackerStat = stats.getStats().get(atacker);
-        Stat victimStat = stats.getStats().get(victim);
+        Stat victimStat  = stats.getStats().get(victim);
 
         if (atacker != victim) {
             atackerStat.increaseKills();
@@ -241,6 +241,11 @@ public class DefaultModel implements Model, DieListener {
 
     public void end() {
         ended = true;
+        for (ModelPlayer player : players) {
+            if(player.isAlive()) {
+               stats.getStats().get(player).changeBonusPoints(3);
+            }
+        }
         for (ModelListener listener : listeners) {
             listener.end();
         }

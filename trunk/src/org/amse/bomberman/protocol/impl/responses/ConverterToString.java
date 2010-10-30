@@ -48,7 +48,7 @@ public class ConverterToString implements GenericConverter<String> {
                 int points1 = e1.getValue().getPoints();
                 int points2 = e2.getValue().getPoints();
 
-                return points1 - points2;
+                return points2 - points1;
             }
         });
 
