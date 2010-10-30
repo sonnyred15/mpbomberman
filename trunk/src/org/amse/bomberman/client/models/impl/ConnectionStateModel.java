@@ -30,6 +30,10 @@ public class ConnectionStateModel {
         updateListeners(ex.getMessage());
     }
 
+    public void reset() {
+        connected = false;
+    }
+
     public void addListener(ConnectionStateListener listener) {
         listeners.add(listener);
     }

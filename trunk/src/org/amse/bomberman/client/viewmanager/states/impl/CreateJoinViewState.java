@@ -48,6 +48,7 @@ public class CreateJoinViewState extends AbstractState
 
     @Override
     public void previous() {
+        getController().getContext().getConnectionStateModel().reset();
         getController().disconnect();
         machine.setState(previous);
     }
