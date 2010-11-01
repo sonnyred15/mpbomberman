@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.MaskFormatter;
+import org.amse.bomberman.server.ServiceContext;
 
 import org.amse.bomberman.server.net.ServerFactory;
 import org.amse.bomberman.server.net.Server;
@@ -100,7 +101,7 @@ public class ServerFrame extends JFrame {
         try {
             int port = Integer.parseInt(portField.getText());    // throws NumberFormatException
 
-            server = new ServerFactory().newInstance();
+            server = new ServerFactory().newInstance(new ServiceContext());//TODO service leak
             server.start(port);
             infoFrame.setServer(server);
             btnStatus.setEnabled(true);
@@ -135,7 +136,7 @@ public class ServerFrame extends JFrame {
     private class ServerControlButtonListener implements ActionListener { 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (server == null || server.isStopped()) {
+            if (server == null || server.isShutdowned()) {
                 raiseServer();
             } else {
                 infoFrame.setVisible(false);

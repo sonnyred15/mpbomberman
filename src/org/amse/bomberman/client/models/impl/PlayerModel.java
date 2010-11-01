@@ -1,8 +1,9 @@
-package org.amse.bomberman.client.models.gamemodel.impl;
+package org.amse.bomberman.client.models.impl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.client.models.gamemodel.Player;
+import org.amse.bomberman.client.models.gamemodel.impl.SimplePlayer;
 import org.amse.bomberman.client.models.listeners.PlayerModelListener;
 
 /**
@@ -16,7 +17,7 @@ public class PlayerModel {
     private final List<PlayerModelListener> listeners
             = new CopyOnWriteArrayList<PlayerModelListener>();
 
-    private volatile Player player  = new PlayerImpl();
+    private volatile Player player  = new SimplePlayer();
     private volatile String name    = "Unnamed";
 
     /**

@@ -6,8 +6,8 @@ import java.awt.event.ComponentListener;
 import javax.swing.*;
 import java.util.List;
 import org.amse.bomberman.client.Main;
-import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
-import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
+import org.amse.bomberman.client.models.impl.GameMapModel;
+import org.amse.bomberman.client.models.impl.PlayerModel;
 import org.amse.bomberman.client.view.ResultsTable;
 import org.amse.bomberman.util.ImageUtilities;
 

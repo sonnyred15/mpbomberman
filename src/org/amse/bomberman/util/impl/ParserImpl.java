@@ -3,10 +3,10 @@ package org.amse.bomberman.util.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.amse.bomberman.client.models.gamemodel.GameMap;
-import org.amse.bomberman.client.models.gamemodel.Cell;
+import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
+import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
 import org.amse.bomberman.client.models.gamemodel.Player;
-import org.amse.bomberman.client.models.gamemodel.impl.PlayerImpl;
+import org.amse.bomberman.client.models.gamemodel.impl.SimplePlayer;
 import org.amse.bomberman.util.Parser;
 
 /**
@@ -17,27 +17,27 @@ import org.amse.bomberman.util.Parser;
 public class ParserImpl implements Parser {
 
     @Override
-    public GameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
-        GameMap map = null;
+    public SimpleGameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
+        SimpleGameMap map = null;
         try {
 
             // PARSING FIELD 0
             int n = 0; //dimension
             n = Integer.parseInt(list.get(0));
-            map = new GameMap(n);
+            map = new SimpleGameMap(n);
             for (int i = 0; i < n; i++) {
                 String[] numbers = list.get(i + 1).split(" ");
                 for (int j = 0; j < numbers.length; j++) {
-                    map.setCell(new Cell(i, j), Integer.parseInt(numbers[j]));
+                    map.setCell(new ImmutableCell(i, j), Integer.parseInt(numbers[j]));
                 }
             }
 
             // PARSING EXPLOSIONS n + 1
             int k = Integer.parseInt(list.get(n + 1)); //explosions count
-            ArrayList<Cell> expl = new ArrayList<Cell>(k);
+            ArrayList<ImmutableCell> expl = new ArrayList<ImmutableCell>(k);
             for (int i = 0; i < k; i++) {
                 String[] xy = list.get(i + n + 2).split(" ");
-                Cell buf = new Cell(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
+                ImmutableCell buf = new ImmutableCell(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
                 expl.add(buf);
             }            
 
@@ -50,7 +50,7 @@ public class ParserImpl implements Parser {
 
     @Override
     public Player parsePlayer(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
-        Player player = new PlayerImpl();
+        Player player = new SimplePlayer();
         try {
             int n = 0; //dimension
             n = Integer.parseInt(list.get(0));
@@ -66,7 +66,7 @@ public class ParserImpl implements Parser {
             int radius = Integer.parseInt(list.get(n + k + 8));
 
             player.setLives(lives);
-            player.setCoord(new Cell(x, y));
+            player.setCoord(new ImmutableCell(x, y));
             player.setBombAmount(maxBombs);
             player.setBombRadius(radius);
         } catch (NumberFormatException ex) {

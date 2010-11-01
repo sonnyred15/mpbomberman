@@ -68,7 +68,7 @@ public class TcpServer implements Server {
      * {@inheritDoc}
      */
     @Override
-    public boolean isStopped() {// don`t need synchronized cause state is volatile.
+    public boolean isShutdowned() {// don`t need synchronized cause state is volatile.
         return (serverState == StoppedState.getInstance());
     }
 

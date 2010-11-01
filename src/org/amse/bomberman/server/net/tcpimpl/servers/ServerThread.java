@@ -21,7 +21,7 @@ class ServerThread implements Runnable {
     @Override
     public void run() {
         try {
-            while(!server.isStopped()) {
+            while(!server.isShutdowned()) {
                 Socket clientSocket = server.getServerSocket().accept();
                 //
                 Session newSession =

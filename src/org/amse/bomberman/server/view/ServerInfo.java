@@ -94,11 +94,11 @@ public class ServerInfo extends JFrame {
 
     private void update() {
         if (server != null) {
-            labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + server.isStopped());
+            labelShutdowned.setText(SHUTDOWNED_LABEL_TEXT + server.isShutdowned());
             labelPort.setText(PORT_LABEL_TEXT + server.getPort());
             labelClients.setText(CLIENTS_LABEL_TEXT + server.getSessions().size());
 
-            if(!server.isStopped()) {
+            if(!server.isShutdowned()) {
                 List<Game> games = server.getServiceContext().getGameStorage().getGamesList();
                 int started = 0;
                 int unstarted = 0;

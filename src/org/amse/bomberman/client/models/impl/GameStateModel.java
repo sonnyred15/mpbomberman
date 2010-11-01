@@ -1,4 +1,4 @@
-package org.amse.bomberman.client.models.gamemodel.impl;
+package org.amse.bomberman.client.models.impl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

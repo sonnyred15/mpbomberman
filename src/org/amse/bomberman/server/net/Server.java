@@ -32,7 +32,7 @@ public interface Server extends SessionEndListener {
      * Checks if server is shutdowned.
      * @return true if server is shutdowned, false otherwise.
      */
-    boolean isStopped();
+    boolean isShutdowned();
 
     /**
      * Returns the port number on which this socket is listening.

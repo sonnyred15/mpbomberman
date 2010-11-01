@@ -46,11 +46,11 @@ public interface Session {
      */
     long getId();
 
-    /**
-     * Returns if current session must terminate.
-     * @return true if session must terminate, false - otherwise.
-     */
-    boolean isMustEnd();
+//    /**
+//     * Returns if current session must terminate.
+//     * @return true if session must terminate, false - otherwise.
+//     */
+//    boolean isMustEnd();
 
     void addEndListener(SessionEndListener listener);
 

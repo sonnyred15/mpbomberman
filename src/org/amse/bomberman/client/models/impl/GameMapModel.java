@@ -1,10 +1,10 @@
-package org.amse.bomberman.client.models.gamemodel.impl;
+package org.amse.bomberman.client.models.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.amse.bomberman.client.models.gamemodel.Cell;
-import org.amse.bomberman.client.models.gamemodel.GameMap;
+import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
+import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
 import org.amse.bomberman.client.models.listeners.GameMapModelListener;
 
 /**
@@ -18,9 +18,9 @@ public class GameMapModel {
     private final List<GameMapModelListener> listeners
             = new CopyOnWriteArrayList<GameMapModelListener>();
     
-    private final List<Cell> changes = new ArrayList<Cell>();
+    private final List<ImmutableCell> changes = new ArrayList<ImmutableCell>();
 
-    private volatile GameMap gameMap;
+    private volatile SimpleGameMap gameMap;
 
     /**
      * Sets GameMap in the model. It modifies list of changes too!!!
@@ -28,30 +28,30 @@ public class GameMapModel {
      *
      * @param newGameMap new GameMap.
      */
-    public synchronized void setGameMap(GameMap newGameMap) {
-        Cell buf = new Cell(0, 0);
+    public synchronized void setGameMap(SimpleGameMap newGameMap) {
+        ImmutableCell buf = new ImmutableCell(0, 0);
         changes.clear();
         // if it is not first call of setGameMap()
         if(this.gameMap != null && this.gameMap.getSize() == newGameMap.getSize()) {
             for(int i = 0; i < newGameMap.getSize(); i++) {
                 for(int j = 0; j < newGameMap.getSize(); j++) {
-                    buf = new Cell(i, j);
+                    buf = new ImmutableCell(i, j);
                     if(newGameMap.getValue(buf) != this.gameMap.getValue(buf)) {
                         changes.add(buf);
                     }
                 }
             }
 
-            List<Cell> oldExpl = this.gameMap.getExplosions();
-            List<Cell> newExpl = newGameMap.getExplosions();
+            List<ImmutableCell> oldExpl = this.gameMap.getExplosions();
+            List<ImmutableCell> newExpl = newGameMap.getExplosions();
 
-            for(Cell cell : oldExpl) {
+            for(ImmutableCell cell : oldExpl) {
                 if(!newExpl.contains(cell)) {
                     changes.add(cell);
                 }
             }
 
-            for(Cell cell : newExpl) {
+            for(ImmutableCell cell : newExpl) {
                 if(!oldExpl.contains(cell)) {
                     changes.add(cell);
                 }
@@ -70,14 +70,14 @@ public class GameMapModel {
     /**
      * @return last game map.
      */
-    public GameMap getGameMap() {//don`t need synchronize. volatile is enough here
+    public SimpleGameMap getGameMap() {//don`t need synchronize. volatile is enough here
         return gameMap;
     }
 
     /**
      * @return changes between previous and last gameMap.
      */
-    public synchronized List<Cell> getChanges() {//need synchronize cause changes list is not thread safe.
+    public synchronized List<ImmutableCell> getChanges() {//need synchronize cause changes list is not thread safe.
         return changes;
     }
 

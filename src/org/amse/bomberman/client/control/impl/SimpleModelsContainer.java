@@ -1,24 +1,25 @@
 package org.amse.bomberman.client.control.impl;
 
+import org.amse.bomberman.client.control.ModelsContainer;
 import org.amse.bomberman.client.models.impl.ChatModel;
 import org.amse.bomberman.client.models.impl.ClientStateModel;
 import org.amse.bomberman.client.models.impl.ConnectionStateModel;
 import org.amse.bomberman.client.models.impl.GameMapsModel;
 import org.amse.bomberman.client.models.impl.GamesModel;
 import org.amse.bomberman.client.models.impl.ResultsModel;
-import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
-import org.amse.bomberman.client.models.gamemodel.impl.GameStateModel;
-import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
+import org.amse.bomberman.client.models.impl.GameMapModel;
+import org.amse.bomberman.client.models.impl.GameStateModel;
+import org.amse.bomberman.client.models.impl.PlayerModel;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
 
 /**
  * Container of models(From MVC). Also can be called 'context'.
- * All models can be treated as singletons. cause getter methods
+ * All models can be treated as singletons, cause getter methods
  * of this container always return the same object.
  *
  * @author Kirilchuk V.E.
  */
-public class ModelsContainer {
+public class SimpleModelsContainer implements ModelsContainer {
     private final ConnectionStateModel  connectionStateModel
             = new ConnectionStateModel();
 
@@ -36,6 +37,7 @@ public class ModelsContainer {
     /**
      * @return gameMaps model.
      */
+    @Override
     public GameMapsModel getGameMapsModel() {
         return gameMapsModel;
     }
@@ -43,6 +45,7 @@ public class ModelsContainer {
     /**
      * @return games model.
      */
+    @Override
     public GamesModel getGamesModel() {
         return gamesModel;
     }
@@ -50,6 +53,7 @@ public class ModelsContainer {
     /**
      * @return client state model.
      */
+    @Override
     public ClientStateModel getClientStateModel() {
         return clientStateModel;
     }
@@ -57,6 +61,7 @@ public class ModelsContainer {
     /**
      * @return chat model.
      */
+    @Override
     public ChatModel getChatModel() {
         return chatModel;
     }
@@ -64,6 +69,7 @@ public class ModelsContainer {
     /**
      * @return connection state model.
      */
+    @Override
     public ConnectionStateModel getConnectionStateModel() {
         return connectionStateModel;
     }
@@ -71,6 +77,7 @@ public class ModelsContainer {
     /**
      * @return gameMap model.
      */
+    @Override
     public GameMapModel getGameMapModel() {
         return gameMapModel;
     }
@@ -78,6 +85,7 @@ public class ModelsContainer {
     /**
      * @return results model.
      */
+    @Override
     public ResultsModel getResultsModel() {
         return resultsModel;
     }
@@ -85,6 +93,7 @@ public class ModelsContainer {
     /**
      * @return game info model.
      */
+    @Override
     public GameInfoModel getGameInfoModel() {
         return gameInfoModel;
     }
@@ -92,6 +101,7 @@ public class ModelsContainer {
     /**
      * @return player model.
      */
+    @Override
     public PlayerModel getPlayerModel() {
         return playerModel;
     }
@@ -99,6 +109,7 @@ public class ModelsContainer {
     /**
      * @return game state model.
      */
+    @Override
     public GameStateModel getGameStateModel() {
         return gameStateModel;
     }

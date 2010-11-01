@@ -1,11 +1,12 @@
-package org.amse.bomberman.client.net.impl;
+package org.amse.bomberman.client.net.stdtcp.impl;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.client.control.ConnectorListener;
+import org.amse.bomberman.client.net.ConnectorListener;
 import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.protocol.impl.ProtocolConstants;
@@ -13,7 +14,9 @@ import org.amse.bomberman.protocol.impl.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
 
 /**
- * Realization of Connector interface.
+ * Realization of {@link GenericConnector} interface that uses
+ * standart java tcp sockets. This connector is asynchronous, it means that
+ * it can send and receive data separately. However send and receive use blocking io.
  *
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
@@ -26,24 +29,35 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
     private DataOutputStream out = null;
     private DataInputStream in = null;
 
-    public ConnectorImpl() {}
-
     @Override
     public void setListener(ConnectorListener listener) {
         this.listener = listener;
     }
 
     @Override
-    public synchronized void сonnect(InetAddress address, int port)
-            throws IOException {
+    public synchronized void сonnect(InetAddress address, int port) throws ConnectException {
+        try {
+            socket = new Socket(address, port);
+            out = initOut();
+            in  = initIn();
 
-        socket = new Socket(address, port);
-        out = initOut();
-        in = initIn();
-
-        inputThread = new Thread(new ServerListen());
-        inputThread.setDaemon(true);
-        inputThread.start();
+            inputThread = new Thread(new ServerListen());
+            inputThread.setDaemon(true);
+            inputThread.start();
+        } catch (IOException ex) {
+            //rollback if for example socket connected, but streams init failed.
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    //TODO CLIENT log this
+                    ; //ignore cause can do nothing.
+                }
+            }
+            out    = null;
+            in     = null;
+            throw new ConnectException(ex.getMessage());
+        }
     }
 
     private DataOutputStream initOut() throws IOException {
@@ -60,6 +74,7 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
         if (socket == null || socket.isClosed() || out == null || in == null ) {
             return true;
         }
+
         return false;
     }
 
@@ -81,6 +96,8 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
                 socket.close();
             }
         } catch (IOException ex) {
+            //TODO CLIENT log this
+            ; //ignore cause can do nothing.
             System.err.println("Session: terminating error. IOException "
                     + "while closing resourses. " + ex.getMessage());
         }
@@ -110,6 +127,7 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
             out.flush();
         } catch (IOException ex) {
             System.err.println("AsynchroConnector: sendRequest error." + ex.getMessage());
+            closeConnection();
             throw new NetException();
         }
     }
@@ -121,8 +139,7 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
             try {
                 while (!Thread.interrupted()) {
                     try {
-                        ProtocolMessage message
-                                = new ProtocolMessage();
+                        ProtocolMessage message = new ProtocolMessage();
                         int messageId = in.readInt();
                         if (messageId == ProtocolConstants.DISCONNECT_MESSAGE_ID) {
                             break;
@@ -147,7 +164,8 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
                 }
             } catch (IOException ex) {                
                 System.err.println("ServerListen: run error. " + ex.getMessage());
-            }
+            } 
+            
             closeConnection();
             System.out.println("ServerListen: run ended.");
         }

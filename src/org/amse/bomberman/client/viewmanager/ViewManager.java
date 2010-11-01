@@ -76,7 +76,7 @@ public class ViewManager implements WizardListener, ConnectionStateListener {
     /**
      * Shows Wizard.
      */
-    public void showWizard() {
+    public void showGUI() {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
