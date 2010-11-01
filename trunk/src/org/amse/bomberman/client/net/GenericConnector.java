@@ -1,9 +1,9 @@
 package org.amse.bomberman.client.net;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import org.amse.bomberman.client.control.ConnectorListener;
 import org.amse.bomberman.protocol.GenericProtocolMessage;
 
 /**
@@ -28,7 +28,7 @@ public interface GenericConnector<Message> {
      * @param port port of server to connect.
      * @throws IOException if io errors occurs during connection.
      */
-    void сonnect(InetAddress address, int port) throws IOException;
+    void сonnect(InetAddress address, int port) throws ConnectException;
 
     /**
      * Closes connection. It is OK to call this method even

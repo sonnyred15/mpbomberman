@@ -65,15 +65,15 @@ public abstract class AbstractSession implements Session {
         this.listeners.clear();
     }
 
-    /**
-     * Checks if session must terminate.
-     *
-     * @return true if session must terminate, false - otherwise.
-     */
-    @Override
-    public boolean isMustEnd() {
-        return this.mustEnd;
-    }
+//    /**
+//     * Checks if session must terminate.
+//     *
+//     * @return true if session must terminate, false - otherwise.
+//     */
+//    @Override
+//    public boolean isMustEnd() {
+//        return this.mustEnd;
+//    }
 
     /**
      * This method must provide terminating of session.

@@ -1,21 +1,20 @@
 package org.amse.bomberman.client.models.gamemodel.impl;
 
-import org.amse.bomberman.client.models.gamemodel.Cell;
 import org.amse.bomberman.client.models.gamemodel.Player;
 import org.amse.bomberman.util.Constants;
 
 /**
  * @author Mikhail Korovkin
  */
-public class PlayerImpl implements Player {
+public class SimplePlayer implements Player {
 
     private int    life;
     private int    bombAmount;
     private int    settedBombs;
     private int    bombRadius;
-    private Cell   myCoord;
+    private ImmutableCell   myCoord;
 
-    public PlayerImpl() {
+    public SimplePlayer() {
         reset();
     }
 
@@ -40,12 +39,12 @@ public class PlayerImpl implements Player {
     }
 
     @Override
-    public void setCoord(Cell cell) {
+    public void setCoord(ImmutableCell cell) {
         myCoord = cell;
     }
 
     @Override
-    public Cell getCoord() {
+    public ImmutableCell getCoord() {
         return myCoord;
     }
 
@@ -79,6 +78,6 @@ public class PlayerImpl implements Player {
         this.bombAmount  = Constants.PLAYER_DEFAULT_MAX_BOMBS;
         this.bombRadius  = Constants.PLAYER_DEFAULT_BOMB_RADIUS;
         this.settedBombs = 0;
-        this.myCoord = new Cell(0, 0);
+        this.myCoord = new ImmutableCell(0, 0);
     }
 }

@@ -1,7 +1,7 @@
 package org.amse.bomberman.util;
 
 import java.util.List;
-import org.amse.bomberman.client.models.gamemodel.GameMap;
+import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
 import org.amse.bomberman.client.models.gamemodel.Player;
 
 /**
@@ -11,7 +11,7 @@ import org.amse.bomberman.client.models.gamemodel.Player;
  */
 public interface Parser {
 
-    GameMap parseGameMap(List<String> data);
+    SimpleGameMap parseGameMap(List<String> data);
 
     Player parsePlayer(List<String> data);
 }

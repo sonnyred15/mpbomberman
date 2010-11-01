@@ -1,46 +1,18 @@
 package org.amse.bomberman.client.models.gamemodel;
 
+import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
 import org.amse.bomberman.util.Direction;
 
 /**
- * Immutable class.
+ * Interface for gameMap cell.
  * 
- * @author Michail Korovkin
+ * @author Kirilchuk V.E.
  */
-public class Cell {
+public interface Cell {
 
-    private int myX;
-    private int myY;
+    int getX();
 
-    public Cell(int x, int y) {
-        myX = x;
-        myY = y;
-    }
+    int getY();
 
-    public int getX() {
-        return myX;
-    }
-
-    public int getY() {
-        return myY;
-    }
-
-    public Cell nextCell(Direction direction) throws UnsupportedOperationException {
-        switch(direction) {
-            case LEFT: {
-                return new Cell(myX, myY - 1);
-            }
-            case RIGHT: {
-                return new Cell(myX, myY + 1);
-            }
-            case UP: {
-                return new Cell(myX - 1, myY);
-            }
-            case DOWN: {
-                return new Cell(myX + 1, myY);
-            }
-            default:
-                throw new UnsupportedOperationException("Unregistered ERROR!!!");
-        }
-    }
+    ImmutableCell nextCell(Direction direction);
 }

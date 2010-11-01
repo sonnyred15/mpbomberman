@@ -1,8 +1,8 @@
 package org.amse.bomberman.client.view.gamejframe;
 
-import org.amse.bomberman.client.models.gamemodel.GameMap;
-import org.amse.bomberman.client.models.gamemodel.Cell;
-import org.amse.bomberman.client.models.gamemodel.impl.GameMapModel;
+import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
+import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
+import org.amse.bomberman.client.models.impl.GameMapModel;
 import org.amse.bomberman.util.Constants;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import org.amse.bomberman.client.models.gamemodel.impl.PlayerModel;
+import org.amse.bomberman.client.models.impl.PlayerModel;
 import org.amse.bomberman.client.view.ImageFactory;
 
 /**
@@ -26,8 +26,8 @@ import org.amse.bomberman.client.view.ImageFactory;
 public class GamePanel extends JPanel {
     private final ImageFactory images = new ImageFactory();
 
-    private GameMap    gameMap = null;
-    private List<Cell> changes = new ArrayList<Cell>();
+    private SimpleGameMap    gameMap = null;
+    private List<ImmutableCell> changes = new ArrayList<ImmutableCell>();
 
     public static final int CELL_SIZE = 48;
     // amount of cells at the one line on the Screen
@@ -39,10 +39,10 @@ public class GamePanel extends JPanel {
     // amount of cells at one line in the Full map
     private int size;
     // Cell that is the most Left and Up at the screen
-    private Cell LUCell = new Cell(0, 0);
+    private ImmutableCell LUCell = new ImmutableCell(0, 0);
     // Cell that is the most Right and Down at the screen
-    private Cell RDCell = new Cell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
-    private Cell myCoord = new Cell(0, 0);
+    private ImmutableCell RDCell = new ImmutableCell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
+    private ImmutableCell myCoord = new ImmutableCell(0, 0);
 
     private final int step = 4;
 
@@ -64,14 +64,14 @@ public class GamePanel extends JPanel {
             return;
         }
 
-        GameMap newGameMap = model.getGameMap();
+        SimpleGameMap newGameMap = model.getGameMap();
 
         // if this is first invocation after receiving of gameMap
         if (gameMap == null) {
             size = newGameMap.getSize();
             if (size < DEFAULT_RANGE) {
                 range = size;
-                RDCell = new Cell(size-1, size-1);
+                RDCell = new ImmutableCell(size-1, size-1);
             } else {
                 range = DEFAULT_RANGE;
             }
@@ -114,41 +114,41 @@ public class GamePanel extends JPanel {
         if (gameMap == null) {//if we have no gameMap
             return;
         }
-        List<Cell> expl = gameMap.getExplosions();
+        List<ImmutableCell> expl = gameMap.getExplosions();
         for (int i = LUCell.getX(); i <= RDCell.getX(); i++) {
             for (int j = LUCell.getY(); j <= RDCell.getY(); j++) {
-                Cell c = parseToMyCoord(new Cell(i, j));
-                graphics.drawImage(drawNotExpl(buffer, new Cell(i, j)),
+                ImmutableCell c = parseToMyCoord(new ImmutableCell(i, j));
+                graphics.drawImage(drawNotExpl(buffer, new ImmutableCell(i, j)),
                         c.getY() * CELL_SIZE, c.getX() * CELL_SIZE, this);
             }
         }
-        for (Cell cell : expl) {
-            Cell myCell = parseToMyCoord(cell);
+        for (ImmutableCell cell : expl) {
+            ImmutableCell myCell = parseToMyCoord(cell);
             graphics.drawImage(drawExplosion(buffer, cell),
                     CELL_SIZE * myCell.getY(), CELL_SIZE * myCell.getX(), this);
         }
     }
 
-    private Cell parseToRealCoord(Cell myCell) {
-        Cell result;
+    private ImmutableCell parseToRealCoord(ImmutableCell myCell) {
+        ImmutableCell result;
         int x = myCell.getX() + LUCell.getX();
         int y = myCell.getY() + LUCell.getY();
-        result = new Cell(x,y);
+        result = new ImmutableCell(x,y);
         return result;
     }
 
-    private Cell parseToMyCoord(Cell realCell) {
-        Cell result;
+    private ImmutableCell parseToMyCoord(ImmutableCell realCell) {
+        ImmutableCell result;
         int x = realCell.getX() - LUCell.getX();
         int y = realCell.getY() - LUCell.getY();
-        result = new Cell(x,y);
+        result = new ImmutableCell(x,y);
         return result;
     }
 
     private void findEyeShot() {
         if (range >= size) {//if we can see more then gameMapSize - do nothing.
-            LUCell = new Cell(0,0);
-            RDCell = new Cell(size-1, size-1);
+            LUCell = new ImmutableCell(0,0);
+            RDCell = new ImmutableCell(size-1, size-1);
         } else {
             int x1;
             int x2;
@@ -176,17 +176,17 @@ public class GamePanel extends JPanel {
             }
             x2 = x1 + range - 1;
             y2 = y1 + range - 1;
-            LUCell = new Cell(x1,y1);
-            RDCell = new Cell(x2, y2);
+            LUCell = new ImmutableCell(x1,y1);
+            RDCell = new ImmutableCell(x2, y2);
         }
     }
 
-    private boolean isInEyeShot(Cell cell) {
+    private boolean isInEyeShot(ImmutableCell cell) {
         return ((cell.getX() >= LUCell.getX()) && (cell.getX() <= RDCell.getX())
                 && (cell.getY() >= LUCell.getY()) && (cell.getY() <= RDCell.getY()));
     }
 
-    private BufferedImage drawExplosion(BufferedImage image, Cell cell) {
+    private BufferedImage drawExplosion(BufferedImage image, ImmutableCell cell) {
         Image result = null;
         Graphics2D g = image.createGraphics();
         g.setBackground(EMPTY_COLOR);
@@ -215,7 +215,7 @@ public class GamePanel extends JPanel {
         return image;
     }
 
-    private BufferedImage drawNotExpl(BufferedImage image, Cell cell) {
+    private BufferedImage drawNotExpl(BufferedImage image, ImmutableCell cell) {
         Graphics2D g = image.createGraphics();
         g.setBackground(EMPTY_COLOR);
         g.clearRect(0, 0, CELL_SIZE, CELL_SIZE);
@@ -240,9 +240,9 @@ public class GamePanel extends JPanel {
     public void reset() {
         gameMap = null;
         range = DEFAULT_RANGE;
-        LUCell = new Cell(0, 0);
-        RDCell = new Cell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
-        myCoord = new Cell(0, 0);
+        LUCell = new ImmutableCell(0, 0);
+        RDCell = new ImmutableCell(DEFAULT_RANGE-1, DEFAULT_RANGE-1);
+        myCoord = new ImmutableCell(0, 0);
         size = 0;
     }
 }
