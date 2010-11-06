@@ -8,18 +8,35 @@ import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
 import org.amse.bomberman.client.models.gamemodel.Player;
 import org.amse.bomberman.client.models.gamemodel.impl.SimplePlayer;
 import org.amse.bomberman.util.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
+ * Implementation of Parser.
  *
  * @author Mikhail Korovkin
  * @author Kirilchuk V.E.
  */
 public class ParserImpl implements Parser {
 
+    private static final Logger logger = LoggerFactory.getLogger(ParserImpl.class);
+
     @Override
     public SimpleGameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
-        SimpleGameMap map = null;
         try {
+            if (list == null || list.isEmpty()) {
+                throw new IllegalArgumentException("Empty or null data.");
+            }
+
+            logger.info("Start parsing gameMap.");
+            if (logger.isDebugEnabled()) {
+                for (String string : list) {
+                    logger.debug(string);
+                }
+            }
+
+            SimpleGameMap map = null;
+
 
             // PARSING FIELD 0
             int n = 0; //dimension
@@ -39,19 +56,32 @@ public class ParserImpl implements Parser {
                 String[] xy = list.get(i + n + 2).split(" ");
                 ImmutableCell buf = new ImmutableCell(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
                 expl.add(buf);
-            }            
+            }
 
             map.setExplosions(expl);
-        } catch (NumberFormatException ex) {
-            System.out.println("Wrong format of gameMap: " + ex);
+            return map;
+        } catch (RuntimeException ex) {
+            logger.error("Wrong format of gameMap.", ex);
+            throw ex;
         }
-        return map;
     }
 
     @Override
     public Player parsePlayer(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
-        Player player = new SimplePlayer();
         try {
+            if (list == null || list.isEmpty()) {
+                throw new IllegalArgumentException("Empty or null data.");
+            }
+
+            logger.info("Start parsing player.");
+            if (logger.isDebugEnabled()) {
+                for (String string : list) {
+                    logger.debug(string);
+                }
+            }
+
+            Player player = new SimplePlayer();
+
             int n = 0; //dimension
             n = Integer.parseInt(list.get(0));
             int k = Integer.parseInt(list.get(n + 1)); //explosions count
@@ -69,9 +99,11 @@ public class ParserImpl implements Parser {
             player.setCoord(new ImmutableCell(x, y));
             player.setBombAmount(maxBombs);
             player.setBombRadius(radius);
-        } catch (NumberFormatException ex) {
-            System.out.println("Wrong format of player: " + ex);
+
+            return player;
+        } catch (RuntimeException ex) {
+            logger.error("Wrong format of player.", ex);
+            throw ex;
         }
-        return player;
     }
 }
