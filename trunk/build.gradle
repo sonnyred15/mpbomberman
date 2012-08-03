@@ -1,0 +1,33 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'		
+		}
+	}
+	
+	test {
+		java {
+			srcDir 'test'
+		}	
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'org.slf4j:slf4j-api:1.6.4'
+	compile 'org.slf4j:slf4j-log4j12:1.6.4'	
+	compile 'org.jboss.netty:netty:3.2.7.Final'  
+	
+	testCompile 'junit:junit:4.6'
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.0'
+}
