@@ -1,6 +1,5 @@
-package org.amse.bomberman.protocol.impl;
+package org.amse.bomberman.protocol;
 
-import org.amse.bomberman.protocol.GenericProtocolMessage;
 
 /**
  *

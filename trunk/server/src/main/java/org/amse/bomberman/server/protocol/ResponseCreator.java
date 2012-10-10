@@ -1,15 +1,15 @@
-package org.amse.bomberman.protocol.impl.responses;
+package org.amse.bomberman.server.protocol;
 
-import org.amse.bomberman.protocol.GenericConverter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.server.gameservice.impl.Game;
-import org.amse.bomberman.util.Creator;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.GamePlayer;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.util.Creator;
 
 /**
  * Invoker of commands

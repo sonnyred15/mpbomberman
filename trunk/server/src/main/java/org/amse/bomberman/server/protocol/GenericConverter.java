@@ -1,4 +1,4 @@
-package org.amse.bomberman.protocol;
+package org.amse.bomberman.server.protocol;
 
 import java.util.List;
 import org.amse.bomberman.server.gameservice.impl.Game;

@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.IOUtilities;

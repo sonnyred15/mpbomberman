@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import org.amse.bomberman.client.net.impl.netty.NettyConnector;
 import org.amse.bomberman.client.net.stdtcp.impl.ConnectorImpl;
 import org.amse.bomberman.common.threadfactory.DaemonThreadFactory;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 

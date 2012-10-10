@@ -1,22 +1,47 @@
 package org.amse.bomberman.client.view.wizard.panels;
 
-import org.amse.bomberman.client.control.Controller;
-import org.amse.bomberman.util.ImageUtilities;
-import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import org.amse.bomberman.client.control.Controller;
+import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.util.ImageUtilities;
+import org.amse.bomberman.util.UIUtil;
 
 /**
  *
@@ -153,7 +178,7 @@ public class LobbyPanel extends JPanel {
                                                   this.getWidth(),
                                                   this.getHeight());
         }catch (IOException ex){
-            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            UIUtil.createErrorDialog(this, "Can`t load background!", ex.getMessage());
             this.image = null;
         }
     }
@@ -401,7 +426,7 @@ public class LobbyPanel extends JPanel {
             try {
                 this.joinedIcon = ImageIO.read(JOINED_ICON_URL);    // returns BufferedImage
             } catch (IOException ex) {
-                Creator.createErrorDialog(this, "Can`t load image for icon!",
+                UIUtil.createErrorDialog(this, "Can`t load image for icon!",
                                           ex.getMessage());
             }
         }

@@ -6,11 +6,11 @@ import java.util.concurrent.ExecutorService;
 
 import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
+import org.amse.bomberman.client.protocol.RequestCreator;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.util.Direction;
-import org.amse.bomberman.protocol.impl.requests.RequestCreator;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * Implementation of {@link Controller} interface that uses {@link ExecutorService} to

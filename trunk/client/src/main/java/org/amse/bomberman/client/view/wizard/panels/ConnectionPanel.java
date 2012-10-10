@@ -1,22 +1,34 @@
 package org.amse.bomberman.client.view.wizard.panels;
 
-import java.text.ParseException;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.NumberFormat;
-import java.awt.*;
-import javax.swing.*;
+import java.text.ParseException;
+
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
 import javax.swing.text.PlainDocument;
-import org.amse.bomberman.util.ImageUtilities;
+
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
+import org.amse.bomberman.util.ImageUtilities;
+import org.amse.bomberman.util.UIUtil;
 
 /**
  *
@@ -179,7 +191,7 @@ public class ConnectionPanel extends JPanel {
                                                   this.getWidth(),
                                                   this.getHeight());
         } catch (IOException ex) {
-            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            UIUtil.createErrorDialog(this, "Can`t load background!", ex.getMessage());
         }
     }
 }

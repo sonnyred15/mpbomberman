@@ -2,7 +2,8 @@ package org.amse.bomberman.client.net.impl.netty;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;

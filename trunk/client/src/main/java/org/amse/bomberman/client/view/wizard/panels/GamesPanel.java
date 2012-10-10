@@ -1,15 +1,30 @@
 package org.amse.bomberman.client.view.wizard.panels;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
+
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.util.ImageUtilities;
-import org.amse.bomberman.util.Creator;
+import org.amse.bomberman.util.UIUtil;
 
 /**
  *
@@ -213,7 +228,7 @@ public class GamesPanel extends JPanel {
                     this.getWidth(),
                     this.getHeight());
         } catch (IOException ex) {
-            Creator.createErrorDialog(this, "Can`t load background!", ex.getMessage());
+            UIUtil.createErrorDialog(this, "Can`t load background!", ex.getMessage());
             this.image = null;
         }
     }

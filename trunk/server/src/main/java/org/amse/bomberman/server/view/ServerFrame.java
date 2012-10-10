@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -16,12 +15,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.MaskFormatter;
-import org.amse.bomberman.server.ServiceContext;
 
-import org.amse.bomberman.server.net.ServerFactory;
+import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.Server;
+import org.amse.bomberman.server.net.ServerFactory;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
+import org.amse.bomberman.util.UIUtil;
 
 
 /**
@@ -130,7 +129,7 @@ public class ServerFrame extends JFrame {
     }
 
     private void showErrorMessage(String message) {
-        Creator.createErrorDialog(this, "Error.", message);
+        UIUtil.createErrorDialog(this, "Error.", message);
     }
 
     private class ServerControlButtonListener implements ActionListener { 

@@ -1,6 +1,6 @@
 package org.amse.bomberman.client.net;
 
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * Class that represents listener of connector.

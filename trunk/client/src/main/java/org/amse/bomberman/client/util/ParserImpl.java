@@ -1,13 +1,12 @@
-package org.amse.bomberman.util.impl;
+package org.amse.bomberman.client.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
-import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
 import org.amse.bomberman.client.models.gamemodel.Player;
+import org.amse.bomberman.client.models.gamemodel.impl.ImmutableCell;
+import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;
 import org.amse.bomberman.client.models.gamemodel.impl.SimplePlayer;
-import org.amse.bomberman.util.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

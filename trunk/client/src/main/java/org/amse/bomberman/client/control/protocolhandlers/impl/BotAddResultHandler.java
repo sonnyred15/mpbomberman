@@ -4,7 +4,7 @@ import java.util.List;
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.GameInfoModel;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *
