@@ -2,7 +2,7 @@ package org.amse.bomberman.server.net;
 
 import java.io.IOException;
 import org.amse.bomberman.server.gameservice.GameStorage;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.gameservice.GameStorageListener;
 

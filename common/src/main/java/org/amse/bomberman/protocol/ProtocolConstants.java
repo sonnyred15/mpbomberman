@@ -1,4 +1,4 @@
-package org.amse.bomberman.protocol.impl;
+package org.amse.bomberman.protocol;
 
 /**
  * Utility class for storing some constants for protocol.

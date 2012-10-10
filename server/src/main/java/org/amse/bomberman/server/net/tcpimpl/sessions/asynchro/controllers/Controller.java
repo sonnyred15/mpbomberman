@@ -7,15 +7,16 @@ import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.util.Direction;
-import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
 import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
 import org.amse.bomberman.protocol.InvalidDataException;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.GameStorageListener;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.ClientState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
+import org.amse.bomberman.server.protocol.ResponseCreator;
+import org.amse.bomberman.server.util.Creator;
 
 /**
  * Class that represents net controller of ingame player.
@@ -167,8 +168,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
         checkArgsNum(args, 1, ProtocolConstants.BOT_ADD_MESSAGE_ID,
                 "Wrong number of arguments.");
 
-        Iterator<String> iterator = args.iterator();
-        String botName = iterator.next(); //TODO what`s about incorrect name. Ex.: null or empty!?
+        String botName = Creator.randomBotName();
 
         sendToClient(state.addBot(botName));
     }

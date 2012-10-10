@@ -3,10 +3,11 @@ package org.amse.bomberman.server.gameservice.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
+import org.amse.bomberman.server.util.GameMapXMLParser;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.GameMapXMLParser;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 

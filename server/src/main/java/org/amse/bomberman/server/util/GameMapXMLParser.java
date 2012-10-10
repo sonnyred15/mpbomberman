@@ -1,4 +1,4 @@
-package org.amse.bomberman.util;
+package org.amse.bomberman.server.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 

@@ -1,13 +1,12 @@
-package org.amse.bomberman.protocol.impl.requests;
+package org.amse.bomberman.client.protocol;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.Direction;
-import org.amse.bomberman.util.Creator;
 
 /**
  *
@@ -64,10 +63,7 @@ public class RequestCreator {
     }
 
     public ProtocolMessage requestJoinBotIntoGame() {
-        List<String> data = new ArrayList<String>(1);
-        data.add(Creator.createBotName());
-
-        return request(ProtocolConstants.BOT_ADD_MESSAGE_ID, data);
+        return requestWithEmptyData(ProtocolConstants.BOT_ADD_MESSAGE_ID);
     }
 
     public ProtocolMessage requestKickFromGame(int id) {

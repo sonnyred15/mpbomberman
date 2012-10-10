@@ -1,7 +1,7 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.bots.Bot;
 import org.amse.bomberman.server.gameservice.bots.BotGamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;

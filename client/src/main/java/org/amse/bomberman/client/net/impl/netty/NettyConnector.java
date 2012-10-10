@@ -10,7 +10,7 @@ import org.amse.bomberman.client.net.ConnectorListener;
 import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.protocol.GenericProtocolMessage;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;

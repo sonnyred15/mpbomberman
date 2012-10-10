@@ -1,23 +1,21 @@
-package org.amse.bomberman.util;
+package org.amse.bomberman.server.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Component;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+
+import org.amse.bomberman.util.Constants;
+//~--- JDK imports ------------------------------------------------------------
 
 /**
  * Utility class.
@@ -73,22 +71,6 @@ public class Creator {
         return ret;
     }
 
-    /**
-     * Creates error JDialog.
-     * @see JDialog
-     * @param parent determines the Frame in which the dialog is displayed.
-     * If null, or if the parentComponent has no Frame, a default Frame is used
-     * @param description description of error.
-     * @param message message of error.
-     */
-    public static void createErrorDialog(Component parent, 
-                                         String description,
-                                         String message) {
-        //
-        JOptionPane.showMessageDialog(parent, description + "\n" + message,
-                                     "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
     static String[] botNames =
     {"Suicider", "Terminator",
      "Nike", "Budda",
@@ -110,7 +92,7 @@ public class Creator {
     };
     static Random rnd = new Random();
 
-    public static String createBotName() {
+    public static String randomBotName() {
         int id = rnd.nextInt(botNames.length);
         return botNames[id];
     }

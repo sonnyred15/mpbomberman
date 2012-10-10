@@ -1,7 +1,7 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates;
 
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
-import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
+import org.amse.bomberman.protocol.ProtocolMessage;
+import org.amse.bomberman.server.protocol.ResponseCreator;
 import org.amse.bomberman.util.Direction;
 
 /**

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.control.protocolhandlers.impl.*;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  * Class that corresponds for giving protocol handlers to hancle protocol

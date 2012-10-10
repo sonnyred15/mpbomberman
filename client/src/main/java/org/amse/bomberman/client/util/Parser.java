@@ -1,4 +1,4 @@
-package org.amse.bomberman.util;
+package org.amse.bomberman.client.util;
 
 import java.util.List;
 import org.amse.bomberman.client.models.gamemodel.impl.SimpleGameMap;

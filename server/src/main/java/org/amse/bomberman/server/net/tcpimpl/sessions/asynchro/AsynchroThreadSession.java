@@ -15,12 +15,12 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
 import org.amse.bomberman.server.gameservice.GameStorage;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.protocol.InvalidDataException;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
-import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.tcpimpl.sessions.AbstractSession;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
+import org.amse.bomberman.server.protocol.ResponseCreator;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.IOUtilities;
 

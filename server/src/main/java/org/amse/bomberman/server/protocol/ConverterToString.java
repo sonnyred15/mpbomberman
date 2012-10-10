@@ -1,12 +1,4 @@
-package org.amse.bomberman.protocol.impl.responses;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.amse.bomberman.protocol.GenericConverter;
-import org.amse.bomberman.server.gameservice.impl.Game;
-import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
-
-//~--- JDK imports ------------------------------------------------------------
+package org.amse.bomberman.server.protocol;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,13 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
+
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.gamemap.impl.SimpleField;
+import org.amse.bomberman.server.gameservice.impl.Game;
+import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
+import org.amse.bomberman.server.util.Creator;
 import org.amse.bomberman.util.Constants;
-import org.amse.bomberman.util.Creator;
 import org.amse.bomberman.util.Pair;
 
 /**

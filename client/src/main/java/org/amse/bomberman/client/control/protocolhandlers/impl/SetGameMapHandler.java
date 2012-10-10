@@ -1,12 +1,13 @@
 package org.amse.bomberman.client.control.protocolhandlers.impl;
 
 import java.util.List;
+
 import org.amse.bomberman.client.control.Controller;
 import org.amse.bomberman.client.control.protocolhandlers.ProtocolHandler;
 import org.amse.bomberman.client.models.impl.GameMapModel;
 import org.amse.bomberman.client.models.impl.PlayerModel;
-import org.amse.bomberman.util.Parser;
-import org.amse.bomberman.util.impl.ParserImpl;
+import org.amse.bomberman.client.util.Parser;
+import org.amse.bomberman.client.util.ParserImpl;
 
 /**
  *

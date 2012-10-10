@@ -3,7 +3,8 @@ package org.amse.bomberman.common.net.netty.handlers;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;

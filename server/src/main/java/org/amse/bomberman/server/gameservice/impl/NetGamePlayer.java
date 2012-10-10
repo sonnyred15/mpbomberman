@@ -1,12 +1,12 @@
 package org.amse.bomberman.server.gameservice.impl;
 
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.responses.ResponseCreator;
+import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.InGameState;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
+import org.amse.bomberman.server.protocol.ResponseCreator;
 
 /**
  *

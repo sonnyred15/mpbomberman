@@ -9,8 +9,8 @@ import java.util.List;
 import org.amse.bomberman.client.net.ConnectorListener;
 import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolConstants;
+import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
 
 /**

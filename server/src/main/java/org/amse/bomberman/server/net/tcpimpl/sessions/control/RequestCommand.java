@@ -1,8 +1,8 @@
 package org.amse.bomberman.server.net.tcpimpl.sessions.control;//TODO this class must be not here.
 
 import java.util.List;
-import org.amse.bomberman.protocol.impl.ProtocolConstants;
 import org.amse.bomberman.protocol.InvalidDataException;
+import org.amse.bomberman.protocol.ProtocolConstants;
 
 /**
  *

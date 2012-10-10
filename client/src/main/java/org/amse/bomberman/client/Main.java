@@ -9,7 +9,7 @@ import org.amse.bomberman.client.control.impl.SimpleModelsContainer;
 import org.amse.bomberman.client.net.ConnectorFactory;
 import org.amse.bomberman.client.net.GenericConnector;
 import org.amse.bomberman.client.viewmanager.ViewManager;
-import org.amse.bomberman.protocol.impl.ProtocolMessage;
+import org.amse.bomberman.protocol.ProtocolMessage;
 
 /**
  * Main class of client side part of application.
