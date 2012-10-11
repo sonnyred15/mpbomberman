@@ -1,3 +1,8 @@
 dependencies {
 	compile project(':common')
 }
+
+jar {
+    archiveName = "client.jar"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}

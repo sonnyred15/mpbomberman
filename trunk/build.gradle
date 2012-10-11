@@ -1,6 +1,7 @@
+apply plugin: 'base'
 allprojects {
 	group = 'org.amse'
-	version = '0.4-SNAPSHOT'
+	version = '0.4-SNAPSHOT'    
 }
 
 subprojects {	
@@ -23,4 +24,20 @@ subprojects {
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '1.0'
+}
+
+task prepareDist(type: Copy) {
+    description "Prepares distributives"
+    dependsOn subprojects.jar
+    
+    def outputDir = file("${buildDir}/distribution") 
+    into outputDir
+    from(project(":client").jar) {
+        rename { "bomberman.jar" }
+    }
+    from(project(":server").jar) {
+        rename { "bomberman-server.jar" }
+    }
+    
+    outputs.dir outputDir
 }
