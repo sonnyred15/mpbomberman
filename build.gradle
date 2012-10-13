@@ -42,17 +42,17 @@ task prepareServerDist(type: Zip) {
     // no need to specify outputs. ZipTask uses archivePath as output!
 }
 
-task prepareClientDist(type: Copy) {
+task prepareClientDist(type: Zip) {
     description "Prepares client distributive"
     
     inputs.files project(":client").jar
     
-    into new File(distDir, "client")
-    def clientJarName = "bomberman.jar"
+    destinationDir distDir
+    archiveName "client.zip"
     from(project(":client").jar) {
-        rename { clientJarName }
+        rename { "bomberman.jar" }
     }
-    // no need to specify outputs. CopyTask uses "into" value as output!
+    // no need to specify outputs. ZipTask uses archivePath as output!
 }
 
 task prepareDist() {
