@@ -27,33 +27,30 @@ task wrapper(type: Wrapper) {
 }
 
 ext.distDir = file("distribution")
-task prepareServerDist(type: Zip) {
-    description "Prepares server distributive"
-    
-    inputs.files project(":server").jar
-    inputs.file project(":server").file("resources")
-    
-    destinationDir distDir
-    archiveName "server.zip"
-    from(project(":server").jar) {
-        rename { "bomberman-server.jar" }
-    }
-    from(project(":server").file("resources"))    
-    // no need to specify outputs. ZipTask uses archivePath as output!
-}
 
+evaluationDependsOn(":client")
 task prepareClientDist(type: Zip) {
-    description "Prepares client distributive"
+    description "Prepares client zip distributive"
     
-    inputs.files project(":client").jar
-    inputs.file project(":client").file("resources")
+    inputs.files project(":client").prepareDist
     
     destinationDir distDir
     archiveName "client.zip"
-    from(project(":client").jar) {
-        rename { "bomberman.jar" }
-    }
-    from(project(":client").file("resources"))
+
+    from(project(":client").prepareDist)
+    // no need to specify outputs. ZipTask uses archivePath as output!
+}
+
+evaluationDependsOn(":server")
+task prepareServerDist(type: Zip) {
+    description "Prepares server zip distributive"
+    
+    inputs.files project(":server").prepareDist
+    
+    destinationDir distDir
+    archiveName "server.zip"
+    
+    from(project(":server").prepareDist)    
     // no need to specify outputs. ZipTask uses archivePath as output!
 }
 

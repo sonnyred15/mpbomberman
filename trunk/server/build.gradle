@@ -6,3 +6,19 @@ jar {
     archiveName = "server.jar"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
+
+ext.distDir = file("distribution")
+task prepareDist(type: Copy) {
+    description "Prepares server distributive"
+    
+    def resources = file("resources")
+    inputs.files jar
+    inputs.file resources
+    
+    into distDir
+    from(jar) {
+        rename { "bomberman-server.jar" }
+    }
+    from(resources)    
+    // no need to specify outputs. CopyTask uses into as output!
+}
