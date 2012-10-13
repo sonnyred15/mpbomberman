@@ -26,18 +26,41 @@ task wrapper(type: Wrapper) {
 	gradleVersion = '1.0'
 }
 
-task prepareDist(type: Copy) {
-    description "Prepares distributives"
-    dependsOn subprojects.jar
+ext.distDir = file("distribution")
+task prepareServerDist(type: Zip) {
+    description "Prepares server distributive"
     
-    def outputDir = file("${buildDir}/distribution") 
-    into outputDir
-    from(project(":client").jar) {
-        rename { "bomberman.jar" }
-    }
+    inputs.files project(":server").jar
+    inputs.file project(":server").file("resources")
+    
+    destinationDir distDir
+    archiveName "server.zip"
     from(project(":server").jar) {
         rename { "bomberman-server.jar" }
     }
+    from(project(":server").file("resources"))    
+    // no need to specify outputs. ZipTask uses archivePath as output!
+}
+
+task prepareClientDist(type: Copy) {
+    description "Prepares client distributive"
     
-    outputs.dir outputDir
+    inputs.files project(":client").jar
+    
+    into new File(distDir, "client")
+    def clientJarName = "bomberman.jar"
+    from(project(":client").jar) {
+        rename { clientJarName }
+    }
+    // no need to specify outputs. CopyTask uses "into" value as output!
+}
+
+task prepareDist() {
+    description "Prepares distributives"
+    inputs.files prepareClientDist.outputs.files
+    inputs.files prepareServerDist.outputs.files
+    
+    //TODO: add file with version and guide
+    
+    outputs.files inputs.files
 }
