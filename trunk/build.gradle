@@ -46,12 +46,14 @@ task prepareClientDist(type: Zip) {
     description "Prepares client distributive"
     
     inputs.files project(":client").jar
+    inputs.file project(":client").file("resources")
     
     destinationDir distDir
     archiveName "client.zip"
     from(project(":client").jar) {
         rename { "bomberman.jar" }
     }
+    from(project(":client").file("resources"))
     // no need to specify outputs. ZipTask uses archivePath as output!
 }
 
