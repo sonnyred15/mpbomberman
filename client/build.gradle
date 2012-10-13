@@ -6,3 +6,19 @@ jar {
     archiveName = "client.jar"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
+
+ext.distDir = file("distribution")
+task prepareDist(type: Copy) {
+    description "Prepares client distributive"
+    
+    def resources = file("resources")
+    inputs.files jar
+    inputs.file resources
+    
+    into distDir
+    from(jar) {
+        rename { "bomberman.jar" }
+    }
+    from(resources)
+    // no need to specify outputs. CopyTask uses into as output!
+}
