@@ -8,12 +8,16 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import org.amse.bomberman.server.ServiceContext;
 
 import org.amse.bomberman.server.net.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class TcpServer implements Server {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(TcpServer.class);
 
     private volatile ServerState serverState = StoppedState.getInstance();
     //
@@ -94,7 +98,7 @@ public class TcpServer implements Server {
     @Override
     public void sessionTerminated(Session endedSession) {
         sessions.remove(endedSession);
-        System.out.println("Server: session removed.");
+        LOG.info("Server: session removed.");
     }
 
     /**

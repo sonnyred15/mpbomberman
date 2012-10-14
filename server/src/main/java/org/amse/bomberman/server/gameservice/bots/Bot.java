@@ -4,6 +4,8 @@ import java.util.Random;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that represents bots(AI controlled players).
@@ -11,6 +13,8 @@ import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
  * @author Kirilchuk V.E.
  */
 public class Bot implements GameChangeListener {
+    private static final Logger LOG = LoggerFactory.getLogger(Bot.class);
+    
     private static final long   BOT_STEP_DELAY = 150L;
 
     private static final Random random = new Random();
@@ -76,7 +80,7 @@ public class Bot implements GameChangeListener {
     }
 
     private class BotRun implements Runnable {
-
+        
         @Override
         public void run() { 
             try {
@@ -90,7 +94,7 @@ public class Bot implements GameChangeListener {
                 Thread.currentThread().interrupt();
             }
 
-            System.out.println("Bot thread ended.");
+            LOG.info("Bot thread {} ended.", botThread);
         }
     }
 }

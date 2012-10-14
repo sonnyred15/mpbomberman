@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Kirilchuk V.E.
  */
 public class ServerFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ServerFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerFactory.class);
 
     private final Properties defaults = new Properties();
     {
@@ -33,12 +33,12 @@ public class ServerFactory {
         try {
             InputStream in = getClass().getResourceAsStream("/server.conf");
             if(in == null) {
-                logger.warn("No server config founded.");
+                LOG.warn("No server config founded.");
             } else {
                 config.load(in);
             }
         } catch (IOException ex) {
-            logger.error("IOException while reading server config.", ex);
+            LOG.error("IOException while reading server config.", ex);
         }
     }
 
@@ -49,7 +49,7 @@ public class ServerFactory {
         } else if("default".equalsIgnoreCase(server)) {
             return newSimpleServer(context);
         } else {
-            logger.error("No factory for specified server(" + server + ")");
+            LOG.error("No factory for specified server(" + server + ")");
             throw new RuntimeException("Can`t instantiate server(" + server + ")");
         }
         

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggingHandler implements ChannelUpstreamHandler, ChannelDownstreamHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoggingHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingHandler.class);
 
     @Override
     public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
@@ -29,14 +29,14 @@ public class LoggingHandler implements ChannelUpstreamHandler, ChannelDownstream
     }
 
     private void log(ChannelEvent e) {
-        if (logger.isTraceEnabled()) {
+        if (LOG.isTraceEnabled()) {
 
             String msg = e.toString();
             // Log the message (and exception if available.)
             if (e instanceof ExceptionEvent) {
-                logger.trace(msg, ((ExceptionEvent) e).getCause());
+                LOG.trace(msg, ((ExceptionEvent) e).getCause());
             } else {
-                logger.trace(msg);
+                LOG.trace(msg);
             }
         }
     }

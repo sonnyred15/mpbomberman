@@ -3,12 +3,17 @@ package org.amse.bomberman.server.net.tcpimpl.servers;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author Kirilchuk V.E.
  */
 class StoppedState implements ServerState {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StoppedState.class);
+    
     private static final ServerState INSTANCE = new StoppedState();
 
     private StoppedState() {
@@ -24,19 +29,18 @@ class StoppedState implements ServerState {
             server.setServerSocket(new ServerSocket(port, 0));    // throws IOExeption,SecurityException
             server.setListeningThread(new Thread(new ServerThread(server)));
         } catch (IOException ex) {
-            System.err.println("Server: start error. " + ex.getMessage());
-
+            LOG.error("Server: start error.", ex);
             throw ex;
         }
 
         server.setServerState(StartedState.getInstance());
         server.getListeningThread().start();
-        System.out.println("Server: started.");
+        LOG.info("Server: started.");
     }
 
     @Override
     public void stop(TcpServer server) {
-        System.err.println("Server: shutdown error. Already shutdowned.");
+        LOG.info("Server: shutdown error. Already shutdowned.");
         throw new IllegalStateException("Server: shutdown error. "
                 + "Already shutdowned.");
     }

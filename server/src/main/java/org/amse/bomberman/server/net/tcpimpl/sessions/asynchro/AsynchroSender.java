@@ -16,6 +16,8 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.util.IOUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -23,6 +25,8 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class AsynchroSender implements SessionEndListener {
 
+    private final static Logger LOG = LoggerFactory.getLogger(AsynchroSender.class);
+    
     private final SeparatelySynchronizedMap<Integer, ProtocolMessage> messagesMap =
             new SeparatelySynchronizedMap<Integer, ProtocolMessage>(30);
     //
@@ -72,7 +76,7 @@ public class AsynchroSender implements SessionEndListener {
 
         @Override
         public void run() {
-            System.out.println(super.getName() + " thread started.");
+            LOG.info(super.getName() + " thread started.");
             Set<Entry<Integer, ProtocolMessage>> entrySet = messagesMap.entrySet();
             try {
                 out = initWriter();
@@ -96,14 +100,14 @@ public class AsynchroSender implements SessionEndListener {
                 try {
                     if(clientSocket != null && !clientSocket.isClosed()) {
                         clientSocket.close();
-                        System.out.println("Session: closed socket.");
+                        LOG.info("Session: closed socket.");
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
 
-            System.out.println(super.getName() + " output listening thread ended.");
+            LOG.info(super.getName() + " output listening thread ended.");
         }
 
         /**

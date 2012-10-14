@@ -12,6 +12,8 @@ import org.amse.bomberman.client.net.NetException;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.util.IOUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Realization of {@link GenericConnector} interface that uses
@@ -23,6 +25,8 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
 
+    private final static Logger LOG = LoggerFactory.getLogger(ConnectorImpl.class);
+    
     private ConnectorListener listener;
     private Socket socket;
     private Thread inputThread;
@@ -96,10 +100,8 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
                 socket.close();
             }
         } catch (IOException ex) {
-            //TODO CLIENT log this
-            ; //ignore cause can do nothing.
-            System.err.println("Session: terminating error. IOException "
-                    + "while closing resourses. " + ex.getMessage());
+            LOG.error("Session: terminating error. IOException "
+                    + "while closing resourses.", ex);
         }
     }
 
@@ -126,7 +128,7 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
             //
             out.flush();
         } catch (IOException ex) {
-            System.err.println("AsynchroConnector: sendRequest error." + ex.getMessage());
+            LOG.error("AsynchroConnector: sendRequest error.", ex);
             closeConnection();
             throw new NetException();
         }
@@ -163,11 +165,11 @@ public class ConnectorImpl implements GenericConnector<ProtocolMessage> {
                     }
                 }
             } catch (IOException ex) {                
-                System.err.println("ServerListen: run error. " + ex.getMessage());
+                LOG.error("ServerListen: run error.", ex);
             } 
             
             closeConnection();
-            System.out.println("ServerListen: run ended.");
+            LOG.info("ServerListen: run ended.");
         }
     }
 }

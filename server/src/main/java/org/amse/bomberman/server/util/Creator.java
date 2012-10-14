@@ -2,7 +2,6 @@ package org.amse.bomberman.server.util;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -12,9 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
 import org.amse.bomberman.util.Constants;
 import org.slf4j.Logger;
@@ -28,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Creator {
 
-    private static final Logger logger = LoggerFactory.getLogger(Creator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Creator.class);
     
     private Creator() {}
 
@@ -65,7 +61,7 @@ public class Creator {
                 }
             });
         } catch (URISyntaxException ex) {
-            logger.error("Can`t get maps list!", ex);
+            LOG.error("Can`t get maps list!", ex);
         }
         
         return result;

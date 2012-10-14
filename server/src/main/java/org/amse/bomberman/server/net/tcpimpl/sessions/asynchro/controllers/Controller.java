@@ -17,6 +17,8 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clien
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.clientstates.NotJoinedState;
 import org.amse.bomberman.server.protocol.ResponseCreator;
 import org.amse.bomberman.server.util.Creator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class that represents net controller of ingame player.
@@ -24,6 +26,8 @@ import org.amse.bomberman.server.util.Creator;
  */
 public class Controller implements RequestExecutor, SessionEndListener, GameStorageListener {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
+    
     private final ResponseCreator protocol;
     private final NetGamePlayer player = new NetGamePlayer(this);
     //
@@ -61,9 +65,8 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
         try {
             maxPlayers = Integer.parseInt(iterator.next());
         } catch (NumberFormatException ex) {
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
-                    + "Wrong command parameters. Error on client side. "
-                    + ex.getMessage());
+            LOG.warn("Session: createGame warning. Client tryed to create game, canceled. "
+                    + "Wrong command parameters. Error on client side", ex);
             throw new InvalidDataException(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                                            "Max players param must be int");
         }
@@ -82,10 +85,9 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
         try {
             gameID = Integer.parseInt(iterator.next());
         } catch (NumberFormatException ex) {
-            System.out.println("Session: joinGame error. "
+            LOG.warn("Session: joinGame error. "
                     + "Wrong command parameters. "
-                    + "Error on client side. gameID must be int. "
-                    + ex.getMessage());
+                    + "Error on client side. gameID must be int.", ex);
             throw new InvalidDataException(ProtocolConstants.JOIN_GAME_MESSAGE_ID,
                                            "Game id param must be int.");
         }
@@ -104,14 +106,14 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
             int dir = Integer.parseInt(iterator.next());    // throws NumberFormatException
             direction = Direction.fromInt(dir);    // throws IllegalArgumentException
         } catch (NumberFormatException ex) {
-            System.out.println("Session: doMove error. "
-                    + "Unsupported direction(not int). ");
+            LOG.warn("Session: doMove error. "
+                    + "Unsupported direction(not int).");
 
             throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
                                            "Direction of move must be integer.");
         } catch (IllegalArgumentException ex) {
-            System.out.println("Session: doMove error. "
-                    + "Unsupported direction. ");
+            LOG.warn("Session: doMove error. "
+                    + "Unsupported direction.");
 
             throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
                                            "Unsupported direction value.");
@@ -154,7 +156,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
 
     @Override
     public void sendGameStatus() {
-        System.out.println("Session: sended game status to client.");
+        LOG.trace("Session: sended game status to client.");
         sendToClient(state.getGameStatus());
     }
 
@@ -175,7 +177,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
 
     @Override
     public void sendGameInfo() {
-        System.out.println("Session: sended gameInfo to client.");
+        LOG.trace("Session: sended gameInfo to client.");
         sendToClient(state.getGameInfo());
     }
 
@@ -201,8 +203,8 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
         try {
             playerId = Integer.parseInt(args.get(0));  
         } catch (NumberFormatException ex) {
-            System.out.println("Session: doMove error. "
-                    + "Unsupported direction(not int). ");
+            LOG.warn("Session: doMove error. "
+                    + "Unsupported direction(not int).");
 
             throw new InvalidDataException(ProtocolConstants.DO_MOVE_MESSAGE_ID,
                                            "Player to kick id must be integer.");
@@ -213,7 +215,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
 
     @Override
     public void sendGamePlayersStats() {        
-        System.out.println("Session: sended gamePlayersStats to client.");
+        LOG.trace("Session: sended gamePlayersStats to client.");
         sendToClient(state.getGamePlayersStats());
     }
 

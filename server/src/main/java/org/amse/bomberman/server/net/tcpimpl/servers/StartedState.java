@@ -2,6 +2,8 @@ package org.amse.bomberman.server.net.tcpimpl.servers;
 
 import java.io.IOException;
 import org.amse.bomberman.server.net.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -9,6 +11,8 @@ import org.amse.bomberman.server.net.Session;
  */
 class StartedState implements ServerState {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StartedState.class);
+    
     private static final ServerState INSTANCE = new StartedState();
 
     private StartedState() {
@@ -21,8 +25,7 @@ class StartedState implements ServerState {
     @Override
     public void start(TcpServer server, int port) throws IOException,
                                                IllegalStateException {
-        System.err.println(
-                "Server: start error. Already in started state.");
+        LOG.error("Server: start error. Already in started state.");
         throw new IllegalStateException("Server: start error. "
                 + "Already in started state.");
 
@@ -42,8 +45,7 @@ class StartedState implements ServerState {
 
         //Terminating all sessions
         for (Session session : server.getSessions()) {
-            System.out.println(
-                    "Server: interrupting session " + session.getId() + "...");
+            LOG.info("Server: interrupting session " + session.getId() + "...");
             session.terminateSession();
         }
 
@@ -55,7 +57,7 @@ class StartedState implements ServerState {
         }
 
         server.setServerState(StoppedState.getInstance());
-        System.out.println("Server: shutdowned.");
+        LOG.info("Server: shutdowned.");
     }
 
 }

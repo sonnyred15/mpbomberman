@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ParserImpl implements Parser {
 
-    private static final Logger logger = LoggerFactory.getLogger(ParserImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParserImpl.class);
 
     @Override
     public SimpleGameMap parseGameMap(List<String> list) {//TODO CLIENT SERVER split gameMap and Player info
@@ -27,10 +27,10 @@ public class ParserImpl implements Parser {
                 throw new IllegalArgumentException("Empty or null data.");
             }
 
-            logger.info("Start parsing gameMap.");
-            if (logger.isDebugEnabled()) {
+            LOG.info("Start parsing gameMap.");
+            if (LOG.isDebugEnabled()) {
                 for (String string : list) {
-                    logger.debug(string);
+                    LOG.debug(string);
                 }
             }
 
@@ -60,7 +60,7 @@ public class ParserImpl implements Parser {
             map.setExplosions(expl);
             return map;
         } catch (RuntimeException ex) {
-            logger.error("Wrong format of gameMap.", ex);
+            LOG.error("Wrong format of gameMap.", ex);
             throw ex;
         }
     }
@@ -72,10 +72,10 @@ public class ParserImpl implements Parser {
                 throw new IllegalArgumentException("Empty or null data.");
             }
 
-            logger.info("Start parsing player.");
-            if (logger.isDebugEnabled()) {
+            LOG.info("Start parsing player.");
+            if (LOG.isDebugEnabled()) {
                 for (String string : list) {
-                    logger.debug(string);
+                    LOG.debug(string);
                 }
             }
 
@@ -101,7 +101,7 @@ public class ParserImpl implements Parser {
 
             return player;
         } catch (RuntimeException ex) {
-            logger.error("Wrong format of player.", ex);
+            LOG.error("Wrong format of player.", ex);
             throw ex;
         }
     }
