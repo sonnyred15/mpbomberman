@@ -5,21 +5,21 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.client.net.impl.netty.NettyConnector;
 import org.amse.bomberman.client.net.stdtcp.impl.ConnectorImpl;
 import org.amse.bomberman.common.threadfactory.DaemonThreadFactory;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class ConnectorFactory {
-    private static final Logger logger = Logger.getLogger(ConnectorFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ConnectorFactory.class);
 
     private final Properties defaults = new Properties();
     {
@@ -33,12 +33,12 @@ public class ConnectorFactory {
         try {
             InputStream in = getClass().getResourceAsStream("/connector.conf");
             if(in == null) {
-                logger.log(Level.SEVERE, "No connector config founded.");
+                logger.warn("No connector config founded.");
             } else {
                 config.load(in);
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "IOException while reading connector config.", ex);
+            logger.error("IOException while reading connector config.", ex);
         }
     }
 
@@ -49,7 +49,7 @@ public class ConnectorFactory {
         } else if("default".equalsIgnoreCase(connector)) {
             return newSimpleConnector();
         } else {
-            logger.log(Level.SEVERE, "No factory for specified connector(" + connector + ")");
+            logger.error("No factory for specified connector(" + connector + ")");
             throw new RuntimeException("Can`t instantiate connector(" + connector + ")");
         }
     }

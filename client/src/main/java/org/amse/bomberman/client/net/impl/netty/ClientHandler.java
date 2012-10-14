@@ -1,17 +1,16 @@
 package org.amse.bomberman.client.net.impl.netty;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHandler extends SimpleChannelUpstreamHandler {//TODO not closing channel. Leak.
 
-    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
     private final ClientHandlerListener listener;
 
     public ClientHandler(ClientHandlerListener listener) {
@@ -28,9 +27,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {//TODO not clos
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        logger.log(Level.SEVERE,
-                "Unexpected exception from downStream",
-                e.getCause());
+        logger.error("Unexpected exception from downStream", e.getCause());
         e.getChannel().close().awaitUninterruptibly();
     }
 }

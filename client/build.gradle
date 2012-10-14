@@ -5,6 +5,9 @@ dependencies {
 jar {
     archiveName = "client.jar"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes("Main-Class": "org.amse.bomberman.client.Main")
+    }
 }
 
 ext.distDir = file("distribution")

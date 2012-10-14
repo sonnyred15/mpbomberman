@@ -3,27 +3,22 @@ package org.amse.bomberman.server.net.netty;
 import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
+
 import org.amse.bomberman.server.ServiceContext;
-import org.amse.bomberman.server.gameservice.GameStorage;
 import org.amse.bomberman.server.net.Server;
 import org.amse.bomberman.server.net.Session;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ServerChannelFactory;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class NettyServer implements Server {
-    private static final Logger logger
-            = Logger.getLogger(NettyServer.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
     private Channel server;
 
