@@ -56,7 +56,7 @@ public class Creator {
         
         try {
             URL url = Creator.class.getClassLoader().getResource("maps");
-            File mapsDir = new File(url.toURI());
+            File mapsDir = new File(url.toURI()); //TODO: NPE
             result = mapsDir.list(new FilenameFilter() {
 
                 @Override
