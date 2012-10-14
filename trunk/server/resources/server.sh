@@ -1,1 +1,2 @@
-java -server -jar bomberman-server.jar
+java  -server -cp .:bomberman-server.jar org.amse.bomberman.server.Main
+
