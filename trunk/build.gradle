@@ -37,7 +37,9 @@ task prepareClientDist(type: Zip) {
     destinationDir distDir
     archiveName "client.zip"
 
-    from(project(":client").prepareDist)
+    from(project(":client").prepareDist) {
+        exclude "log/**"
+    }
     // no need to specify outputs. ZipTask uses archivePath as output!
 }
 
@@ -50,7 +52,9 @@ task prepareServerDist(type: Zip) {
     destinationDir distDir
     archiveName "server.zip"
     
-    from(project(":server").prepareDist)    
+    from(project(":server").prepareDist) {
+        exclude "log/**"
+    }   
     // no need to specify outputs. ZipTask uses archivePath as output!
 }
 
