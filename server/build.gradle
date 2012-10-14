@@ -2,6 +2,14 @@ dependencies {
 	compile project(':common')
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir "resources" //adding maps as resource
+        }
+    }
+}
+
 jar {
     archiveName = "server.jar"
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
