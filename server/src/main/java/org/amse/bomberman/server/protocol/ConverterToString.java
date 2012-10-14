@@ -15,7 +15,7 @@ import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.gameservice.models.impl.ModelPlayer;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable;
 import org.amse.bomberman.server.gameservice.models.impl.StatsTable.Stat;
-import org.amse.bomberman.server.util.Creator;
+import org.amse.bomberman.server.util.GameMapsLoader;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Pair;
 
@@ -147,7 +147,7 @@ public class ConverterToString implements GenericConverter<String> {
      */
     @Override
     public List<String> convertGameMapsList() {
-        return Creator.createGameMapsList();
+        return new GameMapsLoader().createGameMapsList();
     }
 
     /**

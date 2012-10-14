@@ -70,6 +70,7 @@ public class ProtocolConstants {
     public static final int LEAVE_MESSAGE_ID = 190;
 
     //
+    @Deprecated
     public static final int DOWNLOAD_GAME_MAP_MESSAGE_ID = 200;
 
     public static final int INVALID_REQUEST_MESSAGE_ID = 210;

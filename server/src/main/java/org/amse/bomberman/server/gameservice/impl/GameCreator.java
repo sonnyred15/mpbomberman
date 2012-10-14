@@ -1,19 +1,13 @@
 package org.amse.bomberman.server.gameservice.impl;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
-import org.amse.bomberman.server.util.GameMapXMLParser;
-import org.amse.bomberman.util.Constants;
+import org.amse.bomberman.server.util.GameMapsLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -22,6 +16,8 @@ import org.xml.sax.SAXException;
 public class GameCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(GameCreator.class);
+    
+    private GameMapsLoader gameMapsLoader = new GameMapsLoader();
     
     /**
      * Creates game.
@@ -39,35 +35,7 @@ public class GameCreator {
             throw new IllegalArgumentException("Args can`t be null.");
         }
 
-        //TODO all below must do spesial builder, not storage.
-        File f = null;
-        try {
-            URL mapsDir = GameCreator.class.getClassLoader().getResource("maps");
-            f = new File(mapsDir.toURI());
-        } catch (URISyntaxException ex) {
-            LOG.error("Cant find maps directory", ex);
-        }
-
-        int extensionIndex = gameMapName.indexOf(".map");
-        if (extensionIndex == -1) {
-            throw new FileNotFoundException("GameMap name must have .map extension.");
-        }
-
-        String name = gameMapName.substring(0, extensionIndex);
-        f = new File(f.getPath() + File.separatorChar
-                + gameMapName + File.separatorChar + name + ".xml");
-
-        GameMap gameMap = null;
-        try {
-            gameMap = new GameMapXMLParser().parseAndCreate(f);
-        } catch (SAXException ex) {
-            throw new IOException("SAXException while creating gameMap.");
-        } catch (DOMException ex) {
-            throw new IOException("DOMException while creating gameMap.");
-        } catch (IllegalArgumentException ex) {
-            throw new IOException("Wrong gameMap xml file." + ex.getMessage());
-        }
-
+        GameMap gameMap = gameMapsLoader.createGameMap(gameMapName);
         Game game = new Game(creator, gameMap, gameName, maxPlayers);
 
         return game;

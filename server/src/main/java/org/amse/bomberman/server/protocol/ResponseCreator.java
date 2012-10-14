@@ -1,7 +1,5 @@
 package org.amse.bomberman.server.protocol;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +7,6 @@ import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;
-import org.amse.bomberman.server.util.Creator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +59,7 @@ public class ResponseCreator {
         return singleMessage(messageId, msg);
     }
 
-    public ProtocolMessage illegalState(String action,
-                                                         String stateName) {
+    public ProtocolMessage illegalState(String action, String stateName) {
         String message = "Can`t " + action + " in '" + stateName + "' state.";
 
         return singleMessage(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID, message);
@@ -108,29 +104,31 @@ public class ResponseCreator {
      * If errors occurs during creation of gameMap then message will
      * contain remark about error.
      */
+    @Deprecated
     public ProtocolMessage downloadGameMap(String gameMapName) {
-        List<String> data = new ArrayList<String>();
-
-        int[][] ret = null;
-        try {
-            ret = Creator.createMapAndGetField(gameMapName);
-
-            LOG.info("Session: client downloading gameMap." + " GameMap=" + gameMapName);
-            data.addAll(converter.convertField(ret));
-
-        } catch (FileNotFoundException ex) {
-            LOG.warn("Session: sendMap warning. "
-                    + "Client tryed to download map, canceled. "
-                    + "Map wasn`t founded on server." + " Map=" + gameMapName, ex);
-            data.add("No such map on server.");
-        } catch (IOException ex) {
-            LOG.warn("Session: sendMap error. "
-                    + "Client tryed to download map, canceled. "
-                    + "Error on server side while loading map." + " Map=" + gameMapName, ex);
-            data.add("Error on server side, while loading map.");
-        }
-
-        return message(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID, data);
+//        List<String> data = new ArrayList<String>();
+//
+//        int[][] ret = null;
+//        try {
+//            ret = Creator.createMapAndGetField(gameMapName);
+//
+//            LOG.info("Session: client downloading gameMap." + " GameMap=" + gameMapName);
+//            data.addAll(converter.convertField(ret));
+//
+//        } catch (FileNotFoundException ex) {
+//            LOG.warn("Session: sendMap warning. "
+//                    + "Client tryed to download map, canceled. "
+//                    + "Map wasn`t founded on server." + " Map=" + gameMapName, ex);
+//            data.add("No such map on server.");
+//        } catch (IOException ex) {
+//            LOG.warn("Session: sendMap error. "
+//                    + "Client tryed to download map, canceled. "
+//                    + "Error on server side while loading map." + " Map=" + gameMapName, ex);
+//            data.add("Error on server side, while loading map.");
+//        }
+//
+//        return message(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID, data);
+        return null;
     }
 
     /**

@@ -74,6 +74,7 @@ public enum RequestCommand { //TODO it is better to do interface-subclasses impl
         }
 
     },
+    @Deprecated
     DOWNLOAD_GAME_MAP(ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID) {// "8 mapName"
 
         @Override

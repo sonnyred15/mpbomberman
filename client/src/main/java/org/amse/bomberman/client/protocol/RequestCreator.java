@@ -98,6 +98,7 @@ public class RequestCreator {
         return requestWithEmptyData(ProtocolConstants.CHAT_GET_MESSAGE_ID);
     }
 
+    @Deprecated
     public ProtocolMessage
             requestDownloadGameMap(String gameMapName) {
 

@@ -1,24 +1,19 @@
 package org.amse.bomberman.server.util;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import org.xml.sax.SAXException;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.File;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -40,7 +35,7 @@ public class GameMapXMLParser {//TODO TEST IT!
         }
     }
 
-    public GameMap parseAndCreate(File XMLFile) throws IOException,
+    public GameMap parseAndCreate(File xmlFile) throws IOException,
                                                        SAXException,
                                                        IllegalArgumentException,
                                                        DOMException {
@@ -49,7 +44,7 @@ public class GameMapXMLParser {//TODO TEST IT!
         int[][] field       = null;
         int     maxPlayers  = 0;
 
-        Document xml = docBuilder.parse(XMLFile);
+        Document xml = docBuilder.parse(xmlFile);
 
         /* First child of Document is root element which must be <map name="..."> tag. */
         Node root = xml.getFirstChild();
