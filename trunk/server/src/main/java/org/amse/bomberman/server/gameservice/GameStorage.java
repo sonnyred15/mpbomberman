@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.amse.bomberman.server.gameservice.impl.GameCreator;
 import org.amse.bomberman.server.gameservice.listeners.GameChangeListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class GameStorage implements GameChangeListener {
+    private static final Logger LOG = LoggerFactory.getLogger(GameStorage.class);
+    
     private final GameCreator gameCreator = new GameCreator();
 
     private final List<Game> games
@@ -50,9 +54,9 @@ public class GameStorage implements GameChangeListener {
 
     public void removeGame(Game gameToRemove) {
         if (games.remove(gameToRemove)) {
-            System.out.println("GameStorage: game removed.");
+            LOG.info("GameStorage: game {} removed.", gameToRemove.getGameName());
         } else {
-            System.err.println("GameStorage: removeGame warning. No specified game found.");
+            LOG.warn("GameStorage: removeGame warning. No specified game {} found.", gameToRemove.getGameName());
         }
     }
 
@@ -61,7 +65,7 @@ public class GameStorage implements GameChangeListener {
         try {
             game = games.get(n);
         } catch (IndexOutOfBoundsException ex) {
-            System.err.println("GameStorager: getGame warning. Tryed to get game with illegal ID.");
+            LOG.warn("GameStorager: getGame warning. Tryed to get game with illegal ID.");
         }
 
         return game;

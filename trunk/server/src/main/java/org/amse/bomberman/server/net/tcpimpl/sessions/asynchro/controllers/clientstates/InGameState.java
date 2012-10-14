@@ -9,12 +9,16 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Contr
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.Direction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class InGameState extends AbstractClientState {
+    private static final Logger LOG = LoggerFactory.getLogger(InGameState.class);
+    
     private static final String STATE_NAME = "Game";
 
     private final MyTimer timer = new MyTimer(0);
@@ -31,7 +35,7 @@ public class InGameState extends AbstractClientState {
     @Override
     public ProtocolMessage doMove(Direction direction) {
         if(timer.getDiff() < Constants.GAME_STEP_TIME) {
-            System.out.println("Session: doMove warning. "
+            LOG.warn("Session: doMove warning. "
                     + "Client tryed to move, canceled. "
                     + "Moves allowed only every "
                     + Constants.GAME_STEP_TIME + "ms.");

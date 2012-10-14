@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Kirilchuk V.E.
  */
 class SessionHandler extends SimpleChannelUpstreamHandler implements Session {
-    private static final Logger logger = LoggerFactory.getLogger(SessionHandler.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(SessionHandler.class.getName());
 
     private final Server server;
     private final Set<Session> sessions;
@@ -71,9 +71,8 @@ class SessionHandler extends SimpleChannelUpstreamHandler implements Session {
         } catch (IllegalArgumentException ex) {
             send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
                     "Not supported command."));
-            System.out.println("Session: answerOnCommand error. "
-                    + "Non supported command int from client. "
-                    + ex.getMessage());
+            LOG.warn("Session: answerOnCommand error. "
+                    + "Non supported command int from client.", ex);
         } catch (InvalidDataException ex) {
             send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
                     ex.getMessage()));
@@ -82,7 +81,7 @@ class SessionHandler extends SimpleChannelUpstreamHandler implements Session {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        logger.error("Unexpected exception from downStream", e.getCause());
+        LOG.error("Unexpected exception from downStream", e.getCause());
         e.getChannel().close().awaitUninterruptibly();
         for (SessionEndListener listener : listeners) {
             listener.sessionTerminated(this);

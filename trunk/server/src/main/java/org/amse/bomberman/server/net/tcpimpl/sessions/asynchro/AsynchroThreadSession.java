@@ -23,6 +23,8 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Contr
 import org.amse.bomberman.server.protocol.ResponseCreator;
 import org.amse.bomberman.util.Constants;
 import org.amse.bomberman.util.IOUtilities;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * This class represents asynchronous session between client and server
@@ -32,6 +34,8 @@ import org.amse.bomberman.util.IOUtilities;
  */
 public class AsynchroThreadSession extends AbstractSession {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AsynchroThreadSession.class);
+    
     private final ResponseCreator protocol = new ResponseCreator();
     /** GameStorage for this session. */
     private final ServiceContext context;
@@ -121,16 +125,15 @@ public class AsynchroThreadSession extends AbstractSession {
                 sender.start();
                 cyclicReadAndProcess(in);//main part
             } catch (SocketTimeoutException ex) {
-                System.out.println("Session: terminated by socket timeout. "
-                        + ex.getMessage());
+                LOG.warn("Session: terminated by socket timeout.", ex);
             } catch (IOException ex) {
-                System.err.println("Session: run error. " + ex.getMessage());
+                LOG.warn("Session: run error. ", ex.getMessage());
             } finally {
                 release();
                 IOUtilities.close(in);
             }
 
-            System.out.println("Session: input listening thread shutdowned.");
+            LOG.info("Session: input listening thread shutdowned.");
         }
 
         private void cyclicReadAndProcess(DataInputStream in) throws IOException {
@@ -145,7 +148,7 @@ public class AsynchroThreadSession extends AbstractSession {
 
                 int dataCount = in.readInt();
                 if(dataCount < 0) {
-                    System.err.println("Client sended negative dataCount. Disconnect.");
+                    LOG.warn("Client sended negative dataCount. Disconnect.");
                     break;
                 }
                 
@@ -176,9 +179,8 @@ public class AsynchroThreadSession extends AbstractSession {
             } catch (IllegalArgumentException ex) {
                 send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
                         "Not supported command."));
-                System.out.println("Session: answerOnCommand error. "
-                        + "Non supported command int from client. "
-                        + ex.getMessage());
+                LOG.warn("Session: answerOnCommand error. "
+                        + "Non supported command int from client.", ex);
             } catch (InvalidDataException ex) {
                 send(protocol.notOk(ProtocolConstants.INVALID_REQUEST_MESSAGE_ID,
                         ex.getMessage()));
@@ -189,7 +191,7 @@ public class AsynchroThreadSession extends AbstractSession {
             try {
                 clientSocket.setSoTimeout(timeout); // throws SocketException
             } catch (SocketException ex) {
-                System.err.println("Session: run error. " + ex.getMessage()); // Error in the underlaying TCP protocol.
+                LOG.warn("Session: run error.", ex); // Error in the underlaying TCP protocol.
             }
         }
 

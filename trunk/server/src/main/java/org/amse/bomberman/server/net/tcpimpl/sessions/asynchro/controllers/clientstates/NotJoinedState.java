@@ -8,6 +8,8 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,6 +17,8 @@ import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
  */
 public class NotJoinedState extends AbstractClientState {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NotJoinedState.class);
+    
     private static final String STATE_NAME = "Not Joined";
     private final Controller controller;
 
@@ -57,13 +61,13 @@ public class NotJoinedState extends AbstractClientState {
             return protocol.ok(ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                                 "Game created.");
         } catch (FileNotFoundException ex) {
-            System.out.println("Session: createGame warning. Client tryed to create game, canceled. "
+            LOG.warn("Session: createGame warning. Client tryed to create game, canceled. "
                     + "Map wasn`t founded on server." + " Map=" + gameMapName);
             return protocol.notOk(
                     ProtocolConstants.CREATE_GAME_MESSAGE_ID,
                     "No such map on server.");
         } catch (IOException ex) {
-            System.err.println("Session: createGame error while loadimg map. "
+            LOG.warn("Session: createGame error while loadimg map. "
                     + " Map=" + gameMapName + " " + ex.getMessage());
             return protocol.notOk(
                     ProtocolConstants.CREATE_GAME_MESSAGE_ID,
@@ -79,7 +83,7 @@ public class NotJoinedState extends AbstractClientState {
             case NO_SUCH_UNSTARTED_GAME: {
 
                 // if no unstarted gameParams with such gameID finded
-                System.out.println("Session: client tryed to join gameID=" + gameID
+                LOG.warn("Session: client tryed to join gameID=" + gameID
                         + " ,canceled." + " No such game on server.");
                 return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,
@@ -90,7 +94,7 @@ public class NotJoinedState extends AbstractClientState {
             case GAME_IS_ALREADY_STARTED: {
 
                 // if gameParams with such gameID already started
-                System.out.println("Session: joinGame warning. Client tryed to join gameID="
+                LOG.warn("Session: joinGame warning. Client tryed to join gameID="
                         + gameID + " ,canceled."
                         + " Game is already started. ");
                 return (protocol.notOk(
@@ -100,7 +104,7 @@ public class NotJoinedState extends AbstractClientState {
 
             case GAME_IS_FULL: {
 
-                System.out.println(
+                LOG.warn(
                         "Session: joinGame warning. Client tryed to join to full game, canceled.");
                 return (protocol.notOk(
                         ProtocolConstants.JOIN_GAME_MESSAGE_ID,

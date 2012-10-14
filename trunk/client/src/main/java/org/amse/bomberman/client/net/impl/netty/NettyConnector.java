@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author Kirilchuk V.E.
  */
 public class NettyConnector implements GenericConnector<ProtocolMessage>, ClientHandlerListener {
-    private static Logger logger = LoggerFactory.getLogger(NettyConnector.class);
+    private static Logger LOG = LoggerFactory.getLogger(NettyConnector.class);
 
     private final ClientSocketChannelFactory factory;
 
@@ -53,12 +53,12 @@ public class NettyConnector implements GenericConnector<ProtocolMessage>, Client
         connect.awaitUninterruptibly();
 
         if(!connect.isSuccess()) {
-            logger.info("Client failed to connect to " + host + ":" + port);            
+            LOG.info("Client failed to connect to " + host + ":" + port);            
             throw new ConnectException(connect.getCause().getMessage());
         } else {
             connection = connect.getChannel();            
         }
-        logger.info("Connection established with ." + host + ":" + port);
+        LOG.info("Connection established with ." + host + ":" + port);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class NettyConnector implements GenericConnector<ProtocolMessage>, Client
             throw new IllegalStateException("You are not connected");
         }
         connection.write(message);
-        logger.info("Sended message to channel asynchronously.");
+        LOG.info("Sended message to channel asynchronously.");
     }
 
     @Override
@@ -79,7 +79,7 @@ public class NettyConnector implements GenericConnector<ProtocolMessage>, Client
         if(connection.isOpen()) {
             connection.close().awaitUninterruptibly();
         }
-        logger.info("Connection closed.");
+        LOG.info("Connection closed.");
     }
     
     private void initBootstrap(ClientSocketChannelFactory chanelFactory) {

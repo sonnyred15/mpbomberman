@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import org.amse.bomberman.server.ServiceContext;
+
+import org.amse.bomberman.server.net.Session;
 import org.amse.bomberman.server.net.SessionEndListener;
 import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestExecutor;
-import org.amse.bomberman.server.net.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class that represents basic functionality of session.
@@ -19,6 +21,8 @@ import org.amse.bomberman.server.net.Session;
  * @author Kirilchuk V.E.
  */
 public abstract class AbstractSession implements Session {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractSession.class);
 
     /** Client socket of this session. It can`t be null. */
     protected final Socket clientSocket;
@@ -95,7 +99,7 @@ public abstract class AbstractSession implements Session {
             //force blocking io to unblock
             this.clientSocket.shutdownInput();
         } catch (IOException ex) {
-            System.err.println("Session: terminateSession error. " + ex.getMessage());
+            LOG.warn("Session: terminateSession error.", ex);
         }
     }
 

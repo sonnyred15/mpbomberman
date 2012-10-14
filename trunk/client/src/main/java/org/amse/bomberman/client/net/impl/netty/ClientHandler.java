@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class ClientHandler extends SimpleChannelUpstreamHandler {//TODO not closing channel. Leak.
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClientHandler.class);
     private final ClientHandlerListener listener;
 
     public ClientHandler(ClientHandlerListener listener) {
@@ -27,7 +27,7 @@ public class ClientHandler extends SimpleChannelUpstreamHandler {//TODO not clos
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        logger.error("Unexpected exception from downStream", e.getCause());
+        LOG.error("Unexpected exception from downStream", e.getCause());
         e.getChannel().close().awaitUninterruptibly();
     }
 }

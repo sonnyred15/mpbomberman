@@ -7,6 +7,8 @@ import org.amse.bomberman.server.gameservice.bots.BotGamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Controller;
 import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -14,6 +16,8 @@ import org.amse.bomberman.server.gameservice.impl.NetGamePlayer;
  */
 public class InLobbyState extends AbstractClientState {
 
+    private static final Logger LOG = LoggerFactory.getLogger(InLobbyState.class);
+    
     private static final String STATE_NAME = "Lobby";
     private final Controller controller;
     private final Game game;
@@ -31,7 +35,7 @@ public class InLobbyState extends AbstractClientState {
         switch(joinBotResult) {
             case NOT_OWNER_OF_GAME: {
                 // if not owner of game
-                System.out.println("Session: addBot warning. "
+                LOG.warn("Session: addBot warning. "
                         + "Tryed to add bot to game, canceled. "
                         + "Not owner of the game.");
                 return protocol.notOk(
@@ -40,7 +44,7 @@ public class InLobbyState extends AbstractClientState {
             }
 
             case GAME_IS_FULL: {
-                System.out.println("Session: addBot warning. "
+                LOG.warn("Session: addBot warning. "
                         + "Tryed to add bot, canceled. Game is full.");
                 return protocol.notOk(
                         ProtocolConstants.BOT_ADD_MESSAGE_ID,
@@ -50,7 +54,7 @@ public class InLobbyState extends AbstractClientState {
             case GAME_IS_ALREADY_STARTED: {
 
                 // if game.isStarted() true
-                System.out.println("Session: addbot warning. "
+                LOG.warn("Session: addbot warning. "
                         + "Tryed to add bot to game ,canceled."
                         + " Game is already started.");
                 return protocol.notOk(
@@ -59,7 +63,7 @@ public class InLobbyState extends AbstractClientState {
             }
 
             case RESULT_SUCCESS: {
-                System.out.println("Session: added bot to game."
+                LOG.info("Session: added bot to game."
                         + this.game.getGameName());
                 return protocol.ok(
                         ProtocolConstants.BOT_ADD_MESSAGE_ID,

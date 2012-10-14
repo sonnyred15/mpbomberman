@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
  */
 public class GameCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(GameCreator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GameCreator.class);
     
     /**
      * Creates game.
@@ -45,7 +45,7 @@ public class GameCreator {
             URL mapsDir = GameCreator.class.getClassLoader().getResource("maps");
             f = new File(mapsDir.toURI());
         } catch (URISyntaxException ex) {
-            logger.error("Cant find maps directory", ex);
+            LOG.error("Cant find maps directory", ex);
         }
 
         int extensionIndex = gameMapName.indexOf(".map");

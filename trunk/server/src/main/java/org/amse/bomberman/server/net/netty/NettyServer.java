@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @author Kirilchuk V.E.
  */
 public class NettyServer implements Server {
-    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 
     private Channel server;
 
@@ -45,7 +45,7 @@ public class NettyServer implements Server {
         //binding to port
         server = bootstrap.bind(new InetSocketAddress(port));        
         
-        logger.info("Server started");
+        LOG.info("Server started");
     }
 
     @Override
@@ -59,7 +59,7 @@ public class NettyServer implements Server {
             session.terminateSession();
         }
         context.getGameStorage().clearGames();
-        logger.info("Server end accepting clients.");
+        LOG.info("Server end accepting clients.");
     }
 
     @Override

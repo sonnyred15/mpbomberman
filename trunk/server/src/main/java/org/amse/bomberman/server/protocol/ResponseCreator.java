@@ -10,6 +10,8 @@ import org.amse.bomberman.protocol.ProtocolMessage;
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.impl.Game;
 import org.amse.bomberman.server.util.Creator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Invoker of commands
@@ -17,6 +19,8 @@ import org.amse.bomberman.server.util.Creator;
  */
 public class ResponseCreator {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ResponseCreator.class);
+    
     private final GenericConverter<String> converter;
 
     /**
@@ -111,20 +115,18 @@ public class ResponseCreator {
         try {
             ret = Creator.createMapAndGetField(gameMapName);
 
-            System.out.println("Session: client downloading gameMap." + " GameMap=" + gameMapName);
+            LOG.info("Session: client downloading gameMap." + " GameMap=" + gameMapName);
             data.addAll(converter.convertField(ret));
 
         } catch (FileNotFoundException ex) {
-            System.out.println("Session: sendMap warning. "
+            LOG.warn("Session: sendMap warning. "
                     + "Client tryed to download map, canceled. "
-                    + "Map wasn`t founded on server." + " Map=" + gameMapName + " "
-                    + ex.getMessage());
+                    + "Map wasn`t founded on server." + " Map=" + gameMapName, ex);
             data.add("No such map on server.");
         } catch (IOException ex) {
-            System.out.println("Session: sendMap error. "
+            LOG.warn("Session: sendMap error. "
                     + "Client tryed to download map, canceled. "
-                    + "Error on server side while loading map." + " Map=" + gameMapName
-                    + " " + ex.getMessage());
+                    + "Error on server side while loading map." + " Map=" + gameMapName, ex);
             data.add("Error on server side, while loading map.");
         }
 
@@ -158,10 +160,10 @@ public class ResponseCreator {
         List<String> data = converter.convertGameMapsList();
 
         if (data.isEmpty()) {
-            System.out.println("Session: sendMapsList error. No maps founded on server.");
+            LOG.warn("Session: sendMapsList error. No maps founded on server.");
             data.add("No maps on server was founded.");
         } else {
-            System.out.println("Session: sended maps list to client. Maps count="
+            LOG.info("Session: sended maps list to client. Maps count="
                     + (data.size() - 1));
         }
 
