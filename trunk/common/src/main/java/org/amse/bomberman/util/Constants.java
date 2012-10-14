@@ -1,7 +1,5 @@
 package org.amse.bomberman.util;
 
-import java.io.File;
-
 /**
  *
  * @author Kirilchuk V.E
@@ -37,13 +35,4 @@ public final class Constants {
     public static final int DEFAULT_CLIENT_TIMEOUT = 300000;
     
     public static final String DEFAULT_FILE_LOG_NAME = "server.log";
-    public static File RESOURSES_GAMEMAPS_DIRECTORY;
-    static{
-        String path = Constants.class.getProtectionDomain()
-                        .getCodeSource().getLocation().getPath();
-        File f = new File(path);
-        f = f.getParentFile();
-        f = new File(f.getPath() + "/resources/maps");
-        RESOURSES_GAMEMAPS_DIRECTORY = f;
-    }
 }

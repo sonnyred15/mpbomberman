@@ -143,6 +143,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
     }
 
     @Override
+    @Deprecated
     public void sendDownloadingGameMap(List<String> args) throws
             InvalidDataException {
         checkArgsNum(args, 1, ProtocolConstants.DOWNLOAD_GAME_MAP_MESSAGE_ID,

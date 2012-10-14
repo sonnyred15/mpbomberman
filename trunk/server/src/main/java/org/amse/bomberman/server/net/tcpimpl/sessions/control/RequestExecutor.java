@@ -29,6 +29,7 @@ public interface RequestExecutor {
 
     void tryPlaceBomb() throws InvalidDataException ;
 
+    @Deprecated
     void sendDownloadingGameMap(List<String> args) throws InvalidDataException ;
 
     void sendGameStatus() throws InvalidDataException ;

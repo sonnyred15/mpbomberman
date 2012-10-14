@@ -16,7 +16,9 @@ public class Main {
      * 
      * @param args the command line arguments. Not supported.
      */
-    public static void main(String[] args) {//TODO make console start. GUI only for special
+    public static void main(String[] args) {
+        //TODO: make console start. GUI only for special
+        //TODO: create config file in resources for server config
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
