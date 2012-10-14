@@ -5,23 +5,23 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Logger;
+
 import org.amse.bomberman.client.net.ConnectorListener;
 import org.amse.bomberman.client.net.GenericConnector;
-import org.amse.bomberman.client.net.NetException;
-import org.amse.bomberman.protocol.GenericProtocolMessage;
 import org.amse.bomberman.protocol.ProtocolMessage;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class NettyConnector implements GenericConnector<ProtocolMessage>, ClientHandlerListener {
-    private static Logger logger = Logger.getLogger(NettyConnector.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(NettyConnector.class);
 
     private final ClientSocketChannelFactory factory;
 
@@ -53,7 +53,7 @@ public class NettyConnector implements GenericConnector<ProtocolMessage>, Client
         connect.awaitUninterruptibly();
 
         if(!connect.isSuccess()) {
-            logger.warning("Client failed to connect to " + host + ":" + port);            
+            logger.info("Client failed to connect to " + host + ":" + port);            
             throw new ConnectException(connect.getCause().getMessage());
         } else {
             connection = connect.getChannel();            

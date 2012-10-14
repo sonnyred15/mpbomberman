@@ -5,21 +5,21 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.amse.bomberman.common.threadfactory.DaemonThreadFactory;
 import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.netty.NettyServer;
 import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 public class ServerFactory {
-    private static final Logger logger = Logger.getLogger(ServerFactory.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ServerFactory.class);
 
     private final Properties defaults = new Properties();
     {
@@ -33,12 +33,12 @@ public class ServerFactory {
         try {
             InputStream in = getClass().getResourceAsStream("/server.conf");
             if(in == null) {
-                logger.log(Level.SEVERE, "No server config founded.");
+                logger.warn("No server config founded.");
             } else {
                 config.load(in);
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "IOException while reading server config.", ex);
+            logger.error("IOException while reading server config.", ex);
         }
     }
 
@@ -49,7 +49,7 @@ public class ServerFactory {
         } else if("default".equalsIgnoreCase(server)) {
             return newSimpleServer(context);
         } else {
-            logger.log(Level.SEVERE, "No factory for specified server(" + server + ")");
+            logger.error("No factory for specified server(" + server + ")");
             throw new RuntimeException("Can`t instantiate server(" + server + ")");
         }
         

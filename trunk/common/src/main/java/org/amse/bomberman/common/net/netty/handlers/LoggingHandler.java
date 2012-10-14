@@ -1,12 +1,12 @@
 package org.amse.bomberman.common.net.netty.handlers;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jboss.netty.channel.ChannelDownstreamHandler;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelUpstreamHandler;
 import org.jboss.netty.channel.ExceptionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -14,7 +14,7 @@ import org.jboss.netty.channel.ExceptionEvent;
  */
 public class LoggingHandler implements ChannelUpstreamHandler, ChannelDownstreamHandler {
 
-    private static final Logger logger = Logger.getLogger(LoggingHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(LoggingHandler.class);
 
     @Override
     public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e) throws Exception {
@@ -29,14 +29,14 @@ public class LoggingHandler implements ChannelUpstreamHandler, ChannelDownstream
     }
 
     private void log(ChannelEvent e) {
-        if (logger.isLoggable(Level.FINEST)) {
+        if (logger.isTraceEnabled()) {
 
             String msg = e.toString();
             // Log the message (and exception if available.)
             if (e instanceof ExceptionEvent) {
-                logger.log(Level.WARNING, msg, ((ExceptionEvent) e).getCause());
+                logger.trace(msg, ((ExceptionEvent) e).getCause());
             } else {
-                logger.log(Level.FINEST, msg);
+                logger.trace(msg);
             }
         }
     }

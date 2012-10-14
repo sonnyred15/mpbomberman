@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.amse.bomberman.protocol.InvalidDataException;
 import org.amse.bomberman.protocol.ProtocolConstants;
 import org.amse.bomberman.protocol.ProtocolMessage;
@@ -17,20 +16,20 @@ import org.amse.bomberman.server.net.tcpimpl.sessions.asynchro.controllers.Contr
 import org.amse.bomberman.server.net.tcpimpl.sessions.control.RequestCommand;
 import org.amse.bomberman.server.protocol.ResponseCreator;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.group.ChannelGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Kirilchuk V.E.
  */
 class SessionHandler extends SimpleChannelUpstreamHandler implements Session {
-    private static final Logger logger = Logger.getLogger(SessionHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SessionHandler.class.getName());
 
     private final Server server;
     private final Set<Session> sessions;
@@ -83,9 +82,7 @@ class SessionHandler extends SimpleChannelUpstreamHandler implements Session {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        logger.log(Level.WARNING,
-                "Unexpected exception from downStream",
-                e.getCause());
+        logger.error("Unexpected exception from downStream", e.getCause());
         e.getChannel().close().awaitUninterruptibly();
         for (SessionEndListener listener : listeners) {
             listener.sessionTerminated(this);
