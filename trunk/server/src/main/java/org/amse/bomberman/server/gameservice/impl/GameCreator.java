@@ -3,11 +3,15 @@ package org.amse.bomberman.server.gameservice.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.amse.bomberman.server.gameservice.GamePlayer;
 import org.amse.bomberman.server.gameservice.gamemap.impl.GameMap;
 import org.amse.bomberman.server.util.GameMapXMLParser;
 import org.amse.bomberman.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
@@ -17,6 +21,8 @@ import org.xml.sax.SAXException;
  */
 public class GameCreator {
 
+    private static final Logger logger = LoggerFactory.getLogger(GameCreator.class);
+    
     /**
      * Creates game.
      * @param gameMapName name of gameMap.
@@ -34,7 +40,13 @@ public class GameCreator {
         }
 
         //TODO all below must do spesial builder, not storage.
-        File f = Constants.RESOURSES_GAMEMAPS_DIRECTORY;
+        File f = null;
+        try {
+            URL mapsDir = GameCreator.class.getClassLoader().getResource("maps");
+            f = new File(mapsDir.toURI());
+        } catch (URISyntaxException ex) {
+            logger.error("Cant find maps directory", ex);
+        }
 
         int extensionIndex = gameMapName.indexOf(".map");
         if (extensionIndex == -1) {

@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,6 +17,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.amse.bomberman.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //~--- JDK imports ------------------------------------------------------------
 
 /**
@@ -24,6 +28,8 @@ import org.amse.bomberman.util.Constants;
  */
 public class Creator {
 
+    private static final Logger logger = LoggerFactory.getLogger(Creator.class);
+    
     private Creator() {}
 
     /**
@@ -46,15 +52,23 @@ public class Creator {
     private static String[] createGameMapsListFromDirectory() {
         assert Constants.RESOURSES_GAMEMAPS_DIRECTORY != null;
 
-        String[] list = Constants.RESOURSES_GAMEMAPS_DIRECTORY.list(new FilenameFilter() {
+        String[] result = null;
+        
+        try {
+            URL url = Creator.class.getClassLoader().getResource("maps");
+            File mapsDir = new File(url.toURI());
+            result = mapsDir.list(new FilenameFilter() {
 
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".map");
-            }
-        });
-
-        return list;
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".map");
+                }
+            });
+        } catch (URISyntaxException ex) {
+            logger.error("Can`t get maps list!", ex);
+        }
+        
+        return result;
     }
 
     /**

@@ -165,7 +165,7 @@ public class Controller implements RequestExecutor, SessionEndListener, GameStor
 
     @Override
     public void tryAddBot(List<String> args) throws InvalidDataException {
-        checkArgsNum(args, 1, ProtocolConstants.BOT_ADD_MESSAGE_ID,
+        checkArgsNum(args, 0, ProtocolConstants.BOT_ADD_MESSAGE_ID,
                 "Wrong number of arguments.");
 
         String botName = Creator.randomBotName();
