@@ -35,7 +35,7 @@ class StoppedState implements ServerState {
 
         server.setServerState(StartedState.getInstance());
         server.getListeningThread().start();
-        LOG.info("Server: started. You can connect to port: " + server.getPort());
+        LOG.info("Server started. You can connect to port: " + server.getPort());
     }
 
     @Override

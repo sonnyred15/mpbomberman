@@ -25,7 +25,7 @@ class StartedState implements ServerState {
     @Override
     public void start(TcpServer server, int port) throws IOException,
                                                IllegalStateException {
-        LOG.error("Server: start error. Already in started state.");
+        LOG.error("Server start error. Already in started state.");
         throw new IllegalStateException("Server: start error. "
                 + "Already in started state.");
 
@@ -57,7 +57,7 @@ class StartedState implements ServerState {
         }
 
         server.setServerState(StoppedState.getInstance());
-        LOG.info("Server: shutdowned.");
+        LOG.info("Server shutdowned.");
     }
 
 }
