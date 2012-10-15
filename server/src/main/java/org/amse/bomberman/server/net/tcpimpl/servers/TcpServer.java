@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import org.amse.bomberman.server.ServerConfig;
 import org.amse.bomberman.server.ServiceContext;
 
 import org.amse.bomberman.server.net.*;
@@ -50,9 +52,9 @@ public class TcpServer implements Server {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void start(int port) throws IOException,
+    public synchronized void start(ServerConfig config) throws IOException,
                                             IllegalStateException {
-        serverState.start(this, port);
+        serverState.start(this, config.getPort());
     }
 
     /**
