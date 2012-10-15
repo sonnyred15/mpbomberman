@@ -27,7 +27,7 @@ public class ParserImpl implements Parser {
                 throw new IllegalArgumentException("Empty or null data.");
             }
 
-            LOG.info("Start parsing gameMap.");
+            LOG.trace("Start parsing gameMap.");
             if (LOG.isDebugEnabled()) {
                 for (String string : list) {
                     LOG.debug(string);
@@ -72,7 +72,7 @@ public class ParserImpl implements Parser {
                 throw new IllegalArgumentException("Empty or null data.");
             }
 
-            LOG.info("Start parsing player.");
+            LOG.trace("Start parsing player.");
             if (LOG.isDebugEnabled()) {
                 for (String string : list) {
                     LOG.debug(string);
