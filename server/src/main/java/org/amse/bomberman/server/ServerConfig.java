@@ -16,4 +16,9 @@ public class ServerConfig {
     public String getServerType() {
         return config.getProperty("server.type", "simple");
     }
+    
+    @Override
+    public String toString() {
+        return config.toString();
+    }
 }
