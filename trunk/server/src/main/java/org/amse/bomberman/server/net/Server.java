@@ -2,8 +2,9 @@ package org.amse.bomberman.server.net;
 
 import java.io.IOException;
 import java.util.Set;
+
+import org.amse.bomberman.server.ServerConfig;
 import org.amse.bomberman.server.ServiceContext;
-import org.amse.bomberman.server.gameservice.GameStorage;
 
 /**
  * Interface that represents server.
@@ -14,11 +15,13 @@ import org.amse.bomberman.server.gameservice.GameStorage;
 public interface Server extends SessionEndListener {
 
     /**
-     * Raise server on it`s port.
+     * Raise server with specified configuration.
+     * 
+     * @param config server configuration.
      * @throws IOException if any IO errors occurs while raising server.
      * @throws IllegalStateException if server was already raised.
      */
-    void start(int port) throws IOException, IllegalStateException;
+    void start(ServerConfig config) throws IOException, IllegalStateException;
 
     /**
      * Shutdown`s server, so it stop`s to listen on it`s port and unavailiable

@@ -1,7 +1,10 @@
 package org.amse.bomberman.server;
 
-import org.amse.bomberman.server.view.ServerFrame;
-import javax.swing.SwingUtilities;
+import java.io.IOException;
+
+import org.amse.bomberman.server.net.Server;
+import org.amse.bomberman.server.net.ServerFactory;
+import org.amse.bomberman.server.util.ServerConfigLoader;
 
 /**
  * Main class of application.
@@ -15,16 +18,21 @@ public class Main {
      * Initialize view.
      * 
      * @param args the command line arguments. Not supported.
+     * @throws IOException if io errors occur during configuration load
      */
-    public static void main(String[] args) {
-        //TODO: make console start. GUI only for special
-        //TODO: create config file in resources for server config
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                new ServerFrame();
-            }
-        });
+    public static void main(String[] args) throws IOException {
+        ServerConfigLoader configLoader = new ServerConfigLoader();
+        ServerConfig config = configLoader.load();
+        ServerFactory serverFactory = new ServerFactory();
+        ServiceContext context = new ServiceContext();
+        Server server = serverFactory.newInstance(config, context);
+        server.start(config);
+        
+//        What about some stats printed to console?
+//        private final String CLIENTS_LABEL_TEXT         = "Clients: ";
+//        private final String PORT_LABEL_TEXT            = "Port: ";
+//        private final String SHUTDOWNED_LABEL_TEXT      = "Shutdowned: ";
+//        private final String STARTED_GAMES_LABEL_TEXT   = "Started games: ";
+//        private final String UNSTARTED_GAMES_LABEL_TEXT = "Unstarted games: ";
     }
 }

@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.amse.bomberman.server.ServerConfig;
 import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.Server;
 import org.amse.bomberman.server.net.Session;
@@ -32,7 +33,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public synchronized void start(int port) {
+    public synchronized void start(ServerConfig config) {
         if (server != null && server.isBound()) {
             throw new IllegalStateException("Already in started state.");
         }
@@ -43,7 +44,7 @@ public class NettyServer implements Server {
         bootstrap.setPipelineFactory(new ServerPipelineFactory(this, sessions));
 
         //binding to port
-        server = bootstrap.bind(new InetSocketAddress(port));        
+        server = bootstrap.bind(new InetSocketAddress(config.getPort()));        
         
         LOG.info("Server started");
     }

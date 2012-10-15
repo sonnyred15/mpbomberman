@@ -1,11 +1,10 @@
 package org.amse.bomberman.server.net;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import org.amse.bomberman.common.threadfactory.DaemonThreadFactory;
+import org.amse.bomberman.server.ServerConfig;
 import org.amse.bomberman.server.ServiceContext;
 import org.amse.bomberman.server.net.netty.NettyServer;
 import org.amse.bomberman.server.net.tcpimpl.servers.TcpServer;
@@ -21,35 +20,16 @@ import org.slf4j.LoggerFactory;
 public class ServerFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ServerFactory.class);
 
-    private final Properties defaults = new Properties();
-    {
-        defaults.setProperty("server", "default");
-    }
+    public ServerFactory() {}
 
-    private final Properties config;
-
-    public ServerFactory() {
-        config = new Properties(defaults);
-        try {
-            InputStream in = getClass().getResourceAsStream("/server.conf");
-            if(in == null) {
-                LOG.warn("No server config founded.");
-            } else {
-                config.load(in);
-            }
-        } catch (IOException ex) {
-            LOG.error("IOException while reading server config.", ex);
-        }
-    }
-
-    public Server newInstance(ServiceContext context) {
-        String server = config.getProperty("server");
+    public Server newInstance(ServerConfig config, ServiceContext context) {
+        String server = config.getServerType();
         if("netty".equalsIgnoreCase(server)) {
             return newNettyServer(context);
-        } else if("default".equalsIgnoreCase(server)) {
+        } else if("simple".equalsIgnoreCase(server)) {
             return newSimpleServer(context);
         } else {
-            LOG.error("No factory for specified server(" + server + ")");
+            LOG.error("Unknown server type(" + server + ")");
             throw new RuntimeException("Can`t instantiate server(" + server + ")");
         }
         
